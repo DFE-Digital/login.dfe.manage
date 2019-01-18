@@ -77,12 +77,20 @@
 
 
     <main id="content" tabindex="-1">
+        <% if (locals.backLink !== undefined) { %>
+            <% if (locals.backLink === true) { %>
+                <div class="js-back-link"></div>
+            <% } else { %>
+            <a href="<%-locals.backLink%>" class="link-back">Back</a>
+            <% } %>
+        <% } %>
+
         <%- body %>
     </main>
 
 </div>
 
-<footer id="footer">
+<footer id="footer"
     <div class="footer-wrapper">
         <nav>
             <ul>
