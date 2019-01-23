@@ -5,7 +5,7 @@ const logger = require('../../infrastructure/logger');
 const { asyncWrapper } = require('login.dfe.express-error-handling');
 
 const { getDashboard } = require('./getDashboard');
-const { getServiceConfig } = require('./serviceConfig');
+const { getServiceConfig, postServiceConfig } = require('./serviceConfig');
 const router = express.Router({ mergeParams: true });
 
 const services = (csrf) => {
@@ -16,7 +16,7 @@ const services = (csrf) => {
   router.get('/:sid', csrf, asyncWrapper(getDashboard));
 
   router.get('/:sid/service-configuration', csrf, asyncWrapper(getServiceConfig));
-
+  router.post('/:sid/service-configuration', csrf, asyncWrapper(postServiceConfig));
   return router;
 };
 

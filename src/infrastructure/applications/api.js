@@ -44,6 +44,39 @@ const getServiceById = async (id, correlationId) => {
   return await callApi(`services/${id}`, 'GET', undefined, correlationId);
 };
 
+const updateService = async (id, serviceDetails, correlationId) => {
+  const body = {};
+  if (serviceDetails.name) {
+    body.name = serviceDetails.name
+  }
+  if (serviceDetails.description) {
+    body.description = serviceDetails.description
+  }
+  if (serviceDetails.serviceHome) {
+    body.serviceHome = serviceDetails.serviceHome
+  }
+  if (serviceDetails.postResetUrl) {
+    body.postResetUrl = serviceDetails.postResetUrl
+  }
+  if (serviceDetails.clientId) {
+    body.clientId = serviceDetails.clientId
+  }
+  if (serviceDetails.redirect_uris) {
+    body.redirect_uris = serviceDetails.redirect_uris
+  }
+  if (serviceDetails.post_logout_redirect_uris) {
+    body.post_logout_redirect_uris = serviceDetails.post_logout_redirect_uris
+  }
+  if (serviceDetails.grant_types) {
+    body.grant_types = serviceDetails.grant_types
+  }
+  if (serviceDetails.response_types) {
+    body.response_types = serviceDetails.response_types
+  }
+  return await callApi(`services/${id}`, 'PATCH', body, correlationId);
+};
+
 module.exports = {
   getServiceById,
+  updateService
 };
