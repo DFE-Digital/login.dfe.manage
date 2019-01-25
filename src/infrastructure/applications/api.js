@@ -49,7 +49,7 @@ const updateService = async (id, serviceDetails, correlationId) => {
   if (serviceDetails.name) {
     body.name = serviceDetails.name
   }
-  if (serviceDetails.description) {
+  if (serviceDetails.description || serviceDetails.description === '') {
     body.description = serviceDetails.description
   }
   if (serviceDetails.serviceHome) {
@@ -60,6 +60,9 @@ const updateService = async (id, serviceDetails, correlationId) => {
   }
   if (serviceDetails.clientId) {
     body.clientId = serviceDetails.clientId
+  }
+  if (serviceDetails.clientSecret) {
+    body.clientSecret = serviceDetails.clientSecret
   }
   if (serviceDetails.redirect_uris) {
     body.redirect_uris = serviceDetails.redirect_uris
@@ -72,6 +75,9 @@ const updateService = async (id, serviceDetails, correlationId) => {
   }
   if (serviceDetails.response_types) {
     body.response_types = serviceDetails.response_types
+  }
+  if (serviceDetails.apiSecret) {
+    body.apiSecret = serviceDetails.apiSecret
   }
   return await callApi(`services/${id}`, 'PATCH', body, correlationId);
 };

@@ -46,8 +46,13 @@
                         Description
                     </dt>
                     <dd class="app-check-your-answers__answer">
-                        <label for="description" class="vh">Service description</label>
+                        <div class="form-group <%= (locals.validationMessages.description !== undefined) ? 'form-group-error' : '' %>">
+                            <label for="description" class="vh">Service description</label>
+                            <% if (locals.validationMessages.description !== undefined) { %>
+                            <p class="error-message" id="validation-name"><%=locals.validationMessages.description %></p>
+                            <% } %>
                             <textarea class="form-control inputConfig" id="description" name="description" rows = '5' style="resize:none;"><%=locals.service.description%></textarea>
+                        </div>
                     </dd>
 
                 </div>
@@ -72,8 +77,10 @@
                         Post-reset Url
                     </dt>
                     <dd class="app-check-your-answers__answer">
-                        <label for="postResetUrl" class="vh">Post-reset Url</label>
-                        <input class="form-control inputConfig" id="postResetUrl" name="postResetUrl" type="text" value="<%=locals.service.relyingParty.postResetUrl%>">
+                        <div class="form-group <%= (locals.validationMessages.postResetUrl !== undefined) ? 'form-group-error' : '' %>">
+                            <label for="postResetUrl" class="vh">Post-reset Url</label>
+                            <input class="form-control inputConfig" id="postResetUrl" name="postResetUrl" type="text" value="<%=locals.service.relyingParty.postResetUrl%>">
+                        </div>
                     </dd>
                 </div>
             </dl>
@@ -106,10 +113,12 @@
                         Client secret
                     </dt>
                     <dd class="app-check-your-answers__answer">
-                        <label for="clientSecret" class="vh">Client secret</label>
-                        <a href="" class="pull-right" id="generate-client-secret">Regenerate</a>
-                        <div class="show-password full-width" style="width: 75%">
-                            <input class="form-control" id="clientSecret" name="clientSecret" type="password" value="<%=locals.service.relyingParty.client_secret%>" disabled="disabled">
+                        <div class="form-group">
+                            <label for="clientSecret" class="vh">Client secret</label>
+                            <a href="" class="pull-right" id="generate-client-secret">Regenerate</a>
+                            <div class="show-password full-width" style="width: 75%">
+                                <input class="form-control" id="clientSecret" name="clientSecret" type="password" value="<%=locals.service.relyingParty.client_secret%>" readonly="readonly">
+                            </div>
                         </div>
                     </dd>
 
@@ -120,9 +129,12 @@
                         Redirect Urls
                     </dt>
                     <dd class="app-check-your-answers__answer">
-                        <div id ="redirect-url">
+                        <div id ="redirect-url" class="form-group <%= (locals.validationMessages.redirect_uris !== undefined) ? 'form-group-error' : '' %>">
                             <a href="" class="pull-right" id="add-redirect">Add Url</a>
                             <% if (locals.service.relyingParty.redirect_uris.length > 0) { %>
+                                <% if (locals.validationMessages.redirect_uris !== undefined) { %>
+                                <p class="error-message" id="validation-homeUrl"><%=locals.validationMessages.redirect_uris %></p>
+                                <% } %>
                                 <% for (let i=0; i < locals.service.relyingParty.redirect_uris.length; i++) {
                                 const redirect_uri = locals.service.relyingParty.redirect_uris[i]%>
                                 <label for="<%=redirect_uri%>" class="vh">Redirect url</label>
@@ -130,6 +142,9 @@
                                 <% } %>
                             <% } else { %>
                             <label for="redirect" class="vh">Redirect url</label>
+                                <% if (locals.validationMessages.redirect_uris !== undefined) { %>
+                                <p class="error-message" id="validation-homeUrl"><%=locals.validationMessages.redirect_uris %></p>
+                                <% } %>
                             <p><input class="form-control inputConfig" id="redirect" name="redirect_uris"></p>
                             <% } %>
                         </div>
@@ -161,37 +176,59 @@
 
                 <div class="app-check-your-answers__contents">
                     <dt class="app-check-your-answers__question">
-                        Grant types
+                        <p class="check-your-answers-paragraph">Grant types</p>
                     </dt>
                     <dd class="app-check-your-answers__answer">
                         <div class="form-group">
-                            <label class="form-label vh" for="grant_types">Grant types</label>
-                            <select class="form-control inputConfig" id="grant_types" name="grant_types">
-                                <option disabled <%= locals.grantTypes === '' ? 'selected="selected"' : ''%> value>Select grant type</option>
-                                <option <%= locals.grantTypes === 'authorization_code' ? 'selected="selected"' : ''%> value="authorization_code">authorization_code</option>
-                                <option <%= locals.grantTypes === 'implicit' ? 'selected="selected"' : ''%>value="implicit">implicit</option>
-                                <option <%= locals.grantTypes === 'client_credentials' ? 'selected="selected"' : ''%>value="client_credentials">client_credentials</option>
-                            </select>
+                            <div class="multiple-choice">
+                                <input id="authorization_code" type="checkbox" name="grant_types" value="authorization_code" <%=locals.grantTypes.includes('authorization_code') ? 'checked' : ''%>>
+                                <label for="authorization_code">authorization_code</label>
+                            </div>
+                            <div class="multiple-choice">
+                                <input id="implicit" type="checkbox" name="grant_types" value="implicit" <%=locals.grantTypes.includes('implicit') ? 'checked' : ''%>>
+                                <label for="implicit">implicit</label>
+                            </div>
+                            <div class="multiple-choice">
+                                <input id="client_credentials" type="checkbox" name="grant_types" value="client_credentials" <%=locals.grantTypes.includes('client_credentials') ? 'checked' : ''%>>
+                                <label for="client_credentials">client_credentials</label>
+                            </div>
                         </div>
                     </dd>
                 </div>
 
                 <div class="app-check-your-answers__contents">
                     <dt class="app-check-your-answers__question">
-                        Response types
+                        <p class="check-your-answers-paragraph">Response types</p>
                     </dt>
                     <dd class="app-check-your-answers__answer">
                         <div class="form-group">
-                            <label class="form-label vh" for="response_types">Response types</label>
-                            <select class="form-control inputConfig" id="response_types" name="response_types">
-                                <option disabled <%= locals.responseTypes === '' ? 'selected="selected"' : ''%> value>Select response type</option>
-                                <option <%= locals.responseTypes === 'code,id_token,token' ? 'selected="selected"' : ''%> value="code,id_token,token">code, id_token, token</option>
-                                <option <%= locals.responseTypes === 'code,id_token' ? 'selected="selected"' : ''%>value="code,id_token">code, id_token</option>
-                                <option <%= locals.responseTypes === 'code,token' ? 'selected="selected"' : ''%> value="code,token">code, token</option>
-                                <option <%= locals.responseTypes === 'code' ? 'selected="selected"' : ''%> value="code">code</option>
-                                <option <%= locals.responseTypes === 'id_token,token' ? 'selected="selected"' : ''%> value="id_token,token">id_token, token</option>
-                                <option <%= locals.responseTypes === 'id_token' ? 'selected="selected"' : ''%> value="id_token">id_token</option>
-                                <option <%= locals.responseTypes === '' ? 'selected="selected"' : ''%> value="none">none</option>
+                            <div class="multiple-choice">
+                                <input id="code" type="checkbox" name="response_types" value="code" <%=locals.responseTypes.includes('code') ? 'checked' : ''%>>
+                                <label for="code">code</label>
+                            </div>
+                            <div class="multiple-choice">
+                                <input id="id_token" type="checkbox" name="response_types" value="id_token" <%=locals.responseTypes.includes('id_token') ? 'checked' : ''%>>
+                                <label for="id_token">id_token</label>
+                            </div>
+                            <div class="multiple-choice">
+                                <input id="token" type="checkbox" name="response_types" value="token" <%=locals.responseTypes.includes('token') ? 'checked' : ''%>>
+                                <label for="token">token</label>
+                            </div>
+                        </div>
+                    </dd>
+                </div>
+
+                <div class="app-check-your-answers__contents">
+                    <dt class="app-check-your-answers__question">
+                        Token endpoint authentication method
+                    </dt>
+                    <dd class="app-check-your-answers__answer">
+                        <div class="form-group">
+                            <label class="form-label vh" for="tokenEndpointAuthMethod">Token endpoint auth method</label>
+                            <select class="form-control inputConfig" id="tokenEndpointAuthMethod" name="tokenEndpointAuthMethod">
+                                <option disabled value>Select token endpoint authentication method</option>
+                                <option <%= locals.service.relyingParty.token_endpoint_auth_method && locals.service.relyingParty.token_endpoint_auth_method === 'client_secret_post' ? 'selected="selected"' : ''%> value="client_secret_post">client_secret_post</option>
+                                <option <%= !locals.service.relyingParty.token_endpoint_auth_method ? 'selected="selected"' : ''%>value="none">none</option>
                             </select>
                         </div>
                     </dd>
@@ -211,9 +248,12 @@
                         Secret
                     </dt>
                     <dd class="app-check-your-answers__answer">
-                        <label class="form-label vh" for="apiSecret"></label>
-                        <div class="show-password full-width" style="width: 75%">
-                            <input class="form-control" id="apiSecret" name="apiSecret" type="password" value="<%=locals.service.relyingParty.api_secret%>" disabled="disabled">
+                        <div class="form-group">
+                            <label class="form-label vh" for="apiSecret"></label>
+                            <a href="" class="pull-right" id="generate-api-secret">Regenerate</a>
+                            <div class="show-password full-width" style="width: 75%">
+                                <input class="form-control" id="apiSecret" name="apiSecret" type="password" value="<%=locals.service.relyingParty.api_secret%>" readonly="readonly">
+                            </div>
                         </div>
                     </dd>
                 </div>
