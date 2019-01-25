@@ -5,6 +5,7 @@ const logger = require('./infrastructure/logger');
 const https = require('https');
 const path = require('path');
 const config = require('./infrastructure/config');
+const configSchema = require('./infrastructure/config/schema');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const sanitization = require('login.dfe.sanitization');
@@ -15,6 +16,7 @@ const { getErrorHandler } = require('login.dfe.express-error-handling');
 
 const registerRoutes = require('./routes');
 
+configSchema.validate();
 
 const init = async () => {
   const csrf = csurf({

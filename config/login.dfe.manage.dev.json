@@ -17,7 +17,8 @@
     }
   },
   "loggerSettings": {
-    "applicationName": "Manage"
+    "applicationName": "Manage",
+    "logLevel": "debug"
   },
   "applications": {
     "type":"static"
