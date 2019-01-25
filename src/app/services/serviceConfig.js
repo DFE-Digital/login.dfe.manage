@@ -59,6 +59,10 @@ const validate = async (req) => {
     model.validationMessages.clientId = 'Client Id must be present'
   }
 
+  if(!urlValidation.test(req.body.postResetUrl)) {
+    model.validationMessages.postResetUrl = 'Please enter a valid Post-reset url'
+  }
+
   if(!selectedRedirects || !selectedRedirects.length > 0) {
     model.validationMessages.redirect_uris = 'At least one redirect url must be specified'
   } else if (selectedRedirects.some(x => !urlValidation.test(x))) {

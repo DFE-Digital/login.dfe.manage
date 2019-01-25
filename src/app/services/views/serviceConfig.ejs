@@ -79,6 +79,9 @@
                     <dd class="app-check-your-answers__answer">
                         <div class="form-group <%= (locals.validationMessages.postResetUrl !== undefined) ? 'form-group-error' : '' %>">
                             <label for="postResetUrl" class="vh">Post-reset Url</label>
+                            <% if (locals.validationMessages.postResetUrl !== undefined) { %>
+                            <p class="error-message" id="validation-homeUrl"><%=locals.validationMessages.postResetUrl %></p>
+                            <% } %>
                             <input class="form-control inputConfig" id="postResetUrl" name="postResetUrl" type="text" value="<%=locals.service.relyingParty.postResetUrl%>">
                         </div>
                     </dd>
@@ -113,11 +116,14 @@
                         Client secret
                     </dt>
                     <dd class="app-check-your-answers__answer">
-                        <div class="form-group">
+                        <div class="form-group <%= (locals.validationMessages.clientSecret !== undefined) ? 'form-group-error' : '' %>">
                             <label for="clientSecret" class="vh">Client secret</label>
                             <a href="" class="pull-right" id="generate-client-secret">Regenerate</a>
+                            <% if (locals.validationMessages.clientSecret !== undefined) { %>
+                            <p class="error-message" id="validation-homeUrl"><%=locals.validationMessages.clientSecret %></p>
+                            <% } %>
                             <div class="show-password full-width" style="width: 75%">
-                                <input class="form-control" id="clientSecret" name="clientSecret" type="password" value="<%=locals.service.relyingParty.client_secret%>" readonly="readonly">
+                                <input class="form-control read-only-input" id="clientSecret" name="clientSecret" type="password" value="<%=locals.service.relyingParty.client_secret%>" readonly="readonly">
                             </div>
                         </div>
                     </dd>
@@ -157,10 +163,13 @@
                     </dt>
 
                     <dd class="app-check-your-answers__answer">
-                        <div id ="logout-url">
+                        <div id ="logout-url" class="form-group <%= (locals.validationMessages.post_logout_redirect_uris !== undefined) ? 'form-group-error' : '' %>">
 
                             <a href="" class="pull-right" id="add-logout">Add Url</a>
                             <% if (locals.service.relyingParty.post_logout_redirect_uris.length > 0) { %>
+                                <% if (locals.validationMessages.post_logout_redirect_uris !== undefined) { %>
+                                <p class="error-message" id="validation-homeUrl"><%=locals.validationMessages.post_logout_redirect_uris %></p>
+                                <% } %>
                                 <% for (let i=0; i < locals.service.relyingParty.post_logout_redirect_uris.length; i++) {
                                 const logout_redirect = locals.service.relyingParty.post_logout_redirect_uris[i]%>
                                 <label for="<%=logout_redirect%>" class="vh">Logout redirect Urls</label>
@@ -168,6 +177,9 @@
                                 <% } %>
                             <% } else { %>
                                 <label for="post_logout_redirect_uris" class="vh">Redirect url</label>
+                                <% if (locals.validationMessages.post_logout_redirect_uris !== undefined) { %>
+                                <p class="error-message" id="validation-homeUrl"><%=locals.validationMessages.post_logout_redirect_uris %></p>
+                                <% } %>
                                 <p><input class="form-control inputConfig" id="post_logout_redirect_uris" name="post_logout_redirect_uris"></p>
                             <% } %>
                         </div>
@@ -248,11 +260,14 @@
                         Secret
                     </dt>
                     <dd class="app-check-your-answers__answer">
-                        <div class="form-group">
+                        <div class="form-group <%= (locals.validationMessages.apiSecret !== undefined) ? 'form-group-error' : '' %>">
                             <label class="form-label vh" for="apiSecret"></label>
                             <a href="" class="pull-right" id="generate-api-secret">Regenerate</a>
+                            <% if (locals.validationMessages.apiSecret !== undefined) { %>
+                            <p class="error-message" id="validation-homeUrl"><%=locals.validationMessages.apiSecret %></p>
+                            <% } %>
                             <div class="show-password full-width" style="width: 75%">
-                                <input class="form-control" id="apiSecret" name="apiSecret" type="password" value="<%=locals.service.relyingParty.api_secret%>" readonly="readonly">
+                                <input class="form-control read-only-input" id="apiSecret" name="apiSecret" type="password" value="<%=locals.service.relyingParty.api_secret%>" readonly="readonly">
                             </div>
                         </div>
                     </dd>
