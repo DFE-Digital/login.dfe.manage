@@ -34,6 +34,12 @@ const init = async () => {
   }));
 
   Object.assign(app.locals, {
+    urls: {
+      profile: config.hostingEnvironment.profileUrl,
+      services: config.hostingEnvironment.servicesUrl,
+      interactions: config.hostingEnvironment.interactionsUrl,
+      help: config.hostingEnvironment.helpUrl
+    },
     app: {
       title: 'DfE Sign-in Manage',
     },
