@@ -59,7 +59,7 @@ const validate = async (req) => {
     model.validationMessages.clientId = 'Client Id must be present'
   }
 
-  if(!urlValidation.test(req.body.postResetUrl)) {
+  if(!urlValidation.test(req.body.postResetUrl) && req.body.postResetUrl.trim() !== '') {
     model.validationMessages.postResetUrl = 'Please enter a valid Post-reset url'
   }
 
@@ -129,7 +129,8 @@ const postServiceConfig = async (req, res) => {
     post_logout_redirect_uris: model.selectedLogout,
     grant_types: grantTypes,
     response_types: responseTypes,
-    apiSecret: req.body.apiSecret
+    apiSecret: req.body.apiSecret,
+    tokenEndpointAuthMethod: req.body.tokenEndpointAuthMethod,
   };
   await updateService(req.params.sid, updatedService, req.id);
 

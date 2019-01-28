@@ -49,14 +49,9 @@ const updateService = async (id, serviceDetails, correlationId) => {
   if (serviceDetails.name) {
     body.name = serviceDetails.name
   }
-  if (serviceDetails.description || serviceDetails.description === '') {
-    body.description = serviceDetails.description
-  }
+
   if (serviceDetails.serviceHome) {
     body.serviceHome = serviceDetails.serviceHome
-  }
-  if (serviceDetails.postResetUrl) {
-    body.postResetUrl = serviceDetails.postResetUrl
   }
   if (serviceDetails.clientId) {
     body.clientId = serviceDetails.clientId
@@ -79,6 +74,10 @@ const updateService = async (id, serviceDetails, correlationId) => {
   if (serviceDetails.apiSecret) {
     body.apiSecret = serviceDetails.apiSecret
   }
+  body.description = serviceDetails.description ? serviceDetails.description : null;
+  body.tokenEndpointAuthMethod = serviceDetails.tokenEndpointAuthMethod ? serviceDetails.tokenEndpointAuthMethod : null;
+  body.postResetUrl = serviceDetails.postResetUrl ? serviceDetails.postResetUrl : null;
+
   return await callApi(`services/${id}`, 'PATCH', body, correlationId);
 };
 

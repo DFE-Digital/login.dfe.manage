@@ -240,7 +240,7 @@
                             <select class="form-control inputConfig" id="tokenEndpointAuthMethod" name="tokenEndpointAuthMethod">
                                 <option disabled value>Select token endpoint authentication method</option>
                                 <option <%= locals.service.relyingParty.token_endpoint_auth_method && locals.service.relyingParty.token_endpoint_auth_method === 'client_secret_post' ? 'selected="selected"' : ''%> value="client_secret_post">client_secret_post</option>
-                                <option <%= !locals.service.relyingParty.token_endpoint_auth_method ? 'selected="selected"' : ''%>value="none">none</option>
+                                <option <%= !locals.service.relyingParty.token_endpoint_auth_method ? 'selected="selected"' : ''%>value="">none</option>
                             </select>
                         </div>
                     </dd>
