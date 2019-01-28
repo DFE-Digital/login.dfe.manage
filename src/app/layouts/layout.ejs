@@ -57,26 +57,53 @@
                 <div class="phase-banner-beta">
                     <p>
                         <strong class="phase-tag">BETA</strong>
-                        <span>This is a new service – your <a href="#" target="_blank">feedback</a> will help us to improve it. </span>
+                        <span>This is a new service – your <a href="https://www.smartsurvey.co.uk/s/DfESign-in_feedback/" target="_blank">feedback</a> will help us to improve it. </span>
                     </p>
                 </div>
             </div>
-            <% if (locals.user !== undefined) { %>
-            <div class="account-information" role="navigation">
-                <p class="signed-in-as"><span class="vh">You are signed in as</span> <%= locals.displayName %></p>
-                <nav id="user-nav">
-                    <ul role="menubar">
-                        <li><a href="/profile" role="menuitem">Profile</a></li>
-                        <li><a href="/signout" role="menuitem">Sign out</a></li>
-                    </ul>
-                </nav>
-            </div>
-            <% } %>
         </div>
+    </div>
+    <div class="global-navigation">
+        <nav>
+            <ul>
+                <li><a href="<%= locals.urls.services %>/my-services">Services</a></li>
+                <li><a href="<%= locals.urls.services %>/organisations">Organisations</a></li>
+                <li><a href="<%= locals.urls.profile %>">Profile</a></li>
+                <li><a href="/services" class="current">Service management</a></li>
+                <li><a href="/signout" role="menuitem">Sign out</a></li>
+            </ul>
+        </nav>
     </div>
 
 
     <main id="content" tabindex="-1">
+        <% if (locals.backLink !== undefined) { %>
+            <% if (locals.backLink === true) { %>
+                <div class="js-back-link"></div>
+            <% } else { %>
+            <a href="<%-locals.backLink%>" class="link-back">Back</a>
+            <% } %>
+        <% } %>
+            <% if (locals.validationMessages !== undefined) { %>
+
+                <% const validationKeys = Object.keys(locals.validationMessages)  %>
+
+                <% if (validationKeys.length > 0) { %>
+
+                    <div class="error-summary" role="alert" aria-labelledby="error-summary" tabindex="-1">
+                        <h2 class="heading-medium error-summary-heading" id="error-summary">
+                            Information missing or incorrect
+                        </h2>
+                        <ul class="error-summary-list">
+                            <% for (const prop in locals.validationMessages) { %>
+                            <li><a href="#<%=prop%>"><%=locals.validationMessages[prop]%></a></li>
+                            <% } %>
+                        </ul>
+                    </div>
+
+                <% } %>
+            <% } %>
+
         <%- body %>
     </main>
 
@@ -84,15 +111,32 @@
 
 <footer id="footer">
     <div class="footer-wrapper">
+        <% if (locals.urls !== undefined) { %>
         <nav>
             <ul>
-                <li></li>
+                <li><a href="<%=locals.urls.interactions%>/cookies">Cookies</a></li>
+                <li><a href="<%=locals.urls.interactions%>/terms">Terms and conditions</a></li>
+                <li><a href="<%=locals.urls.help%>/contact">Need help using this service?</a></li>
             </ul>
         </nav>
+        <% } %>
+        <div class="footer-meta">
+            <div class="footer-meta-inner">
+                <div class="open-government-licence">
+                    <p class="logo"><a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" rel="license">Open Government Licence</a></p>
+                    <p>All content is available under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" rel="license">Open Government Licence v3.0</a>, except where otherwise stated</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <a href="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/copyright-and-re-use/crown-copyright/">&copy; Crown copyright</a>
+            </div>
+        </div>
     </div>
 </footer>
 
 <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+<!--remove this -->
+<script src="/assets/javascript/niceware.js"></script>
 <script src="https://rawgit.com/DFE-Digital/dfe.ui.toolkit/master/dist/javascript/app.min.js"></script>
 
 </body>
