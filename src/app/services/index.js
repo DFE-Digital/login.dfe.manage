@@ -16,6 +16,9 @@ const services = (csrf) => {
 
   //TODO: route / - multiple service selection
   router.get('/', asyncWrapper((req, res) => {
+    if (req.userServices.roles.length === 0) {
+      return res.status(401).render('errors/views/notAuthorised');
+    }
     if (req.userServices.roles.length === 1) {
       const role = req.userServices.roles[0];
       return res.redirect(`services/${role.code.substr(0, role.code.indexOf('_'))}`)
