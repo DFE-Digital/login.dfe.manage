@@ -3,11 +3,11 @@
 const express = require('express');
 const logger = require('../../infrastructure/logger');
 const { asyncWrapper } = require('login.dfe.express-error-handling');
-const { isLoggedIn } = require('../../infrastructure/utils');
+const { isLoggedIn, isManageUserForService } = require('../../infrastructure/utils');
 
 const { getDashboard } = require('./getDashboard');
 const { getServiceConfig, postServiceConfig } = require('./serviceConfig');
-
+const { get: getSelectService, post: postSelectService } = require('./selectService');
 const router = express.Router({ mergeParams: true });
 
 const services = (csrf) => {
@@ -15,11 +15,24 @@ const services = (csrf) => {
   router.use(isLoggedIn);
 
   //TODO: route / - multiple service selection
+  router.get('/', asyncWrapper((req, res) => {
+    if (req.userServices.roles.length === 1) {
+      const role = req.userServices.roles[0];
+      return res.redirect(`services/${role.code.substr(0, role.code.indexOf('_'))}`)
+    } else {
+      return res.redirect(`services/select-service`);
+    }
+  }));
 
-  router.get('/:sid', csrf, asyncWrapper(getDashboard));
+  router.get('/select-service', csrf, asyncWrapper(getSelectService));
+  router.post('/select-service', csrf, asyncWrapper(postSelectService));
 
-  router.get('/:sid/service-configuration', csrf, asyncWrapper(getServiceConfig));
-  router.post('/:sid/service-configuration', csrf, asyncWrapper(postServiceConfig));
+  router.get('/:sid', csrf, isManageUserForService, asyncWrapper(getDashboard));
+
+  router.get('/:sid/service-configuration', csrf, isManageUserForService, asyncWrapper(getServiceConfig));
+  router.post('/:sid/service-configuration', csrf, isManageUserForService, asyncWrapper(postServiceConfig));
+
+
   return router;
 };
 

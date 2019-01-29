@@ -7,7 +7,12 @@ const getServiceById = async (idOrClientId, correlationId) => {
 const updateService = async (id, body, correlationId) => {
   return Promise.resolve(null);
 };
+
+const listAllServices = async (correlationId) => {
+  return Promise.resolve(null);
+};
 module.exports = {
   getServiceById,
   updateService,
+  listAllServices,
 };

@@ -1,0 +1,32 @@
+<div class="grid-row">
+    <div class="col-8">
+        <h1 class="heading-xlarge">
+            Select service
+        </h1>
+        <p>Select the service that you want to manage.</p>
+        <form method="post">
+            <input type="hidden" name="_csrf" value="<%=csrfToken%>"/>
+            <div class="form-group <%= (locals.validationMessages.selectedService !== undefined) ? 'form-group-error' : '' %>">
+                <fieldset>
+                    <% if (locals.validationMessages.selectedService !== undefined) { %>
+                    <p class="error-message" id="validation-selected-organisation"><%=locals.validationMessages.selectedService %></p>
+                    <% } %>
+                    <legend class="vh">Select the service </legend>
+                    <% for(let i= 0; i < locals.services.length; i++) {
+                        const service = locals.services[i];
+                    %>
+                    <div class="multiple-choice">
+                        <input id="<%= service.id %>" type="radio" name="selectedService" value="<%= service.id %>">
+                        <label for="<%= service.id %>">
+                            <span class="form-label-bold"><%= service.name %></span>
+                        </label>
+                    </div>
+                    <% } %>
+                </fieldset>
+            </div>
+            <div class="form-submit">
+                <button class="button">Continue</button>
+            </div>
+        </form>
+    </div>
+</div>
