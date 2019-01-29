@@ -22,5 +22,11 @@
   },
   "applications": {
     "type":"static"
+  },
+  "identifyingParty": {
+    "url": "https://localhost:4430",
+    "clientId": "manage",
+    "clientSecret":"some-secret",
+    "clockTolerance": 300
   }
 }

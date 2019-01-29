@@ -11,7 +11,9 @@ const cookieParser = require('cookie-parser');
 const sanitization = require('login.dfe.sanitization');
 const csurf = require('csurf');
 const flash = require('express-flash-2');
+const oidc = require('./infrastructure/oidc');
 const session = require('cookie-session');
+const { setUserContext } = require('./infrastructure/utils');
 const { getErrorHandler } = require('login.dfe.express-error-handling');
 
 const registerRoutes = require('./routes');
@@ -75,6 +77,8 @@ const init = async () => {
   app.use(expressLayouts);
   app.set('layout', 'layouts/layout');
 
+  await oidc.init(app);
+  app.use(setUserContext);
   app.use('/assets', express.static(path.join(__dirname, 'app/assets')));
   registerRoutes(app, csrf);
   // Error handing
