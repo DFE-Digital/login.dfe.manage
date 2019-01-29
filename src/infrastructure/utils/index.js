@@ -23,8 +23,7 @@ const isManageUserForService = (req, res, next) => {
       const role = req.userServices.roles[i];
       services.push({id: role.code.substr(0, role.code.indexOf('_'))})
     }
-    req.userServices = services;
-    if (req.userServices.find(x => x.id.toLowerCase() === req.params.sid.toLowerCase())) {
+    if (services.find(x => x.id.toLowerCase() === req.params.sid.toLowerCase())) {
       return next();
     }
   }

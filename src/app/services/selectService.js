@@ -2,10 +2,14 @@
 const { getServiceById } = require('./../../infrastructure/applications');
 
 const getServiceDetails = async (req) => {
-  const userServices = [];
-  for (let i = 0; i < req.userServices.length; i++) {
-    const service = req.userServices[i];
-    userServices.push(await getServiceById(service.id, req.id));
+  const userServices = req.userServices.roles.map((role) => ({
+    id: role.code.substr(0, role.code.indexOf('_')),
+    name: ''
+  }));
+  for (let i = 0; i < userServices.length; i++) {
+    const service = userServices[i];
+    const application = await getServiceById(service.id, req.id);
+    service.name = application.name
   }
   return userServices;
 };
