@@ -15,6 +15,10 @@ const routes = (app, csrf) => {
   });
 
   app.use('/signout', signOut(csrf));
+
+  app.get('*', (req, res) => {
+    res.status(404).render('errors/views/notFound');
+  });
 };
 
 module.exports = routes;

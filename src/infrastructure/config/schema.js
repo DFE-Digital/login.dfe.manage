@@ -14,6 +14,7 @@ const schema = new SimpleSchema({
   loggerSettings: schemas.loggerSettings,
   hostingEnvironment: schemas.hostingEnvironment,
   applications: schemas.apiClient,
+  access: schemas.apiClient,
   identifyingParty: identifyingPartySchema,
 });
 

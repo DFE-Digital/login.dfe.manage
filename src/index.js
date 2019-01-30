@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const expressLayouts = require('express-ejs-layouts');
 const logger = require('./infrastructure/logger');
+const http = require('http');
 const https = require('https');
 const path = require('path');
 const config = require('./infrastructure/config');
@@ -13,12 +14,27 @@ const csurf = require('csurf');
 const flash = require('express-flash-2');
 const oidc = require('./infrastructure/oidc');
 const session = require('cookie-session');
-const { setUserContext } = require('./infrastructure/utils');
+const { setUserContext, isManageUser } = require('./infrastructure/utils');
 const { getErrorHandler } = require('login.dfe.express-error-handling');
+const KeepAliveAgent = require('agentkeepalive');
 
 const registerRoutes = require('./routes');
 
 configSchema.validate();
+
+http.GlobalAgent = new KeepAliveAgent({
+  maxSockets: config.hostingEnvironment.agentKeepAlive.maxSockets,
+  maxFreeSockets: config.hostingEnvironment.agentKeepAlive.maxFreeSockets,
+  timeout: config.hostingEnvironment.agentKeepAlive.timeout,
+  keepAliveTimeout: config.hostingEnvironment.agentKeepAlive.keepAliveTimeout,
+});
+https.GlobalAgent = new KeepAliveAgent({
+  maxSockets: config.hostingEnvironment.agentKeepAlive.maxSockets,
+  maxFreeSockets: config.hostingEnvironment.agentKeepAlive.maxFreeSockets,
+  timeout: config.hostingEnvironment.agentKeepAlive.timeout,
+  keepAliveTimeout: config.hostingEnvironment.agentKeepAlive.keepAliveTimeout,
+});
+
 
 const init = async () => {
   const csrf = csurf({
@@ -81,6 +97,7 @@ const init = async () => {
   app.use(setUserContext);
   app.use('/assets', express.static(path.join(__dirname, 'app/assets')));
   registerRoutes(app, csrf);
+  app.use(isManageUser);
   // Error handing
   app.use(getErrorHandler({
     logger,

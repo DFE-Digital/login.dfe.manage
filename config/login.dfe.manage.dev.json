@@ -23,6 +23,9 @@
   "applications": {
     "type":"static"
   },
+  "access": {
+    "type": "static"
+  },
   "identifyingParty": {
     "url": "https://localhost:4430",
     "clientId": "manage",

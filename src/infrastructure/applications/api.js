@@ -44,6 +44,10 @@ const getServiceById = async (id, correlationId) => {
   return await callApi(`services/${id}`, 'GET', undefined, correlationId);
 };
 
+const listAllServices = async (correlationId) => {
+  return await callApi(`services`, 'GET', undefined, correlationId);
+};
+
 const updateService = async (id, serviceDetails, correlationId) => {
   const body = {};
   if (serviceDetails.name) {
@@ -83,5 +87,6 @@ const updateService = async (id, serviceDetails, correlationId) => {
 
 module.exports = {
   getServiceById,
-  updateService
+  updateService,
+  listAllServices,
 };
