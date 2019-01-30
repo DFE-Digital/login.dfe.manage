@@ -15,6 +15,9 @@ const getServiceDetails = async (req) => {
 };
 
 const get = async (req, res) => {
+  if (!req.userServices || req.userServices.roles.length === 0) {
+    return res.status(401).render('errors/views/notAuthorised');
+  }
   const userServices = await getServiceDetails(req);
   return res.render('services/views/selectService', {
     csrfToken: req.csrfToken(),

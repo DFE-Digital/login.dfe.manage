@@ -14,9 +14,8 @@ const services = (csrf) => {
   logger.info('Mounting services routes');
   router.use(isLoggedIn);
 
-  //TODO: route / - multiple service selection
   router.get('/', asyncWrapper((req, res) => {
-    if (req.userServices.roles.length === 0) {
+    if (!req.userServices || req.userServices.roles.length === 0) {
       return res.status(401).render('errors/views/notAuthorised');
     }
     if (req.userServices.roles.length === 1) {
