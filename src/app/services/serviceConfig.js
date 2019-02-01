@@ -11,7 +11,7 @@ const getServiceConfig = async (req, res) => {
     service,
     responseTypes,
     grantTypes,
-    backLink: './',
+    backLink: true,
     validationMessages: {},
   });
 };
