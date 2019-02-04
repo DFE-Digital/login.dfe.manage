@@ -8,6 +8,8 @@ const { isLoggedIn, isManageUserForService } = require('../../infrastructure/uti
 const { getDashboard } = require('./getDashboard');
 const { getServiceConfig, postServiceConfig } = require('./serviceConfig');
 const { get: getSelectService, post: postSelectService } = require('./selectService');
+const { get: getServiceBanners } = require('./serviceBanners');
+
 const router = express.Router({ mergeParams: true });
 
 const services = (csrf) => {
@@ -33,6 +35,8 @@ const services = (csrf) => {
 
   router.get('/:sid/service-configuration', csrf, isManageUserForService, asyncWrapper(getServiceConfig));
   router.post('/:sid/service-configuration', csrf, isManageUserForService, asyncWrapper(postServiceConfig));
+
+  router.get('/:sid/service-banners', csrf, isManageUserForService, asyncWrapper(getServiceBanners));
 
 
   return router;

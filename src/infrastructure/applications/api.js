@@ -85,8 +85,13 @@ const updateService = async (id, serviceDetails, correlationId) => {
   return await callApi(`services/${id}`, 'PATCH', body, correlationId);
 };
 
+const listBannersForService = async (id, correlationId) => {
+  return await callApi(`services/${id}/banners`, 'GET', undefined, correlationId);
+};
+
 module.exports = {
   getServiceById,
   updateService,
   listAllServices,
+  listBannersForService,
 };

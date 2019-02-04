@@ -17,6 +17,7 @@ const session = require('cookie-session');
 const { setUserContext, isManageUser } = require('./infrastructure/utils');
 const { getErrorHandler } = require('login.dfe.express-error-handling');
 const KeepAliveAgent = require('agentkeepalive');
+const moment = require('moment');
 
 const registerRoutes = require('./routes');
 
@@ -52,6 +53,7 @@ const init = async () => {
   }));
 
   Object.assign(app.locals, {
+    moment,
     urls: {
       profile: config.hostingEnvironment.profileUrl,
       services: config.hostingEnvironment.servicesUrl,

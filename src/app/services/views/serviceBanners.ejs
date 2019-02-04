@@ -1,0 +1,48 @@
+<div class="row">
+    <div class="col-8">
+        <h1 class="heading-xlarge">Manage banners</h1>
+    </div>
+    <div class="col-4">
+        <aside>
+            <h2 class="heading-medium">Actions</h2>
+            <nav class="subnav">
+                <ul>
+                    <li><a href="">Create new banner</a></li>
+                </ul>
+            </nav>
+        </aside>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-8">
+        <table class="data">
+            <thead>
+            <tr class="sortable">
+                <th scope="col" class="cwp-35">
+                    Banner name</th>
+                <th scope="col" class="cwp-25">
+                    Last update</th>
+                <th scope="col" class="cwp-25">
+                    Is currently displayed?</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% if (locals.serviceBanners.length === 0) { %>
+            <tr>
+                <td colspan="5"><span class="empty-state">No banners found for service</span></td>
+            </tr>
+            <% } %>
+            <% for (let i = 0; i < locals.serviceBanners.length; i++) {
+            const banner = locals.serviceBanners[i]%>
+
+            <tr>
+                <td><a href=""><%= banner.name %></a></td>
+                <td><%= banner.updatedAt ? locals.moment(banner.updatedAt).format('DD MMM YYYY') : 'never' %></td>
+                <td><%= banner.isActive ? 'Yes' : ''%></td>
+            </tr>
+            <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>
