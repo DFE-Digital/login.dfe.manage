@@ -85,8 +85,16 @@ const updateService = async (id, serviceDetails, correlationId) => {
   return await callApi(`services/${id}`, 'PATCH', body, correlationId);
 };
 
-const listBannersForService = async (id, correlationId) => {
-  return await callApi(`services/${id}/banners`, 'GET', undefined, correlationId);
+const listBannersForService = async (id, pageSize, correlationId) => {
+  return await callApi(`services/${id}/banners?pageSize=${pageSize}`, 'GET', undefined, correlationId);
+};
+
+const getBannerById = async (id, bid, correlationId) => {
+  return await callApi(`services/${id}/banners/${bid}`, 'GET', undefined, correlationId);
+};
+
+const upsertBanner = async (sid, banner, correlationId) => {
+  return await callApi(`services/${sid}/banners`, 'POST', banner, correlationId);
 };
 
 module.exports = {
@@ -94,4 +102,6 @@ module.exports = {
   updateService,
   listAllServices,
   listBannersForService,
+  getBannerById,
+  upsertBanner,
 };

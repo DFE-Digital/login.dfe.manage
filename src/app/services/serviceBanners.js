@@ -2,12 +2,13 @@
 const { listBannersForService } = require('./../../infrastructure/applications');
 
 const get = async (req, res) => {
-  const serviceBanners = await listBannersForService(req.params.sid, req.id);
+  const serviceBanners = await listBannersForService(req.params.sid,10, req.id);
 
   return res.render('services/views/serviceBanners', {
     csrfToken: req.csrfToken(),
     backLink: true,
     serviceBanners: serviceBanners.banners,
+    serviceId: req.params.sid,
   });
 };
 

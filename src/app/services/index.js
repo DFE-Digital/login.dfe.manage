@@ -9,6 +9,7 @@ const { getDashboard } = require('./getDashboard');
 const { getServiceConfig, postServiceConfig } = require('./serviceConfig');
 const { get: getSelectService, post: postSelectService } = require('./selectService');
 const { get: getServiceBanners } = require('./serviceBanners');
+const { get: getNewServiceBanners, post: postNewServiceBanners } = require('./newServiceBanner');
 
 const router = express.Router({ mergeParams: true });
 
@@ -38,7 +39,8 @@ const services = (csrf) => {
 
   router.get('/:sid/service-banners', csrf, isManageUserForService, asyncWrapper(getServiceBanners));
 
-
+  router.get('/:sid/service-banners/new-banner', csrf, isManageUserForService, asyncWrapper(getNewServiceBanners));
+  router.post('/:sid/service-banners/new-banner', csrf, isManageUserForService, asyncWrapper(postNewServiceBanners));
   return router;
 };
 

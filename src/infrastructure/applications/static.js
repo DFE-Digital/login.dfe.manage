@@ -12,7 +12,15 @@ const listAllServices = async (correlationId) => {
   return Promise.resolve(null);
 };
 
-const listBannersForService = async (id, correlationId) => {
+const listBannersForService = async (id, pageSize, correlationId) => {
+  return Promise.resolve(null);
+};
+
+const getBannerById = async (id, bid, correlationId) => {
+  return Promise.resolve(null);
+};
+
+const upsertBanner = async (sid, banner, correlationId) => {
   return Promise.resolve(null);
 };
 
@@ -21,4 +29,6 @@ module.exports = {
   updateService,
   listAllServices,
   listBannersForService,
+  getBannerById,
+  upsertBanner,
 };
