@@ -15,6 +15,9 @@ describe('when getting the list of service banners page', () => {
       params: {
         sid: 'service1'
       },
+      query: {
+        page: 1
+      }
     });
 
     listBannersForService.mockReset();
@@ -36,7 +39,9 @@ describe('when getting the list of service banners page', () => {
 
     expect(listBannersForService.mock.calls).toHaveLength(1);
     expect(listBannersForService.mock.calls[0][0]).toBe('service1');
-    expect(listBannersForService.mock.calls[0][1]).toBe('correlationId');
+    expect(listBannersForService.mock.calls[0][1]).toBe(10);
+    expect(listBannersForService.mock.calls[0][2]).toBe(1);
+    expect(listBannersForService.mock.calls[0][3]).toBe('correlationId');
   });
 
   it('then it should return the service banners view', async () => {
