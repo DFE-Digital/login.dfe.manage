@@ -1,15 +1,25 @@
 'use strict';
 const { getBannerById, upsertBanner } = require('./../../infrastructure/applications');
+const moment = require('moment');
 
 const get = async (req, res) => {
   const model = {
     csrfToken: req.csrfToken(),
     backLink: true,
     name: '',
-    title: '',
+    bannerTitle: '',
     message: '',
-    validFrom: '',
-    validTo: '',
+    bannerDisplay: '',
+    fromDay: '',
+    fromMonth: '',
+    fromYear: '',
+    fromHour: '',
+    fromMinute: '',
+    toDay: '',
+    toMonth: '',
+    toYear: '',
+    toHour: '',
+    toMinute: '',
     isActive: '',
     validationMessages: {},
   };
@@ -18,8 +28,9 @@ const get = async (req, res) => {
     const existingBanner = await getBannerById(req.params.sid, req.params.bid, req.id);
     if (existingBanner) {
       model.name = existingBanner.name;
-      model.title = existingBanner.title;
+      model.bannerTitle = existingBanner.title;
       model.message = existingBanner.message;
+      //remove these add day, month, year, hour, minute
       model.validFrom = existingBanner.validFrom;
       model.validTo = existingBanner.validTo;
       model.isActive = existingBanner.isActive;
@@ -29,11 +40,31 @@ const get = async (req, res) => {
 };
 
 const validate = (req) => {
+  let fromDate;
+  let toDate;
+  if (req.body.bannerDisplay === 'date' && req.body.fromYear && req.body.fromMonth && req.body.fromDay && req.body.fromHour && req.body.fromMinute) {
+    fromDate = `${req.body.fromYear}-${req.body.fromMonth}-${req.body.fromDay} ${req.body.fromHour}:${req.body.fromMinute}`
+  }
+  if (req.body.bannerDisplay === 'date' && req.body.toYear && req.body.toMonth && req.body.toDay && req.body.toHour && req.body.toMinute) {
+    toDate = `${req.body.toYear}-${req.body.toMonth}-${req.body.toDay} ${req.body.toHour}:${req.body.toMinute}`
+  }
   const model = {
     name: req.body.bannerName || '',
-    title: req.body.bannerTitle || '',
+    bannerTitle: req.body.bannerTitle || '',
     message: req.body.bannerMesssage || '',
     bannerDisplay: req.body.bannerDisplay || '',
+    fromDay: req.body.fromDay,
+    fromMonth: req.body.fromMonth,
+    fromYear: req.body.fromYear,
+    fromHour: req.body.fromHour,
+    fromMinute: req.body.fromMinute,
+    toDay: req.body.toDay,
+    toMonth: req.body.toMonth,
+    toYear: req.body.toYear,
+    toHour: req.body.toHour,
+    toMinute: req.body.toMinute,
+    fromDate,
+    toDate,
     isActive: false,
     validationMessages: {},
     backLink: true,
@@ -42,11 +73,23 @@ const validate = (req) => {
   if(!model.name) {
     model.validationMessages.name = 'Please enter a banner name';
   }
-  if(!model.title) {
+  if(!model.bannerTitle) {
     model.validationMessages.title = 'Please enter a banner title';
   }
   if(!model.message) {
     model.validationMessages.message = 'Please enter a banner message';
+  }
+  if (model.bannerDisplay === 'date' && !model.fromDate) {
+    model.validationMessages.fromDate = 'Please enter a from date'
+  }
+  if (model.bannerDisplay === 'date' && !model.toDate) {
+    model.validationMessages.fromDate = 'Please enter a to date'
+  }
+  if (model.fromDate && !moment(new Date(model.fromDate)).isValid()) {
+    model.validationMessages.fromDate = 'From date must be a valid date. For example, 31 01 2019 14:30'
+  }
+  if (model.toDate && !moment( new Date (model.toDate)).isValid()) {
+    model.validationMessages.toDate = 'To date must be a valid date. For example, 31 01 2019 14:30'
   }
   return model;
 };
@@ -64,11 +107,12 @@ const post = async (req, res) => {
     model.isActive = true;
   }
   // show banner between specific times
-
+  if (model.bannerDisplay === 'date') {
+  }
   const body = {
     id: req.params.bid ? req.params.bid : undefined,
     name: model.name,
-    title: model.title,
+    title: model.bannerTitle,
     message: model.message,
     validFrom: model.validFrom,
     validTo: model.validTo,
