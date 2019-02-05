@@ -21,19 +21,39 @@ const get = async (req, res) => {
     toHour: '',
     toMinute: '',
     isActive: '',
+    isEditExisting: false,
     validationMessages: {},
   };
 
   if (req.params.bid) {
     const existingBanner = await getBannerById(req.params.sid, req.params.bid, req.id);
     if (existingBanner) {
+      model.isEditExisting = true;
       model.name = existingBanner.name;
       model.bannerTitle = existingBanner.title;
       model.message = existingBanner.message;
-      //remove these add day, month, year, hour, minute
-      model.validFrom = existingBanner.validFrom;
-      model.validTo = existingBanner.validTo;
       model.isActive = existingBanner.isActive;
+
+      if (existingBanner.isActive) {
+        model.bannerDisplay = 'isActive';
+      } else if (existingBanner.validFrom && existingBanner.validTo) {
+        model.bannerDisplay = 'date';
+        // get existing dates if editing
+        const validFrom = existingBanner.validFrom;
+        const validTo = existingBanner.validTo;
+        model.fromYear = validFrom.substr(0,4);
+        model.fromMonth = validFrom.substr(5,2);
+        model.fromDay = validFrom.substr(8,2);
+        model.fromHour = validFrom.substr(11,2);
+        model.fromMinute = validFrom.substr(14,2);
+        model.toYear = validTo.substr(0,4);
+        model.toMonth = validTo.substr(5,2);
+        model.toDay = validTo.substr(8,2);
+        model.toHour = validTo.substr(11,2);
+        model.toMinute = validTo.substr(14,2);
+      } else {
+        model.bannerDisplay = 'notActive';
+      }
     }
   }
   return res.render('services/views/newServiceBanner', model);
@@ -105,13 +125,10 @@ const post = async (req, res) => {
     return res.render('services/views/newServiceBanner', model);
   }
 
-  // always show banner
   if (model.bannerDisplay === 'isActive') {
     model.isActive = true;
   }
-  // show banner between specific times
-  if (model.bannerDisplay === 'date') {
-  }
+
   const body = {
     id: req.params.bid ? req.params.bid : undefined,
     name: model.name,

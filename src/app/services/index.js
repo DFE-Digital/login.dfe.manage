@@ -42,6 +42,10 @@ const services = (csrf) => {
 
   router.get('/:sid/service-banners/new-banner', csrf, isManageUserForService, asyncWrapper(getNewServiceBanners));
   router.post('/:sid/service-banners/new-banner', csrf, isManageUserForService, asyncWrapper(postNewServiceBanners));
+
+  router.get('/:sid/service-banners/:bid', csrf, isManageUserForService, asyncWrapper(getNewServiceBanners));
+  router.post('/:sid/service-banners/:bid', csrf, isManageUserForService, asyncWrapper(postNewServiceBanners));
+
   return router;
 };
 

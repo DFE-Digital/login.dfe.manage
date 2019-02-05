@@ -65,7 +65,7 @@ const paginationModel = {
             const banner = locals.serviceBanners[i]%>
 
             <tr>
-                <td><a href=""><%= banner.name %></a></td>
+                <td><a href="service-banners/<%=banner.id%>"><%= banner.name %></a></td>
                 <td><%= banner.updatedAt ? locals.moment(banner.updatedAt).format('DD MMM YYYY') : 'never' %></td>
                 <td><%= banner.isActive ? 'Yes' : ''%></td>
             </tr>
