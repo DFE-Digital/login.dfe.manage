@@ -32,11 +32,14 @@
                 <textarea class="form-control " name="bannerMesssage" id="bannerMesssage" rows="4" maxlength="400"><%=locals.message%></textarea>
             </div>
 
-            <div class="form-group">
+            <div class="form-group <%= (locals.validationMessages.bannerDisplay !== undefined) ? 'form-group-error' : '' %>">
                 <fieldset>
                     <legend>
                         When do you want this banner to be displayed?
                     </legend>
+                    <% if (locals.validationMessages.bannerDisplay !== undefined) { %>
+                        <p class="error-message" id="validation-display"><%= locals.validationMessages.bannerDisplay %></p>
+                    <% } %>
                     <div class="multiple-choice">
                         <input id="notActive" type="radio" name="bannerDisplay" value="notActive" <%=locals.bannerDisplay === 'notActive' ? 'checked' : ''%>>
                         <label for="notActive">I don't know yet</label>

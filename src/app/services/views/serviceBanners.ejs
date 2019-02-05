@@ -24,8 +24,26 @@
     </div>
 </div>
 
+<%
+const paginationModel = {
+    method: 'post',
+    csrfToken,
+    currentPage: locals.page,
+    numberOfPages: locals.numberOfPages,
+    totalNumberOfResults: locals.totalNumberOfResults,
+    numberOfResultsOnPage: locals.serviceBanners.length,
+    data: [
+        { key: 'criteria', value: locals.criteria },
+        { key: 'sort', value: locals.sortBy },
+        { key: 'sortDir', value: locals.sortOrder },
+        { key: 'showFilters', value: locals.showFilters }
+    ]
+}
+%>
+
 <div class="row">
     <div class="col-8">
+        <%- include('../../layouts/pagination', paginationModel); %>
         <table class="data">
             <thead>
             <tr class="sortable">
@@ -54,5 +72,6 @@
             <% } %>
             </tbody>
         </table>
+        <%- include('../../layouts/pagination', paginationModel); %>
     </div>
 </div>

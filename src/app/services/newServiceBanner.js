@@ -79,6 +79,9 @@ const validate = (req) => {
   if(!model.message) {
     model.validationMessages.message = 'Please enter a banner message';
   }
+  if(!model.bannerDisplay) {
+    model.validationMessages.bannerDisplay = 'Please select when you want the banner to be displayed'
+  }
   if (model.bannerDisplay === 'date' && !model.fromDate) {
     model.validationMessages.fromDate = 'Please enter a from date'
   }
@@ -114,8 +117,8 @@ const post = async (req, res) => {
     name: model.name,
     title: model.bannerTitle,
     message: model.message,
-    validFrom: model.validFrom,
-    validTo: model.validTo,
+    validFrom: model.fromDate,
+    validTo: model.toDate,
     isActive: model.isActive,
   };
 

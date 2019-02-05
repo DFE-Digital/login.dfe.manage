@@ -85,8 +85,8 @@ const updateService = async (id, serviceDetails, correlationId) => {
   return await callApi(`services/${id}`, 'PATCH', body, correlationId);
 };
 
-const listBannersForService = async (id, pageSize, correlationId) => {
-  return await callApi(`services/${id}/banners?pageSize=${pageSize}`, 'GET', undefined, correlationId);
+const listBannersForService = async (id, pageSize, page, correlationId) => {
+  return await callApi(`services/${id}/banners?pageSize=${pageSize}?&page=${page}`, 'GET', undefined, correlationId);
 };
 
 const getBannerById = async (id, bid, correlationId) => {
