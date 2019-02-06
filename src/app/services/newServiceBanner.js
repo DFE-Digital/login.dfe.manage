@@ -106,7 +106,7 @@ const validate = (req) => {
     model.validationMessages.fromDate = 'Please enter a from date'
   }
   if (model.bannerDisplay === 'date' && !model.toDate) {
-    model.validationMessages.fromDate = 'Please enter a to date'
+    model.validationMessages.toDate = 'Please enter a to date'
   }
   if (model.fromDate && !moment(new Date(model.fromDate)).isValid()) {
     model.validationMessages.fromDate = 'From date must be a valid date. For example, 31 01 2019 14:30'
@@ -114,6 +114,9 @@ const validate = (req) => {
   if (model.toDate && !moment( new Date (model.toDate)).isValid()) {
     model.validationMessages.toDate = 'To date must be a valid date. For example, 31 01 2019 14:30'
   }
+
+  //TODO: validate overlapping time banners and alwaysOn banners
+
   return model;
 };
 
@@ -142,7 +145,7 @@ const post = async (req, res) => {
   //TODO: audit event for updated/created banner
   await upsertBanner(req.params.sid, body, req.id);
 
-  res.flash('info', 'Service banner created successfully');
+  req.params.bid ? res.flash('info', 'Service banner updated successfully') : res.flash('info', 'Service banner created successfully');
   return res.redirect(`/services/${req.params.sid}/service-banners`);
 };
 
