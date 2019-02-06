@@ -32,7 +32,7 @@ const post = async (req, res) => {
     backLink: true,
     serviceBanners: serviceBanners.banners,
     page: serviceBanners.page,
-    totalNumberOfRecords: serviceBanners.totalNumberOfRecords,
+    totalNumberOfResults: serviceBanners.totalNumberOfRecords,
     numberOfPages: serviceBanners.totalNumberOfPages,
     serviceId: req.params.sid,
   });
