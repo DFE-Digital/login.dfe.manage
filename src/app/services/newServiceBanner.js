@@ -22,6 +22,7 @@ const get = async (req, res) => {
     toMinute: '',
     isActive: '',
     isEditExisting: false,
+    bannerId: req.params.bid,
     validationMessages: {},
   };
 
@@ -86,6 +87,7 @@ const validate = (req) => {
     fromDate,
     toDate,
     isActive: false,
+    bannerId: req.params.bid,
     validationMessages: {},
     backLink: true,
   };

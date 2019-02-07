@@ -1,0 +1,61 @@
+<div class="grid-row">
+    <div class="col-8">
+        <h1 class="heading-xlarge">
+            Confirm delete banner
+        </h1>
+        <p class="lede">Confirm that you want to permanently delete this banner.</p>
+
+        <dl class="app-check-your-answers app-check-your-answers--short">
+
+            <div class="app-check-your-answers__contents">
+                <dt class="app-check-your-answers__title">
+                    Banner name
+                </dt>
+                <dd class="app-check-your-answers__answer">
+                    <%=locals.serviceBanners.name%>
+                </dd>
+            </div>
+
+            <div class="app-check-your-answers__contents">
+                <dt class="app-check-your-answers__title">
+                    Banner title
+                </dt>
+                <dd class="app-check-your-answers__answer">
+                    <%=locals.serviceBanners.title%>
+                </dd>
+            </div>
+
+            <div class="app-check-your-answers__contents">
+                <dt class="app-check-your-answers__title">
+                    Banner message
+                </dt>
+                <dd class="app-check-your-answers__answer">
+                    <%=locals.serviceBanners.message%>
+                </dd>
+            </div>
+
+            <div class="app-check-your-answers__contents">
+                <dt class="app-check-your-answers__title">
+                    Status
+                </dt>
+                <dd class="app-check-your-answers__answer">
+                    <% if (locals.serviceBanners.isActive) { %>
+                        Always show this banner until I stop it
+                    <% } else if (locals.serviceBanners.validFrom && locals.serviceBanners.validTo) { %>
+                        Display banner from <%=locals.moment(locals.serviceBanners.validFrom).format('DD MMM YYYY HH:MM')%> to <%=locals.moment(locals.serviceBanners.validTo).format('DD MMM YYYY HH:MM')%>
+                    <% } else { %>
+                        Not active
+                    <% } %>
+                </dd>
+            </div>
+        </dl>
+
+        <form method="post">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
+            <div class="form-submit submit-buttons">
+                <button type="submit" class="button">Continue</button>
+                <a href="<%=locals.cancelLink%>" class="button button-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

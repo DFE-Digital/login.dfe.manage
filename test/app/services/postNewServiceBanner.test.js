@@ -70,6 +70,7 @@ describe('when creating a new service banner', () => {
       toMinute: '30',
       toMonth: '12',
       toYear: '2019',
+      bannerId: 'bannerId',
       validationMessages: {
         name: 'Please enter a banner name',
       },
@@ -101,6 +102,7 @@ describe('when creating a new service banner', () => {
       toMinute: '30',
       toMonth: '12',
       toYear: '2019',
+      bannerId: 'bannerId',
       validationMessages: {
         title: 'Please enter a banner title',
       },
@@ -132,6 +134,7 @@ describe('when creating a new service banner', () => {
       toMinute: '30',
       toMonth: '12',
       toYear: '2019',
+      bannerId: 'bannerId',
       validationMessages: {
         message: 'Please enter a banner message',
       },
@@ -163,6 +166,7 @@ describe('when creating a new service banner', () => {
       toMinute: '30',
       toMonth: '12',
       toYear: '2019',
+      bannerId: 'bannerId',
       validationMessages: {
         bannerDisplay: 'Please select when you want the banner to be displayed',
       },
@@ -195,6 +199,7 @@ describe('when creating a new service banner', () => {
       toMinute: '30',
       toMonth: '12',
       toYear: '2019',
+      bannerId: 'bannerId',
       validationMessages: {
         fromDate: 'Please enter a from date',
       },
@@ -227,6 +232,7 @@ describe('when creating a new service banner', () => {
       toHour: '12',
       toMinute: '30',
       toMonth: '12',
+      bannerId: 'bannerId',
       validationMessages: {
         toDate: 'Please enter a to date',
       },

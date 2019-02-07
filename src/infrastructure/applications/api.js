@@ -97,6 +97,10 @@ const upsertBanner = async (sid, banner, correlationId) => {
   return await callApi(`services/${sid}/banners`, 'POST', banner, correlationId);
 };
 
+const removeBanner = async (sid, bid, correlationId) => {
+  return await  callApi(`services/${sid}/banners/${bid}`, 'DELETE', undefined, correlationId);
+};
+
 module.exports = {
   getServiceById,
   updateService,
@@ -104,4 +108,5 @@ module.exports = {
   listBannersForService,
   getBannerById,
   upsertBanner,
+  removeBanner,
 };
