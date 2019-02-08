@@ -120,6 +120,5 @@ module.exports = {
   listBannersForService,
   getBannerById,
   upsertBanner,
-  removeBanner,
   listAllBannersForService,
 };

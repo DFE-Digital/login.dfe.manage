@@ -279,7 +279,6 @@ describe('when creating a new service banner', () => {
       toMinute: '30',
       toMonth: '12',
       toYear: '2019',
-      bannerId: 'bannerId',
       validationMessages: {
         toDate: 'To date must be after from date',
       },
