@@ -35,6 +35,10 @@ const upsertBanner = async (sid, banner, correlationId) => {
   return Promise.resolve(null);
 };
 
+const removeBanner = async (sid, bid, correlationId) => {
+  return Promise.resolve(null);
+};
+
 const listAllBannersForService = async (id, correlationId) => {
   return (await listBannersForService(id, 25, 1, correlationId).banners.find(x => x.id === id))
 };
@@ -46,5 +50,6 @@ module.exports = {
   listBannersForService,
   getBannerById,
   upsertBanner,
+  removeBanner,
   listAllBannersForService,
 };

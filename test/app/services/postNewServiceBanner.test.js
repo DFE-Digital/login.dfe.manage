@@ -266,6 +266,7 @@ describe('when creating a new service banner', () => {
     expect(res.render.mock.calls[0][0]).toBe('services/views/newServiceBanner');
     expect(res.render.mock.calls[0][1]).toEqual({
       backLink: true,
+      bannerId: 'bannerId',
       cancelLink: '/services/service1/service-banners',
       bannerDisplay: 'date',
       bannerTitle: 'banner title',
