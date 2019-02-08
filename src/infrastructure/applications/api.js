@@ -89,6 +89,22 @@ const listBannersForService = async (id, pageSize, page, correlationId) => {
   return await callApi(`services/${id}/banners?pageSize=${pageSize}?&page=${page}`, 'GET', undefined, correlationId);
 };
 
+const listAllBannersForService = async (id, correlationId) => {
+  const allBanners = [];
+
+  let pageNumber = 1;
+  let isMorePages = true;
+  while (isMorePages) {
+    const page = await listBannersForService(id, 25, pageNumber ,correlationId);
+    page.banners.forEach((banner) => {
+      allBanners.push(banner);
+    });
+    pageNumber ++;
+    isMorePages = pageNumber <= page.totalNumberOfPages;
+  }
+  return allBanners;
+};
+
 const getBannerById = async (id, bid, correlationId) => {
   return await callApi(`services/${id}/banners/${bid}`, 'GET', undefined, correlationId);
 };
@@ -104,4 +120,6 @@ module.exports = {
   listBannersForService,
   getBannerById,
   upsertBanner,
+  removeBanner,
+  listAllBannersForService,
 };

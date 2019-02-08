@@ -1,11 +1,12 @@
 'use strict';
-const { getBannerById, upsertBanner } = require('./../../infrastructure/applications');
+const { getBannerById, upsertBanner, listAllBannersForService } = require('./../../infrastructure/applications');
 const moment = require('moment');
 
 const get = async (req, res) => {
   const model = {
     csrfToken: req.csrfToken(),
     backLink: true,
+    cancelLink: `/services/${req.params.sid}/service-banners`,
     name: '',
     bannerTitle: '',
     message: '',
@@ -59,7 +60,7 @@ const get = async (req, res) => {
   return res.render('services/views/newServiceBanner', model);
 };
 
-const validate = (req) => {
+const validate = async (req) => {
   let fromDate;
   let toDate;
   if (req.body.bannerDisplay === 'date' && req.body.fromYear && req.body.fromMonth && req.body.fromDay && req.body.fromHour && req.body.fromMinute) {
@@ -88,6 +89,7 @@ const validate = (req) => {
     isActive: false,
     validationMessages: {},
     backLink: true,
+    cancelLink: `/services/${req.params.sid}/service-banners`,
   };
 
   if(!model.name) {
@@ -102,20 +104,52 @@ const validate = (req) => {
   if(!model.bannerDisplay) {
     model.validationMessages.bannerDisplay = 'Please select when you want the banner to be displayed'
   }
-  if (model.bannerDisplay === 'date' && !model.fromDate) {
-    model.validationMessages.fromDate = 'Please enter a from date'
-  }
-  if (model.bannerDisplay === 'date' && !model.toDate) {
-    model.validationMessages.toDate = 'Please enter a to date'
-  }
-  if (model.fromDate && !moment(new Date(model.fromDate)).isValid()) {
-    model.validationMessages.fromDate = 'From date must be a valid date. For example, 31 01 2019 14:30'
-  }
-  if (model.toDate && !moment( new Date (model.toDate)).isValid()) {
-    model.validationMessages.toDate = 'To date must be a valid date. For example, 31 01 2019 14:30'
+  if (model.bannerDisplay === 'date') {
+    let validToDate = true;
+    let validFromDate = true;
+
+    if (!model.fromDate) {
+      validFromDate = false;
+      model.validationMessages.fromDate = 'Please enter a from date'
+    } else {
+      if (!moment(new Date(model.fromDate)).isValid()) {
+        validFromDate = false;
+        model.validationMessages.fromDate = 'From date must be a valid date. For example, 31 03 1980 14:30'
+      } else {
+        const allCurrentServiceBanners = await listAllBannersForService(req.params.sid, req.id);
+        const isInRange = allCurrentServiceBanners.find(x => moment(fromDate).isBetween(x.validFrom, x.validTo) === true);
+        if (isInRange) {
+          //TODO: link to the banner that exists
+          validFromDate = false;
+          model.validationMessages.fromDate = `Another banner exists between ${moment(isInRange.validFrom).format('DD MM YYYY HH:MM')} and ${moment(isInRange.validTo).format('DD MM YYYY HH:MM')}`
+        }
+      }
+    }
+    if (!model.toDate) {
+      validToDate = false;
+      model.validationMessages.toDate = 'Please enter a to date'
+    } else {
+      if (!moment( new Date (model.toDate)).isValid()) {
+        validToDate = false;
+        model.validationMessages.toDate = 'To date must be a valid date. For example, 31 03 1980 14:30'
+      } else {
+        const allCurrentServiceBanners = await listAllBannersForService(req.params.sid, req.id);
+        const isInRange = allCurrentServiceBanners.find(x => moment(toDate).isBetween(x.validFrom, x.validTo) === true);
+        if (isInRange) {
+          //TODO: link to the banner that exists
+          validToDate = false;
+          model.validationMessages.toDate = `Another banner exists between ${moment(isInRange.validFrom).format('DD MM YYYY HH:MM')} and ${moment(isInRange.validTo).format('DD MM YYYY HH:MM')}`
+        }
+      }
+    }
+
+    if (validToDate && validFromDate && !(moment(toDate).isAfter(fromDate))) {
+      model.validationMessages.toDate = 'To date must be after from date'
+    }
   }
 
-  //TODO: validate overlapping time banners and alwaysOn banners
+
+  //TODO: validate alwaysOn banners
 
   return model;
 };
