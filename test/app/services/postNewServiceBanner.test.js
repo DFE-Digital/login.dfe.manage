@@ -4,7 +4,7 @@ jest.mock('./../../../src/infrastructure/applications');
 
 const { getRequestMock, getResponseMock } = require('./../../utils');
 const postNewServiceBanner = require('./../../../src/app/services/newServiceBanner').post;
-const { getBannerById, upsertBanner } = require('./../../../src/infrastructure/applications');
+const { getBannerById, upsertBanner, listAllBannersForService } = require('./../../../src/infrastructure/applications');
 const res = getResponseMock();
 
 describe('when creating a new service banner', () => {
@@ -41,6 +41,17 @@ describe('when creating a new service banner', () => {
       title: 'banner title',
       message: 'banner message',
     });
+    listAllBannersForService.mockReset();
+    listAllBannersForService.mockReturnValue([
+        {
+          id: 'bannerId',
+          serviceId: 'serviceId',
+          name: 'banner name',
+          title: 'banner title',
+          message: 'banner message',
+        }
+    ]
+    );
     upsertBanner.mockReset();
     res.mockResetAll();
   });
@@ -54,6 +65,7 @@ describe('when creating a new service banner', () => {
     expect(res.render.mock.calls[0][0]).toBe('services/views/newServiceBanner');
     expect(res.render.mock.calls[0][1]).toEqual({
       backLink: true,
+      cancelLink: '/services/service1/service-banners',
       bannerDisplay: 'isActive',
       bannerTitle: 'banner title',
       csrfToken: 'token',
@@ -86,6 +98,7 @@ describe('when creating a new service banner', () => {
     expect(res.render.mock.calls[0][0]).toBe('services/views/newServiceBanner');
     expect(res.render.mock.calls[0][1]).toEqual({
       backLink: true,
+      cancelLink: '/services/service1/service-banners',
       bannerDisplay: 'isActive',
       bannerTitle: '',
       csrfToken: 'token',
@@ -118,6 +131,7 @@ describe('when creating a new service banner', () => {
     expect(res.render.mock.calls[0][0]).toBe('services/views/newServiceBanner');
     expect(res.render.mock.calls[0][1]).toEqual({
       backLink: true,
+      cancelLink: '/services/service1/service-banners',
       bannerDisplay: 'isActive',
       bannerTitle: 'banner title',
       csrfToken: 'token',
@@ -150,6 +164,7 @@ describe('when creating a new service banner', () => {
     expect(res.render.mock.calls[0][0]).toBe('services/views/newServiceBanner');
     expect(res.render.mock.calls[0][1]).toEqual({
       backLink: true,
+      cancelLink: '/services/service1/service-banners',
       bannerDisplay: '',
       bannerTitle: 'banner title',
       csrfToken: 'token',
@@ -183,6 +198,7 @@ describe('when creating a new service banner', () => {
     expect(res.render.mock.calls[0][0]).toBe('services/views/newServiceBanner');
     expect(res.render.mock.calls[0][1]).toEqual({
       backLink: true,
+      cancelLink: '/services/service1/service-banners',
       bannerDisplay: 'date',
       bannerTitle: 'banner title',
       csrfToken: 'token',
@@ -216,6 +232,7 @@ describe('when creating a new service banner', () => {
     expect(res.render.mock.calls[0][0]).toBe('services/views/newServiceBanner');
     expect(res.render.mock.calls[0][1]).toEqual({
       backLink: true,
+      cancelLink: '/services/service1/service-banners',
       bannerDisplay: 'date',
       bannerTitle: 'banner title',
       csrfToken: 'token',
@@ -238,6 +255,43 @@ describe('when creating a new service banner', () => {
       },
     });
   });
+
+  it('then it should render view if toDate before fromDate', async () => {
+    req.body.bannerDisplay = 'date';
+    req.body.fromDay= '18';
+
+    await postNewServiceBanner(req, res);
+
+    expect(res.render.mock.calls).toHaveLength(1);
+    expect(res.render.mock.calls[0][0]).toBe('services/views/newServiceBanner');
+    expect(res.render.mock.calls[0][1]).toEqual({
+      backLink: true,
+      cancelLink: '/services/service1/service-banners',
+      bannerDisplay: 'date',
+      bannerTitle: 'banner title',
+      csrfToken: 'token',
+      fromDay: '18',
+      fromHour: '12',
+      fromMinute: '30',
+      fromMonth: '12',
+      fromYear: '2019',
+      fromDate: '2019-12-18 12:30',
+      toDate: '2019-12-13 12:30',
+      isActive: false,
+      message: 'banner message',
+      name: 'banner name',
+      toDay: '13',
+      toHour: '12',
+      toMinute: '30',
+      toMonth: '12',
+      toYear: '2019',
+      bannerId: 'bannerId',
+      validationMessages: {
+        toDate: 'To date must be after from date',
+      },
+    });
+  });
+
 
   it('then it should upsert the banner', async () => {
     await postNewServiceBanner(req, res);
