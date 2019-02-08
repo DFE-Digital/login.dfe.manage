@@ -65,60 +65,78 @@
                         <label for="date-radio">Only display this banner between a specific date and time</label>
                     </div>
                 </fieldset>
-                <div class="panel panel-border-narrow js-hidden form-date" id="date">
+                <div class="panel panel-border-narrow js-hidden" id="date">
                     <div class="row row-spacer">
                         <div class="col-12">
-                            <p>From date</p>
-                            <div class="form-group form-date">
-                                <label class="form-label" for="fromDay">Day</label>
-                                <input id="fromDay" name="fromDay" type="number" value="<%=locals.fromDay%>">
-                            </div>
-
-                            <div class="form-group form-date">
-                                <label class="form-label" for="fromMonth">Month</label>
-                                <input id="fromMonth" name="fromMonth" type="number" value="<%=locals.fromMonth%>">
-                            </div>
-
-                            <div class="form-group form-group-year">
-                                <label class="form-label" for="fromYear">Year</label>
-                                <input id="fromYear" name="fromYear" type="number" value="<%=locals.fromYear%>">
-                            </div>
-
-                            <div class="form-group form-date">
-                                <label class="form-label" for="fromHour">Hour</label>
-                                <input id="fromHour" name="fromHour" type="number" value="<%=locals.fromHour%>">
-                            </div>
-                            <div class="form-group form-date">
-                                <label class="form-label" for="fromMinute">Minute</label>
-                                <input id="fromMinute" name="fromMinute" type="number" value="<%=locals.fromMinute%>">
+                            <div class="form-group <%= (locals.validationMessages.fromDate !== undefined) ? 'form-group-error' : '' %>">
+                                <fieldset>
+                                    <legend>
+                                        <span class="form-label-bold">From date</span>
+                                        <span class="form-hint">For example, 31 03 1980 14:30</span>
+                                    </legend>
+                                    <% if (locals.validationMessages.fromDate !== undefined) { %>
+                                        <p class="error-message" id="validation-display"><%= locals.validationMessages.fromDate %></p>
+                                    <% } %>
+                                    <div class="form-date">
+                                        <div class="form-group form-group-day">
+                                            <label class="form-label" for="fromDay">Day</label>
+                                            <input class="form-control" id="fromDay" name="fromDay" type="number" pattern="[0-9]*" value="<%=locals.fromDay%>">
+                                        </div>
+                                        <div class="form-group form-group-month">
+                                            <label class="form-label" for="fromMonth">Month</label>
+                                            <input class="form-control" id="fromMonth" name="fromMonth" type="number" pattern="[0-9]*" value="<%=locals.fromMonth%>">
+                                        </div>
+                                        <div class="form-group form-group-year">
+                                            <label class="form-label" for="fromYear">Year</label>
+                                            <input class="form-control" id="fromYear" name="fromYear" type="number" pattern="[0-9]*" value="<%=locals.fromYear%>">
+                                        </div>
+                                        <div class="form-group form-group-day">
+                                            <label class="form-label" for="fromHour">Hour</label>
+                                            <input class="form-control" id="fromHour" name="fromHour" type="number" pattern="[0-9]*" value="<%=locals.fromHour%>">
+                                        </div>
+                                        <div class="form-group form-group-day">
+                                            <label class="form-label" for="fromMinute">Minute</label>
+                                            <input class="form-control" id="fromMinute" name="fromMinute" type="number" pattern="[0-9]*" value="<%=locals.fromMinute%>">
+                                        </div>
+                                    </div>
+                                </fieldset>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-12">
-                            <p>To date</p>
-                            <div class="form-group form-date">
-                                <label class="form-label" for="toDay">Day</label>
-                                <input id="toDay" name="toDay" type="number" value="<%=locals.toDay%>">
-                            </div>
-
-                            <div class="form-group form-date">
-                                <label class="form-label" for="toMonth">Month</label>
-                                <input id="toMonth" name="toMonth" type="number" value="<%=locals.toMonth%>">
-                            </div>
-
-                            <div class="form-group form-group-year">
-                                <label class="form-label" for="toYear">Year</label>
-                                <input id="toYear" name="toYear" type="number" value="<%=locals.toYear%>">
-                            </div>
-
-                            <div class="form-group form-date">
-                                <label class="form-label" for="toHour">Hour</label>
-                                <input id="toHour" name="toHour" type="number" value="<%=locals.toHour%>">
-                            </div>
-                            <div class="form-group form-date">
-                                <label class="form-label" for="toMinute">Minute</label>
-                                <input id="toMinute" name="toMinute" type="number" value="<%=locals.toMinute%>">
+                            <div class="form-group <%= (locals.validationMessages.toDate !== undefined) ? 'form-group-error' : '' %>">
+                                <fieldset>
+                                    <legend>
+                                        <span class="form-label-bold">To date</span>
+                                        <span class="form-hint">For example, 31 03 1980 14:30</span>
+                                    </legend>
+                                    <% if (locals.validationMessages.toDate !== undefined) { %>
+                                        <p class="error-message" id="validation-display"><%= locals.validationMessages.toDate %></p>
+                                    <% } %>
+                                    <div class="form-date">
+                                        <div class="form-group form-group-day">
+                                            <label class="form-label" for="toDay">Day</label>
+                                            <input class="form-control" id="toDay" name="toDay" type="number" pattern="[0-9]*" value="<%=locals.toDay%>">
+                                        </div>
+                                        <div class="form-group form-group-month">
+                                            <label class="form-label" for="toMonth">Month</label>
+                                            <input class="form-control" id="toMonth" name="toMonth" type="number" pattern="[0-9]*" value="<%=locals.toMonth%>">
+                                        </div>
+                                        <div class="form-group form-group-year">
+                                            <label class="form-label" for="toYear">Year</label>
+                                            <input class="form-control" id="toYear" name="toYear" type="number" pattern="[0-9]*" value="<%=locals.toYear%>">
+                                        </div>
+                                        <div class="form-group form-group-day">
+                                            <label class="form-label" for="toHour">Hour</label>
+                                            <input class="form-control" id="toHour" name="toHour" type="number" pattern="[0-9]*" value="<%=locals.toHour%>">
+                                        </div>
+                                        <div class="form-group form-group-day">
+                                            <label class="form-label" for="toMinute">Minute</label>
+                                            <input class="form-control" id="toMinute" name="toMinute" type="number" pattern="[0-9]*" value="<%=locals.toMinute%>">
+                                        </div>
+                                    </div>
+                                </fieldset>
                             </div>
                         </div>
                     </div>
