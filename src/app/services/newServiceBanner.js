@@ -150,8 +150,14 @@ const validate = async (req) => {
     }
   }
 
-
-  //TODO: validate alwaysOn banners
+  if (model.bannerDisplay === 'isActive') {
+    //TODO: link to the existing banner that is always display
+    const allCurrentServiceBanners = await listAllBannersForService(req.params.sid, req.id);
+    const isAlwaysOnBanner = allCurrentServiceBanners.find(x => x.isActive === true);
+    if (isAlwaysOnBanner) {
+      model.validationMessages.bannerDisplay = 'A banner is already set to always display'
+    }
+  }
 
   return model;
 };
