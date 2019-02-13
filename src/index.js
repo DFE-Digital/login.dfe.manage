@@ -89,7 +89,15 @@ const init = async () => {
 
   app.use(bodyParser.urlencoded({extended: true}));
   app.use(cookieParser());
-  app.use(sanitization());
+  app.use(sanitization({
+    sanitizer: (key, value) => {
+      const fieldToNotSanitize = ['bannerName', 'bannerTitle','bannerMessage'];
+      if (fieldToNotSanitize.find(x => x.toLowerCase() === key.toLowerCase())) {
+        return value;
+      }
+      return sanitization.defaultSanitizer(key, value);
+    },
+  }));
   app.set('view engine', 'ejs');
   app.set('views', path.resolve(__dirname, 'app'));
   app.use(expressLayouts);
