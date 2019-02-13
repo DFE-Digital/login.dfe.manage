@@ -304,8 +304,8 @@ describe('when creating a new service banner', () => {
       message: 'banner message',
       name: 'banner name',
       title: 'banner title',
-      validFrom: undefined,
-      validTo: undefined,
+      validFrom: null,
+      validTo: null,
     });
     expect(upsertBanner.mock.calls[0][2]).toBe('correlationId');
   });
