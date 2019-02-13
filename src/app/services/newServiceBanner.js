@@ -5,7 +5,7 @@ const moment = require('moment');
 const get = async (req, res) => {
   const model = {
     csrfToken: req.csrfToken(),
-    backLink: true,
+    backLink: `/services/${req.params.sid}/service-banners`,
     cancelLink: `/services/${req.params.sid}/service-banners`,
     name: '',
     bannerTitle: '',
