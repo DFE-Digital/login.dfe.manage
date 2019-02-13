@@ -156,6 +156,8 @@ const validate = async (req) => {
     const isAlwaysOnBanner = allCurrentServiceBanners.find(x => x.isActive === true);
     if (isAlwaysOnBanner) {
       model.validationMessages.bannerDisplay = 'A banner is already set to always display'
+    } else {
+      model.isActive = true;
     }
   }
 
@@ -170,8 +172,7 @@ const post = async (req, res) => {
     return res.render('services/views/newServiceBanner', model);
   }
 
-  if (model.bannerDisplay === 'isActive') {
-    model.isActive = true;
+  if (model.bannerDisplay === 'isActive' || model.bannerDisplay === 'notActive') {
     model.fromDate = null;
     model.toDate = null;
   }
