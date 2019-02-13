@@ -172,6 +172,8 @@ const post = async (req, res) => {
 
   if (model.bannerDisplay === 'isActive') {
     model.isActive = true;
+    model.fromDate = null;
+    model.toDate = null;
   }
 
   const body = {
