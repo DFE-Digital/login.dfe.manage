@@ -21,14 +21,14 @@
         <form method="post" id="form-new-banner">
             <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
             <div class="form-group <%= (locals.validationMessages.name !== undefined) ? 'form-group-error' : '' %>">
-                <label class="form-label" for="bannerName">Banner name</label>
+                <label class="form-label" for="bannerName">Name</label>
                 <% if (locals.validationMessages.name !== undefined) { %>
                     <p class="error-message" id="validation-name"><%= locals.validationMessages.name %></p>
                 <% } %>
                 <input class="form-control banner-input" id="bannerName" name="bannerName" maxlength="20" value="<%=locals.name%>">
             </div>
             <div class="form-group <%= (locals.validationMessages.title !== undefined) ? 'form-group-error' : '' %>">
-                <label class="form-label" for="bannerTitle">Banner title</label>
+                <label class="form-label" for="bannerTitle">Title</label>
                 <% if (locals.validationMessages.title !== undefined) { %>
                     <p class="error-message" id="validation-title"><%= locals.validationMessages.title %></p>
                 <% } %>
@@ -36,7 +36,7 @@
             </div>
             <div class="form-group <%= (locals.validationMessages.message !== undefined) ? 'form-group-error' : '' %>">
                 <label class="form-label" for="bannerMesssage">
-                    Banner message
+                    Message
                 </label>
                 <% if (locals.validationMessages.message !== undefined) { %>
                     <p class="error-message" id="validation-message"><%= locals.validationMessages.message %></p>

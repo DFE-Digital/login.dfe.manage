@@ -12,17 +12,16 @@
     <div class="col-8">
         <h1 class="heading-xlarge">Manage banners</h1>
     </div>
-    <div class="col-4">
-        <aside>
-            <h2 class="heading-medium">Actions</h2>
-            <nav class="subnav">
-                <ul>
-                    <li><a href="/services/<%=locals.serviceId%>/service-banners/new-banner">Create new banner</a></li>
-                </ul>
-            </nav>
-        </aside>
+</div>
+
+<div class="row">
+    <div class="col-4 pull-right">
+        <div class="buttons pull-right">
+            <a href="/services/<%=locals.serviceId%>/service-banners/new-banner" class="button button-secondary">Create banner</a>
+        </div>
     </div>
 </div>
+
 
 <%
 const paginationModel = {
@@ -42,12 +41,12 @@ const paginationModel = {
 %>
 
 <div class="row">
-    <div class="col-8">
+    <div class="col-12">
         <%- include('../../layouts/pagination', paginationModel); %>
         <table class="data">
             <thead>
             <tr class="sortable">
-                <th scope="col" class="cwp-35">
+                <th scope="col" class="cwp-55">
                     Banner name</th>
                 <th scope="col" class="cwp-25">
                     Last update</th>
