@@ -1,3 +1,13 @@
+<% if (locals.flash.info) { %>
+<div class="row">
+    <div class="col-12">
+        <div class="notification notification-success">
+            <%=locals.flash.info%>
+        </div>
+    </div>
+</div>
+<% } %>
+
 <div class="row">
     <div class="col-8">
         <h1 class="heading-xlarge">Manage banners</h1>
@@ -7,15 +17,33 @@
             <h2 class="heading-medium">Actions</h2>
             <nav class="subnav">
                 <ul>
-                    <li><a href="">Create new banner</a></li>
+                    <li><a href="/services/<%=locals.serviceId%>/service-banners/new-banner">Create new banner</a></li>
                 </ul>
             </nav>
         </aside>
     </div>
 </div>
 
+<%
+const paginationModel = {
+    method: 'post',
+    csrfToken,
+    currentPage: locals.page,
+    numberOfPages: locals.numberOfPages,
+    totalNumberOfResults: locals.totalNumberOfResults,
+    numberOfResultsOnPage: locals.serviceBanners.length,
+    data: [
+        { key: 'criteria', value: locals.criteria },
+        { key: 'sort', value: locals.sortBy },
+        { key: 'sortDir', value: locals.sortOrder },
+        { key: 'showFilters', value: locals.showFilters }
+    ]
+}
+%>
+
 <div class="row">
     <div class="col-8">
+        <%- include('../../layouts/pagination', paginationModel); %>
         <table class="data">
             <thead>
             <tr class="sortable">
@@ -37,12 +65,13 @@
             const banner = locals.serviceBanners[i]%>
 
             <tr>
-                <td><a href=""><%= banner.name %></a></td>
+                <td><a href="service-banners/<%=banner.id%>"><%= banner.name %></a></td>
                 <td><%= banner.updatedAt ? locals.moment(banner.updatedAt).format('DD MMM YYYY') : 'never' %></td>
                 <td><%= banner.isActive ? 'Yes' : ''%></td>
             </tr>
             <% } %>
             </tbody>
         </table>
+        <%- include('../../layouts/pagination', paginationModel); %>
     </div>
 </div>

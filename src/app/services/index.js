@@ -8,7 +8,8 @@ const { isLoggedIn, isManageUserForService } = require('../../infrastructure/uti
 const { getDashboard } = require('./getDashboard');
 const { getServiceConfig, postServiceConfig } = require('./serviceConfig');
 const { get: getSelectService, post: postSelectService } = require('./selectService');
-const { get: getServiceBanners } = require('./serviceBanners');
+const { get: getServiceBanners, post: postServiceBanners } = require('./serviceBanners');
+const { get: getNewServiceBanners, post: postNewServiceBanners } = require('./newServiceBanner');
 
 const router = express.Router({ mergeParams: true });
 
@@ -37,7 +38,13 @@ const services = (csrf) => {
   router.post('/:sid/service-configuration', csrf, isManageUserForService, asyncWrapper(postServiceConfig));
 
   router.get('/:sid/service-banners', csrf, isManageUserForService, asyncWrapper(getServiceBanners));
+  router.post('/:sid/service-banners', csrf, isManageUserForService, asyncWrapper(postServiceBanners));
 
+  router.get('/:sid/service-banners/new-banner', csrf, isManageUserForService, asyncWrapper(getNewServiceBanners));
+  router.post('/:sid/service-banners/new-banner', csrf, isManageUserForService, asyncWrapper(postNewServiceBanners));
+
+  router.get('/:sid/service-banners/:bid', csrf, isManageUserForService, asyncWrapper(getNewServiceBanners));
+  router.post('/:sid/service-banners/:bid', csrf, isManageUserForService, asyncWrapper(postNewServiceBanners));
 
   return router;
 };

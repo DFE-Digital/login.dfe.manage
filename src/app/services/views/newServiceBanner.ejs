@@ -1,0 +1,139 @@
+<div class="row">
+    <div class="col-8">
+        <h1 class="heading-xlarge"><%= locals.isEditExisting ? 'Edit banner' : 'Create banner'%></h1>
+    </div>
+</div>
+
+<div class="grid-row">
+    <div class="col-12">
+        <form method="post" id="form-new-banner">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
+            <div class="form-group <%= (locals.validationMessages.name !== undefined) ? 'form-group-error' : '' %>">
+                <label class="form-label" for="bannerName">Banner name</label>
+                <% if (locals.validationMessages.name !== undefined) { %>
+                    <p class="error-message" id="validation-name"><%= locals.validationMessages.name %></p>
+                <% } %>
+                <input class="form-control" id="bannerName" name="bannerName" maxlength="20" value="<%=locals.name%>">
+            </div>
+            <div class="form-group <%= (locals.validationMessages.title !== undefined) ? 'form-group-error' : '' %>">
+                <label class="form-label" for="bannerTitle">Banner title</label>
+                <% if (locals.validationMessages.title !== undefined) { %>
+                    <p class="error-message" id="validation-title"><%= locals.validationMessages.title %></p>
+                <% } %>
+                <input class="form-control" id="bannerTitle" name="bannerTitle" maxlength="80" value="<%=locals.bannerTitle%>">
+            </div>
+            <div class="form-group <%= (locals.validationMessages.message !== undefined) ? 'form-group-error' : '' %>">
+                <label class="form-label" for="bannerMesssage">
+                    Banner message
+                </label>
+                <% if (locals.validationMessages.message !== undefined) { %>
+                    <p class="error-message" id="validation-message"><%= locals.validationMessages.message %></p>
+                <% } %>
+                <textarea class="form-control " name="bannerMesssage" id="bannerMesssage" rows="4" maxlength="400"><%=locals.message%></textarea>
+            </div>
+
+            <div class="form-group <%= (locals.validationMessages.bannerDisplay !== undefined) ? 'form-group-error' : '' %>">
+                <fieldset>
+                    <legend>
+                        When do you want this banner to be displayed?
+                    </legend>
+                    <% if (locals.validationMessages.bannerDisplay !== undefined) { %>
+                        <p class="error-message" id="validation-display"><%= locals.validationMessages.bannerDisplay %></p>
+                    <% } %>
+                    <div class="multiple-choice">
+                        <input id="notActive" type="radio" name="bannerDisplay" value="notActive" <%=locals.bannerDisplay === 'notActive' ? 'checked' : 'checked'%>>
+                        <label for="notActive">Don't display</label>
+                    </div>
+                    <div class="multiple-choice">
+                        <input id="alwayson" type="radio" name="bannerDisplay" value="isActive" <%=locals.bannerDisplay === 'isActive' ? 'checked' : ''%>>
+                        <label for="alwayson">Always show this banner until I stop it</label>
+                    </div>
+                    <div class="multiple-choice" data-target="date">
+                        <input id="date-radio" type="radio" name="bannerDisplay" value="date" <%=locals.bannerDisplay === 'date' ? 'checked' : ''%>>
+                        <label for="date-radio">Only display this banner between a specific date and time</label>
+                    </div>
+                </fieldset>
+                <div class="panel panel-border-narrow js-hidden" id="date">
+                    <div class="row row-spacer">
+                        <div class="col-12">
+                            <div class="form-group <%= (locals.validationMessages.fromDate !== undefined) ? 'form-group-error' : '' %>">
+                                <fieldset>
+                                    <legend>
+                                        <span class="form-label-bold">From date</span>
+                                        <span class="form-hint">For example, 31 03 1980 14:30</span>
+                                    </legend>
+                                    <% if (locals.validationMessages.fromDate !== undefined) { %>
+                                        <p class="error-message" id="validation-display"><%= locals.validationMessages.fromDate %></p>
+                                    <% } %>
+                                    <div class="form-date">
+                                        <div class="form-group form-group-day">
+                                            <label class="form-label" for="fromDay">Day</label>
+                                            <input class="form-control" id="fromDay" name="fromDay" type="number" pattern="[0-9]*" value="<%=locals.fromDay%>">
+                                        </div>
+                                        <div class="form-group form-group-month">
+                                            <label class="form-label" for="fromMonth">Month</label>
+                                            <input class="form-control" id="fromMonth" name="fromMonth" type="number" pattern="[0-9]*" value="<%=locals.fromMonth%>">
+                                        </div>
+                                        <div class="form-group form-group-year">
+                                            <label class="form-label" for="fromYear">Year</label>
+                                            <input class="form-control" id="fromYear" name="fromYear" type="number" pattern="[0-9]*" value="<%=locals.fromYear%>">
+                                        </div>
+                                        <div class="form-group form-group-day">
+                                            <label class="form-label" for="fromHour">Hour</label>
+                                            <input class="form-control" id="fromHour" name="fromHour" type="number" pattern="[0-9]*" value="<%=locals.fromHour%>">
+                                        </div>
+                                        <div class="form-group form-group-day">
+                                            <label class="form-label" for="fromMinute">Minute</label>
+                                            <input class="form-control" id="fromMinute" name="fromMinute" type="number" pattern="[0-9]*" value="<%=locals.fromMinute%>">
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group <%= (locals.validationMessages.toDate !== undefined) ? 'form-group-error' : '' %>">
+                                <fieldset>
+                                    <legend>
+                                        <span class="form-label-bold">To date</span>
+                                        <span class="form-hint">For example, 31 03 1980 14:30</span>
+                                    </legend>
+                                    <% if (locals.validationMessages.toDate !== undefined) { %>
+                                        <p class="error-message" id="validation-display"><%= locals.validationMessages.toDate %></p>
+                                    <% } %>
+                                    <div class="form-date">
+                                        <div class="form-group form-group-day">
+                                            <label class="form-label" for="toDay">Day</label>
+                                            <input class="form-control" id="toDay" name="toDay" type="number" pattern="[0-9]*" value="<%=locals.toDay%>">
+                                        </div>
+                                        <div class="form-group form-group-month">
+                                            <label class="form-label" for="toMonth">Month</label>
+                                            <input class="form-control" id="toMonth" name="toMonth" type="number" pattern="[0-9]*" value="<%=locals.toMonth%>">
+                                        </div>
+                                        <div class="form-group form-group-year">
+                                            <label class="form-label" for="toYear">Year</label>
+                                            <input class="form-control" id="toYear" name="toYear" type="number" pattern="[0-9]*" value="<%=locals.toYear%>">
+                                        </div>
+                                        <div class="form-group form-group-day">
+                                            <label class="form-label" for="toHour">Hour</label>
+                                            <input class="form-control" id="toHour" name="toHour" type="number" pattern="[0-9]*" value="<%=locals.toHour%>">
+                                        </div>
+                                        <div class="form-group form-group-day">
+                                            <label class="form-label" for="toMinute">Minute</label>
+                                            <input class="form-control" id="toMinute" name="toMinute" type="number" pattern="[0-9]*" value="<%=locals.toMinute%>">
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-submit submit-buttons">
+                <button type="submit" class="button">Save</button>
+                <a href="<%=locals.cancelLink%>" class="button button-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
