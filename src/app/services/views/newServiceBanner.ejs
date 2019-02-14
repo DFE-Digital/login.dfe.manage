@@ -2,6 +2,18 @@
     <div class="col-8">
         <h1 class="heading-xlarge"><%= locals.isEditExisting ? 'Edit banner' : 'Create banner'%></h1>
     </div>
+    <% if (locals.isEditExisting) { %>
+    <div class="col-4">
+        <aside>
+            <h2 class="heading-medium">Actions</h2>
+            <nav class="subnav">
+                <ul>
+                    <li><a href="<%=locals.bannerId%>/delete-banner">Delete banner</a></li>
+                </ul>
+            </nav>
+        </aside>
+    </div>
+    <% } %>
 </div>
 
 <div class="grid-row">
@@ -9,27 +21,27 @@
         <form method="post" id="form-new-banner">
             <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
             <div class="form-group <%= (locals.validationMessages.name !== undefined) ? 'form-group-error' : '' %>">
-                <label class="form-label" for="bannerName">Banner name</label>
+                <label class="form-label" for="bannerName">Name</label>
                 <% if (locals.validationMessages.name !== undefined) { %>
                     <p class="error-message" id="validation-name"><%= locals.validationMessages.name %></p>
                 <% } %>
-                <input class="form-control" id="bannerName" name="bannerName" maxlength="20" value="<%=locals.name%>">
+                <input class="form-control banner-input" id="bannerName" name="bannerName" maxlength="20" value="<%=locals.name%>">
             </div>
             <div class="form-group <%= (locals.validationMessages.title !== undefined) ? 'form-group-error' : '' %>">
-                <label class="form-label" for="bannerTitle">Banner title</label>
+                <label class="form-label" for="bannerTitle">Title</label>
                 <% if (locals.validationMessages.title !== undefined) { %>
                     <p class="error-message" id="validation-title"><%= locals.validationMessages.title %></p>
                 <% } %>
-                <input class="form-control" id="bannerTitle" name="bannerTitle" maxlength="80" value="<%=locals.bannerTitle%>">
+                <input class="form-control banner-input" id="bannerTitle" name="bannerTitle" maxlength="80" value="<%=locals.bannerTitle%>">
             </div>
             <div class="form-group <%= (locals.validationMessages.message !== undefined) ? 'form-group-error' : '' %>">
                 <label class="form-label" for="bannerMesssage">
-                    Banner message
+                    Message
                 </label>
                 <% if (locals.validationMessages.message !== undefined) { %>
                     <p class="error-message" id="validation-message"><%= locals.validationMessages.message %></p>
                 <% } %>
-                <textarea class="form-control " name="bannerMesssage" id="bannerMesssage" rows="4" maxlength="400"><%=locals.message%></textarea>
+                <textarea class="form-control banner-input" name="bannerMesssage" id="bannerMesssage" rows="4" maxlength="400"><%=locals.message%></textarea>
             </div>
 
             <div class="form-group <%= (locals.validationMessages.bannerDisplay !== undefined) ? 'form-group-error' : '' %>">

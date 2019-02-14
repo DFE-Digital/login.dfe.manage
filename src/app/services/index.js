@@ -10,6 +10,7 @@ const { getServiceConfig, postServiceConfig } = require('./serviceConfig');
 const { get: getSelectService, post: postSelectService } = require('./selectService');
 const { get: getServiceBanners, post: postServiceBanners } = require('./serviceBanners');
 const { get: getNewServiceBanners, post: postNewServiceBanners } = require('./newServiceBanner');
+const { get: getDeleteBanner, post: postDeleteBanner } = require('./deleteServiceBanner');
 
 const router = express.Router({ mergeParams: true });
 
@@ -45,6 +46,9 @@ const services = (csrf) => {
 
   router.get('/:sid/service-banners/:bid', csrf, isManageUserForService, asyncWrapper(getNewServiceBanners));
   router.post('/:sid/service-banners/:bid', csrf, isManageUserForService, asyncWrapper(postNewServiceBanners));
+
+  router.get('/:sid/service-banners/:bid/delete-banner', csrf, isManageUserForService, asyncWrapper(getDeleteBanner));
+  router.post('/:sid/service-banners/:bid/delete-banner', csrf, isManageUserForService, asyncWrapper(postDeleteBanner));
 
   return router;
 };

@@ -74,7 +74,7 @@ describe('when creating a new service banner', () => {
       fromMinute: '30',
       fromMonth: '12',
       fromYear: '2019',
-      isActive: false,
+      isActive: true,
       message: 'banner message',
       name: '',
       toDay: '13',
@@ -82,6 +82,7 @@ describe('when creating a new service banner', () => {
       toMinute: '30',
       toMonth: '12',
       toYear: '2019',
+      bannerId: 'bannerId',
       validationMessages: {
         name: 'Please enter a banner name',
       },
@@ -106,7 +107,7 @@ describe('when creating a new service banner', () => {
       fromMinute: '30',
       fromMonth: '12',
       fromYear: '2019',
-      isActive: false,
+      isActive: true,
       message: 'banner message',
       name: 'banner name',
       toDay: '13',
@@ -114,6 +115,7 @@ describe('when creating a new service banner', () => {
       toMinute: '30',
       toMonth: '12',
       toYear: '2019',
+      bannerId: 'bannerId',
       validationMessages: {
         title: 'Please enter a banner title',
       },
@@ -138,7 +140,7 @@ describe('when creating a new service banner', () => {
       fromMinute: '30',
       fromMonth: '12',
       fromYear: '2019',
-      isActive: false,
+      isActive: true,
       message: '',
       name: 'banner name',
       toDay: '13',
@@ -146,6 +148,7 @@ describe('when creating a new service banner', () => {
       toMinute: '30',
       toMonth: '12',
       toYear: '2019',
+      bannerId: 'bannerId',
       validationMessages: {
         message: 'Please enter a banner message',
       },
@@ -178,6 +181,7 @@ describe('when creating a new service banner', () => {
       toMinute: '30',
       toMonth: '12',
       toYear: '2019',
+      bannerId: 'bannerId',
       validationMessages: {
         bannerDisplay: 'Please select when you want the banner to be displayed',
       },
@@ -211,6 +215,7 @@ describe('when creating a new service banner', () => {
       toMinute: '30',
       toMonth: '12',
       toYear: '2019',
+      bannerId: 'bannerId',
       validationMessages: {
         fromDate: 'Please enter a from date',
       },
@@ -244,6 +249,7 @@ describe('when creating a new service banner', () => {
       toHour: '12',
       toMinute: '30',
       toMonth: '12',
+      bannerId: 'bannerId',
       validationMessages: {
         toDate: 'Please enter a to date',
       },
@@ -260,6 +266,7 @@ describe('when creating a new service banner', () => {
     expect(res.render.mock.calls[0][0]).toBe('services/views/newServiceBanner');
     expect(res.render.mock.calls[0][1]).toEqual({
       backLink: true,
+      bannerId: 'bannerId',
       cancelLink: '/services/service1/service-banners',
       bannerDisplay: 'date',
       bannerTitle: 'banner title',
@@ -297,8 +304,8 @@ describe('when creating a new service banner', () => {
       message: 'banner message',
       name: 'banner name',
       title: 'banner title',
-      validFrom: undefined,
-      validTo: undefined,
+      validFrom: null,
+      validTo: null,
     });
     expect(upsertBanner.mock.calls[0][2]).toBe('correlationId');
   });

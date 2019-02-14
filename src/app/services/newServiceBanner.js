@@ -5,7 +5,7 @@ const moment = require('moment');
 const get = async (req, res) => {
   const model = {
     csrfToken: req.csrfToken(),
-    backLink: true,
+    backLink: `/services/${req.params.sid}/service-banners`,
     cancelLink: `/services/${req.params.sid}/service-banners`,
     name: '',
     bannerTitle: '',
@@ -23,6 +23,7 @@ const get = async (req, res) => {
     toMinute: '',
     isActive: '',
     isEditExisting: false,
+    bannerId: req.params.bid,
     validationMessages: {},
   };
 
@@ -87,6 +88,7 @@ const validate = async (req) => {
     fromDate,
     toDate,
     isActive: false,
+    bannerId: req.params.bid,
     validationMessages: {},
     backLink: true,
     cancelLink: `/services/${req.params.sid}/service-banners`,
@@ -117,7 +119,7 @@ const validate = async (req) => {
         model.validationMessages.fromDate = 'From date must be a valid date. For example, 31 03 1980 14:30'
       } else {
         const allCurrentServiceBanners = await listAllBannersForService(req.params.sid, req.id);
-        const isInRange = allCurrentServiceBanners.find(x => moment(fromDate).isBetween(x.validFrom, x.validTo) === true);
+        const isInRange = allCurrentServiceBanners.find(x => moment(fromDate).isBetween(x.validFrom, x.validTo) === true && x.id !== req.params.bid);
         if (isInRange) {
           //TODO: link to the banner that exists
           validFromDate = false;
@@ -134,7 +136,7 @@ const validate = async (req) => {
         model.validationMessages.toDate = 'To date must be a valid date. For example, 31 03 1980 14:30'
       } else {
         const allCurrentServiceBanners = await listAllBannersForService(req.params.sid, req.id);
-        const isInRange = allCurrentServiceBanners.find(x => moment(toDate).isBetween(x.validFrom, x.validTo) === true);
+        const isInRange = allCurrentServiceBanners.find(x => moment(toDate).isBetween(x.validFrom, x.validTo) === true && x.id !== req.params.bid);
         if (isInRange) {
           //TODO: link to the banner that exists
           validToDate = false;
@@ -151,9 +153,11 @@ const validate = async (req) => {
   if (model.bannerDisplay === 'isActive') {
     //TODO: link to the existing banner that is always display
     const allCurrentServiceBanners = await listAllBannersForService(req.params.sid, req.id);
-    const isAlwaysOnBanner = allCurrentServiceBanners.find(x => x.isActive === true);
+    const isAlwaysOnBanner = allCurrentServiceBanners.find(x => x.isActive === true && x.id !== req.params.bid);
     if (isAlwaysOnBanner) {
       model.validationMessages.bannerDisplay = 'A banner is already set to always display'
+    } else {
+      model.isActive = true;
     }
   }
 
@@ -168,8 +172,9 @@ const post = async (req, res) => {
     return res.render('services/views/newServiceBanner', model);
   }
 
-  if (model.bannerDisplay === 'isActive') {
-    model.isActive = true;
+  if (model.bannerDisplay === 'isActive' || model.bannerDisplay === 'notActive') {
+    model.fromDate = null;
+    model.toDate = null;
   }
 
   const body = {

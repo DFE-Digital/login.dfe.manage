@@ -11,7 +11,7 @@ const get = async (req, res) => {
 
   return res.render('services/views/serviceBanners', {
     csrfToken: req.csrfToken(),
-    backLink: true,
+    backLink: `/services/${req.params.sid}`,
     serviceBanners: serviceBanners.banners,
     page: serviceBanners.page,
     totalNumberOfResults: serviceBanners.totalNumberOfRecords,
