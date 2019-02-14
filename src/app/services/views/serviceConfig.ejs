@@ -122,7 +122,7 @@
                             <% if (locals.validationMessages.clientSecret !== undefined) { %>
                             <p class="error-message" id="validation-homeUrl"><%=locals.validationMessages.clientSecret %></p>
                             <% } %>
-                            <div class="show-password full-width" style="width: 75%">
+                            <div class="show-password full-width" id="secret-input">
                                 <input class="form-control read-only-input" id="clientSecret" name="clientSecret" type="password" value="<%=locals.service.relyingParty.client_secret%>" readonly="readonly">
                             </div>
                         </div>
@@ -266,7 +266,7 @@
                             <% if (locals.validationMessages.apiSecret !== undefined) { %>
                             <p class="error-message" id="validation-homeUrl"><%=locals.validationMessages.apiSecret %></p>
                             <% } %>
-                            <div class="show-password full-width" style="width: 75%">
+                            <div class="show-password full-width" id="secret-input">
                                 <input class="form-control read-only-input" id="apiSecret" name="apiSecret" type="password" value="<%=locals.service.relyingParty.api_secret%>" readonly="readonly">
                             </div>
                         </div>

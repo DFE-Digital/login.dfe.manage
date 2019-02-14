@@ -119,7 +119,7 @@ const validate = async (req) => {
         model.validationMessages.fromDate = 'From date must be a valid date. For example, 31 03 1980 14:30'
       } else {
         const allCurrentServiceBanners = await listAllBannersForService(req.params.sid, req.id);
-        const isInRange = allCurrentServiceBanners.find(x => moment(fromDate).isBetween(x.validFrom, x.validTo) === true);
+        const isInRange = allCurrentServiceBanners.find(x => moment(fromDate).isBetween(x.validFrom, x.validTo) === true && x.id !== req.params.bid);
         if (isInRange) {
           //TODO: link to the banner that exists
           validFromDate = false;
@@ -136,7 +136,7 @@ const validate = async (req) => {
         model.validationMessages.toDate = 'To date must be a valid date. For example, 31 03 1980 14:30'
       } else {
         const allCurrentServiceBanners = await listAllBannersForService(req.params.sid, req.id);
-        const isInRange = allCurrentServiceBanners.find(x => moment(toDate).isBetween(x.validFrom, x.validTo) === true);
+        const isInRange = allCurrentServiceBanners.find(x => moment(toDate).isBetween(x.validFrom, x.validTo) === true && x.id !== req.params.bid);
         if (isInRange) {
           //TODO: link to the banner that exists
           validToDate = false;
@@ -153,7 +153,7 @@ const validate = async (req) => {
   if (model.bannerDisplay === 'isActive') {
     //TODO: link to the existing banner that is always display
     const allCurrentServiceBanners = await listAllBannersForService(req.params.sid, req.id);
-    const isAlwaysOnBanner = allCurrentServiceBanners.find(x => x.isActive === true);
+    const isAlwaysOnBanner = allCurrentServiceBanners.find(x => x.isActive === true && x.id !== req.params.bid);
     if (isAlwaysOnBanner) {
       model.validationMessages.bannerDisplay = 'A banner is already set to always display'
     } else {
