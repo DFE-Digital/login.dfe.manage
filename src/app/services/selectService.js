@@ -24,6 +24,10 @@ const get = async (req, res) => {
     return res.status(401).render('errors/views/notAuthorised');
   }
   const userServices = await getServiceDetails(req);
+  if (userServices.length === 1) {
+    const service = userServices[0];
+    return res.redirect(`${service.id}`);
+  }
   return res.render('services/views/selectService', {
     csrfToken: req.csrfToken(),
     title: 'Select service',

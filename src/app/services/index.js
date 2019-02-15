@@ -23,16 +23,7 @@ const services = (csrf) => {
     if (!req.userServices || req.userServices.roles.length === 0) {
       return res.status(401).render('errors/views/notAuthorised');
     }
-    let userServices = req.userServices.roles.map((role) => ({
-      id: role.code.substr(0, role.code.indexOf('_')),
-    }));
-    userServices = uniqBy(userServices, 'id');
-    if (userServices.length === 1) {
-      const service = userServices[0];
-      return res.redirect(`services/${service.id}`)
-    } else {
-      return res.redirect(`services/select-service`);
-    }
+    return res.redirect(`services/select-service`);
   }));
 
   router.get('/select-service', csrf, asyncWrapper(getSelectService));
