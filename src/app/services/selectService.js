@@ -1,13 +1,15 @@
 'use strict';
 const { getServiceById } = require('./../../infrastructure/applications');
+const uniqBy = require('lodash/uniqBy');
 
 const getServiceDetails = async (req) => {
-  const userServices = req.userServices.roles.map((role) => ({
+
+  let userServices = req.userServices.roles.map((role) => ({
     id: role.code.substr(0, role.code.indexOf('_')),
     name: ''
   }));
 
-  //TODO: only show unique
+  userServices = uniqBy(userServices, 'id');
 
   for (let i = 0; i < userServices.length; i++) {
     const service = userServices[i];
