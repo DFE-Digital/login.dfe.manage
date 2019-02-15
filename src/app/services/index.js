@@ -3,7 +3,8 @@
 const express = require('express');
 const logger = require('../../infrastructure/logger');
 const { asyncWrapper } = require('login.dfe.express-error-handling');
-const { isLoggedIn, isManageUserForService } = require('../../infrastructure/utils');
+const { isLoggedIn, isManageUserForService, hasRole } = require('../../infrastructure/utils');
+const uniqBy = require('lodash/uniqBy');
 
 const { getDashboard } = require('./getDashboard');
 const { getServiceConfig, postServiceConfig } = require('./serviceConfig');
@@ -22,12 +23,7 @@ const services = (csrf) => {
     if (!req.userServices || req.userServices.roles.length === 0) {
       return res.status(401).render('errors/views/notAuthorised');
     }
-    if (req.userServices.roles.length === 1) {
-      const role = req.userServices.roles[0];
-      return res.redirect(`services/${role.code.substr(0, role.code.indexOf('_'))}`)
-    } else {
-      return res.redirect(`services/select-service`);
-    }
+    return res.redirect(`services/select-service`);
   }));
 
   router.get('/select-service', csrf, asyncWrapper(getSelectService));
@@ -35,20 +31,20 @@ const services = (csrf) => {
 
   router.get('/:sid', csrf, isManageUserForService, asyncWrapper(getDashboard));
 
-  router.get('/:sid/service-configuration', csrf, isManageUserForService, asyncWrapper(getServiceConfig));
-  router.post('/:sid/service-configuration', csrf, isManageUserForService, asyncWrapper(postServiceConfig));
+  router.get('/:sid/service-configuration', csrf, isManageUserForService, hasRole('serviceconfig'), asyncWrapper(getServiceConfig));
+  router.post('/:sid/service-configuration', csrf, isManageUserForService, hasRole('serviceconfig'), asyncWrapper(postServiceConfig));
 
-  router.get('/:sid/service-banners', csrf, isManageUserForService, asyncWrapper(getServiceBanners));
-  router.post('/:sid/service-banners', csrf, isManageUserForService, asyncWrapper(postServiceBanners));
+  router.get('/:sid/service-banners', csrf, isManageUserForService, hasRole('serviceBanner'), asyncWrapper(getServiceBanners));
+  router.post('/:sid/service-banners', csrf, isManageUserForService, hasRole('serviceBanner'), asyncWrapper(postServiceBanners));
 
-  router.get('/:sid/service-banners/new-banner', csrf, isManageUserForService, asyncWrapper(getNewServiceBanners));
-  router.post('/:sid/service-banners/new-banner', csrf, isManageUserForService, asyncWrapper(postNewServiceBanners));
+  router.get('/:sid/service-banners/new-banner', csrf, isManageUserForService, hasRole('serviceBanner'), asyncWrapper(getNewServiceBanners));
+  router.post('/:sid/service-banners/new-banner', csrf, isManageUserForService, hasRole('serviceBanner'), asyncWrapper(postNewServiceBanners));
 
-  router.get('/:sid/service-banners/:bid', csrf, isManageUserForService, asyncWrapper(getNewServiceBanners));
-  router.post('/:sid/service-banners/:bid', csrf, isManageUserForService, asyncWrapper(postNewServiceBanners));
+  router.get('/:sid/service-banners/:bid', csrf, isManageUserForService, hasRole('serviceBanner'), asyncWrapper(getNewServiceBanners));
+  router.post('/:sid/service-banners/:bid', csrf, isManageUserForService, hasRole('serviceBanner'), asyncWrapper(postNewServiceBanners));
 
-  router.get('/:sid/service-banners/:bid/delete-banner', csrf, isManageUserForService, asyncWrapper(getDeleteBanner));
-  router.post('/:sid/service-banners/:bid/delete-banner', csrf, isManageUserForService, asyncWrapper(postDeleteBanner));
+  router.get('/:sid/service-banners/:bid/delete-banner', csrf, isManageUserForService, hasRole('serviceBanner'), asyncWrapper(getDeleteBanner));
+  router.post('/:sid/service-banners/:bid/delete-banner', csrf, isManageUserForService, hasRole('serviceBanner'), asyncWrapper(postDeleteBanner));
 
   return router;
 };

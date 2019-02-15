@@ -1,11 +1,16 @@
 'use strict';
 const { getServiceById } = require('./../../infrastructure/applications');
+const uniqBy = require('lodash/uniqBy');
 
 const getServiceDetails = async (req) => {
-  const userServices = req.userServices.roles.map((role) => ({
+
+  let userServices = req.userServices.roles.map((role) => ({
     id: role.code.substr(0, role.code.indexOf('_')),
     name: ''
   }));
+
+  userServices = uniqBy(userServices, 'id');
+
   for (let i = 0; i < userServices.length; i++) {
     const service = userServices[i];
     const application = await getServiceById(service.id, req.id);
@@ -19,6 +24,10 @@ const get = async (req, res) => {
     return res.status(401).render('errors/views/notAuthorised');
   }
   const userServices = await getServiceDetails(req);
+  if (userServices.length === 1) {
+    const service = userServices[0];
+    return res.redirect(`${service.id}`);
+  }
   return res.render('services/views/selectService', {
     csrfToken: req.csrfToken(),
     title: 'Select service',

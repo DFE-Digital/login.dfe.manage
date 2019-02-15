@@ -16,9 +16,15 @@ describe('when getting the select service page', () => {
         sid: 'service1'
       },
       userServices: {
-        roles: [{
+        roles: [
+          {
           code: 'serviceid_serviceconfiguration'
-        }]
+          },
+          {
+            code: 'serviceid1_serviceconfiguration'
+          },
+
+        ]
       },
     });
 
@@ -50,13 +56,25 @@ describe('when getting the select service page', () => {
     });
     res.mockResetAll();
   });
-  it('then it should get the service by id', async () => {
+  it('then it should get the services by id', async () => {
 
     await getSelectService(req, res);
 
-    expect(getServiceById.mock.calls).toHaveLength(1);
+    expect(getServiceById.mock.calls).toHaveLength(2);
     expect(getServiceById.mock.calls[0][0]).toBe('serviceid');
     expect(getServiceById.mock.calls[0][1]).toBe('correlationId');
+  });
+
+  it('then it should redirect to the service if only one service', async () => {
+    req.userServices= {
+      roles: [{
+        code: 'serviceid_serviceconfiguration'
+      }]
+    };
+    await getSelectService(req, res);
+
+    expect(res.redirect.mock.calls).toHaveLength(1);
+    expect(res.redirect.mock.calls[0][0]).toBe(`serviceid`);
   });
 
   it('then it should return the multiple services view', async () => {
@@ -78,10 +96,16 @@ describe('when getting the select service page', () => {
     await getSelectService(req, res);
 
     expect(res.render.mock.calls[0][1]).toMatchObject({
-      services: [{
+      services: [
+        {
         id: 'serviceid',
         name: 'service one'
-      }]
+        },
+        {
+          id: 'serviceid1',
+          name: 'service one'
+        },
+      ],
     });
   });
 });

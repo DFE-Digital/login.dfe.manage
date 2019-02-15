@@ -30,6 +30,20 @@ const isManageUserForService = (req, res, next) => {
   return res.status(401).render('errors/views/notAuthorised');
 };
 
+const hasRole = (role) => {
+  return (req, res, next) => {
+    if (req.userServices && req.userServices.roles.length > 0) {
+      const services = req.userServices.roles.map((role) => ({
+        role: role.code.split('_')[1],
+      }));
+      if (services.find(x => x.role === role)) {
+        return next();
+      }
+    }
+    return res.status(401).render('errors/views/notAuthorised');
+  }
+};
+
 const getUserDisplayName = user => `${user.given_name || ''} ${user.family_name || ''}`.trim();
 
 const setUserContext = async (req, res, next) => {
@@ -46,4 +60,5 @@ module.exports = {
   setUserContext,
   isManageUser,
   isManageUserForService,
+  hasRole,
 };
