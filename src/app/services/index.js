@@ -3,7 +3,7 @@
 const express = require('express');
 const logger = require('../../infrastructure/logger');
 const { asyncWrapper } = require('login.dfe.express-error-handling');
-const { isLoggedIn, isManageUserForService } = require('../../infrastructure/utils');
+const { isLoggedIn, isManageUserForService, hasRole } = require('../../infrastructure/utils');
 
 const { getDashboard } = require('./getDashboard');
 const { getServiceConfig, postServiceConfig } = require('./serviceConfig');
@@ -38,7 +38,7 @@ const services = (csrf) => {
   router.get('/:sid/service-configuration', csrf, isManageUserForService, asyncWrapper(getServiceConfig));
   router.post('/:sid/service-configuration', csrf, isManageUserForService, asyncWrapper(postServiceConfig));
 
-  router.get('/:sid/service-banners', csrf, isManageUserForService, asyncWrapper(getServiceBanners));
+  router.get('/:sid/service-banners', csrf, isManageUserForService, hasRole('serviceBanner'), asyncWrapper(getServiceBanners));
   router.post('/:sid/service-banners', csrf, isManageUserForService, asyncWrapper(postServiceBanners));
 
   router.get('/:sid/service-banners/new-banner', csrf, isManageUserForService, asyncWrapper(getNewServiceBanners));

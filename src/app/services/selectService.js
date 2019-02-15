@@ -6,6 +6,9 @@ const getServiceDetails = async (req) => {
     id: role.code.substr(0, role.code.indexOf('_')),
     name: ''
   }));
+
+  //TODO: only show unique
+
   for (let i = 0; i < userServices.length; i++) {
     const service = userServices[i];
     const application = await getServiceById(service.id, req.id);
