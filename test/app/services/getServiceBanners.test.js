@@ -4,7 +4,7 @@ jest.mock('./../../../src/infrastructure/applications');
 
 const { getRequestMock, getResponseMock } = require('./../../utils');
 const getServiceBanners = require('./../../../src/app/services/serviceBanners').get;
-const { listBannersForService } = require('./../../../src/infrastructure/applications');
+const { listBannersForService, getServiceById } = require('./../../../src/infrastructure/applications');
 const res = getResponseMock();
 
 describe('when getting the list of service banners page', () => {
@@ -30,6 +30,33 @@ describe('when getting the list of service banners page', () => {
         isActive: true,
       }],
     });
+
+    getServiceById.mockReset();
+    getServiceById.mockReturnValue({
+      id: 'service1',
+      name:'service one',
+      description: 'service description',
+      relyingParty: {
+        client_id: 'clientid',
+        client_secret: 'dewier-thrombi-confounder-mikado',
+        api_secret: 'dewier-thrombi-confounder-mikado',
+        service_home: 'https://www.servicehome.com',
+        postResetUrl: 'https://www.postreset.com',
+        redirect_uris: [
+          'https://www.redirect.com',
+        ],
+        post_logout_redirect_uris: [
+          'https://www.logout.com',
+        ],
+        grant_types: [
+          'implicit',
+          'authorization_code'
+        ],
+        response_types: [
+          'code',
+        ],
+      }
+    });
     res.mockResetAll();
   });
 
@@ -42,6 +69,15 @@ describe('when getting the list of service banners page', () => {
     expect(listBannersForService.mock.calls[0][1]).toBe(10);
     expect(listBannersForService.mock.calls[0][2]).toBe(1);
     expect(listBannersForService.mock.calls[0][3]).toBe('correlationId');
+  });
+
+  it('then it should get the service details', async () => {
+
+    await getServiceBanners(req, res);
+
+    expect(getServiceById.mock.calls).toHaveLength(1);
+    expect(getServiceById.mock.calls[0][0]).toBe('service1');
+    expect(getServiceById.mock.calls[0][1]).toBe('correlationId');
   });
 
   it('then it should return the service banners view', async () => {
@@ -70,6 +106,38 @@ describe('when getting the list of service banners page', () => {
         updatedAt: '01-01-2019',
         isActive: true,
       }]
+    });
+  });
+
+  it('then it should include the service in the model', async () => {
+    await getServiceBanners(req, res);
+
+    expect(res.render.mock.calls[0][1]).toMatchObject({
+      serviceDetails: {
+        id: 'service1',
+        name:'service one',
+        description: 'service description',
+        relyingParty: {
+          client_id: 'clientid',
+          client_secret: 'dewier-thrombi-confounder-mikado',
+          api_secret: 'dewier-thrombi-confounder-mikado',
+          service_home: 'https://www.servicehome.com',
+          postResetUrl: 'https://www.postreset.com',
+          redirect_uris: [
+            'https://www.redirect.com',
+          ],
+          post_logout_redirect_uris: [
+            'https://www.logout.com',
+          ],
+          grant_types: [
+            'implicit',
+            'authorization_code'
+          ],
+          response_types: [
+            'code',
+          ],
+        }
+      }
     });
   });
 
