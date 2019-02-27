@@ -121,7 +121,7 @@
                     <dd class="app-check-your-answers__answer">
                         <div class="form-group <%= (locals.validationMessages.clientSecret !== undefined) ? 'form-group-error' : '' %>">
                             <label for="clientSecret" class="vh">Client secret</label>
-                            <a href="" class="pull-right" id="generate-client-secret" onclick="alert('Client secret regenerated');">Regenerate</a>
+                            <a href="" class="pull-right" id="generate-client-secret">Regenerate</a>
                             <% if (locals.validationMessages.clientSecret !== undefined) { %>
                             <p class="error-message" id="validation-homeUrl"><%=locals.validationMessages.clientSecret %></p>
                             <% } %>
@@ -265,7 +265,7 @@
                     <dd class="app-check-your-answers__answer">
                         <div class="form-group <%= (locals.validationMessages.apiSecret !== undefined) ? 'form-group-error' : '' %>">
                             <label class="form-label vh" for="apiSecret"></label>
-                            <a href="" class="pull-right" id="generate-api-secret" onclick="alert('API secret regenerated');">Regenerate</a>
+                            <a href="" class="pull-right" id="generate-api-secret">Regenerate</a>
                             <% if (locals.validationMessages.apiSecret !== undefined) { %>
                             <p class="error-message" id="validation-homeUrl"><%=locals.validationMessages.apiSecret %></p>
                             <% } %>
