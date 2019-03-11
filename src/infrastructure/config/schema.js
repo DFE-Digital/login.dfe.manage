@@ -26,6 +26,8 @@ const schema = new SimpleSchema({
   applications: schemas.apiClient,
   search: schemas.apiClient,
   access: accessIdentifiers,
+  organisations: schemas.apiClient,
+  directories: schemas.apiClient,
   identifyingParty: identifyingPartySchema,
 });
 

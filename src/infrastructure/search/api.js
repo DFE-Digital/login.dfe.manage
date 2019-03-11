@@ -90,6 +90,18 @@ const searchForUsersForService = async (serviceId, criteria, pageNumber, sortBy,
   }
 };
 
+const getSearchDetailsForUserById = async (id) => {
+  try {
+    const user = await callApi(`/users/${id}`, 'GET');
+    return user ? mapSearchUserToSupportModel(user) : undefined;
+  } catch (e) {
+    throw new Error(`Error getting user ${id} from search - ${e.message}`);
+  }
+};
+
+
+
 module.exports = {
   searchForUsersForService,
+  getSearchDetailsForUserById,
 };
