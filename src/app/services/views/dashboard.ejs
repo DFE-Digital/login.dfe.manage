@@ -46,8 +46,8 @@
     </div>
 
     <div class="col-6">
-        <% if (locals.userRoles.includes('serviceSupport')) { %>
-            <a href=""><h2 class="heading-large">Organisations and users</h2></a>
+        <% if (locals.userRoles.includes('serviceSup')) { %>
+            <a href="<%= locals.serviceId %>/users"><h2 class="heading-large">Organisations and users</h2></a>
         <% } else { %>
             <h2 class="heading-large">Organisations and users</h2>
         <% } %>

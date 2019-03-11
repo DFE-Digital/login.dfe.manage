@@ -47,8 +47,8 @@ const services = (csrf) => {
   router.get('/:sid/service-banners/:bid/delete-banner', csrf, isManageUserForService, hasRole('serviceBanner'), asyncWrapper(getDeleteBanner));
   router.post('/:sid/service-banners/:bid/delete-banner', csrf, isManageUserForService, hasRole('serviceBanner'), asyncWrapper(postDeleteBanner));
 
-  router.get('/:sid/users', csrf, isManageUserForService, asyncWrapper(getUsersSearch));
-  router.post('/:sid/users', csrf, isManageUserForService, asyncWrapper(getUsersSearch));
+  router.get('/:sid/users', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getUsersSearch));
+  router.post('/:sid/users', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postUsersSearch));
 
   return router;
 };
