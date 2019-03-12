@@ -14,6 +14,7 @@ const { get: getNewServiceBanners, post: postNewServiceBanners } = require('./ne
 const { get: getDeleteBanner, post: postDeleteBanner } = require('./deleteServiceBanner');
 const { get: getUsersSearch, post: postUsersSearch } = require('./usersSearch');
 const getUserOrganisations = require('./getUserOrganisations');
+const { get: getWebServiceSync, post: postWebServiceSync } = require('./webServiceSync');
 
 const router = express.Router({ mergeParams: true });
 
@@ -52,6 +53,9 @@ const services = (csrf) => {
   router.post('/:sid/users', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postUsersSearch));
 
   router.get('/:sid/users/:uid', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getUserOrganisations));
+
+  router.get('/:sid/users/:uid/web-service-sync',csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getWebServiceSync));
+  router.post('/:sid/users/:uid/web-service-sync',csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postWebServiceSync));
 
   return router;
 };

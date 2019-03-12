@@ -20,6 +20,11 @@ const accessIdentifiers = new SimpleSchema({
 
 accessIdentifiers.extend(schemas.apiClient);
 
+const notificationsSchema = new SimpleSchema({
+  connectionString: patterns.redis
+});
+
+
 const schema = new SimpleSchema({
   loggerSettings: schemas.loggerSettings,
   hostingEnvironment: schemas.hostingEnvironment,
@@ -29,6 +34,7 @@ const schema = new SimpleSchema({
   organisations: schemas.apiClient,
   directories: schemas.apiClient,
   identifyingParty: identifyingPartySchema,
+  notifications: notificationsSchema,
 });
 
 
