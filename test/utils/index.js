@@ -22,6 +22,12 @@ const configMockFactory = (customConfig) => {
     search: {
       type: 'static',
     },
+    organisations: {
+      type: 'static',
+    },
+    directories: {
+      type: 'static',
+    },
     loggerSettings: {},
   }, customConfig);
 };
