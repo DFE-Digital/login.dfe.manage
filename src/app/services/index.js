@@ -52,7 +52,7 @@ const services = (csrf) => {
   router.get('/:sid/users', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getUsersSearch));
   router.post('/:sid/users', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postUsersSearch));
 
-  router.get('/:sid/users/:uid', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getUserOrganisations));
+  router.get('/:sid/users/:uid/organisations', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getUserOrganisations));
 
   router.get('/:sid/users/:uid/web-service-sync',csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getWebServiceSync));
   router.post('/:sid/users/:uid/web-service-sync',csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postWebServiceSync));
