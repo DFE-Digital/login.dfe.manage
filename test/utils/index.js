@@ -16,6 +16,12 @@ const configMockFactory = (customConfig) => {
     applications: {
       type: 'static',
     },
+    access: {
+      type: 'static',
+    },
+    search: {
+      type: 'static',
+    },
     loggerSettings: {},
   }, customConfig);
 };
