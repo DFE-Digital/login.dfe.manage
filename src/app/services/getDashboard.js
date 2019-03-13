@@ -1,7 +1,8 @@
 'use strict';
-
+const { getServiceById } = require('./../../infrastructure/applications');
 const getDashboard = async (req, res) => {
 
+  const serviceDetails = await getServiceById(req.params.sid, req.id);
   const allUserRoles = req.userServices.roles.map((role) => ({
     serviceId: role.code.substr(0, role.code.indexOf('_')),
     role: role.code.substr(role.code.lastIndexOf('_') + 1),
@@ -13,6 +14,7 @@ const getDashboard = async (req, res) => {
     csrfToken: req.csrfToken(),
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
+    serviceDetails,
   });
 };
 

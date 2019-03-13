@@ -1,5 +1,5 @@
 'use strict';
-const { listBannersForService } = require('./../../infrastructure/applications');
+const { listBannersForService, getServiceById } = require('./../../infrastructure/applications');
 
 const get = async (req, res) => {
   const paramsSource = req.method === 'POST' ? req.body : req.query;
@@ -8,6 +8,7 @@ const get = async (req, res) => {
     page = 1;
   }
   const serviceBanners = await listBannersForService(req.params.sid,10, page, req.id);
+  const serviceDetails = await getServiceById(req.params.sid, req.id);
 
   return res.render('services/views/serviceBanners', {
     csrfToken: req.csrfToken(),
@@ -17,6 +18,7 @@ const get = async (req, res) => {
     totalNumberOfResults: serviceBanners.totalNumberOfRecords,
     numberOfPages: serviceBanners.totalNumberOfPages,
     serviceId: req.params.sid,
+    serviceDetails,
   });
 };
 
@@ -27,6 +29,8 @@ const post = async (req, res) => {
     page = 1;
   }
   const serviceBanners = await listBannersForService(req.params.sid,10, page, req.id);
+  const serviceDetails = await getServiceById(req.params.sid, req.id);
+
   return res.render('services/views/serviceBanners', {
     csrfToken: req.csrfToken(),
     backLink: true,
@@ -35,6 +39,7 @@ const post = async (req, res) => {
     totalNumberOfResults: serviceBanners.totalNumberOfRecords,
     numberOfPages: serviceBanners.totalNumberOfPages,
     serviceId: req.params.sid,
+    serviceDetails,
   });
 };
 
