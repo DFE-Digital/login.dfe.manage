@@ -88,7 +88,7 @@ const paginationModel = {
             <% } %>
             <% for (let i = 0; i < locals.users.length; i++) { %>
                 <tr>
-                    <td><a href="/services/<%= locals.serviceId %>/users/<%= users[i].id %>"><%= users[i].name %></a></td>
+                    <td><a href="/services/<%= locals.serviceId %>/users/<%= users[i].id %>/organisations"><%= users[i].name %></a></td>
 
                     <td><span class="breakable"><%= users[i].email %></span></td>
                     <td>

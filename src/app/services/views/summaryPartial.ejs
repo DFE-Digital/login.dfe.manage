@@ -1,0 +1,63 @@
+<% if (locals.flash.info) { %>
+    <div class="row">
+        <div class="col-12">
+            <div class="notification notification-success">
+                <%= locals.flash.info %>
+            </div>
+        </div>
+    </div>
+<% } %>
+
+<div class="row">
+    <div class="col-8">
+        <h1 class="heading-xlarge">
+            <%= user.name %>
+            <small><%= user.email %></small>
+        </h1>
+        <dl class="inline condensed">
+            <dt class="label">Last login:</dt>
+            <dd><%= locals.user.lastLogin ? locals.moment(locals.user.lastLogin).format('DD MMM YYYY, HH:mm:ss') : 'Never' %></dd>
+            <dt class="label">Account status:</dt>
+            <dd><%= user.status.description %></dd>
+            <dt class="label">Number of logins in last 12 months:</dt>
+            <dd><%= user.loginsInPast12Months.successful %></dd>
+        </dl>
+    </div>
+
+    <div class="col-4">
+        <% if(!locals.isInvitation) { %>
+            <aside>
+                <h2 class="heading-medium">Actions</h2>
+                <ul class="list">
+                    <li><a href="web-service-sync">Send WS Sync</a></li>
+                </ul>
+            </aside>
+        <% } %>
+    </div>
+</div>
+
+<nav>
+    <ul class="tabs" role="tablist">
+
+        <% if(locals.area === 'organisations') { %>
+            <li class="active">Organisations</li>
+        <% } else { %>
+            <li><a href="organisations" role="tab">Organisations</a></li>
+        <% } %>
+
+        <% if(locals.area === 'services') { %>
+            <li class="active">Services</li>
+        <% } else { %>
+            <li><a href="services" role="tab">Services</a></li>
+        <% } %>
+
+        <% if(!locals.isInvitation) { %>
+            <% if(locals.area === 'audit') { %>
+                <li class="active">Audit</li>
+            <% } else { %>
+                <li><a href="audit" role="tab">Audit</a></li>
+            <% } %>
+        <% } %>
+
+    </ul>
+</nav>
