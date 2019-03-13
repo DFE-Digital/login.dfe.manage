@@ -9,53 +9,56 @@
 </div>
 
 <div class="row">
-    <div class="col-6">
-        <% if (locals.userRoles.includes('serviceconfig')) { %>
-        <a href="<%=locals.serviceId%>/service-configuration"><h2 class="heading-large">Service configuration</h2></a>
-        <% } else { %>
-        <h2 class="heading-large">Service configuration</h2>
-        <% } %>
-        <p>Manage the urls and secret keys for your service.</p>
-    </div>
+    <div class="col-12">
+        <div class="manage-cards">
+            <div class="<%=locals.userRoles.includes('serviceconfig') ? 'manage-card' : 'manage-card-disabled'%>">
+                <% if (locals.userRoles.includes('serviceconfig')) { %>
+                <a href="<%=locals.serviceId%>/service-configuration"></a>
+                <% } %>
+                <h2 class="heading-large">Service configuration</h2>
+                <p>Manage the urls and secret keys for your service.</p>
+            </div>
 
-    <div class="col-6">
-        <% if (locals.userRoles.includes('serviceBanner')) { %>
-        <a href="<%=locals.serviceId%>/service-banners"><h2 class="heading-large">Manage banners</h2></a>
-        <% } else { %>
-            <h2 class="heading-large">Manage banners</h2>
-        <% } %>
-        <p>Manage banners that will be displayed on the DfE Sign-in page for your service.</p>
-    </div>
+            <div class="<%=locals.userRoles.includes('serviceBanner') ? 'manage-card' : 'manage-card-disabled'%>">
+                <% if (locals.userRoles.includes('serviceBanner')) { %>
+                <a href="<%=locals.serviceId%>/service-banners"></a>
+                <% } %>
+                <h2 class="heading-large">Manage banners</h2>
+                <p>Manage banners that will be displayed on the DfE Sign-in page for your service.</p>
+            </div>
 
-    <div class="col-6">
-        <% if (locals.userRoles.includes('accessManagement')) { %>
-        <a href=""><h2 class="heading-large">Access management</h2></a>
-        <% } else { %>
-            <h2 class="heading-large">Access management</h2>
-        <% } %>
-        <p>Manage access management for your service.</p>
-    </div>
+            <div class="<%=locals.userRoles.includes('accessManagement') ? 'manage-card' : 'manage-card-disabled'%>">
+                <% if (locals.userRoles.includes('accessManagement')) { %>
+                    <a href=""></a>
+                <% } %>
+                    <h2 class="heading-large">Access management</h2>
+                <p>Manage access management for your service.</p>
+            </div>
 
-    <div class="col-6">
-        <% if (locals.userRoles.includes('serviceReport')) { %>
-            <a href=""><h2 class="heading-large">Reports</h2></a>
-        <% } else { %>
-            <h2 class="heading-large">Reports</h2>
-        <% } %>
-        <p>View reports for the users of your service.</p>
-    </div>
+            <div class="<%=locals.userRoles.includes('serviceReport') ? 'manage-card' : 'manage-card-disabled'%>">
+                <% if (locals.userRoles.includes('serviceReport')) { %>
+                    <a href=""></a>
+                <% } %>
+                    <h2 class="heading-large">Reports</h2>
+                <p>View reports for the users of your service.</p>
+            </div>
 
-    <div class="col-6">
-        <% if (locals.userRoles.includes('serviceSup')) { %>
-            <a href="<%= locals.serviceId %>/users"><h2 class="heading-large">Organisations and users</h2></a>
-        <% } else { %>
-            <h2 class="heading-large">Organisations and users</h2>
-        <% } %>
-        <p>Manage the organisations, approvers and users of your service.</p>
-    </div>
+            <div class="manage-card-disabled">
+                <h2 class="heading-large">Support</h2>
+                <p>Manage the organisations, approvers and users of your service.</p>
+                <% if (locals.userRoles.includes('serviceSup')) { %>
+                    <p class="manage-link"><a href="<%= locals.serviceId %>/users">Users</a></p>
+                    <p class="manage-link"><a href="">Organisations</a></p>
+                <% } %>
+            </div>
 
-    <div class="col-6">
-        <h2 class="heading-large">Manage team</h2>
-        <p>Manage the roles and access permissions of your team.</p>
+            <div class="<%=locals.userRoles.includes('serviceTeam') ? 'manage-card' : 'manage-card-disabled'%>">
+                <% if (locals.userRoles.includes('serviceTeam')) { %>
+                    <a href=""></a>
+                <% } %>
+                <h2 class="heading-large">Manage team</h2>
+                <p>Manage the roles and access permissions of your team.</p>
+            </div>
+        </div>
     </div>
 </div>
