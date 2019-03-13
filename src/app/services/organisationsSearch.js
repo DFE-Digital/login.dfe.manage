@@ -11,6 +11,7 @@ const buildModel = async (req) => {
   const pageOfOrganisations = await searchOrganisations(criteria, undefined, pageNumber, req.id);
   return {
     csrfToken: req.csrfToken(),
+    backLink: true,
     criteria: criteria,
     page: pageNumber,
     numberOfPages: pageOfOrganisations.totalNumberOfPages,
