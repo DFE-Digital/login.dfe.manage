@@ -43,12 +43,13 @@
                 <p>View reports for the users of your service.</p>
             </div>
 
-            <div class="<%=locals.userRoles.includes('serviceSupport') ? 'manage-card' : 'manage-card-disabled'%>">
-                <% if (locals.userRoles.includes('serviceSupport')) { %>
-                    <a href=""></a>
-                <% } %>
-                    <h2 class="heading-large">Support</h2>
+            <div class="<%=locals.userRoles.includes('serviceSup') ? 'manage-card' : 'manage-card-disabled'%>">
+                <h2 class="heading-large">Support</h2>
                 <p>Manage the organisations, approvers and users of your service.</p>
+                <% if (locals.userRoles.includes('serviceSup')) { %>
+                    <p><a href="<%= locals.serviceId %>/users">Users</a></p>
+                    <p><a href="">Organisations</a></p>
+                <% } %>
             </div>
 
             <div class="<%=locals.userRoles.includes('serviceTeam') ? 'manage-card' : 'manage-card-disabled'%>">
