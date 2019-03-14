@@ -48,7 +48,7 @@
                 <p>Manage the organisations, approvers and users of your service.</p>
                 <% if (locals.userRoles.includes('serviceSup')) { %>
                     <p class="manage-link"><a href="<%= locals.serviceId %>/users">Users</a></p>
-                    <p class="manage-link"><a href="">Organisations</a></p>
+                    <p class="manage-link"><a href="<%= locals.serviceId %>/organisations">Organisations</a></p>
                 <% } %>
             </div>
 
