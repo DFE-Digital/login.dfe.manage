@@ -28,6 +28,7 @@ const render = async (req, res, dataSource) => {
 
   return res.render('services/views/organisationUserList', {
     csrfToken: req.csrfToken(),
+    serviceId: req.params.sid,
     backLink: true,
     organisation,
     users,
