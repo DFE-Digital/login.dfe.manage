@@ -40,7 +40,26 @@ const getInvitationOrganisations = async (invitationId, correlationId) => {
   ])
 };
 
+const getPageOfOrganisations = async (pageNumber) => {
+  return Promise.resolve({
+    organisations: [
+      {
+        "id": "83f00ace-f1a0-4338-8784-fa14f5943e5a",
+        "name": "Some service",
+      }
+    ],
+    page: pageNumber,
+    totalNumberOfPages: 1,
+  });
+};
+
+
+const searchOrganisations = async (criteria, pageNumber, correlationId) => {
+  return getPageOfOrganisations(pageNumber, correlationId);
+};
+
 module.exports = {
   getAllUserOrganisations,
   getInvitationOrganisations,
+  searchOrganisations,
 };
