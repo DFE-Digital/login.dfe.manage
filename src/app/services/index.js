@@ -16,6 +16,7 @@ const { get: getUsersSearch, post: postUsersSearch } = require('./usersSearch');
 const getUserOrganisations = require('./getUserOrganisations');
 const { get: getWebServiceSync, post: postWebServiceSync } = require('./webServiceSync');
 const { get: getOrganisationsSearch, post: postOrganisationsSearch } = require('./organisationsSearch');
+const { get: getOrganisationUserList, post: postOrganisationUserList } = require('./organisationUserList');
 
 const router = express.Router({ mergeParams: true });
 
@@ -61,6 +62,8 @@ const services = (csrf) => {
   router.get('/:sid/organisations', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getOrganisationsSearch));
   router.post('/:sid/organisations', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postOrganisationsSearch));
 
+  router.get('/:sid/organisations/:oid/users', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getOrganisationUserList));
+  router.post('/:sid/organisations/:oid/users', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postOrganisationUserList));
   return router;
 };
 

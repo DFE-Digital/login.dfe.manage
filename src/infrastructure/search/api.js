@@ -70,14 +70,21 @@ const mapSupportUserSortByToSearchApi = (supportSortBy) => {
   }
 };
 
-const searchForUsersForService = async (serviceId, criteria, pageNumber, sortBy, sortDirection) => {
+const searchForUsers = async (criteria, pageNumber, sortBy, sortDirection, filters) => {
   try {
-    let endpoint = `/users?filter_services=${serviceId}&criteria=${criteria}&page=${pageNumber}`;
+    let endpoint = `/users?criteria=${criteria}&page=${pageNumber}`;
     if (sortBy) {
       endpoint += `&sortBy=${mapSupportUserSortByToSearchApi(sortBy)}`;
     }
     if (sortDirection) {
       endpoint += `&sortDirection=${sortDirection}`;
+    }
+    if (filters) {
+      const properties = Object.keys(filters);
+      properties.forEach((property) => {
+        const values = filters[property];
+        endpoint += values.map(v => `&filter_${property}=${v}`).join('');
+      });
     }
     const results = await callApi(endpoint, 'GET');
     return {
@@ -102,6 +109,6 @@ const getSearchDetailsForUserById = async (id) => {
 
 
 module.exports = {
-  searchForUsersForService,
+  searchForUsers,
   getSearchDetailsForUserById,
 };
