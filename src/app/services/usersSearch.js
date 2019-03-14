@@ -1,4 +1,4 @@
-const { searchForUsersForService } = require('./../../infrastructure/search');
+const { searchForUsers } = require('./../../infrastructure/search');
 
 const search = async (req) => {
   const serviceId = req.params.sid;
@@ -21,7 +21,9 @@ const search = async (req) => {
   let sortBy = paramsSource.sort ? paramsSource.sort.toLowerCase() : 'name';
   let sortAsc = (paramsSource.sortdir ? paramsSource.sortdir : 'asc').toLowerCase() === 'asc';
 
-  const results = await searchForUsersForService(serviceId, criteria + '*', page, sortBy, sortAsc ? 'asc' : 'desc');
+  const results = await searchForUsers(criteria + '*', page, sortBy, sortAsc ? 'asc' : 'desc', {
+    services: [serviceId],
+  });
   //TODO : audit search
 
   return {

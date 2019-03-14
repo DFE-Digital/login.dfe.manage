@@ -16,6 +16,8 @@ const { get: getUsersSearch, post: postUsersSearch } = require('./usersSearch');
 const getUserOrganisations = require('./getUserOrganisations');
 const { get: getWebServiceSync, post: postWebServiceSync } = require('./webServiceSync');
 const { get: getOrganisationsSearch, post: postOrganisationsSearch } = require('./organisationsSearch');
+const { get: getOrganisationUserList, post: postOrganisationUserList } = require('./organisationUserList');
+const { get: getWebServiceSyncOrg, post: postWebServiceSyncOrg } = require('./webServiceSyncOrg');
 
 const router = express.Router({ mergeParams: true });
 
@@ -61,6 +63,11 @@ const services = (csrf) => {
   router.get('/:sid/organisations', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getOrganisationsSearch));
   router.post('/:sid/organisations', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postOrganisationsSearch));
 
+  router.get('/:sid/organisations/:oid/users', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getOrganisationUserList));
+  router.post('/:sid/organisations/:oid/users', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postOrganisationUserList));
+
+  router.get('/:sid/organisations/:oid/web-service-sync', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getWebServiceSyncOrg));
+  router.post('/:sid/organisations/:oid/web-service-sync', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postWebServiceSyncOrg));
   return router;
 };
 

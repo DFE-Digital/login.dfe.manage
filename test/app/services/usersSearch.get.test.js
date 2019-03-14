@@ -3,7 +3,7 @@ jest.mock('./../../../src/infrastructure/logger', () => require('./../../utils')
 jest.mock('./../../../src/infrastructure/search');
 
 
-const { searchForUsersForService } = require('./../../../src/infrastructure/search');
+const { searchForUsers } = require('./../../../src/infrastructure/search');
 const { getRequestMock, getResponseMock } = require('./../../utils');
 const { get } = require('./../../../src/app/services/usersSearch');
 
@@ -39,8 +39,8 @@ describe('When getting users search ', () => {
       },
     ];
 
-    searchForUsersForService.mockReset();
-    searchForUsersForService.mockReturnValue({
+    searchForUsers.mockReset();
+    searchForUsers.mockReturnValue({
       criteria: 'test',
       page: 1,
       numberOfPages: 3,
