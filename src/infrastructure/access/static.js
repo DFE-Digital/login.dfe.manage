@@ -22,7 +22,12 @@ const getServicesForUser  = (id, correlationId) => {
 const getSingleUserService = (id, sid, oid, correlationId) => {
   return Promise.resolve([]);
 };
+
+const getSingleInvitationService = (iid, sid, oid, correlationId) => {
+  return Promise.resolve([]);
+};
 module.exports = {
   getServicesForUser,
   getSingleUserService,
+  getSingleInvitationService,
 };
