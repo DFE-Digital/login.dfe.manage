@@ -19,7 +19,7 @@ const { get: getOrganisationsSearch, post: postOrganisationsSearch } = require('
 const { get: getOrganisationUserList, post: postOrganisationUserList } = require('./organisationUserList');
 const { get: getWebServiceSyncOrg, post: postWebServiceSyncOrg } = require('./webServiceSyncOrg');
 const { get: getEditService, post: postEditService } = require('./editService');
-const { get: getConfirmEditService } = require('./confirmEditService');
+const { get: getConfirmEditService, post: postConfirmEditService } = require('./confirmEditService');
 
 const router = express.Router({ mergeParams: true });
 
@@ -63,6 +63,7 @@ const services = (csrf) => {
   router.post('/:sid/users/:uid/organisations/:oid', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postEditService));
 
   router.get('/:sid/users/:uid/organisations/:oid/confirm-edit-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getConfirmEditService));
+  router.post('/:sid/users/:uid/organisations/:oid/confirm-edit-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postConfirmEditService));
 
   router.get('/:sid/users/:uid/web-service-sync',csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getWebServiceSync));
   router.post('/:sid/users/:uid/web-service-sync',csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postWebServiceSync));

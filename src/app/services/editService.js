@@ -27,6 +27,7 @@ const getViewModel = async (req) => {
 
   return {
     csrfToken: req.csrfToken(),
+    cancelLink: `/services/${req.params.sid}/users/${req.params.uid}/organisations`,
     service: userService,
     serviceRoles,
     selectedRoles: [],
@@ -45,7 +46,10 @@ const get = async (req, res) => {
 };
 
 const post = async (req, res) => {
-  const selectedRoles = req.body.role;
+  let selectedRoles = req.body.role ? req.body.role : [];
+  if (!(selectedRoles instanceof Array)) {
+    selectedRoles = [req.body.role];
+  }
   const model = await getViewModel(req);
 
   const uid = req.params.uid && !req.params.uid.startsWith('inv-') ? req.params.uid : undefined;

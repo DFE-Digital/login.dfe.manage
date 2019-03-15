@@ -26,8 +26,24 @@ const getSingleUserService = (id, sid, oid, correlationId) => {
 const getSingleInvitationService = (iid, sid, oid, correlationId) => {
   return Promise.resolve([]);
 };
+
+const listRolesOfService = async (sid, correlationId) => {
+  return Promise.resolve([]);
+};
+
+const updateUserService = async (uid, sid, oid, role, correlationId) => {
+  return Promise.resolve(null);
+};
+
+const updateInvitationService = async (iid, sid, oid, role, correlationId) => {
+  return Promise.resolve(null);
+};
+
 module.exports = {
   getServicesForUser,
   getSingleUserService,
   getSingleInvitationService,
+  listRolesOfService,
+  updateUserService,
+  updateInvitationService,
 };
