@@ -34,6 +34,7 @@ const getViewModel = async (req) => {
     user,
     backLink: true,
     organisation,
+    validationMessages: {},
   };
 };
 
