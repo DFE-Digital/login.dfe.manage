@@ -77,7 +77,7 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls[0][0]).toBe('services/views/serviceConfig');
     expect(res.render.mock.calls[0][1]).toEqual({
       csrfToken: 'token',
-      backLink: './',
+      backLink: '/services/service1',
       grantTypes: 'implicit,authorization_code',
       responseTypes: 'code',
       selectedRedirects: ['https://www.redirect.com','https://www.redirect2.com'],
@@ -122,7 +122,7 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls[0][0]).toBe('services/views/serviceConfig');
     expect(res.render.mock.calls[0][1]).toEqual({
       csrfToken: 'token',
-      backLink: './',
+      backLink: '/services/service1',
       grantTypes: 'implicit,authorization_code',
       responseTypes: 'code',
       selectedRedirects: ['https://www.redirect.com','https://www.redirect2.com'],
@@ -166,7 +166,7 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls[0][0]).toBe('services/views/serviceConfig');
     expect(res.render.mock.calls[0][1]).toEqual({
       csrfToken: 'token',
-      backLink: './',
+      backLink: '/services/service1',
       grantTypes: 'implicit,authorization_code',
       responseTypes: 'code',
       selectedRedirects: ['https://www.redirect.com','https://www.redirect2.com'],
@@ -210,7 +210,7 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls[0][0]).toBe('services/views/serviceConfig');
     expect(res.render.mock.calls[0][1]).toEqual({
       csrfToken: 'token',
-      backLink: './',
+      backLink: '/services/service1',
       grantTypes: 'implicit,authorization_code',
       responseTypes: 'code',
       selectedRedirects: ['https://www.redirect.com','https://www.redirect2.com'],
@@ -257,7 +257,7 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls[0][0]).toBe('services/views/serviceConfig');
     expect(res.render.mock.calls[0][1]).toEqual({
       csrfToken: 'token',
-      backLink: './',
+      backLink: '/services/service1',
       grantTypes: 'implicit,authorization_code',
       responseTypes: 'code',
       selectedRedirects: ['https://www.redirect.com', 'https://www.redirect.com'],
