@@ -20,6 +20,7 @@ const { get: getOrganisationUserList, post: postOrganisationUserList } = require
 const { get: getWebServiceSyncOrg, post: postWebServiceSyncOrg } = require('./webServiceSyncOrg');
 const { get: getEditService, post: postEditService } = require('./editService');
 const { get: getConfirmEditService, post: postConfirmEditService } = require('./confirmEditService');
+const { get: getRemoveService, post: postRemoveService } = require('./removeService');
 
 const router = express.Router({ mergeParams: true });
 
@@ -64,6 +65,9 @@ const services = (csrf) => {
 
   router.get('/:sid/users/:uid/organisations/:oid/confirm-edit-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getConfirmEditService));
   router.post('/:sid/users/:uid/organisations/:oid/confirm-edit-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postConfirmEditService));
+
+  router.get('/:sid/users/:uid/organisations/:oid/remove-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getRemoveService));
+  router.post('/:sid/users/:uid/organisations/:oid/remove-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postRemoveService));
 
   router.get('/:sid/users/:uid/web-service-sync',csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getWebServiceSync));
   router.post('/:sid/users/:uid/web-service-sync',csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postWebServiceSync));
