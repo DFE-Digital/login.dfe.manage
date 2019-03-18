@@ -43,6 +43,11 @@ describe('when getting users organisation details', () => {
         approvers: [
           "user1",
         ],
+        services: [
+          {
+           id: 'service1',
+          }
+        ],
       },
       {
         organisation: {
@@ -52,6 +57,11 @@ describe('when getting users organisation details', () => {
         approvers: [
           "user1",
         ],
+        services: [
+          {
+            id: 'service1',
+          }
+        ]
       },
     ]);
 
@@ -65,6 +75,11 @@ describe('when getting users organisation details', () => {
         approvers: [
           "user1",
         ],
+        services: [
+          {
+            id: 'service1',
+          }
+        ],
       },
       {
         organisation: {
@@ -73,6 +88,11 @@ describe('when getting users organisation details', () => {
         },
         approvers: [
           "user1",
+        ],
+        services: [
+          {
+            id: 'service1',
+          }
         ],
       },
     ]);
@@ -97,7 +117,7 @@ describe('when getting users organisation details', () => {
     });
   });
 
-  it('then it should get organisations mapping for user', async () => {
+  it('then it should get organisations mapping for user where they have the service', async () => {
     await getUserOrganisations(req, res);
 
     expect(getAllUserOrganisations.mock.calls).toHaveLength(1);
@@ -115,7 +135,7 @@ describe('when getting users organisation details', () => {
     });
   });
 
-  it('then it should get organisations mapping for invitation', async () => {
+  it('then it should get organisations mapping for invitation where they have the service', async () => {
     getUserDetails.mockReturnValue({
       id: 'inv-invitation1',
     });

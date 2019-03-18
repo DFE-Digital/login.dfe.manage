@@ -18,6 +18,8 @@ const { get: getWebServiceSync, post: postWebServiceSync } = require('./webServi
 const { get: getOrganisationsSearch, post: postOrganisationsSearch } = require('./organisationsSearch');
 const { get: getOrganisationUserList, post: postOrganisationUserList } = require('./organisationUserList');
 const { get: getWebServiceSyncOrg, post: postWebServiceSyncOrg } = require('./webServiceSyncOrg');
+const { get: getEditService, post: postEditService } = require('./editService');
+const { get: getConfirmEditService, post: postConfirmEditService } = require('./confirmEditService');
 
 const router = express.Router({ mergeParams: true });
 
@@ -57,6 +59,12 @@ const services = (csrf) => {
 
   router.get('/:sid/users/:uid/organisations', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getUserOrganisations));
 
+  router.get('/:sid/users/:uid/organisations/:oid', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getEditService));
+  router.post('/:sid/users/:uid/organisations/:oid', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postEditService));
+
+  router.get('/:sid/users/:uid/organisations/:oid/confirm-edit-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getConfirmEditService));
+  router.post('/:sid/users/:uid/organisations/:oid/confirm-edit-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postConfirmEditService));
+
   router.get('/:sid/users/:uid/web-service-sync',csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getWebServiceSync));
   router.post('/:sid/users/:uid/web-service-sync',csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postWebServiceSync));
 
@@ -68,6 +76,7 @@ const services = (csrf) => {
 
   router.get('/:sid/organisations/:oid/web-service-sync', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getWebServiceSyncOrg));
   router.post('/:sid/organisations/:oid/web-service-sync', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postWebServiceSyncOrg));
+
   return router;
 };
 

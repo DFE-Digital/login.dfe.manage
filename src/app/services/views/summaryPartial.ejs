@@ -45,12 +45,6 @@
             <li><a href="organisations" role="tab">Organisations</a></li>
         <% } %>
 
-        <% if(locals.area === 'services') { %>
-            <li class="active">Services</li>
-        <% } else { %>
-            <li><a href="services" role="tab">Services</a></li>
-        <% } %>
-
         <% if(!locals.isInvitation) { %>
             <% if(locals.area === 'audit') { %>
                 <li class="active">Audit</li>

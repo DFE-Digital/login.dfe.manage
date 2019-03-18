@@ -13,14 +13,15 @@ const getApproverDetails = async (organisation, correlationId) => {
   return await getUsersByIdV2(distinctApproverIds, correlationId);
 };
 
-const getOrganisations = async (userId, correlationId) => {
+const getOrganisations = async (userId, serviceId, correlationId) => {
   const orgMapping = userId.startsWith('inv-') ? await getInvitationOrganisations(userId.substr(4), correlationId) : await getAllUserOrganisations(userId, correlationId);
   if (!orgMapping) {
     return [];
   }
-  const allApprovers = await getApproverDetails(orgMapping, correlationId);
+  const orgsForService = orgMapping.filter(x => x.services.find(y => y.id.toLowerCase() === serviceId.toLowerCase()));
+  const allApprovers = await getApproverDetails(orgsForService, correlationId);
 
-  return await Promise.all(orgMapping.map(async (invitation) => {
+  return await Promise.all(orgsForService.map(async (invitation) => {
     const approvers = invitation.approvers.map((approverId) => {
       return allApprovers.find(x => x.sub.toLowerCase() === approverId.toLowerCase());
     }).filter(x => x);
@@ -40,7 +41,7 @@ const getOrganisations = async (userId, correlationId) => {
 
 const getUserOrganisations = async (req, res) => {
   const user = await getUserDetails(req);
-  const organisations = await getOrganisations(user.id, req.id);
+  const organisations = await getOrganisations(user.id, req.params.sid, req.id);
 
   return res.render('services/views/userOrganisations', {
     csrfToken: req.csrfToken(),
