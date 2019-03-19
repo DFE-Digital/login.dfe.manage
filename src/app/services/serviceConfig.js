@@ -11,7 +11,7 @@ const getServiceConfig = async (req, res) => {
     service,
     responseTypes,
     grantTypes,
-    backLink: true,
+    backLink: `/services/${req.params.sid}`,
     validationMessages: {},
   });
 };
@@ -41,7 +41,7 @@ const validate = async (req) => {
     grantTypes,
     selectedRedirects,
     selectedLogout,
-    backLink: './',
+    backLink: `/services/${req.params.sid}`,
     validationMessages: {},
   };
 
