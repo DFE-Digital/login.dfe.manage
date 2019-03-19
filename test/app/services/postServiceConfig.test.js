@@ -78,83 +78,29 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls[0][1]).toEqual({
       csrfToken: 'token',
       backLink: './',
-      grantTypes: 'implicit,authorization_code',
-      responseTypes: 'code',
-      selectedRedirects: ['https://www.redirect.com','https://www.redirect2.com'],
-      selectedLogout: ['https://www.logout2.com'],
       validationMessages: {
         name: 'Service name must be present',
       },
       service: {
-        id: 'service1',
-        name:'service one',
-        description: 'service description',
-        relyingParty: {
-          client_id: 'clientid',
-          client_secret: 'dewier-thrombi-confounder-mikado',
-          api_secret: 'dewier-thrombi-confounder-mikado',
-          service_home: 'https://www.servicehome.com',
-          postResetUrl: 'https://www.postreset.com',
-          redirect_uris: [
-            'https://www.redirect.com',
-          ],
-          post_logout_redirect_uris: [
-            'https://www.logout.com',
-          ],
-          grant_types: [
-            'implicit',
-            'authorization_code'
-          ],
-          response_types: [
-            'code',
-          ],
-        }
-      }
-    });
-  });
-
-
-  it('then it should render view with validation if service home not entered', async () => {
-    req.body.serviceHome = undefined;
-
-    await postServiceConfig(req, res);
-    expect(res.render.mock.calls).toHaveLength(1);
-    expect(res.render.mock.calls[0][0]).toBe('services/views/serviceConfig');
-    expect(res.render.mock.calls[0][1]).toEqual({
-      csrfToken: 'token',
-      backLink: './',
-      grantTypes: 'implicit,authorization_code',
-      responseTypes: 'code',
-      selectedRedirects: ['https://www.redirect.com','https://www.redirect2.com'],
-      selectedLogout: ['https://www.logout2.com'],
-      validationMessages: {
-        serviceHome: 'Home url must be present',
+        clientId: 'clientid2',
+        clientSecret: 'outshine-wringing-imparting-submitted',
+        description: 'description',
+        grantTypes: [
+          'implicit'
+        ],
+        postLogoutRedirectUris: [
+          'https://www.logout2.com'
+        ],
+        postResetUrl: 'https://www.postreset2.com',
+        redirectUris: [
+          'https://www.redirect.com',
+          'https://www.redirect2.com'
+        ],
+        responseTypes: [
+          'code'
+        ],
+        serviceHome: 'https://www.servicehome2.com'
       },
-      service: {
-        id: 'service1',
-        name:'service one',
-        description: 'service description',
-        relyingParty: {
-          client_id: 'clientid',
-          client_secret: 'dewier-thrombi-confounder-mikado',
-          api_secret: 'dewier-thrombi-confounder-mikado',
-          service_home: 'https://www.servicehome.com',
-          postResetUrl: 'https://www.postreset.com',
-          redirect_uris: [
-            'https://www.redirect.com',
-          ],
-          post_logout_redirect_uris: [
-            'https://www.logout.com',
-          ],
-          grant_types: [
-            'implicit',
-            'authorization_code'
-          ],
-          response_types: [
-            'code',
-          ],
-        }
-      }
     });
   });
 
@@ -167,38 +113,30 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls[0][1]).toEqual({
       csrfToken: 'token',
       backLink: './',
-      grantTypes: 'implicit,authorization_code',
-      responseTypes: 'code',
-      selectedRedirects: ['https://www.redirect.com','https://www.redirect2.com'],
-      selectedLogout: ['https://www.logout2.com'],
       validationMessages: {
         serviceHome: 'Please enter a valid home url',
       },
       service: {
-        id: 'service1',
-        name:'service one',
-        description: 'service description',
-        relyingParty: {
-          client_id: 'clientid',
-          client_secret: 'dewier-thrombi-confounder-mikado',
-          api_secret: 'dewier-thrombi-confounder-mikado',
-          service_home: 'https://www.servicehome.com',
-          postResetUrl: 'https://www.postreset.com',
-          redirect_uris: [
-            'https://www.redirect.com',
-          ],
-          post_logout_redirect_uris: [
-            'https://www.logout.com',
-          ],
-          grant_types: [
-            'implicit',
-            'authorization_code'
-          ],
-          response_types: [
-            'code',
-          ],
-        }
-      }
+        name: 'service two',
+        clientId: 'clientid2',
+        clientSecret: 'outshine-wringing-imparting-submitted',
+        description: 'description',
+        grantTypes: [
+          'implicit'
+        ],
+        postLogoutRedirectUris: [
+          'https://www.logout2.com'
+        ],
+        postResetUrl: 'https://www.postreset2.com',
+        redirectUris: [
+          'https://www.redirect.com',
+          'https://www.redirect2.com'
+        ],
+        responseTypes: [
+          'code'
+        ],
+        serviceHome: 'not-a-url'
+      },
     });
   });
 
@@ -211,38 +149,30 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls[0][1]).toEqual({
       csrfToken: 'token',
       backLink: './',
-      grantTypes: 'implicit,authorization_code',
-      responseTypes: 'code',
-      selectedRedirects: ['https://www.redirect.com','https://www.redirect2.com'],
-      selectedLogout: ['https://www.logout2.com'],
       validationMessages: {
         clientId: 'Client Id must be present',
       },
       service: {
-        id: 'service1',
-        name:'service one',
-        description: 'service description',
-        relyingParty: {
-          client_id: 'clientid',
-          client_secret: 'dewier-thrombi-confounder-mikado',
-          api_secret: 'dewier-thrombi-confounder-mikado',
-          service_home: 'https://www.servicehome.com',
-          postResetUrl: 'https://www.postreset.com',
-          redirect_uris: [
-            'https://www.redirect.com',
-          ],
-          post_logout_redirect_uris: [
-            'https://www.logout.com',
-          ],
-          grant_types: [
-            'implicit',
-            'authorization_code'
-          ],
-          response_types: [
-            'code',
-          ],
-        }
-      }
+        name: 'service two',
+        clientId: undefined,
+        clientSecret: 'outshine-wringing-imparting-submitted',
+        description: 'description',
+        grantTypes: [
+          'implicit'
+        ],
+        postLogoutRedirectUris: [
+          'https://www.logout2.com'
+        ],
+        postResetUrl: 'https://www.postreset2.com',
+        redirectUris: [
+          'https://www.redirect.com',
+          'https://www.redirect2.com'
+        ],
+        responseTypes: [
+          'code'
+        ],
+        serviceHome: 'https://www.servicehome2.com'
+      },
     });
   });
 
@@ -258,40 +188,33 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls[0][1]).toEqual({
       csrfToken: 'token',
       backLink: './',
-      grantTypes: 'implicit,authorization_code',
-      responseTypes: 'code',
-      selectedRedirects: ['https://www.redirect.com', 'https://www.redirect.com'],
-      selectedLogout: ['https://www.logout2.com'],
       validationMessages: {
         redirect_uris: 'Redirect urls must be unique',
       },
       service: {
-        id: 'service1',
-        name:'service one',
-        description: 'service description',
-        relyingParty: {
-          client_id: 'clientid',
-          client_secret: 'dewier-thrombi-confounder-mikado',
-          api_secret: 'dewier-thrombi-confounder-mikado',
-          service_home: 'https://www.servicehome.com',
-          postResetUrl: 'https://www.postreset.com',
-          redirect_uris: [
-            'https://www.redirect.com',
-          ],
-          post_logout_redirect_uris: [
-            'https://www.logout.com',
-          ],
-          grant_types: [
-            'implicit',
-            'authorization_code'
-          ],
-          response_types: [
-            'code',
-          ],
-        }
-      }
+        name: 'service two',
+        clientId: 'clientid2',
+        clientSecret: 'outshine-wringing-imparting-submitted',
+        description: 'description',
+        grantTypes: [
+          'implicit'
+        ],
+        postLogoutRedirectUris: [
+          'https://www.logout2.com'
+        ],
+        postResetUrl: 'https://www.postreset2.com',
+        redirectUris: [
+          'https://www.redirect.com',
+          'https://www.redirect.com'
+        ],
+        responseTypes: [
+          'code'
+        ],
+        serviceHome: 'https://www.servicehome2.com'
+      },
     });
   });
+
   it('then it should update the service', async () => {
     await postServiceConfig(req, res);
 
