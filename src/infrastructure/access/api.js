@@ -64,6 +64,14 @@ const updateInvitationService = async (iid, sid, oid, roles, correlationId) => {
   return callApi('PATCH', `/invitations/${iid}/services/${sid}/organisations/${oid}`, correlationId, body);
 };
 
+const removeServiceFromUser = async (uid, sid, oid, correlationId) => {
+  return callApi('DELETE', `users/${uid}/services/${sid}/organisations/${oid}`, correlationId, undefined);
+};
+
+const removeServiceFromInvitation = async (iid, sid, oid, correlationId) => {
+  return callApi('DELETE', `invitations/${iid}/services/${sid}/organisations/${oid}`, correlationId, undefined);
+};
+
 module.exports = {
   getServicesForUser,
   getSingleUserService,
@@ -71,4 +79,6 @@ module.exports = {
   listRolesOfService,
   updateUserService,
   updateInvitationService,
+  removeServiceFromUser,
+  removeServiceFromInvitation,
 };
