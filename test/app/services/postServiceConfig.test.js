@@ -77,7 +77,7 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls[0][0]).toBe('services/views/serviceConfig');
     expect(res.render.mock.calls[0][1]).toEqual({
       csrfToken: 'token',
-      backLink: './',
+      backLink: '/services/service1',
       validationMessages: {
         name: 'Service name must be present',
       },
@@ -112,7 +112,7 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls[0][0]).toBe('services/views/serviceConfig');
     expect(res.render.mock.calls[0][1]).toEqual({
       csrfToken: 'token',
-      backLink: './',
+      backLink: '/services/service1',
       validationMessages: {
         serviceHome: 'Please enter a valid home url',
       },
@@ -148,7 +148,7 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls[0][0]).toBe('services/views/serviceConfig');
     expect(res.render.mock.calls[0][1]).toEqual({
       csrfToken: 'token',
-      backLink: './',
+      backLink: '/services/service1',
       validationMessages: {
         clientId: 'Client Id must be present',
       },
@@ -187,7 +187,7 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls[0][0]).toBe('services/views/serviceConfig');
     expect(res.render.mock.calls[0][1]).toEqual({
       csrfToken: 'token',
-      backLink: './',
+      backLink: '/services/service1',
       validationMessages: {
         redirect_uris: 'Redirect urls must be unique',
       },

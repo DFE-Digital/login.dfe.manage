@@ -22,7 +22,7 @@ const getServiceConfig = async (req, res) => {
       apiSecret: service.relyingParty.api_secret || '',
       tokenEndpointAuthMethod: service.relyingParty.token_endpoint_auth_method,
     },
-    backLink: true,
+    backLink: `/services/${req.params.sid}`,
     validationMessages: {},
   });
 };
@@ -67,7 +67,7 @@ const validate = async (req) => {
       apiSecret: req.body.apiSecret,
       tokenEndpointAuthMethod: req.body.tokenEndpointAuthMethod,
     },
-    backLink: './',
+    backLink: `/services/${req.params.sid}`,
     validationMessages: {},
   };
 
