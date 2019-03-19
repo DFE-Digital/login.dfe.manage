@@ -33,10 +33,12 @@ const isManageUserForService = (req, res, next) => {
 const hasRole = (role) => {
   return (req, res, next) => {
     if (req.userServices && req.userServices.roles.length > 0) {
-      const services = req.userServices.roles.map((role) => ({
-        role: role.code.split('_')[1],
+      const allUserRoles = req.userServices.roles.map((role) => ({
+        serviceId: role.code.substr(0, role.code.indexOf('_')),
+        role: role.code.substr(role.code.lastIndexOf('_') + 1),
       }));
-      if (services.find(x => x.role === role)) {
+      const userRolesForService = allUserRoles.filter(x => x.serviceId === req.params.sid);
+      if (userRolesForService.find(x => x.role === role)) {
         return next();
       }
     }
