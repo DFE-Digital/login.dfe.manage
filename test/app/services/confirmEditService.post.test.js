@@ -1,15 +1,32 @@
 jest.mock('./../../../src/infrastructure/config', () => require('./../../utils').configMockFactory());
 jest.mock('./../../../src/infrastructure/logger', () => require('./../../utils').loggerMockFactory());
-
+jest.mock('./../../../src/app/services/utils');
 jest.mock('./../../../src/infrastructure/access', () => {
   return {
     updateUserService: jest.fn(),
     updateInvitationService: jest.fn(),
+    listRolesOfService: jest.fn(),
   };
 });
 
+jest.mock('./../../../src/infrastructure/applications', () => {
+  return {
+    getServiceById: jest.fn(),
+  };
+});
+jest.mock('./../../../src/infrastructure/organisations', () => {
+  return {
+    getOrganisationByIdV2: jest.fn(),
+  };
+});
+
+const logger = require('./../../../src/infrastructure/logger');
 const { getRequestMock, getResponseMock } = require('./../../utils');
 const { updateInvitationService, updateUserService } = require('./../../../src/infrastructure/access');
+const { listRolesOfService } = require('./../../../src/infrastructure/access');
+const { getOrganisationByIdV2 } = require('./../../../src/infrastructure/organisations');
+const { getUserDetails } = require('./../../../src/app/services/utils');
+const { getServiceById } = require('./../../../src/infrastructure/applications');
 const res = getResponseMock();
 
 describe('when editing a service for a user', () => {
@@ -30,6 +47,36 @@ describe('when editing a service for a user', () => {
           roles: ['role_id']
         },
       },
+    });
+
+
+    getServiceById.mockReset();
+    getServiceById.mockReturnValue({
+      id: 'service1',
+      dateActivated: '10/10/2018',
+      name: 'service name',
+      status: 'active',
+    });
+
+    listRolesOfService.mockReset();
+    listRolesOfService.mockReturnValue([{
+      code: 'role_code',
+      id: 'role_id',
+      name: 'role_name',
+      status: {
+        id: 'status_id'
+      },
+    }]);
+
+    getUserDetails.mockReset();
+    getUserDetails.mockReturnValue({
+      id: 'user1',
+    });
+
+    getOrganisationByIdV2.mockReset();
+    getOrganisationByIdV2.mockReturnValue({
+      id: 'org1',
+      name: 'org name',
     });
 
     updateUserService.mockReset();
@@ -63,6 +110,26 @@ describe('when editing a service for a user', () => {
     expect(updateUserService.mock.calls[0][2]).toBe('org1');
     expect(updateUserService.mock.calls[0][3]).toEqual(["role_id"]);
     expect(updateUserService.mock.calls[0][4]).toBe('correlationId');
+  });
+
+  it('then it should should audit service being edited', async () => {
+    await postConfirmEditService(req, res);
+
+    expect(logger.audit.mock.calls).toHaveLength(1);
+    expect(logger.audit.mock.calls[0][0]).toBe('user@unit.test (id: user1) updated service service name for organisation org name (id: org1) for user undefined (id: user1)');
+    expect(logger.audit.mock.calls[0][1]).toMatchObject({
+      type: 'manage',
+      subType: 'user-service-updated',
+      userId: 'user1',
+      userEmail: 'user@unit.test',
+      editedUser: 'user1',
+      editedFields: [
+        {
+          name: 'update_service',
+          newValue: ['role_id'],
+        }
+      ],
+    });
   });
 
   it('then it should redirect to user details', async () => {
