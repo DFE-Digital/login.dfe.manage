@@ -1,6 +1,7 @@
 'use strict';
 const { getBannerById, upsertBanner, listAllBannersForService } = require('./../../infrastructure/applications');
 const moment = require('moment');
+const logger = require('./../../infrastructure/logger');
 
 const get = async (req, res) => {
   const model = {
@@ -187,7 +188,22 @@ const post = async (req, res) => {
     isActive: model.isActive,
   };
 
-  //TODO: audit event for updated/created banner
+  if (req.params.bid) {
+    logger.audit(`${req.user.email} (id: ${req.user.sub}) updated banner ${model.name} (${model.bannerId}) for service ${req.params.sid}`, {
+      type: 'manage',
+      subType: 'service-banner-updated',
+      userId: req.user.sub,
+      userEmail: req.user.email,
+      editedBanner: req.params.bid,
+    });
+  } else {
+    logger.audit(`${req.user.email} (id: ${req.user.sub}) created banner ${model.name} for service ${req.params.sid}`, {
+      type: 'manage',
+      subType: 'service-banner-created',
+      userId: req.user.sub,
+      userEmail: req.user.email,
+    });
+  }
   await upsertBanner(req.params.sid, body, req.id);
 
   req.params.bid ? res.flash('info', 'Service banner updated successfully') : res.flash('info', 'Service banner created successfully');
