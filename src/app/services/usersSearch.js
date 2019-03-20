@@ -1,4 +1,5 @@
 const { searchForUsers } = require('./../../infrastructure/search');
+const logger = require('./../../infrastructure/logger');
 
 const search = async (req) => {
   const serviceId = req.params.sid;
@@ -24,7 +25,18 @@ const search = async (req) => {
   const results = await searchForUsers(criteria + '*', page, sortBy, sortAsc ? 'asc' : 'desc', {
     services: [serviceId],
   });
-  //TODO : audit search
+
+  logger.audit(`${req.user.email} (id: ${req.user.sub}) searched for users in manage using criteria "${criteria}"`, {
+    type: 'manage',
+    subType: 'user-search',
+    userId: req.user.sub,
+    userEmail: req.user.email,
+    criteria: criteria,
+    pageNumber: page,
+    numberOfPages: results.numberOfPages,
+    sortedBy: sortBy,
+    sortDirection: sortAsc ? 'asc' : 'desc',
+  });
 
   return {
     criteria: safeCriteria,
