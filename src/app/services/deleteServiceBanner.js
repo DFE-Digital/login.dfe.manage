@@ -1,5 +1,5 @@
 'use strict';
-
+const logger = require('./../../infrastructure/logger');
 const { removeBanner, getBannerById } = require('./../../infrastructure/applications');
 
 const get = async (req, res) => {
@@ -16,7 +16,17 @@ const get = async (req, res) => {
 const post = async (req, res) => {
   await removeBanner(req.params.sid, req.params.bid, req.id);
 
-  //TODO: audit banner removal
+  logger.audit(`${req.user.email} (id: ${req.user.sub}) removed banner ${req.params.bid} for service ${req.params.sid}`, {
+    type: 'manage',
+    subType: 'service-banner-deleted',
+    userId: req.user.sub,
+    userEmail: req.user.email,
+    editedFields: [{
+      name: 'delete_banner',
+      oldValue: req.params.bid,
+      newValue: undefined,
+    }],
+  });
 
   res.flash('info','Banner successfully deleted');
   res.redirect(`/services/${req.params.sid}/service-banners`);

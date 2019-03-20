@@ -4,7 +4,7 @@ jest.mock('./../../../src/app/services/utils');
 jest.mock('./../../../src/infrastructure/organisations');
 jest.mock('./../../../src/infrastructure/directories');
 
-
+const logger = require('./../../../src/infrastructure/logger');
 const { getRequestMock, getResponseMock } = require('./../../utils');
 const getUserOrganisations = require('./../../../src/app/services/getUserOrganisations');
 const { getAllUserOrganisations, getInvitationOrganisations } = require('./../../../src/infrastructure/organisations');
@@ -154,6 +154,20 @@ describe('when getting users organisation details', () => {
     expect(res.render.mock.calls[0][1].organisations[1]).toMatchObject({
       id: 'fe68a9f4-a995-4d74-aa4b-e39e0e88c15d',
       name: 'Little Tiny School',
+    });
+  });
+
+  it('then it should should audit user being viewed', async () => {
+    await getUserOrganisations(req, res);
+
+    expect(logger.audit.mock.calls).toHaveLength(1);
+    expect(logger.audit.mock.calls[0][0]).toBe('super.user@unit.test (id: user1) viewed user undefined (id: user1)');
+    expect(logger.audit.mock.calls[0][1]).toMatchObject({
+      type: 'organisations',
+      subType: 'user-view',
+      userEmail: 'super.user@unit.test',
+      userId: 'user1',
+      viewedUser: 'user1',
     });
   });
 });
