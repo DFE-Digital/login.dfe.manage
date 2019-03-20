@@ -1,6 +1,7 @@
 'use strict';
 const { getServiceById, updateService } = require('./../../infrastructure/applications');
 const niceware = require('niceware');
+const logger = require('./../../infrastructure/logger');
 
 const getServiceConfig = async (req, res) => {
   const service = await getServiceById(req.params.sid, req.id);
@@ -146,6 +147,14 @@ const postServiceConfig = async (req, res) => {
     apiSecret: model.service.apiSecret,
     tokenEndpointAuthMethod: model.service.tokenEndpointAuthMethod,
   };
+
+  logger.audit(`${req.user.email} (id: ${req.user.sub}) updated service configuration for service ${model.service.name} (id: ${req.params.sid})`, {
+    type: 'manage',
+    subType: 'service-config-updated',
+    userId: req.user.sub,
+    userEmail: req.user.email,
+    editedService: req.params.sid,
+  });
 
   await updateService(req.params.sid, updatedService, req.id);
 
