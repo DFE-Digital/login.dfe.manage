@@ -76,29 +76,19 @@ describe('when getting the service config page', () => {
 
     expect(res.render.mock.calls[0][1]).toMatchObject({
       service: {
-        id: 'service1',
-        name:'service one',
+        clientId: 'clientid',
+        clientSecret: 'dewier-thrombi-confounder-mikado',
         description: 'service description',
-        relyingParty: {
-          client_id: 'clientid',
-          client_secret: 'dewier-thrombi-confounder-mikado',
-          api_secret: 'dewier-thrombi-confounder-mikado',
-          service_home: 'https://www.servicehome.com',
-          postResetUrl: 'https://www.postreset.com',
-          redirect_uris: [
-            'https://www.redirect.com',
-          ],
-          post_logout_redirect_uris: [
-            'https://www.logout.com',
-          ],
-          grant_types: [
-            'implicit',
-            'authorization_code'
-          ],
-          response_types: [
-            'code',
-          ],
-        }
+        grantTypes: 'implicit,authorization_code',
+        postLogoutRedirectUris: [
+          'https://www.logout.com'
+        ],
+        postResetUrl: 'https://www.postreset.com',
+        redirectUris: [
+          'https://www.redirect.com',
+        ],
+        responseTypes: 'code',
+        serviceHome: 'https://www.servicehome.com'
       }
     });
   });
@@ -107,7 +97,9 @@ describe('when getting the service config page', () => {
     await getServiceConfig(req, res);
 
     expect(res.render.mock.calls[0][1]).toMatchObject({
-      grantTypes: 'implicit,authorization_code'
+      service: {
+        grantTypes: 'implicit,authorization_code'
+      }
     });
   });
 
@@ -115,7 +107,9 @@ describe('when getting the service config page', () => {
     await getServiceConfig(req, res);
 
     expect(res.render.mock.calls[0][1]).toMatchObject({
-      responseTypes: 'code'
+      service: {
+        responseTypes: 'code'
+      }
     });
   });
 

@@ -8,20 +8,37 @@ const getServiceConfig = async (req, res) => {
   const responseTypes = service.relyingParty.response_types ? service.relyingParty.response_types.join() : '';
   return res.render('services/views/serviceConfig', {
     csrfToken: req.csrfToken(),
-    service,
-    responseTypes,
-    grantTypes,
+    service: {
+      name: service.name || '',
+      description: service.description || '',
+      serviceHome: service.relyingParty.service_home || '',
+      postResetUrl: service.relyingParty.postResetUrl || '',
+      clientId: service.relyingParty.client_id || '',
+      clientSecret: service.relyingParty.client_secret || '',
+      redirectUris: service.relyingParty.redirect_uris,
+      postLogoutRedirectUris: service.relyingParty.post_logout_redirect_uris,
+      responseTypes,
+      grantTypes,
+      apiSecret: service.relyingParty.api_secret || '',
+      tokenEndpointAuthMethod: service.relyingParty.token_endpoint_auth_method,
+    },
     backLink: `/services/${req.params.sid}`,
     validationMessages: {},
   });
 };
 
 const validate = async (req) => {
-  const urlValidation = new RegExp('https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&\\\\=]*)');
+  const urlValidation = new RegExp('^https?:\\/\\/(.*)');
 
-  const service = await getServiceById(req.params.sid, req.id);
-  const grantTypes = service.relyingParty.grant_types ? service.relyingParty.grant_types.join() : '';
-  const responseTypes = service.relyingParty.response_types ? service.relyingParty.response_types.join() : '';
+  let grantTypes = req.body.grant_types ? req.body.grant_types : [];
+  if(!(grantTypes instanceof Array)) {
+    grantTypes = [req.body.grant_types]
+  }
+
+  let responseTypes = req.body.response_types ? req.body.response_types : [];
+  if(!(responseTypes instanceof Array)) {
+    responseTypes = [req.body.response_types]
+  }
 
   let selectedRedirects = req.body.redirect_uris ? req.body.redirect_uris : [];
   if(!(selectedRedirects instanceof Array)) {
@@ -36,50 +53,57 @@ const validate = async (req) => {
   selectedLogout = selectedLogout.filter(x => x.trim() !== '');
 
   const model = {
-    service,
-    responseTypes,
-    grantTypes,
-    selectedRedirects,
-    selectedLogout,
+    service: {
+      name: req.body.name,
+      description: req.body.description.trim(),
+      clientId: req.body.clientId,
+      clientSecret: req.body.clientSecret || '',
+      serviceHome: req.body.serviceHome || '',
+      postResetUrl: req.body.postResetUrl || '',
+      redirectUris: selectedRedirects,
+      postLogoutRedirectUris: selectedLogout,
+      grantTypes,
+      responseTypes,
+      apiSecret: req.body.apiSecret,
+      tokenEndpointAuthMethod: req.body.tokenEndpointAuthMethod,
+    },
     backLink: `/services/${req.params.sid}`,
     validationMessages: {},
   };
 
-  if(!req.body.name) {
+  if(!model.service.name) {
     model.validationMessages.name = 'Service name must be present'
   }
 
-  if(!req.body.serviceHome) {
-    model.validationMessages.serviceHome = 'Home url must be present'
-  } else if (!urlValidation.test(req.body.serviceHome)) {
+  if (model.service.serviceHome && !urlValidation.test(model.service.serviceHome)) {
     model.validationMessages.serviceHome = 'Please enter a valid home url'
   }
 
-  if(!req.body.clientId) {
+  if(!model.service.clientId) {
     model.validationMessages.clientId = 'Client Id must be present'
   }
 
-  if(!urlValidation.test(req.body.postResetUrl) && req.body.postResetUrl.trim() !== '') {
+  if(!urlValidation.test(model.service.postResetUrl) && model.service.postResetUrl.trim() !== '') {
     model.validationMessages.postResetUrl = 'Please enter a valid Post-reset url'
   }
 
-  if(!selectedRedirects || !selectedRedirects.length > 0) {
+  if(!model.service.redirectUris || !model.service.redirectUris.length > 0) {
     model.validationMessages.redirect_uris = 'At least one redirect url must be specified'
-  } else if (selectedRedirects.some(x => !urlValidation.test(x))) {
+  } else if (model.service.redirectUris.some(x => !urlValidation.test(x))) {
     model.validationMessages.redirect_uris = 'Invalid redirect url'
-  } else if (selectedRedirects.some((value, i) => selectedRedirects.indexOf(value) !== i)) {
+  } else if (model.service.redirectUris.some((value, i) => model.service.redirectUris.indexOf(value) !== i)) {
     model.validationMessages.redirect_uris = 'Redirect urls must be unique'
   }
 
-  if(!selectedLogout || !selectedLogout.length > 0) {
+  if(!model.service.postLogoutRedirectUris || !model.service.postLogoutRedirectUris.length > 0) {
     model.validationMessages.post_logout_redirect_uris = 'At least one logout redirect url must be specified'
-  } else if (selectedLogout.some(x => !urlValidation.test(x))) {
+  } else if (model.service.postLogoutRedirectUris.some(x => !urlValidation.test(x))) {
     model.validationMessages.post_logout_redirect_uris = 'Invalid logout redirect url'
-  } else if (selectedLogout.some((value, i) => selectedLogout.indexOf(value) !== i)) {
+  } else if (model.service.postLogoutRedirectUris.some((value, i) => model.service.postLogoutRedirectUris.indexOf(value) !== i)) {
     model.validationMessages.post_logout_redirect_uris = 'Logout redirect urls must be unique'
   }
   try {
-    const validateClientSecret = niceware.passphraseToBytes(req.body.clientSecret.split('-'));
+    const validateClientSecret = niceware.passphraseToBytes(model.service.clientSecret.split('-'));
     if(validateClientSecret.length !== 8) {
       model.validationMessages.clientSecret = 'Invalid client secret';
     }
@@ -87,9 +111,9 @@ const validate = async (req) => {
     model.validationMessages.clientSecret = 'Invalid client secret';
   }
 
-  if (req.body.apiSecret) {
+  if (model.service.apiSecret) {
     try {
-      const validateApiSecret = niceware.passphraseToBytes(req.body.apiSecret.split('-'));
+      const validateApiSecret = niceware.passphraseToBytes(model.service.apiSecret.split('-'));
       if (validateApiSecret.length !== 8) {
         model.validationMessages.apiSecret = 'Invalid api secret';
       }
@@ -108,30 +132,21 @@ const postServiceConfig = async (req, res) => {
     return res.render('services/views/serviceConfig', model);
   }
 
-  let grantTypes = req.body.grant_types ? req.body.grant_types : [];
-  if(!(grantTypes instanceof Array)) {
-    grantTypes = [req.body.grant_types]
-  }
-
-  let responseTypes = req.body.response_types ? req.body.response_types : [];
-  if(!(responseTypes instanceof Array)) {
-    responseTypes = [req.body.response_types]
-  }
-
   const updatedService = {
-    name: req.body.name,
-    description: req.body.description.trim(),
-    clientId: req.body.clientId,
-    clientSecret: req.body.clientSecret,
-    serviceHome: req.body.serviceHome,
-    postResetUrl: req.body.postResetUrl,
-    redirect_uris: model.selectedRedirects,
-    post_logout_redirect_uris: model.selectedLogout,
-    grant_types: grantTypes,
-    response_types: responseTypes,
-    apiSecret: req.body.apiSecret,
-    tokenEndpointAuthMethod: req.body.tokenEndpointAuthMethod,
+    name: model.service.name,
+    description: model.service.description,
+    clientId: model.service.clientId,
+    clientSecret: model.service.clientSecret,
+    serviceHome: model.service.serviceHome,
+    postResetUrl: model.service.postResetUrl,
+    redirect_uris: model.service.redirectUris,
+    post_logout_redirect_uris: model.service.postLogoutRedirectUris,
+    grant_types: model.service.grantTypes,
+    response_types: model.service.responseTypes,
+    apiSecret: model.service.apiSecret,
+    tokenEndpointAuthMethod: model.service.tokenEndpointAuthMethod,
   };
+
   await updateService(req.params.sid, updatedService, req.id);
 
   res.flash('info', 'Service configuration updated successfully');
