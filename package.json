@@ -44,7 +44,7 @@
     "niceware": "^1.0.6",
     "moment": "^2.19.3",
     "simpl-schema": "^1.5.3",
-    "login.dfe.config.schema.common": "git+https://github.com/DFE-Digital/login.dfe.config.schema.common.git#v1.0.1",
+    "login.dfe.config.schema.common": "git+https://github.com/DFE-Digital/login.dfe.config.schema.common.git#v1.2",
     "winston": "^2.4.0",
     "openid-client": "^2.3.1",
     "passport": "^0.4.0"
