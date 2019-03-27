@@ -5,6 +5,7 @@ jest.mock('./../../../src/infrastructure/applications');
 const { getRequestMock, getResponseMock } = require('./../../utils');
 const postServiceConfig = require('./../../../src/app/services/serviceConfig').postServiceConfig;
 const { getServiceById, updateService } = require('./../../../src/infrastructure/applications');
+const logger = require('./../../../src/infrastructure/logger');
 
 const res = getResponseMock();
 
@@ -243,7 +244,20 @@ describe('when editing the service configuration', () => {
       ],
     });
     expect(updateService.mock.calls[0][2]).toBe('correlationId');
+  });
 
+  it('then it should should audit service being edited', async () => {
+    await postServiceConfig(req, res);
+
+    expect(logger.audit.mock.calls).toHaveLength(1);
+    expect(logger.audit.mock.calls[0][0]).toBe('user@unit.test (id: user1) updated service configuration for service service two (id: service1)');
+    expect(logger.audit.mock.calls[0][1]).toMatchObject({
+      type: 'manage',
+      subType: 'service-config-updated',
+      userId: 'user1',
+      userEmail: 'user@unit.test',
+      editedService: 'service1',
+    });
   });
 
 });

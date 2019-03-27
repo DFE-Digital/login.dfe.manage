@@ -2,6 +2,7 @@ jest.mock('./../../../src/infrastructure/config', () => require('./../../utils')
 jest.mock('./../../../src/infrastructure/logger', () => require('./../../utils').loggerMockFactory());
 jest.mock('./../../../src/infrastructure/applications');
 
+const logger = require('./../../../src/infrastructure/logger');
 const { getRequestMock, getResponseMock } = require('./../../utils');
 const postNewServiceBanner = require('./../../../src/app/services/newServiceBanner').post;
 const { getBannerById, upsertBanner, listAllBannersForService } = require('./../../../src/infrastructure/applications');
@@ -334,5 +335,33 @@ describe('when creating a new service banner', () => {
     expect(res.flash.mock.calls).toHaveLength(1);
     expect(res.flash.mock.calls[0][0]).toBe('info');
     expect(res.flash.mock.calls[0][1]).toBe(`Service banner updated successfully`)
+  });
+
+  it('then it should should audit banner being edited if banner id', async () => {
+    await postNewServiceBanner(req, res);
+
+    expect(logger.audit.mock.calls).toHaveLength(1);
+    expect(logger.audit.mock.calls[0][0]).toBe('user@unit.test (id: user1) updated banner banner name (bannerId) for service service1');
+    expect(logger.audit.mock.calls[0][1]).toMatchObject({
+      type: 'manage',
+      subType: 'service-banner-updated',
+      userId: 'user1',
+      userEmail: 'user@unit.test',
+      editedBanner: 'bannerId'
+    });
+  });
+
+  it('then it should should audit banner being created if no banner id ', async () => {
+    req.params.bid = null;
+    await postNewServiceBanner(req, res);
+
+    expect(logger.audit.mock.calls).toHaveLength(1);
+    expect(logger.audit.mock.calls[0][0]).toBe('user@unit.test (id: user1) created banner banner name for service service1');
+    expect(logger.audit.mock.calls[0][1]).toMatchObject({
+      type: 'manage',
+      subType: 'service-banner-created',
+      userId: 'user1',
+      userEmail: 'user@unit.test',
+    });
   });
 });

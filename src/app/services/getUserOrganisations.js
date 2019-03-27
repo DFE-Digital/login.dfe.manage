@@ -3,6 +3,7 @@ const { getUsersByIdV2 } = require('./../../infrastructure/directories');
 const { getUserDetails } = require('./utils');
 const flatten = require('lodash/flatten');
 const uniq = require('lodash/uniq');
+const logger = require('./../../infrastructure/logger');
 
 const getApproverDetails = async (organisation, correlationId) => {
   const allApproverIds = flatten(organisation.map((org) => org.approvers));
@@ -42,6 +43,14 @@ const getOrganisations = async (userId, serviceId, correlationId) => {
 const getUserOrganisations = async (req, res) => {
   const user = await getUserDetails(req);
   const organisations = await getOrganisations(user.id, req.params.sid, req.id);
+
+  logger.audit(`${req.user.email} (id: ${req.user.sub}) viewed user ${user.email} (id: ${user.id})`, {
+    type: 'organisations',
+    subType: 'user-view',
+    userId: req.user.sub,
+    userEmail: req.user.email,
+    viewedUser: user.id,
+  });
 
   return res.render('services/views/userOrganisations', {
     csrfToken: req.csrfToken(),
