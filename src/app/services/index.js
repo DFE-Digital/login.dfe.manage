@@ -40,9 +40,11 @@ const services = (csrf) => {
 
   router.get('/:sid', csrf, isManageUserForService, asyncWrapper(getDashboard));
 
+  // service config
   router.get('/:sid/service-configuration', csrf, isManageUserForService, hasRole('serviceconfig'), asyncWrapper(getServiceConfig));
   router.post('/:sid/service-configuration', csrf, isManageUserForService, hasRole('serviceconfig'), asyncWrapper(postServiceConfig));
 
+  // service banners
   router.get('/:sid/service-banners', csrf, isManageUserForService, hasRole('serviceBanner'), asyncWrapper(getServiceBanners));
   router.post('/:sid/service-banners', csrf, isManageUserForService, hasRole('serviceBanner'), asyncWrapper(postServiceBanners));
 
@@ -55,6 +57,7 @@ const services = (csrf) => {
   router.get('/:sid/service-banners/:bid/delete-banner', csrf, isManageUserForService, hasRole('serviceBanner'), asyncWrapper(getDeleteBanner));
   router.post('/:sid/service-banners/:bid/delete-banner', csrf, isManageUserForService, hasRole('serviceBanner'), asyncWrapper(postDeleteBanner));
 
+  // service support
   router.get('/:sid/users', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getUsersSearch));
   router.post('/:sid/users', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postUsersSearch));
 
@@ -80,6 +83,9 @@ const services = (csrf) => {
 
   router.get('/:sid/organisations/:oid/web-service-sync', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getWebServiceSyncOrg));
   router.post('/:sid/organisations/:oid/web-service-sync', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postWebServiceSyncOrg));
+
+  // service access management
+  router.get('/:sid/policies', csrf, isManageUserForService, hasRole('accessManage'), asyncWrapper());
 
   return router;
 };
