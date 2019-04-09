@@ -1,11 +1,37 @@
+const { getServiceById } = require('./../../infrastructure/applications');
+const { getPageOfPoliciesForService } = require('./../../infrastructure/access');
 
-const get = async (req, res) => {
-  return res.render('services/views/listPolicies', {
+const viewModel = async (req) => {
+  const paramsSource = req.method === 'POST' ? req.body : req.query;
+  let page = paramsSource.page ? parseInt(paramsSource.page) : 1;
+  if (isNaN(page)) {
+    page = 1;
+  }
+
+  const serviceDetails = await getServiceById(req.params.sid, req.id);
+  const servicePolicies = await getPageOfPoliciesForService(req.params.sid, page, 25, req.id);
+  return {
     csrfToken: req.csrfToken(),
     backLink: true,
-  });
+    serviceDetails,
+    policies: servicePolicies.policies,
+    page: servicePolicies.page,
+    totalNumberOfResults: servicePolicies.totalNumberOfRecords,
+    numberOfPages: servicePolicies.totalNumberOfPages,
+  }
+};
+
+const get = async (req, res) => {
+  const model = await viewModel(req);
+  return res.render('services/views/listPolicies', model);
+};
+
+const post = async (req, res) => {
+  const model = await viewModel(req);
+  return res.render('services/views/listPolicies', model);
 };
 
 module.exports = {
   get,
+  post,
 };

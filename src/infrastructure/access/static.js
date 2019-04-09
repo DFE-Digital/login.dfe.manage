@@ -47,6 +47,24 @@ const removeServiceFromInvitation = async(iid, sid, oid, correlationId) => {
   return Promise.resolve();
 };
 
+const getPageOfPoliciesForService = async (sid, page, pageSize, correlationId) => {
+  return Promise.resolve({
+    policies: {
+      id: 'policyId',
+      applicationId: 'serviceId',
+      name: 'policy name',
+      status: {
+        id: '1',
+      },
+      conditions: [],
+      roles: [],
+    },
+    page: page,
+    totalNumberOfPages: 1,
+    totalNumberOfRecords: 1,
+  });
+};
+
 module.exports = {
   getServicesForUser,
   getSingleUserService,
@@ -56,4 +74,5 @@ module.exports = {
   updateInvitationService,
   removeServiceFromUser,
   removeServiceFromInvitation,
+  getPageOfPoliciesForService,
 };
