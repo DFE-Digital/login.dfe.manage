@@ -27,12 +27,13 @@
                 <p>Manage banners that will be displayed on the DfE Sign-in page for your service.</p>
             </div>
 
-            <div class="<%=locals.userRoles.includes('accessManagement') ? 'manage-card' : 'manage-card-disabled'%>">
-                <% if (locals.userRoles.includes('accessManagement')) { %>
-                    <a href=""></a>
+            <div class="manage-card-disabled">
+                <h2 class="heading-large">Access Management</h2>
+                <p>Manage the policies and roles of your service.</p>
+                <% if (locals.userRoles.includes('accessManage')) { %>
+                    <p class="manage-link"><a href="<%= locals.serviceId %>/policies">Manage policies</a></p>
+                    <p class="manage-link"><a href="<%= locals.serviceId %>/roles">Manage roles</a></p>
                 <% } %>
-                    <h2 class="heading-large">Access management</h2>
-                <p>Manage access management for your service.</p>
             </div>
 
             <div class="<%=locals.userRoles.includes('serviceReport') ? 'manage-card' : 'manage-card-disabled'%>">
