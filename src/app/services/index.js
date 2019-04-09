@@ -21,6 +21,7 @@ const { get: getWebServiceSyncOrg, post: postWebServiceSyncOrg } = require('./we
 const { get: getEditService, post: postEditService } = require('./editService');
 const { get: getConfirmEditService, post: postConfirmEditService } = require('./confirmEditService');
 const { get: getRemoveService, post: postRemoveService } = require('./removeService');
+const { get: getListPolicies } = require('./listPolicies');
 
 const router = express.Router({ mergeParams: true });
 
@@ -85,7 +86,7 @@ const services = (csrf) => {
   router.post('/:sid/organisations/:oid/web-service-sync', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postWebServiceSyncOrg));
 
   // service access management
-  router.get('/:sid/policies', csrf, isManageUserForService, hasRole('accessManage'), asyncWrapper());
+  router.get('/:sid/policies', csrf, isManageUserForService, hasRole('accessManage'), asyncWrapper(getListPolicies));
 
   return router;
 };
