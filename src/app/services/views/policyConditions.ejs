@@ -1,0 +1,32 @@
+<%- include('policySummary', {area: 'conditions'}); %>
+
+<% if (locals.policy.conditions.length > 0) { %>
+    <table class="data no-borders">
+        <thead>
+        <tr>
+            <th scope="col" class="cwp-40">Condition</th>
+            <th scope="col" class="cwp-20">Operator</th>
+            <th scope="col" class="cwp-30">Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% for (let i = 0; i < locals.policy.conditions.length; i++) { %>
+            <% const condition = locals.policy.conditions[i];%>
+            <tr>
+                <td> <%= condition.field %>
+                </td>
+                <td><%= condition.operator %></td>
+                <% if (condition.value.length === 1) { %>
+                    <td><%= condition.value[0] %></td>
+                <% } else { %>
+                    <td><a href=""><%= condition.value.length %> values</a></td>
+                <% }%>
+            </tr>
+        <% } %>
+        </tbody>
+    </table>
+<% } else { %>
+    <div class="empty-state">
+        <p><%= locals.policy.name %> has no conditions</p>
+    </div>
+<% } %>

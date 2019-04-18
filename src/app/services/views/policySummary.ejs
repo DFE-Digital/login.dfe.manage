@@ -1,0 +1,32 @@
+<div class="row">
+    <div class="col-8">
+        <h1 class="heading-xlarge">
+            <%= locals.policy.name %>
+            <small><%= locals.service.name %></small>
+        </h1>
+        <dl class="inline condensed">
+            <dt class="label">Status:</dt>
+            <dd><%= locals.policy.status && locals.policy.status.id === 1 ? 'Active' : 'Inactive' %></dd>
+        </dl>
+    </div>
+</div>
+
+<nav>
+    <ul class="tabs" role="tablist">
+
+        <% if(locals.area === 'conditions') { %>
+            <li class="active">Conditions</li>
+        <% } else { %>
+            <li><a href="" role="tab">Conditions</a></li>
+        <% } %>
+
+        <% if(!locals.isInvitation) { %>
+            <% if(locals.area === 'roles') { %>
+                <li class="active">Roles</li>
+            <% } else { %>
+                <li><a href="" role="tab">Roles</a></li>
+            <% } %>
+        <% } %>
+
+    </ul>
+</nav>

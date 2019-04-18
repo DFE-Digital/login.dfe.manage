@@ -22,6 +22,7 @@ const { get: getEditService, post: postEditService } = require('./editService');
 const { get: getConfirmEditService, post: postConfirmEditService } = require('./confirmEditService');
 const { get: getRemoveService, post: postRemoveService } = require('./removeService');
 const { get: getListPolicies, post: postListPolicies } = require('./listPolicies');
+const getPolicyConditions = require('./getPolicyConditions');
 
 const router = express.Router({ mergeParams: true });
 
@@ -88,6 +89,8 @@ const services = (csrf) => {
   // service access management
   router.get('/:sid/policies', csrf, isManageUserForService, hasRole('accessManage'), asyncWrapper(getListPolicies));
   router.post('/:sid/policies', csrf, isManageUserForService, hasRole('accessManage'), asyncWrapper(postListPolicies));
+
+  router.get('/:sid/policies/:pid/conditions', csrf, isManageUserForService, hasRole('accessManage'), asyncWrapper(getPolicyConditions));
 
   return router;
 };
