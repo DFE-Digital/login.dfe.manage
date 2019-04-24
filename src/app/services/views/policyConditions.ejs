@@ -19,7 +19,22 @@
                 <% if (condition.value.length === 1) { %>
                     <td><%= condition.value[0] %></td>
                 <% } else { %>
-                    <td><a href=""><%= condition.value.length %> values</a></td>
+                    <td>
+                        <article class="condition-value" style="margin-bottom: 0">
+                            <section class="conditions" style="padding: 0; margin:0;">
+                                <div class="user">
+                                    <a href="" class="info-link" style="float: none;"><%= condition.value.length %> values</a>
+                                </div>
+                                <div class="meta js-hidden">
+                                    <div class="approvers">
+                                        <dl class="inline condensed small-dt">
+
+                                        </dl>
+                                    </div>
+                                </div>
+                            </section>
+                        </article>
+                    </td>
                 <% }%>
             </tr>
         <% } %>
