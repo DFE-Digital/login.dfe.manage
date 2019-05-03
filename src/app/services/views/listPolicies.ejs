@@ -1,0 +1,63 @@
+<div class="row">
+    <div class="col-8">
+        <h1 class="heading-xlarge">
+            Manage policies
+            <small><%=locals.serviceDetails.name%></small>
+        </h1>
+    </div>
+</div>
+
+<%
+const paginationModel = {
+    method: 'post',
+    csrfToken,
+    currentPage: locals.page,
+    numberOfPages: locals.numberOfPages,
+    totalNumberOfResults: locals.totalNumberOfResults,
+    numberOfResultsOnPage: locals.policies.length,
+    data: [
+        { key: 'criteria', value: locals.criteria },
+        { key: 'sort', value: locals.sortBy },
+        { key: 'sortDir', value: locals.sortOrder },
+        { key: 'showFilters', value: locals.showFilters }
+    ]
+}
+%>
+
+<div class="row">
+    <div class="col-12">
+        <%- include('../../layouts/pagination', paginationModel); %>
+        <table class="data">
+            <thead>
+            <tr class="sortable">
+                <th scope="col" class="cwp-55">
+                    Name</th>
+                <th scope="col" class="cwp-25">
+                    Roles</th>
+                <th scope="col" class="cwp-25">
+                    Conditions</th>
+                <th scope="col" class="cwp-25">
+                    Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% if (locals.policies.length === 0) { %>
+                <tr>
+                    <td colspan="5"><span class="empty-state">No policies found for service</span></td>
+                </tr>
+            <% } %>
+            <% for (let i = 0; i < locals.policies.length; i++) {
+                const policy = locals.policies[i]%>
+
+            <tr>
+                <td><a href=""><%= policy.name %></a></td>
+                <td><%= policy.roles.length %></td>
+                <td><%= policy.conditions.length %></td>
+                <td><%= policy.status.id ===  1 ? 'Active' : 'Inactive'%></td>
+            </tr>
+            <% } %>
+            </tbody>
+        </table>
+        <%- include('../../layouts/pagination', paginationModel); %>
+    </div>
+</div>

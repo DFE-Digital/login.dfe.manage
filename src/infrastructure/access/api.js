@@ -72,6 +72,10 @@ const removeServiceFromInvitation = async (iid, sid, oid, correlationId) => {
   return callApi('DELETE', `invitations/${iid}/services/${sid}/organisations/${oid}`, correlationId, undefined);
 };
 
+const getPageOfPoliciesForService = async (sid, page, pageSize, correlationId) => {
+  return callApi('GET', `services/v2/${sid}/policies?page=${page}&pageSize=${pageSize}`, correlationId, undefined);
+};
+
 module.exports = {
   getServicesForUser,
   getSingleUserService,
@@ -81,4 +85,5 @@ module.exports = {
   updateInvitationService,
   removeServiceFromUser,
   removeServiceFromInvitation,
+  getPageOfPoliciesForService,
 };
