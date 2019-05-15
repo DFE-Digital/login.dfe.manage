@@ -16,7 +16,7 @@ const post = async (req, res) => {
   await serviceNotificationsClient.notifyUserUpdated({ sub: req.params.uid });
 
   res.flash('info', 'User has been queued for sync');
-  return res.redirect(`/services/${req.params.sid}/users/${req.params.uid}`);
+  return res.redirect(`/services/${req.params.sid}/users/${req.params.uid}/organisations`);
 };
 
 module.exports = {
