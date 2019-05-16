@@ -20,15 +20,18 @@
                     <td><%= condition.value[0] %></td>
                 <% } else { %>
                     <td>
-                        <article class="condition-value" style="margin-bottom: 0">
-                            <section class="conditions" style="padding: 0; margin:0;">
+                        <article class="organisation-services" style="margin-bottom: 0">
+                            <section class="organisation" style="padding: 0; margin:0;">
                                 <div class="user">
                                     <a href="" class="info-link" style="float: none;"><%= condition.value.length %> values</a>
                                 </div>
                                 <div class="meta js-hidden">
                                     <div class="approvers">
                                         <dl class="inline condensed small-dt">
-
+                                            <% for (let i = 0; i < condition.value.length; i++) {
+                                            const selectedcondition = condition.value[i]; %>
+                                            <p> <%= selectedcondition %></p>
+                                            <% } %>
                                         </dl>
                                     </div>
                                 </div>
