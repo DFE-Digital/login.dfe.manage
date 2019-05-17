@@ -1,9 +1,10 @@
 jest.mock('./../../../src/infrastructure/config', () => require('./../../utils').configMockFactory());
 jest.mock('./../../../src/infrastructure/logger', () => require('./../../utils').loggerMockFactory());
 jest.mock('./../../../src/infrastructure/search');
-
+jest.mock('./../../../src/infrastructure/applications');
 
 const { searchForUsers } = require('./../../../src/infrastructure/search');
+const { getServiceById } = require('./../../../src/infrastructure/applications');
 const { getRequestMock, getResponseMock } = require('./../../utils');
 const { get } = require('./../../../src/app/services/usersSearch');
 
@@ -47,6 +48,14 @@ describe('When getting users search ', () => {
       sortBy: 'test',
       sortOrder: 'desc',
       users: usersSearchResult
+    });
+
+    getServiceById.mockReset();
+    getServiceById.mockReturnValue({
+      id: 'service1',
+      dateActivated: '10/10/2018',
+      name: 'service name',
+      status: 'active',
     });
   });
 

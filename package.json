@@ -41,6 +41,7 @@
     "login.dfe.service-notifications.jobs.client": "git+https://github.com/DFE-Digital/login.dfe.service-notifications.jobs.client.git#v1.4",
     "login.dfe.request-promise-retry": "git+https://github.com/DFE-Digital/login.dfe.request-promise-retry.git#v1.0",
     "login.dfe.sanitization": "git+https://github.com/DFE-Digital/login.dfe.sanitization.git#v1.0.1",
+    "login.dfe.validation": "git+https://github.com/DFE-Digital/login.dfe.validation.git#v1.1.0",
     "niceware": "^1.0.6",
     "moment": "^2.19.3",
     "simpl-schema": "^1.5.3",
