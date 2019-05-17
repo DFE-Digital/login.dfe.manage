@@ -50,7 +50,7 @@ const paginationModel = {
                 const policy = locals.policies[i]%>
 
             <tr>
-                <td><a href=""><%= policy.name %></a></td>
+                <td><a href="policies/<%= policy.id %>/conditions"><%= policy.name %></a></td>
                 <td><%= policy.roles.length %></td>
                 <td><%= policy.conditions.length %></td>
                 <td><%= policy.status.id ===  1 ? 'Active' : 'Inactive'%></td>

@@ -1,0 +1,29 @@
+<%- include('policySummary', {area: 'roles'}); %>
+
+<% if (locals.policy.roles.length > 0) { %>
+    <table class="data no-borders">
+        <thead>
+        <tr>
+            <th scope="col" class="cwp-40">Name</th>
+            <th scope="col" class="cwp-20">Code</th>
+            <th scope="col" class="cwp-30">ID</th>
+            <th scope="col" class="cwp-30">Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% for (let i = 0; i < locals.policy.roles.length; i++) { %>
+            <% const role = locals.policy.roles[i];%>
+            <tr>
+                <td> <%= role.name %></td>
+                <td><%= role.code %></td>
+                <td><%= role.numericId %></td>
+                <td><%= role.status ? role.status.id : '' %></td>
+            </tr>
+        <% } %>
+        </tbody>
+    </table>
+<% } else { %>
+    <div class="empty-state">
+        <p><%= locals.policy.name %> has no roles</p>
+    </div>
+<% } %>

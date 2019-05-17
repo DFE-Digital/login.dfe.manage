@@ -76,6 +76,10 @@ const getPageOfPoliciesForService = async (sid, page, pageSize, correlationId) =
   return callApi('GET', `services/v2/${sid}/policies?page=${page}&pageSize=${pageSize}`, correlationId, undefined);
 };
 
+const getPolicyById = async (sid, pid, correlationId) => {
+  return callApi('GET', `services/${sid}/policies/${pid}`, correlationId, undefined);
+};
+
 module.exports = {
   getServicesForUser,
   getSingleUserService,
@@ -86,4 +90,5 @@ module.exports = {
   removeServiceFromUser,
   removeServiceFromInvitation,
   getPageOfPoliciesForService,
+  getPolicyById,
 };

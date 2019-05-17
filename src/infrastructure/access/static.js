@@ -65,6 +65,10 @@ const getPageOfPoliciesForService = async (sid, page, pageSize, correlationId) =
   });
 };
 
+const getPolicyById = async (sid, pid, correlationId) => {
+  return Promise.resolve();
+};
+
 module.exports = {
   getServicesForUser,
   getSingleUserService,
@@ -75,4 +79,5 @@ module.exports = {
   removeServiceFromUser,
   removeServiceFromInvitation,
   getPageOfPoliciesForService,
+  getPolicyById,
 };
