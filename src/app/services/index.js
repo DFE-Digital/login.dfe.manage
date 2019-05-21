@@ -24,6 +24,7 @@ const { get: getRemoveService, post: postRemoveService } = require('./removeServ
 const { get: getListPolicies, post: postListPolicies } = require('./listPolicies');
 const getPolicyConditions = require('./getPolicyConditions');
 const getPolicyRoles = require('./getPolicyRoles');
+const { get: getNewUserDetails , post: postNewUserDetails } = require('./newUserDetails');
 
 const router = express.Router({ mergeParams: true });
 
@@ -63,6 +64,9 @@ const services = (csrf) => {
   // service support
   router.get('/:sid/users', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getUsersSearch));
   router.post('/:sid/users', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postUsersSearch));
+
+  router.get('/:sid/users/new-user', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getNewUserDetails));
+  router.post('/:sid/users/new-user', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postNewUserDetails));
 
   router.get('/:sid/users/:uid/organisations', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getUserOrganisations));
 

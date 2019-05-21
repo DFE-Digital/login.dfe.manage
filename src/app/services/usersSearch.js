@@ -1,5 +1,6 @@
 const { searchForUsers } = require('./../../infrastructure/search');
 const logger = require('./../../infrastructure/logger');
+const { getServiceById } = require('./../../infrastructure/applications');
 
 const search = async (req) => {
   const serviceId = req.params.sid;
@@ -73,7 +74,7 @@ const search = async (req) => {
 
 const viewModel = async (req) => {
   const result = await search(req);
-
+  const service = await getServiceById(req.params.sid, req.id);
   return {
     csrfToken: req.csrfToken(),
     serviceId: req.params.sid,
@@ -86,6 +87,8 @@ const viewModel = async (req) => {
     sort: result.sort,
     sortBy: result.sortBy,
     sortOrder: result.sortOrder,
+    service,
+    allowInvite: !!(service.relyingParty && service.relyingParty.params && service.relyingParty.params.allowManageInvite === 'true')
   };
 };
 

@@ -79,8 +79,31 @@ const getUserById = async (uid, correlationId) => {
   }
 };
 
+const getInvitationByEmail = async (email, correlationId) => {
+  const token = await jwtStrategy(config.directories.service).getBearerToken();
+
+  try {
+    return await rp({
+      method: 'GET',
+      uri: `${config.directories.service.url}/invitations/by-email/${email}`,
+      headers: {
+        authorization: `bearer ${token}`,
+        'x-correlation-id': correlationId,
+      },
+      json: true,
+    });
+  } catch (e) {
+    const status = e.statusCode ? e.statusCode : 500;
+    if (status === 404) {
+      return null;
+    }
+    throw e;
+  }
+};
+
 module.exports = {
   getInvitation,
   getUsersByIdV2,
   getUserById,
+  getInvitationByEmail,
 };
