@@ -2,6 +2,12 @@ const { searchForUsers } = require('./../../infrastructure/search');
 const logger = require('./../../infrastructure/logger');
 const { getServiceById } = require('./../../infrastructure/applications');
 
+const clearNewUserSessionData = (req) => {
+  if (req.session.user) {
+    req.session.user = undefined;
+  }
+};
+
 const search = async (req) => {
   const serviceId = req.params.sid;
   const paramsSource = req.method === 'POST' ? req.body : req.query;
@@ -93,6 +99,7 @@ const viewModel = async (req) => {
 };
 
 const get = async (req, res) => {
+  clearNewUserSessionData(req);
   const model = await viewModel(req);
   return res.render('services/views/usersSearch', model);
 };
