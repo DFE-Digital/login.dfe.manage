@@ -26,6 +26,7 @@ const getPolicyConditions = require('./getPolicyConditions');
 const getPolicyRoles = require('./getPolicyRoles');
 const { get: getNewUserDetails , post: postNewUserDetails } = require('./newUserDetails');
 const { get: getSelectOrganisation, post: postSelectOrganisation } = require('./selectOrganisation');
+const { get: getAssociateOrganisation, post: postAssociateOrganisation } = require('./associateOrganisation');
 
 const router = express.Router({ mergeParams: true });
 
@@ -72,11 +73,11 @@ const services = (csrf) => {
   router.get('/:sid/users/:uid/select-organisation', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getSelectOrganisation));
   router.post('/:sid/users/:uid/select-organisation', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postSelectOrganisation));
 
-  router.get('/:sid/users/:uid/associate-organisation', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper());
-  router.post('/:sid/users/:uid/associate-organisation', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper());
+  router.get('/:sid/users/:uid/associate-organisation', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getAssociateOrganisation));
+  router.post('/:sid/users/:uid/associate-organisation', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postAssociateOrganisation));
 
-  router.get('/:sid/users/associate-organisation', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper());
-  router.post('/:sid/users/associate-organisation', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper());
+  router.get('/:sid/users/associate-organisation', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getAssociateOrganisation));
+  router.post('/:sid/users/associate-organisation', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postAssociateOrganisation));
 
   router.get('/:sid/users/:uid/organisations', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getUserOrganisations));
 

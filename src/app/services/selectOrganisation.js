@@ -60,6 +60,10 @@ const validate = async (req) => {
 };
 
 const post = async (req, res) => {
+  if (!req.session.user) {
+    return res.redirect(`/services/${req.params.sid}/users`)
+  }
+
   const model = await validate(req);
 
   if (Object.keys(model.validationMessages).length > 0) {
