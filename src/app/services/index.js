@@ -25,6 +25,7 @@ const { get: getListPolicies, post: postListPolicies } = require('./listPolicies
 const getPolicyConditions = require('./getPolicyConditions');
 const getPolicyRoles = require('./getPolicyRoles');
 const { get: getNewUserDetails , post: postNewUserDetails } = require('./newUserDetails');
+const { get: getSelectOrganisation, post: postSelectOrganisation } = require('./selectOrganisation');
 
 const router = express.Router({ mergeParams: true });
 
@@ -67,6 +68,15 @@ const services = (csrf) => {
 
   router.get('/:sid/users/new-user', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getNewUserDetails));
   router.post('/:sid/users/new-user', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postNewUserDetails));
+
+  router.get('/:sid/users/:uid/select-organisation', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getSelectOrganisation));
+  router.post('/:sid/users/:uid/select-organisation', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postSelectOrganisation));
+
+  router.get('/:sid/users/:uid/associate-organisation', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper());
+  router.post('/:sid/users/:uid/associate-organisation', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper());
+
+  router.get('/:sid/users/associate-organisation', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper());
+  router.post('/:sid/users/associate-organisation', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper());
 
   router.get('/:sid/users/:uid/organisations', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getUserOrganisations));
 
