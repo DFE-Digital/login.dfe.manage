@@ -50,6 +50,7 @@ describe('when displaying the select permission page', () => {
       backLink: true,
       selectedLevel: undefined,
       organisation: 'org name',
+      cancelLink: '/services/service1/users',
       service: {
         id: 'service1',
         dateActivated: '10/10/2018',
@@ -74,6 +75,7 @@ describe('when displaying the select permission page', () => {
       backLink: true,
       selectedLevel: 10,
       organisation: 'org name',
+      cancelLink: '/services/service1/users',
       service: {
         id: 'service1',
         dateActivated: '10/10/2018',
