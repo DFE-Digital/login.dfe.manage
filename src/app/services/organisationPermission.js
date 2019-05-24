@@ -9,6 +9,7 @@ const get = async (req, res) => {
   return res.render('services/views/organisationPermission', {
     csrfToken: req.csrfToken(),
     backLink: true,
+    cancelLink: `/services/${req.params.sid}/users`,
     user: `${req.session.user.firstName} ${req.session.user.lastName}`,
     organisation: req.session.user.organisationName,
     service,
@@ -25,6 +26,7 @@ const validate = async (req) => {
 
   const model = {
     backLink: true,
+    cancelLink: `/services/${req.params.sid}/users`,
     user: `${req.session.user.firstName} ${req.session.user.lastName}`,
     organisation: req.session.user.organisationName,
     service,
