@@ -30,6 +30,11 @@ const get = async (req, res) => {
   }
 
   const organisations = await getOrgsForUser(req);
+
+  if (organisations.length === 0) {
+    return res.redirect('associate-organisation')
+  }
+
   return res.render('services/views/selectOrganisation', {
     csrfToken: req.csrfToken(),
     backLink: true,
