@@ -59,10 +59,15 @@ const getOrganisationByIdV2 = async (id, correlationId) => {
   return await callOrganisationsApi(`organisations/v2/${id}`, 'GET', undefined, correlationId);
 };
 
+const getOrganisationForUserV2 = async (userId, correlationId) => {
+  return await callOrganisationsApi( `organisations/v2/associated-with-user/${userId}`,'GET', undefined, correlationId);
+};
+
 
 module.exports = {
   getInvitationOrganisations,
   getAllUserOrganisations,
   searchOrganisations,
   getOrganisationByIdV2,
+  getOrganisationForUserV2,
 };

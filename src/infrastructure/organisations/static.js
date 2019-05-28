@@ -62,9 +62,14 @@ const getOrganisationByIdV2 = async (id) => {
   return (await getPageOfOrganisations(1)).organisations.find(x => x.id === id);
 };
 
+const getOrganisationForUserV2 = async (userId, correlationId) => {
+  return Promise.resolve([]);
+};
+
 module.exports = {
   getAllUserOrganisations,
   getInvitationOrganisations,
   searchOrganisations,
   getOrganisationByIdV2,
+  getOrganisationForUserV2,
 };
