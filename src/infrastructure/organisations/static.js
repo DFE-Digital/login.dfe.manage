@@ -66,10 +66,20 @@ const getOrganisationForUserV2 = async (userId, correlationId) => {
   return Promise.resolve([]);
 };
 
+const putInvitationInOrganisation = async (invitationId, organisationId, role, correlationId) => {
+  return Promise.resolve();
+};
+
+const putUserInOrganisation = async (userId, organisationId, role, correlationId) => {
+  return Promise.resolve();
+};
+
 module.exports = {
   getAllUserOrganisations,
   getInvitationOrganisations,
   searchOrganisations,
   getOrganisationByIdV2,
   getOrganisationForUserV2,
+  putInvitationInOrganisation,
+  putUserInOrganisation,
 };

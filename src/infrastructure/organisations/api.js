@@ -63,6 +63,14 @@ const getOrganisationForUserV2 = async (userId, correlationId) => {
   return await callOrganisationsApi( `organisations/v2/associated-with-user/${userId}`,'GET', undefined, correlationId);
 };
 
+const putInvitationInOrganisation = async (invitationId, organisationId, role, correlationId) => {
+  return callOrganisationsApi(`organisations/${organisationId}/invitations/${invitationId}`, 'PUT', { roleId: role }, correlationId);
+};
+
+const putUserInOrganisation = async (userId, organisationId, role, correlationId) => {
+  return callOrganisationsApi(`organisations/${organisationId}/users/${userId}`, 'PUT', { roleId: role }, correlationId);
+};
+
 
 module.exports = {
   getInvitationOrganisations,
@@ -70,4 +78,6 @@ module.exports = {
   searchOrganisations,
   getOrganisationByIdV2,
   getOrganisationForUserV2,
+  putInvitationInOrganisation,
+  putUserInOrganisation,
 };

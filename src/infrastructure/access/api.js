@@ -80,6 +80,20 @@ const getPolicyById = async (sid, pid, correlationId) => {
   return callApi('GET', `services/${sid}/policies/${pid}`, correlationId, undefined);
 };
 
+const addUserService = async (uid, sid, oid, roles, correlationId) => {
+  const body = {
+    roles,
+  };
+  return callApi('PUT', `users/${uid}/services/${sid}/organisations/${oid}`, correlationId, body);
+};
+
+const addInvitationService = async (iid, sid, oid, roles, correlationId) => {
+  const body = {
+    roles,
+  };
+  return callApi('PUT', `invitations/${iid}/services/${sid}/organisations/${oid}`, correlationId, body);
+};
+
 module.exports = {
   getServicesForUser,
   getSingleUserService,
@@ -91,4 +105,6 @@ module.exports = {
   removeServiceFromInvitation,
   getPageOfPoliciesForService,
   getPolicyById,
+  addUserService,
+  addInvitationService,
 };

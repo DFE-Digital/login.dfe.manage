@@ -29,6 +29,7 @@ const { get: getSelectOrganisation, post: postSelectOrganisation } = require('./
 const { get: getAssociateOrganisation, post: postAssociateOrganisation } = require('./associateOrganisation');
 const { get: getOrganisationPermission, post: postOrganisationPermission } = require('./organisationPermission');
 const { get: getAssociateRoles, post: postAssociateRoles } = require('./associateRoles');
+const { get: getConfirmInvitation, post: postConfirmInvitation } = require('./confirmInvitation');
 
 const router = express.Router({ mergeParams: true });
 
@@ -93,8 +94,11 @@ const services = (csrf) => {
   router.get('/:sid/users/associate-roles', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getAssociateRoles));
   router.post('/:sid/users/associate-roles', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postAssociateRoles));
 
-  router.get('/:sid/users/:uid/confirm-details', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper());
-  router.get('/:sid/users/confirm-new-user', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper());
+  router.get('/:sid/users/:uid/confirm-details', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getConfirmInvitation));
+  router.post('/:sid/users/:uid/confirm-details', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postConfirmInvitation));
+
+  router.get('/:sid/users/confirm-new-user', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getConfirmInvitation));
+  router.post('/:sid/users/confirm-new-user', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postConfirmInvitation));
 
   router.get('/:sid/users/:uid/organisations', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getUserOrganisations));
 
