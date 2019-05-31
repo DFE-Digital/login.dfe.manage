@@ -3,8 +3,9 @@ const logger = require('./../../infrastructure/logger');
 
 const { listRolesOfService } = require('./../../infrastructure/access');
 const { createInvite } = require('./../../infrastructure/directories');
-const { putUserInOrganisation, putInvitationInOrganisation } = require('./../../infrastructure/organisations');
+const { putUserInOrganisation, putInvitationInOrganisation, getOrganisationByIdV2 } = require('./../../infrastructure/organisations');
 const { addUserService, addInvitationService } = require('./../../infrastructure/access');
+const { getSearchDetailsForUserById, updateIndex } = require('./../../infrastructure/search');
 
 const get = async (req, res) => {
   if (!req.session.user) {
@@ -72,7 +73,6 @@ const post = async (req, res) => {
     await addUserService(uid, req.params.sid, organisationId, req.session.user.roles, req.id);
   }
 
-  // TODO: patch search API
 
   if (isInvitation) {
     // audit invitation
@@ -90,6 +90,35 @@ const post = async (req, res) => {
     return res.redirect (`/services/${req.params.sid}/users`);
 
   } else {
+    // patch search api
+    const getUserDetails = await getSearchDetailsForUserById(uid, req.id);
+    if (!getUserDetails) {
+      logger.error(`Failed to find user ${uid} when confirming change of user permissions`, { correlationId: req.id });
+    } else {
+      if (!req.session.user.existingOrg) {
+        // patch search api with users new org
+        const organisation = await getOrganisationByIdV2(organisationId, req.id);
+        const currentUserOrgDetails = getUserDetails.organisations || [];
+        const newOrg = {
+          id: organisation.id,
+          name: organisation.name,
+          urn: organisation.urn || undefined,
+          uid: organisation.uid || undefined,
+          establishmentNumber: organisation.establishmentNumber || undefined,
+          laNumber: organisation.localAuthority ? organisation.localAuthority.code : undefined,
+          categoryId: organisation.category.id,
+          statusId: organisation.status.id,
+          roleId: req.session.user.permission || 0,
+        };
+        currentUserOrgDetails.push(newOrg);
+        await updateIndex(uid, { organisations: currentUserOrgDetails }, req.id);
+      }
+      // patch search api with users new service
+      const currentUserServices = getUserDetails.services || [];
+      currentUserServices.push(req.params.sid);
+      await updateIndex(uid, { services: currentUserServices }, req.id);
+    }
+
     // audit add service to user
     logger.audit(`${req.user.email} (id: ${req.user.sub}) added services for organisation ${req.session.user.organisationName} (id: ${organisationId}) for user ${req.session.user.email} (id: ${uid})`, {
       type: 'manage',
