@@ -37,7 +37,7 @@
     "login.dfe.express-error-handling": "git+https://github.com/DFE-Digital/login.dfe.express-error-handling.git#v1.4",
     "login.dfe.healthcheck": "git+https://github.com/DFE-Digital/login.dfe.healthcheck.git#v1.4.5",
     "login.dfe.jwt-strategies": "git+https://github.com/DFE-Digital/login.dfe.jwt-strategies.git#v2.0.1",
-    "login.dfe.policy-engine": "git+https://github.com/DFE-Digital/login.dfe.policy-engine.git#v2.0.4",
+    "login.dfe.policy-engine": "git+https://github.com/DFE-Digital/login.dfe.policy-engine.git#v2.0.6",
     "login.dfe.service-notifications.jobs.client": "git+https://github.com/DFE-Digital/login.dfe.service-notifications.jobs.client.git#v1.4",
     "login.dfe.notifications.client": "git+https://github.com/DFE-Digital/login.dfe.notifications.client.git#v3.4.2",
     "login.dfe.request-promise-retry": "git+https://github.com/DFE-Digital/login.dfe.request-promise-retry.git#v1.0",
