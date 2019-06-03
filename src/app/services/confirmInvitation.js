@@ -1,10 +1,9 @@
 const config = require('./../../infrastructure/config');
 const logger = require('./../../infrastructure/logger');
 
-const { listRolesOfService } = require('./../../infrastructure/access');
 const { createInvite } = require('./../../infrastructure/directories');
 const { putUserInOrganisation, putInvitationInOrganisation, getOrganisationByIdV2 } = require('./../../infrastructure/organisations');
-const { addUserService, addInvitationService } = require('./../../infrastructure/access');
+const { addUserService, addInvitationService, listRolesOfService } = require('./../../infrastructure/access');
 const { getSearchDetailsForUserById, updateIndex } = require('./../../infrastructure/search');
 const NotificationClient = require('login.dfe.notifications.client');
 
@@ -18,7 +17,7 @@ const get = async (req, res) => {
   }
 
   const allRolesForService = await listRolesOfService(req.params.sid, req.id);
-  const selectedRoleIds = req.session.user.roles;
+  const selectedRoleIds = req.session.user.roles || [];
   const roleDetails = allRolesForService.filter(x => selectedRoleIds.find(y => y.toLowerCase() === x.id.toLowerCase()));
 
 
@@ -74,12 +73,10 @@ const post = async (req, res) => {
     if (!req.session.user.existingOrg) {
       await putUserInOrganisation(uid, organisationId, req.session.user.permission, req.id);
     }
-    //TODO: send email for adding service to existing user
+
     await addUserService(uid, req.params.sid, organisationId, req.session.user.roles, req.id);
     await notificationClient.sendServiceAdded(req.session.user.email, req.session.user.firstName, req.session.user.lastName, req.session.user.organisationName, req.session.user.service);
-
   }
-
 
   if (isInvitation) {
     // audit invitation

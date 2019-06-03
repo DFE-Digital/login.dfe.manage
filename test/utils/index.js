@@ -12,6 +12,7 @@ const configMockFactory = (customConfig) => {
     hostingEnvironment: {
       agentKeepAlive: {},
       env: 'test-run',
+      servicesUrl: 'https://services.unit.test'
     },
     applications: {
       type: 'static',
@@ -27,6 +28,9 @@ const configMockFactory = (customConfig) => {
     },
     directories: {
       type: 'static',
+    },
+    notifications:{
+      connectionString: 'test',
     },
     loggerSettings: {},
   }, customConfig);
