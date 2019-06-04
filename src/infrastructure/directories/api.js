@@ -101,9 +101,38 @@ const getInvitationByEmail = async (email, correlationId) => {
   }
 };
 
+const createInvite = async (firstName, lastName, email, clientId, redirectUri, correlationId) => {
+  const token = await jwtStrategy(config.directories.service).getBearerToken();
+
+  const body = {
+    firstName,
+    lastName,
+    email,
+    origin: {
+      clientId,
+      redirectUri,
+    },
+  };
+
+  const invitation = await rp({
+    method: 'POST',
+    uri: `${config.directories.service.url}/invitations`,
+    headers: {
+      authorization: `bearer ${token}`,
+      'x-correlation-id': correlationId,
+    },
+    body,
+    json: true,
+  });
+
+  return invitation.id;
+
+};
+
 module.exports = {
   getInvitation,
   getUsersByIdV2,
   getUserById,
   getInvitationByEmail,
+  createInvite,
 };

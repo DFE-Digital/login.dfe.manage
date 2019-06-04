@@ -46,6 +46,7 @@ const mapSearchUserToSupportModel = (user) => {
       name: user.primaryOrganisation
     } : null,
     organisations: user.organisations,
+    services: user.services,
     lastLogin: user.lastLogin ? new Date(user.lastLogin) : null,
     successfulLoginsInPast12Months: user.numberOfSuccessfulLoginsInPast12Months,
     status: mapUserStatus(user.statusId, user.statusLastChangedOn),
@@ -97,13 +98,17 @@ const searchForUsers = async (criteria, pageNumber, sortBy, sortDirection, filte
   }
 };
 
-const getSearchDetailsForUserById = async (id) => {
+const getSearchDetailsForUserById = async (id, correlationId) => {
   try {
-    const user = await callApi(`/users/${id}`, 'GET');
+    const user = await callApi(`/users/${id}`, 'GET', undefined, correlationId);
     return user ? mapSearchUserToSupportModel(user) : undefined;
   } catch (e) {
     throw new Error(`Error getting user ${id} from search - ${e.message}`);
   }
+};
+
+const updateIndex = async (userId, body, correlationId) => {
+  await callApi(`/users/${userId}`, 'PATCH', body, correlationId);
 };
 
 
@@ -111,4 +116,5 @@ const getSearchDetailsForUserById = async (id) => {
 module.exports = {
   searchForUsers,
   getSearchDetailsForUserById,
+  updateIndex,
 };

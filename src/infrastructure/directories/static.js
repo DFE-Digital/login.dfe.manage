@@ -24,9 +24,15 @@ const getUserById = async (uid, correlationId) => {
   };
 };
 
+const createInvite = async (firstName, lastName, email, clientId, redirectUri, correlationId) => {
+  return Promise.resolve(uuid());
+};
+
+
 
 module.exports = {
   getInvitation,
   getUsersByIdV2,
   getUserById,
+  createInvite,
 };

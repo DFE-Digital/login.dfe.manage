@@ -1,0 +1,117 @@
+<div class="grid-row">
+    <div class="col-8">
+        <h1 class="heading-xlarge">
+            Review invitation
+        </h1>
+        <% if (locals.user.isExistingUser) { %>
+            <p>The user will receive an email to confirm they have access to this service.</p>
+        <% } else { %>
+            <p>The user will have to confirm their email address and create a password before their account is active.</p>
+        <% } %>
+
+        <dl class="app-check-your-answers app-check-your-answers--short">
+            <div class="app-check-your-answers__contents">
+                <dt class="app-check-your-answers__title">
+                    Personal details
+                </dt>
+                <dd class="app-check-your-answers__change ">
+                </dd>
+            </div>
+            <div class="app-check-your-answers__contents">
+                <dt class="app-check-your-answers__question">
+                    First name
+                </dt>
+                <dd class="app-check-your-answers__answer">
+                    <%= locals.user.firstName %>
+                </dd>
+            </div>
+
+            <div class="app-check-your-answers__contents">
+                <dt class="app-check-your-answers__question">
+                    Last name
+                </dt>
+                <dd class="app-check-your-answers__answer">
+                    <%= locals.user.lastName %>
+                </dd>
+
+            </div>
+
+            <div class="app-check-your-answers__contents">
+                <dt class="app-check-your-answers__question">
+                    Email Address
+                </dt>
+                <dd class="app-check-your-answers__answer">
+                    <%= locals.user.email %>
+                </dd>
+            </div>
+        </dl>
+
+
+        <dl class="app-check-your-answers app-check-your-answers--short">
+            <div class="app-check-your-answers__contents">
+                <dt class="app-check-your-answers__title">
+                    Organisation
+                </dt>
+                <dd class="app-check-your-answers__answer"></dd>
+            </div>
+            <div class="app-check-your-answers__contents">
+                <dt class="app-check-your-answers__question">
+                    Name
+                </dt>
+                <dd class="app-check-your-answers__answer">
+                    <%= locals.organisation.name %>
+                </dd>
+            </div>
+            <div class="app-check-your-answers__contents">
+                <dt class="app-check-your-answers__question">
+                    Permission level
+                </dt>
+                <dd class="app-check-your-answers__answer">
+                    <%= locals.organisation.permissionLevel %>
+                </dd>
+            </div>
+        </dl>
+
+        <dl class="app-check-your-answers app-check-your-answers--short">
+            <div class="app-check-your-answers__contents">
+                <dt class="app-check-your-answers__title">
+                    Service
+                </dt>
+                <dd class="app-check-your-answers__answer"></dd>
+
+            </div>
+
+            <div class="app-check-your-answers__contents">
+                <dt class="app-check-your-answers__question">
+                    Name
+                </dt>
+                <dd class="app-check-your-answers__answer">
+                    <%= locals.service.name %>
+                </dd>
+            </div>
+            <div class="app-check-your-answers__contents">
+                <dt class="app-check-your-answers__question">
+                    Roles
+                </dt>
+                <dd class="app-check-your-answers__answer">
+                    <% if (locals.service.roles.length > 0) { %>
+                        <% for (let i = 0; i < locals.service.roles.length; i++) { %>
+                            <% const role = locals.service.roles[i]; %>
+                            <%= role.name %> <br>
+                        <% } %>
+                    <% } else { %>
+                            No roles selected
+                        <% } %>
+                </dd>
+            </div>
+        </dl>
+
+        <form method="post">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
+            <div class="form-submit submit-buttons">
+                <button type="submit" class="button">Submit</button>
+                <a href="<%= locals.cancelLink %>" class="button button-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

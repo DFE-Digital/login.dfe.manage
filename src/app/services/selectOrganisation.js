@@ -82,6 +82,8 @@ const post = async (req, res) => {
 
   req.session.user.organisationId = model.selectedOrganisation;
   req.session.user.organisationName = selectedOrgDetails ? selectedOrgDetails.organisation.name : undefined;
+  req.session.user.permission = selectedOrgDetails ? selectedOrgDetails.role.id : undefined;
+  req.session.user.existingOrg = true;
   req.session.user.service = service ? service.name : undefined;
 
   return res.redirect('associate-roles')
