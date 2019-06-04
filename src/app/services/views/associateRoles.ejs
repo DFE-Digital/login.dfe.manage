@@ -1,0 +1,71 @@
+<div class="row">
+    <div class="col-8">
+        <h1 class="heading-xlarge">
+            Select roles
+        </h1>
+        <dl class="app-check-your-answers app-check-your-answers--short">
+
+            <div class="app-check-your-answers__contents">
+                <dt class="app-check-your-answers__title">
+                    User
+                </dt>
+                <dd class="app-check-your-answers__answer">
+                    <%= locals.user %>
+                </dd>
+            </div>
+
+            <div class="app-check-your-answers__contents">
+                <dt class="app-check-your-answers__title">
+                    Organisation
+                </dt>
+                <dd class="app-check-your-answers__answer">
+                    <%= locals.organisation %>
+                </dd>
+            </div>
+
+            <div class="app-check-your-answers__contents">
+                <dt class="app-check-your-answers__title">
+                    Service
+                </dt>
+                <dd class="app-check-your-answers__answer">
+                    <%= locals.service %>
+                </dd>
+            </div>
+        </dl>
+
+        <form method="post">
+            <input type="hidden" name="_csrf" value="<%=csrfToken%>" />
+            <div class="form-group  <%= (locals.validationMessages.roles !== undefined) ? 'form-group-error' : '' %>">
+                <fieldset>
+                    <% if (locals.validationMessages.roles !== undefined) { %>
+                    <p class="error-message" id="validation-selected-role"><%=locals.validationMessages.roles%></p>
+                    <% } %>
+                    <% if (locals.serviceRoles.length > 0) { %>
+                        <legend>
+                            <span class="body-text">Select all required roles</span>
+                        </legend>
+
+                        <% for (let i = 0; i < locals.serviceRoles.length; i++) { %>
+                            <% const role = locals.serviceRoles[i]; %>
+                            <div class="multiple-choice">
+                                <input id="<%=role.id%>" type="checkbox" name="role" value="<%=role.id%>"
+                                        <% if (locals.selectedRoles && locals.selectedRoles.length > 0) {
+                                        for (let i = 0; i < locals.selectedRoles.length; i++) {
+                                            const selectedRole = locals.selectedRoles[i];
+                                        %>
+                                        <%= role.id === selectedRole ? 'checked': ''%><% } }%>>
+                                <label for="<%=role.id%>"><%=role.name%></label>
+                            </div>
+                        <% } %>
+                    <% } else { %>
+                        <legend><h2 class="heading-small">There are no available roles for <%= locals.service %>.</h2></legend>
+                    <% } %>
+                </fieldset>
+            </div>
+            <div class="form-submit submit-buttons">
+                <button type="submit" class="button">Continue</button>
+                <a href="<%= locals.cancelLink %>" class="button button-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

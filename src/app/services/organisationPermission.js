@@ -53,6 +53,7 @@ const post = async (req, res) => {
     return res.render('services/views/organisationPermission', model);
   }
 
+  req.session.user.service = model.service.name;
   req.session.user.permission = model.selectedLevel;
   return res.redirect('associate-roles')
 };

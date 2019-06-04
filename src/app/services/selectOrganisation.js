@@ -1,4 +1,5 @@
 const { getAllUserOrganisations, getInvitationOrganisations } = require('./../../infrastructure/organisations');
+const { getServiceById } = require('./../../infrastructure/applications');
 
 const getOrgsForUser = async (req) => {
   const userId = req.params.uid;
@@ -75,7 +76,13 @@ const post = async (req, res) => {
     model.csrfToken = req.csrfToken();
     return res.render('services/views/selectOrganisation', model);
   }
-  req.session.user.organisation = model.selectedOrganisation;
+  const selectedOrgDetails = model.organisations.find(x => x.organisation.id === model.selectedOrganisation);
+  const service = await getServiceById(req.params.sid, req.id);
+
+
+  req.session.user.organisationId = model.selectedOrganisation;
+  req.session.user.organisationName = selectedOrgDetails ? selectedOrgDetails.organisation.name : undefined;
+  req.session.user.service = service ? service.name : undefined;
 
   return res.redirect('associate-roles')
 };
