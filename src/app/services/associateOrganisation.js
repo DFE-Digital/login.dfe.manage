@@ -1,4 +1,4 @@
-const { searchOrganisations } = require('./../../infrastructure/organisations');
+const { searchOrganisations, getOrganisationByIdV2 } = require('./../../infrastructure/organisations');
 
 const buildModel = async (req) => {
   const inputSource = req.method.toUpperCase() === 'POST' ? req.body : req.query;
@@ -34,6 +34,8 @@ const post = async (req, res) => {
   }
 
   if (req.body.selectedOrganisation) {
+    const organisation = req.body.selectedOrganisation ? await getOrganisationByIdV2(req.body.selectedOrganisation) : undefined;
+    req.session.user.organisationName = organisation ? organisation.name : undefined;
     req.session.user.organisationId = req.body.selectedOrganisation;
     return res.redirect('organisation-permissions');
   }

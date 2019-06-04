@@ -1,0 +1,66 @@
+<div class="grid-row">
+    <div class="col-8">
+        <h1 class="heading-xlarge">
+            Permission level
+        </h1>
+
+        <dl class="app-check-your-answers app-check-your-answers--short">
+
+            <div class="app-check-your-answers__contents">
+                <dt class="app-check-your-answers__title">
+                    User
+                </dt>
+                <dd class="app-check-your-answers__answer">
+                    <%= locals.user %>
+                </dd>
+            </div>
+
+            <div class="app-check-your-answers__contents">
+                <dt class="app-check-your-answers__title">
+                    Organisation
+                </dt>
+                <dd class="app-check-your-answers__answer">
+                    <%=locals.organisation%>
+                </dd>
+            </div>
+
+            <div class="app-check-your-answers__contents">
+                <dt class="app-check-your-answers__title">
+                    Service
+                </dt>
+                <dd class="app-check-your-answers__answer">
+                    <%= locals.service.name %>
+                </dd>
+            </div>
+        </dl>
+    </div>
+</div>
+<div class="grid-row">
+    <div class="col-6">
+        <form method="post">
+            <input type="hidden" name="_csrf" value="<%=csrfToken%>"/>
+            <div class="form-group <%= (locals.validationMessages.selectedLevel !== undefined) ? 'form-group-error' : '' %>">
+                <fieldset>
+                    <legend>
+                        <span class="body-text">Select the permission level</span>
+                    </legend>
+                    <% if (locals.validationMessages.selectedLevel !== undefined) { %>
+                    <p class="error-message" id="validation-permission-level"><%=locals.validationMessages.selectedLevel %></p>
+                    <% } %>
+                    <div class="multiple-choice">
+                        <input id="level-user" type="radio" name="selectedLevel" value="0">
+                        <label for="level-user">End user</label>
+                    </div>
+                    <div class="multiple-choice">
+                        <input id="level-approver" type="radio" name="selectedLevel" value="10000">
+                        <label for="level-approver">Approver</label>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="form-submit submit-buttons">
+                <button class="button">Continue</button>
+                <a href="<%= locals.cancelLink %>" class="button button-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

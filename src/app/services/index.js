@@ -27,6 +27,7 @@ const getPolicyRoles = require('./getPolicyRoles');
 const { get: getNewUserDetails , post: postNewUserDetails } = require('./newUserDetails');
 const { get: getSelectOrganisation, post: postSelectOrganisation } = require('./selectOrganisation');
 const { get: getAssociateOrganisation, post: postAssociateOrganisation } = require('./associateOrganisation');
+const { get: getOrganisationPermission, post: postOrganisationPermission } = require('./organisationPermission');
 
 const router = express.Router({ mergeParams: true });
 
@@ -78,6 +79,18 @@ const services = (csrf) => {
 
   router.get('/:sid/users/associate-organisation', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getAssociateOrganisation));
   router.post('/:sid/users/associate-organisation', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postAssociateOrganisation));
+
+  router.get('/:sid/users/:uid/organisation-permissions', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getOrganisationPermission));
+  router.post('/:sid/users/:uid/organisation-permissions', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postOrganisationPermission));
+
+  router.get('/:sid/users/organisation-permissions', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getOrganisationPermission));
+  router.post('/:sid/users/organisation-permissions', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postOrganisationPermission));
+
+  router.get('/:sid/users/:uid/associate-roles', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper());
+  router.post('/:sid/users/:uid/associate-roles', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper());
+
+  router.get('/:sid/users/associate-roles', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper());
+  router.post('/:sid/users/associate-roles', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper());
 
   router.get('/:sid/users/:uid/organisations', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getUserOrganisations));
 
