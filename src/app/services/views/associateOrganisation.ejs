@@ -1,0 +1,103 @@
+<div class="grid-row">
+    <div class="col-8">
+        <h1 class="heading-xlarge">
+            Add organisation
+        </h1>
+        <p class="lede">Search for the organisation that you want the user to be associated with.</p>
+    </div>
+</div>
+
+<%
+const paginationModel = {
+    method: 'post',
+    csrfToken,
+    currentPage: locals.page,
+    numberOfPages: locals.numberOfPages,
+    totalNumberOfResults: locals.totalNumberOfResults,
+    numberOfResultsOnPage: locals.organisations ? locals.organisations.length : 0,
+    data: [
+        { key: 'criteria', value: locals.criteria }
+    ]
+}
+%>
+
+<div class="grid-row">
+    <div class="col-6">
+        <div class="search-field">
+            <form method="post">
+                <input type="hidden" name="_csrf" value="<%=csrfToken%>"/>
+                <input type="hidden" name="page" value="1" />
+                <fieldset class="search-input">
+                    <label for="criteria" class="vh">Search by organisation name or unique identifier</label>
+                    <input type="text" id="criteria" name="criteria" class="form-control" value="<%=criteria%>" placeholder="Search by name, urn, uid or ukprn">
+                </fieldset>
+                <fieldset class="search-submit">
+                    <button type="submit" class="button">Search</button>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>
+
+<%if(organisations && organisations.length > 0) { %>
+
+<%if (numberOfPages > 1) { %>
+    <%- include('../../layouts/pagination', paginationModel); %>
+<%}%>
+
+<div class="grid-row">
+    <div class="col-12">
+        <ol class="search-results">
+            <%for (let i = 0; i < organisations.length; i += 1) {%>
+                <%const org = organisations[i];%>
+                <li>
+                    <article>
+                        <h2 class="heading-medium">
+                            <form method="post">
+                                <input type="hidden" name="_csrf" value="<%=csrfToken%>"/>
+                                <input type="hidden" name="selectedOrganisation" value="<%=org.id%>" />
+                                <button class="button-link"><%=org.name%></button>
+                            </form>
+                        </h2>
+                        <dl class="inline">
+                            <%if(org.urn) {%>
+                            <dt>URN</dt>
+                            <dd><%=org.urn%></dd>
+                            <%} else if(org.uid) {%>
+                            <dt>UID</dt>
+                            <dd><%=org.uid%></dd>
+                            <%}%>
+
+                            <dt>Address</dt>
+                            <dd><%=org.address%></dd>
+
+                            <%if(org.type || org.category) {%>
+                            <dt>Type</dt>
+                            <dd><%=(org.type ? org.type.name : org.category.name)%></dd>
+                            <%}%>
+
+                            <% if (org.status && org.status.name) { %>
+                            <dt>Status</dt>
+                            <dd><%=org.status.name%></dd>
+                            <% } %>
+                        </dl>
+                    </article>
+                </li>
+            <%}%>
+        </ol>
+    </div>
+</div>
+
+<%if (numberOfPages > 1) { %>
+    <%- include('../../layouts/pagination', paginationModel); %>
+<%}%>
+
+<%} else if (organisations && organisations.length === 0) { %>
+<div class="grid-row">
+    <div class="col-8">
+        <div class="empty-state">
+            <p>No organisations found matching search criteria</p>
+        </div>
+    </div>
+</div>
+<% } %>
