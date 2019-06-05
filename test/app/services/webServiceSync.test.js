@@ -26,6 +26,7 @@ describe('when syncing user for sync', function () {
     req = getRequestMock({
       params: {
         uid: 'user-1',
+        sid: 'service-1'
       },
     });
 
@@ -57,6 +58,6 @@ describe('when syncing user for sync', function () {
     await webServiceSync.post(req, res);
 
     expect(res.redirect).toHaveBeenCalledTimes(1);
-    expect(res.redirect).toHaveBeenCalledWith('/services/undefined/users/user-1');
+    expect(res.redirect).toHaveBeenCalledWith('/services/service-1/users/user-1/organisations');
   });
 });
