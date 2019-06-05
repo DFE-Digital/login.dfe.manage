@@ -23,7 +23,7 @@ const paginationModel = {
 
 <div class="grid-row">
     <div class="col-6">
-        <div class="search-field">
+        <div class="search-field form-group  <%= (locals.validationMessages.organisation !== undefined) ? 'form-group-error' : '' %>">
             <form method="post">
                 <input type="hidden" name="_csrf" value="<%=csrfToken%>"/>
                 <input type="hidden" name="page" value="1" />

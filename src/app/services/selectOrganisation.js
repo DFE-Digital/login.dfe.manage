@@ -1,5 +1,8 @@
 const { getAllUserOrganisations, getInvitationOrganisations } = require('./../../infrastructure/organisations');
 const { getServiceById } = require('./../../infrastructure/applications');
+const config = require('./../../infrastructure/config');
+const PolicyEngine = require('login.dfe.policy-engine');
+const policyEngine = new PolicyEngine(config);
 
 const getOrgsForUser = async (req) => {
   const userId = req.params.uid;
@@ -50,6 +53,8 @@ const get = async (req, res) => {
 const validate = async (req) => {
   const userOrganisations = await getOrgsForUser(req);
   const selectedOrg = req.body.selectedOrganisation;
+  const policyResult = await policyEngine.getPolicyApplicationResultsForUser(req.params.uid, selectedOrg, req.params.sid, req.id);
+
   const model = {
     selectedOrganisation: selectedOrg,
     user: req.session.user,
@@ -61,7 +66,10 @@ const validate = async (req) => {
 
   if (model.selectedOrganisation === undefined || model.selectedOrganisation === null) {
     model.validationMessages.selectedOrganisation = 'Please select an organisation'
+  } else if (policyResult.rolesAvailableToUser.length === 0) {
+    model.validationMessages.selectedOrganisation = 'The organisation you have selected does not have access to this service'
   }
+
   return model;
 };
 
