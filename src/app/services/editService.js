@@ -28,12 +28,16 @@ const getViewModel = async (req) => {
   return {
     csrfToken: req.csrfToken(),
     cancelLink: `/services/${req.params.sid}/users/${req.params.uid}/organisations`,
-    service: userService,
+    service: {
+      name: userService.name,
+      id: userService.id,
+    },
     serviceRoles,
     selectedRoles: [],
     user,
     backLink: true,
     organisation,
+    userService,
     validationMessages: {},
   };
 };
@@ -43,6 +47,8 @@ const get = async (req, res) => {
   if (req.session.service) {
     model.selectedRoles = req.session.service.roles;
   }
+
+  model.service.roles = model.userService.roles;
   return res.render('services/views/editService', model);
 };
 
@@ -51,19 +57,21 @@ const post = async (req, res) => {
   if (!(selectedRoles instanceof Array)) {
     selectedRoles = [req.body.role];
   }
-  const model = await getViewModel(req);
 
   const uid = req.params.uid && !req.params.uid.startsWith('inv-') ? req.params.uid : undefined;
   const policyValidationResult = await policyEngine.validate(uid, req.params.oid, req.params.sid, selectedRoles, req.id);
   if (policyValidationResult.length > 0) {
+    const model = await getViewModel(req);
+    let roles = {};
+    model.service.roles = selectedRoles.map(x => roles[x] = {id: x});
     model.validationMessages.roles = policyValidationResult.map(x => x.message);
-    return res.render('services/views/editService');
+    return res.render('services/views/editService', model);
   }
 
   req.session.service = {
     roles: selectedRoles
   };
-  return res.redirect(`${model.organisation.id}/confirm-edit-service`)
+  return res.redirect(`${req.params.oid}/confirm-edit-service`)
 };
 
 module.exports = {

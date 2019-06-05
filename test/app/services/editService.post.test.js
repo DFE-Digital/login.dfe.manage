@@ -108,6 +108,6 @@ describe('when selecting the roles for a service', () => {
     await postEditService(req, res);
 
     expect(res.redirect.mock.calls).toHaveLength(1);
-    expect(res.redirect.mock.calls[0][0]).toBe(`org-1/confirm-edit-service`);
+    expect(res.redirect.mock.calls[0][0]).toBe(`org1/confirm-edit-service`);
   });
 });
