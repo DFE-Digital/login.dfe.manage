@@ -1,15 +1,22 @@
 jest.mock('./../../../src/infrastructure/config', () => require('./../../utils').configMockFactory());
 jest.mock('./../../../src/infrastructure/logger', () => require('./../../utils').loggerMockFactory());
 jest.mock('./../../../src/infrastructure/organisations');
+jest.mock('login.dfe.policy-engine');
 
 const { getRequestMock, getResponseMock } = require('./../../utils');
 const res = getResponseMock();
-const postSelectOrg = require('./../../../src/app/services/selectOrganisation').post;
 const { getAllUserOrganisations, getInvitationOrganisations } = require('./../../../src/infrastructure/organisations');
+const PolicyEngine = require('login.dfe.policy-engine');
+
+const policyEngine = {
+  getPolicyApplicationResultsForUser: jest.fn(),
+  validate: jest.fn(),
+};
 
 describe('when selecting an organisation', () => {
 
   let req;
+  let postSelectOrg;
 
   beforeEach(() => {
     req = getRequestMock({
@@ -91,6 +98,15 @@ describe('when selecting an organisation', () => {
         ],
       },
     ]);
+
+    policyEngine.getPolicyApplicationResultsForUser.mockReset().mockReturnValue({
+      rolesAvailableToUser: ['role_id'],
+    });
+    policyEngine.validate.mockReturnValue([]);
+
+    PolicyEngine.mockReset().mockImplementation(() => policyEngine);
+
+    postSelectOrg = require('./../../../src/app/services/selectOrganisation').post;
   });
 
   it('then it should render validation message if no selected organisation', async () => {
