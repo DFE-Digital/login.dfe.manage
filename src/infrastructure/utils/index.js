@@ -1,4 +1,5 @@
 const { getSingleUserService } = require('../../infrastructure/access');
+const { getServiceById } = require('./../../infrastructure/applications');
 const config = require('../../infrastructure/config');
 
 const isLoggedIn = (req, res, next) => {
@@ -46,6 +47,15 @@ const hasRole = (role) => {
   }
 };
 
+const hasInvite =  async (req, res, next) => {
+  const service = await getServiceById(req.params.sid, req.id);
+  if (service.relyingParty && service.relyingParty.params && service.relyingParty.params.allowManageInvite === 'true') {
+    return next();
+  }
+  return res.status(401).render('errors/views/notFound');
+
+};
+
 const getUserDisplayName = user => `${user.given_name || ''} ${user.family_name || ''}`.trim();
 
 const setUserContext = async (req, res, next) => {
@@ -78,4 +88,5 @@ module.exports = {
   isManageUserForService,
   hasRole,
   mapUserStatus,
+  hasInvite,
 };
