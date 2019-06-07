@@ -53,7 +53,7 @@ const get = async (req, res) => {
 const validate = async (req) => {
   const userOrganisations = await getOrgsForUser(req);
   const selectedOrg = req.body.selectedOrganisation;
-  const policyResult = await policyEngine.getPolicyApplicationResultsForUser(req.params.uid, selectedOrg, req.params.sid, req.id);
+  const policyResult = await policyEngine.getPolicyApplicationResultsForUser(req.params.uid.startsWith('inv-') ? undefined : req.params.uid, selectedOrg, req.params.sid, req.id);
 
   const model = {
     selectedOrganisation: selectedOrg,
