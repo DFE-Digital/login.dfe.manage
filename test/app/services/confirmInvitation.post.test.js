@@ -22,6 +22,7 @@ jest.mock('./../../../src/infrastructure/search', () => {
   return {
     getSearchDetailsForUserById: jest.fn(),
     updateIndex: jest.fn(),
+    createIndex: jest.fn(),
   };
 });
 jest.mock('login.dfe.notifications.client');
