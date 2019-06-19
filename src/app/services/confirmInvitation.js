@@ -4,7 +4,7 @@ const logger = require('./../../infrastructure/logger');
 const { createInvite } = require('./../../infrastructure/directories');
 const { putUserInOrganisation, putInvitationInOrganisation, getOrganisationByIdV2 } = require('./../../infrastructure/organisations');
 const { addUserService, addInvitationService, listRolesOfService } = require('./../../infrastructure/access');
-const { getSearchDetailsForUserById, updateIndex } = require('./../../infrastructure/search');
+const { getSearchDetailsForUserById, updateIndex, createIndex } = require('./../../infrastructure/search');
 const NotificationClient = require('login.dfe.notifications.client');
 
 const notificationClient = new NotificationClient({
@@ -89,6 +89,11 @@ const post = async (req, res) => {
       invitedUser: uid,
       organisationId: organisationId,
     });
+
+    const createUserIndex = await createIndex(`${uid}`, req.id);
+    if (!createUserIndex) {
+      logger.error(`Failed to create user in index ${uid}`, {correlationId: req.id});
+    }
 
     res.flash('info', `Invitation email sent to ${req.session.user.email}`);
     return res.redirect (`/services/${req.params.sid}/users`);
