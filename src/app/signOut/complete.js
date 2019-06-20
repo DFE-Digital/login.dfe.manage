@@ -1,9 +1,8 @@
 'use strict';
 
-const config = require('./../../infrastructure/config');
 
 const complete = (req, res) => {
-  res.redirect(config.hostingEnvironment.servicesUrl);
+  res.redirect('/auth');
 };
 
 module.exports = complete;
