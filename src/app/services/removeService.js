@@ -1,7 +1,9 @@
 const { removeServiceFromUser, removeServiceFromInvitation } = require('./../../infrastructure/access');
 const { getServiceById } = require('./../../infrastructure/applications');
-const { getUserDetails } = require('./utils');
+const { getUserDetails, waitForIndexToUpdate } = require('./utils');
 const { getOrganisationByIdV2 } = require('./../../infrastructure/organisations');
+const { getSearchDetailsForUserById, updateIndex } = require('./../../infrastructure/search');
+
 const logger = require('./../../infrastructure/logger');
 
 const getModel = async (req) => {
@@ -28,6 +30,13 @@ const post = async (req, res) => {
   const model = await getModel(req);
   req.params.uid.startsWith('inv-') ? await removeServiceFromInvitation(req.params.uid.substr(4), req.params.sid, req.params.oid, req.id) :
     await removeServiceFromUser(req.params.uid, req.params.sid, req.params.oid, req.id);
+
+  const getAllUserDetails = await getSearchDetailsForUserById(req.params.uid, req.id);
+  const currentServiceDetails = getAllUserDetails.services;
+  const serviceRemoved = currentServiceDetails.findIndex(x => x === req.params.sid);
+  const updatedServiceDetails = currentServiceDetails.filter((_, index) => index !== serviceRemoved);
+  await updateIndex(req.params.uid, { services: updatedServiceDetails }, req.id);
+  await waitForIndexToUpdate(req.params.uid, (updated) => updated.services.length === updatedServiceDetails.length);
 
   logger.audit(`${req.user.email} (id: ${req.user.sub}) removed service ${model.service.name} for organisation ${model.organisation.name} (id: ${model.organisation.id}) for user ${model.user.email} (id: ${model.user.id})`, {
     type: 'manage',

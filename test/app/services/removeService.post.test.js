@@ -4,11 +4,18 @@ jest.mock('./../../../src/infrastructure/applications');
 jest.mock('./../../../src/infrastructure/organisations');
 jest.mock('./../../../src/infrastructure/access');
 jest.mock('./../../../src/app/services/utils');
-
+jest.mock('./../../../src/infrastructure/search', () => {
+  return {
+    getSearchDetailsForUserById: jest.fn(),
+    updateIndex: jest.fn(),
+    createIndex: jest.fn(),
+  };
+});
 const { getRequestMock, getResponseMock } = require('./../../utils');
 const { getUserDetails } = require('./../../../src/app/services/utils');
 const { getOrganisationByIdV2 } = require('./../../../src/infrastructure/organisations');
 const { getServiceById } = require('./../../../src/infrastructure/applications');
+const { getSearchDetailsForUserById, updateIndex } = require('./../../../src/infrastructure/search');
 const { removeServiceFromInvitation, removeServiceFromUser } = require('./../../../src/infrastructure/access');
 
 const res = getResponseMock();
@@ -45,8 +52,25 @@ describe('when displaying the remove service access view', () => {
       lastName: 'Doe'
     });
 
+    getSearchDetailsForUserById.mockReset();
+    getSearchDetailsForUserById.mockReturnValue({
+      organisations: [
+        {
+          id: "org1",
+          name: "organisationId",
+          categoryId: "004",
+          statusId: 1,
+          roleId: 0
+        },
+      ],
+      services: [
+        'service id',
+      ],
+    });
+
     removeServiceFromUser.mockReset();
     removeServiceFromInvitation.mockReset();
+    updateIndex.mockReset();
 
     postRemoveService = require('./../../../src/app/services/removeService').post;
   });
