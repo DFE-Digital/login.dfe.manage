@@ -45,7 +45,7 @@
             <li><a href="organisations" role="tab">Organisations</a></li>
         <% } %>
 
-        <% if(!locals.isInvitation) { %>
+        <% if(!locals.isInvitation && locals.isAudit) { %>
             <% if(locals.area === 'audit') { %>
                 <li class="active">Audit</li>
             <% } else { %>
