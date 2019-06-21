@@ -221,8 +221,31 @@ const getFriendlyValues = async (fieldName, values, correlationId) => {
   return values;
 };
 
+const delay = async (milliseconds) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, milliseconds);
+  });
+};
+
+const waitForIndexToUpdate = async (uid, updatedCheck) => {
+  const abandonTime = Date.now() + 10000;
+  let hasBeenUpdated = false;
+  while (!hasBeenUpdated && Date.now() < abandonTime) {
+    const updated = await getSearchDetailsForUserById(uid);
+    if (updatedCheck) {
+      hasBeenUpdated = updatedCheck(updated);
+    } else {
+      hasBeenUpdated = updated;
+    }
+    if (!hasBeenUpdated) {
+      await delay(200);
+    }
+  }
+};
+
 module.exports = {
   getUserDetails,
   getFriendlyFieldName,
   getFriendlyValues,
+  waitForIndexToUpdate,
 };

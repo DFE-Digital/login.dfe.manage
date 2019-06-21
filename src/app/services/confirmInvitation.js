@@ -5,6 +5,7 @@ const { createInvite } = require('./../../infrastructure/directories');
 const { putUserInOrganisation, putInvitationInOrganisation, getOrganisationByIdV2 } = require('./../../infrastructure/organisations');
 const { addUserService, addInvitationService, listRolesOfService } = require('./../../infrastructure/access');
 const { getSearchDetailsForUserById, updateIndex, createIndex } = require('./../../infrastructure/search');
+const { waitForIndexToUpdate } = require('./utils');
 const NotificationClient = require('login.dfe.notifications.client');
 
 const notificationClient = new NotificationClient({
@@ -90,10 +91,8 @@ const post = async (req, res) => {
       organisationId: organisationId,
     });
 
-    const createUserIndex = await createIndex(`${uid}`, req.id);
-    if (!createUserIndex) {
-      logger.error(`Failed to create user in index ${uid}`, {correlationId: req.id});
-    }
+    await createIndex(`${uid}`, req.id);
+    await waitForIndexToUpdate(uid);
 
     res.flash('info', `Invitation email sent to ${req.session.user.email}`);
     return res.redirect (`/services/${req.params.sid}/users`);
@@ -121,11 +120,13 @@ const post = async (req, res) => {
         };
         currentUserOrgDetails.push(newOrg);
         await updateIndex(uid, { organisations: currentUserOrgDetails }, req.id);
+        await waitForIndexToUpdate(uid, (updated) => updated.organisations.length === currentUserOrgDetails.length);
       }
       // patch search api with users new service
       const currentUserServices = getUserDetails.services || [];
       currentUserServices.push(req.params.sid);
       await updateIndex(uid, { services: currentUserServices }, req.id);
+      await waitForIndexToUpdate(uid, (updated) => updated.services.length === currentUserServices.length);
     }
 
     // audit add service to user
