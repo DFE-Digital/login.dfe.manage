@@ -8,7 +8,7 @@ const getPolicyRoles= async (req, res) => {
     csrfToken: req.csrfToken(),
     policy,
     service,
-    backLink: true,
+    backLink: `/services/${req.params.sid}/policies`,
   })
 };
 
