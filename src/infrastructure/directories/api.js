@@ -126,7 +126,51 @@ const createInvite = async (firstName, lastName, email, clientId, redirectUri, c
   });
 
   return invitation.id;
+};
 
+const resendInvitation = async (id, correlationId) => {
+  const token = await jwtStrategy(config.directories.service).getBearerToken();
+
+  try {
+    await rp({
+      method: 'POST',
+      uri: `${config.directories.service.url}/invitations/${id}/resend`,
+      headers: {
+        authorization: `bearer ${token}`,
+        'x-correlation-id': correlationId,
+      },
+      json: true,
+    });
+    return true;
+  } catch (e) {
+    if (e.statusCode === 404) {
+      return null;
+    }
+    throw e;
+  }
+};
+
+const updateInvite = async (id, email, correlationId) => {
+  try {
+    const token = await jwtStrategy(config.directories.service).getBearerToken();
+    await rp({
+      method: 'PATCH',
+      uri: `${config.directories.service.url}/invitations/${id}`,
+      headers: {
+        authorization: `bearer ${token}`,
+        'x-correlation-id': correlationId,
+      },
+      body: {
+        email,
+      },
+      json: true,
+    })
+  } catch (e) {
+    if (e.statusCode === 404) {
+      return null;
+    }
+    throw e;
+  }
 };
 
 module.exports = {
@@ -135,4 +179,6 @@ module.exports = {
   getUserById,
   getInvitationByEmail,
   createInvite,
+  resendInvitation,
+  updateInvite,
 };
