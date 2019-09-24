@@ -52,13 +52,16 @@ const init = async () => {
     },
   }));
 
+  let assetsUrl = config.hostingEnvironment.assetsUrl || 'https://rawgit.com/DFE-Digital/dfe.ui.toolkit/master/dist/';
+  assetsUrl = assetsUrl.endsWith('/') ? assetsUrl.substr(0, assetsUrl.length - 1) : assetsUrl;
   Object.assign(app.locals, {
     moment,
     urls: {
       profile: config.hostingEnvironment.profileUrl,
       services: config.hostingEnvironment.servicesUrl,
       interactions: config.hostingEnvironment.interactionsUrl,
-      help: config.hostingEnvironment.helpUrl
+      help: config.hostingEnvironment.helpUrl,
+      assets: assetsUrl,
     },
     app: {
       title: 'DfE Sign-in Manage',
