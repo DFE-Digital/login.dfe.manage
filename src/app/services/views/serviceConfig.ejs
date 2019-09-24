@@ -207,6 +207,10 @@
                                 <input id="client_credentials" type="checkbox" name="grant_types" value="client_credentials" <%=locals.service.grantTypes.includes('client_credentials') ? 'checked' : ''%>>
                                 <label for="client_credentials">client_credentials</label>
                             </div>
+                            <div class="multiple-choice">
+                                <input id="refresh_token" type="checkbox" name="grant_types" value="refresh_token" <%=locals.service.grantTypes.includes('refresh_token') ? 'checked' : ''%>>
+                                <label for="refresh_token">refresh_token</label>
+                            </div>
                         </div>
                     </dd>
                 </div>
