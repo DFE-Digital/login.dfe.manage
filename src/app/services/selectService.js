@@ -1,6 +1,7 @@
 'use strict';
 const { getServiceById } = require('./../../infrastructure/applications');
 const uniqBy = require('lodash/uniqBy');
+const sortBy = require('lodash/sortBy');
 
 const getServiceDetails = async (req) => {
 
@@ -16,7 +17,7 @@ const getServiceDetails = async (req) => {
     const application = await getServiceById(service.id, req.id);
     service.name = application.name
   }
-  return userServices;
+  return sortBy(userServices, 'name');
 };
 
 const get = async (req, res) => {
