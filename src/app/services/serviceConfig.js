@@ -29,6 +29,7 @@ const getServiceConfig = async (req, res) => {
 };
 
 const validate = async (req) => {
+  const service = await getServiceById(req.params.sid, req.id);
   const urlValidation = new RegExp('^https?:\\/\\/(.*)');
 
   let grantTypes = req.body.grant_types ? req.body.grant_types : [];
@@ -103,16 +104,18 @@ const validate = async (req) => {
   } else if (model.service.postLogoutRedirectUris.some((value, i) => model.service.postLogoutRedirectUris.indexOf(value) !== i)) {
     model.validationMessages.post_logout_redirect_uris = 'Logout redirect urls must be unique'
   }
-  try {
-    const validateClientSecret = niceware.passphraseToBytes(model.service.clientSecret.split('-'));
-    if(validateClientSecret.length !== 8) {
+  if (model.service.clientSecret !== service.relyingParty.client_secret) {
+    try {
+      const validateClientSecret = niceware.passphraseToBytes(model.service.clientSecret.split('-'));
+      if(validateClientSecret.length < 8) {
+        model.validationMessages.clientSecret = 'Invalid client secret';
+      }
+    } catch (e) {
       model.validationMessages.clientSecret = 'Invalid client secret';
     }
-  } catch (e) {
-    model.validationMessages.clientSecret = 'Invalid client secret';
   }
 
-  if (model.service.apiSecret) {
+  if (model.service.apiSecret && model.service.apiSecret !== service.relyingParty.api_secret) {
     try {
       const validateApiSecret = niceware.passphraseToBytes(model.service.apiSecret.split('-'));
       if (validateApiSecret.length !== 8) {
