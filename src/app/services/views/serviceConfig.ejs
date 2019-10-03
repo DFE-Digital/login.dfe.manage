@@ -196,19 +196,19 @@
                     <dd class="app-check-your-answers__answer">
                         <div class="form-group">
                             <div class="multiple-choice">
-                                <input id="authorization_code" type="checkbox" name="grant_types" value="authorization_code" <%=locals.service.grantTypes.includes('authorization_code') ? 'checked' : ''%>>
+                                <input id="authorization_code" type="checkbox" name="grant_types" value="authorization_code" <%= (locals.service.grantTypes.indexOf('authorization_code') !== -1) ? 'checked' : ''%>>
                                 <label for="authorization_code">authorization_code</label>
                             </div>
                             <div class="multiple-choice">
-                                <input id="implicit" type="checkbox" name="grant_types" value="implicit" <%=locals.service.grantTypes.includes('implicit') ? 'checked' : ''%>>
+                                <input id="implicit" type="checkbox" name="grant_types" value="implicit" <%= (locals.service.grantTypes.indexOf('implicit') !== -1) ? 'checked' : ''%>>
                                 <label for="implicit">implicit</label>
                             </div>
                             <div class="multiple-choice">
-                                <input id="client_credentials" type="checkbox" name="grant_types" value="client_credentials" <%=locals.service.grantTypes.includes('client_credentials') ? 'checked' : ''%>>
+                                <input id="client_credentials" type="checkbox" name="grant_types" value="client_credentials" <%= (locals.service.grantTypes.indexOf('client_credentials') !== -1) ? 'checked' : ''%>>
                                 <label for="client_credentials">client_credentials</label>
                             </div>
                             <div class="multiple-choice">
-                                <input id="refresh_token" type="checkbox" name="grant_types" value="refresh_token" <%=locals.service.grantTypes.includes('refresh_token') ? 'checked' : ''%>>
+                                <input id="refresh_token" type="checkbox" name="grant_types" value="refresh_token" <%= (locals.service.grantTypes.indexOf('refresh_token') !== -1) ? 'checked' : ''%>>
                                 <label for="refresh_token">refresh_token</label>
                             </div>
                         </div>
