@@ -222,15 +222,15 @@
                     <dd class="app-check-your-answers__answer">
                         <div class="form-group">
                             <div class="multiple-choice">
-                                <input id="code" type="checkbox" name="response_types" value="code" <%=locals.service.responseTypes.includes('code') ? 'checked' : ''%>>
+                                <input id="code" type="checkbox" name="response_types" value="code" <%= (locals.service.responseTypes.indexOf('code') !== -1) ? 'checked' : ''%>>
                                 <label for="code">code</label>
                             </div>
                             <div class="multiple-choice">
-                                <input id="id_token" type="checkbox" name="response_types" value="id_token" <%=locals.service.responseTypes.includes('id_token') ? 'checked' : ''%>>
+                                <input id="id_token" type="checkbox" name="response_types" value="id_token" <%= (locals.service.responseTypes.indexOf('id_token') !== -1) ? 'checked' : ''%>>
                                 <label for="id_token">id_token</label>
                             </div>
                             <div class="multiple-choice">
-                                <input id="token" type="checkbox" name="response_types" value="token" <%=locals.service.responseTypes.includes('token') ? 'checked' : ''%>>
+                                <input id="token" type="checkbox" name="response_types" value="token" <%= (locals.service.responseTypes.indexOf('token') !== -1) ? 'checked' : ''%>>
                                 <label for="token">token</label>
                             </div>
                         </div>

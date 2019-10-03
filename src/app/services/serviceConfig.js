@@ -6,7 +6,6 @@ const logger = require('./../../infrastructure/logger');
 const getServiceConfig = async (req, res) => {
   const service = await getServiceById(req.params.sid, req.id);
   const grantTypes = service.relyingParty.grant_types ? service.relyingParty.grant_types.join() : '';
-  const responseTypes = service.relyingParty.response_types ? service.relyingParty.response_types.join() : '';
   return res.render('services/views/serviceConfig', {
     csrfToken: req.csrfToken(),
     service: {
@@ -18,7 +17,7 @@ const getServiceConfig = async (req, res) => {
       clientSecret: service.relyingParty.client_secret || '',
       redirectUris: service.relyingParty.redirect_uris,
       postLogoutRedirectUris: service.relyingParty.post_logout_redirect_uris,
-      responseTypes,
+      responseTypes: service.relyingParty.response_types,
       grantTypes,
       apiSecret: service.relyingParty.api_secret || '',
       tokenEndpointAuthMethod: service.relyingParty.token_endpoint_auth_method,
