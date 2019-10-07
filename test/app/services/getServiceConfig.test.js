@@ -79,7 +79,7 @@ describe('when getting the service config page', () => {
         clientId: 'clientid',
         clientSecret: 'dewier-thrombi-confounder-mikado',
         description: 'service description',
-        grantTypes: 'implicit,authorization_code',
+        grantTypes: ['implicit', 'authorization_code'],
         postLogoutRedirectUris: [
           'https://www.logout.com'
         ],
@@ -87,28 +87,8 @@ describe('when getting the service config page', () => {
         redirectUris: [
           'https://www.redirect.com',
         ],
-        responseTypes: 'code',
+        responseTypes: ['code'],
         serviceHome: 'https://www.servicehome.com'
-      }
-    });
-  });
-
-  it('then it should include the grant types as a string', async () => {
-    await getServiceConfig(req, res);
-
-    expect(res.render.mock.calls[0][1]).toMatchObject({
-      service: {
-        grantTypes: 'implicit,authorization_code'
-      }
-    });
-  });
-
-  it('then it should include the response types as a string', async () => {
-    await getServiceConfig(req, res);
-
-    expect(res.render.mock.calls[0][1]).toMatchObject({
-      service: {
-        responseTypes: 'code'
       }
     });
   });
