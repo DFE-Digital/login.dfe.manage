@@ -146,7 +146,7 @@ const postServiceConfig = async (req, res) => {
     grant_types: model.service.grantTypes,
     response_types: model.service.responseTypes,
     apiSecret: model.service.apiSecret,
-    tokenEndpointAuthMethod: model.service.tokenEndpointAuthMethod,
+    tokenEndpointAuthMethod: model.service.tokenEndpointAuthMethod === 'client_secret_post' ? 'client_secret_post' : null,
   };
 
   logger.audit(`${req.user.email} (id: ${req.user.sub}) updated service configuration for service ${model.service.name} (id: ${req.params.sid})`, {
