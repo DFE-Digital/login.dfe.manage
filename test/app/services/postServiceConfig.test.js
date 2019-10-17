@@ -229,6 +229,7 @@ describe('when editing the service configuration', () => {
       clientSecret: 'outshine-wringing-imparting-submitted',
       serviceHome: 'https://www.servicehome2.com',
       postResetUrl: 'https://www.postreset2.com',
+      tokenEndpointAuthMethod: null,
       redirect_uris: [
         'https://www.redirect.com',
         'https://www.redirect2.com',
