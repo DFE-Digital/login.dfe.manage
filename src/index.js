@@ -15,7 +15,7 @@ const flash = require('express-flash-2');
 const oidc = require('./infrastructure/oidc');
 const session = require('cookie-session');
 const { setUserContext, isManageUser } = require('./infrastructure/utils');
-const { getErrorHandler } = require('login.dfe.express-error-handling');
+const { getErrorHandler, ejsErrorPages } = require('login.dfe.express-error-handling');
 const KeepAliveAgent = require('agentkeepalive');
 const moment = require('moment');
 
@@ -105,9 +105,15 @@ const init = async () => {
   app.use('/assets', express.static(path.join(__dirname, 'app/assets')));
   registerRoutes(app, csrf);
   app.use(isManageUser);
+
   // Error handing
+  const errorPageRenderer = ejsErrorPages.getErrorPageRenderer({
+    help: config.hostingEnvironment.helpUrl,
+    assets: assetsUrl,
+  }, config.hostingEnvironment.env === 'dev');
   app.use(getErrorHandler({
     logger,
+    errorPageRenderer,
   }));
 
   if (config.hostingEnvironment.env === 'dev') {
