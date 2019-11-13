@@ -7,7 +7,7 @@
     "test": "./node_modules/.bin/jest"
   },
   "engines": {
-    "node": "8.x.x"
+    "node": "10.x.x"
   },
   "repository": {
     "type": "git",
@@ -30,11 +30,11 @@
     "express-ejs-layouts": "^2.3.1",
     "express-flash-2": "^1.0.1",
     "helmet": "^3.9.0",
-    "lodash": "^4.17.10",
+    "lodash": "^4.17.11",
     "login.dfe.async-retry": "git+https://github.com/DFE-Digital/login.dfe.async-retry.git#v1.0",
-    "login.dfe.audit.winston-sequelize-transport": "github:DFE-Digital/login.dfe.audit.winston-sequelize-transport#v2.4",
+    "login.dfe.audit.winston-sequelize-transport": "github:DFE-Digital/login.dfe.audit.winston-sequelize-transport#v2.10",
     "login.dfe.express-error-handling": "git+https://github.com/DFE-Digital/login.dfe.express-error-handling.git#v1.4",
-    "login.dfe.healthcheck": "git+https://github.com/DFE-Digital/login.dfe.healthcheck.git#v1.4.5",
+    "login.dfe.healthcheck": "git+https://github.com/DFE-Digital/login.dfe.healthcheck.git#v1.6",
     "login.dfe.jwt-strategies": "git+https://github.com/DFE-Digital/login.dfe.jwt-strategies.git#v2.0.1",
     "login.dfe.policy-engine": "git+https://github.com/DFE-Digital/login.dfe.policy-engine.git#v2.0.6",
     "login.dfe.service-notifications.jobs.client": "git+https://github.com/DFE-Digital/login.dfe.service-notifications.jobs.client.git#v1.4",
@@ -47,7 +47,7 @@
     "simpl-schema": "^1.5.3",
     "login.dfe.config.schema.common": "git+https://github.com/DFE-Digital/login.dfe.config.schema.common.git#v1.3",
     "winston": "^2.4.0",
-    "openid-client": "^2.3.1",
+    "openid-client": "^3.7.0",
     "passport": "^0.4.0"
   },
   "devDependencies": {
