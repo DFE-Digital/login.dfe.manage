@@ -44,7 +44,7 @@
     "login.dfe.validation": "git+https://github.com/DFE-Digital/login.dfe.validation.git#v1.1.0",
     "niceware": "^1.0.6",
     "moment": "^2.19.3",
-    "simpl-schema": "^1.5.3",
+    "simpl-schema": "^1.5.6",
     "login.dfe.config.schema.common": "git+https://github.com/DFE-Digital/login.dfe.config.schema.common.git#v1.4",
     "winston": "^2.4.0",
     "openid-client": "^2.3.1",
