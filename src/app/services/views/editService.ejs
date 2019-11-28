@@ -40,12 +40,9 @@
                     <% if (locals.validationMessages.roles !== undefined) { %>
                     <p class="error-message" id="validation-selected-role"><%=locals.validationMessages.roles%></p>
                     <% } %>
-
-                    <% if (locals.serviceRoles.length > 0) { %>
                         <legend>
                             <span class="body-text">Select all required roles</span>
                         </legend>
-
                         <% for (let i = 0; i < locals.serviceRoles.length; i++) { %>
                             <% const role = locals.serviceRoles[i]; %>
                             <div class="multiple-choice">
@@ -58,9 +55,6 @@
                                 <label for="<%=role.id%>"><%=role.name%></label>
                             </div>
                         <% } %>
-                    <% } else { %>
-                        <legend><h2 class="heading-small">There are no available roles for <%= locals.service.name %>.</h2></legend>
-                    <% } %>
                 </fieldset>
             </div>
             <div class="form-submit submit-buttons">
@@ -68,6 +62,8 @@
                 <a href="<%= locals.cancelLink %>" class="button button-secondary">Cancel</a>
             </div>
         </form>
+        <% } else { %>
+            <legend><h2 class="heading-small">There are no available roles for <%= locals.service.name %>.</h2></legend>
         <% } %>
     </div>
     <div class="col-4">
