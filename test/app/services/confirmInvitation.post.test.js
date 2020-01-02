@@ -39,7 +39,7 @@ NotificationClient.mockImplementation(() => {
 
 const { getRequestMock, getResponseMock } = require('./../../utils');
 const { addUserService, addInvitationService } = require('./../../../src/infrastructure/access');
-const { getOrganisationByIdV2, putInvitationInOrganisation, putUserInOrganisation, getPendingRequestsAssociatedWithUser, updateRequestById} = require('./../../../src/infrastructure/organisations');
+const { getOrganisationByIdV2, putInvitationInOrganisation, putUserInOrganisation} = require('./../../../src/infrastructure/organisations');
 const { createInvite } = require('./../../../src/infrastructure/directories');
 const { getSearchDetailsForUserById, updateIndex } = require('./../../../src/infrastructure/search');
 const logger = require('./../../../src/infrastructure/logger');
