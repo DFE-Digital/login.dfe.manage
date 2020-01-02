@@ -71,6 +71,26 @@ const putUserInOrganisation = async (userId, organisationId, role, correlationId
   return callOrganisationsApi(`organisations/${organisationId}/users/${userId}`, 'PUT', { roleId: role }, correlationId);
 };
 
+const getPendingRequestsAssociatedWithUser = async (userId, correlationId) => {
+  return callOrganisationsApi(`/organisations/requests-for-user/${userId}`, 'GET', undefined, correlationId);
+};
+
+const updateRequestById = async (requestId, status, actionedBy, actionedReason, actionedAt, correlationId) => {
+  const body = {};
+  if (status) {
+    body.status = status
+  }
+  if (actionedBy) {
+    body.actioned_by = actionedBy
+  }
+  if (actionedReason) {
+    body.actioned_reason = actionedReason
+  }
+  if (actionedAt) {
+    body.actioned_at = actionedAt
+  }
+  return callOrganisationsApi( `/organisations/requests/${requestId}`, 'PATCH', body, correlationId);
+};
 
 module.exports = {
   getInvitationOrganisations,
@@ -80,4 +100,6 @@ module.exports = {
   getOrganisationForUserV2,
   putInvitationInOrganisation,
   putUserInOrganisation,
+  getPendingRequestsAssociatedWithUser,
+  updateRequestById,
 };
