@@ -2,7 +2,7 @@ const config = require('./../../infrastructure/config');
 const logger = require('./../../infrastructure/logger');
 
 const { createInvite } = require('./../../infrastructure/directories');
-const { putUserInOrganisation, putInvitationInOrganisation, getOrganisationByIdV2 } = require('./../../infrastructure/organisations');
+const { putUserInOrganisation, putInvitationInOrganisation, getOrganisationByIdV2, getPendingRequestsAssociatedWithUser, updateRequestById } = require('./../../infrastructure/organisations');
 const { addUserService, addInvitationService, listRolesOfService } = require('./../../infrastructure/access');
 const { getSearchDetailsForUserById, updateIndex, createIndex } = require('./../../infrastructure/search');
 const { waitForIndexToUpdate } = require('./utils');
@@ -73,6 +73,12 @@ const post = async (req, res) => {
     // put user in org
     if (!req.session.user.existingOrg) {
       await putUserInOrganisation(uid, organisationId, req.session.user.permission, req.id);
+      const pendingOrgRequests = await getPendingRequestsAssociatedWithUser(uid,req.id);
+      const requestForOrg = pendingOrgRequests ? pendingOrgRequests.find(x => x.org_id === organisationId) : null;
+      if (requestForOrg) {
+        // mark request as approved if outstanding for same org
+        await updateRequestById(requestForOrg.id, 1, req.user.sub, null, Date.now(), req.id);
+      }
     }
 
     await addUserService(uid, req.params.sid, organisationId, req.session.user.roles, req.id);

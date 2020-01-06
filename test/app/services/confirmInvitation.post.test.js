@@ -11,6 +11,8 @@ jest.mock('./../../../src/infrastructure/organisations', () => {
     getOrganisationByIdV2: jest.fn(),
     putUserInOrganisation: jest.fn(),
     putInvitationInOrganisation: jest.fn(),
+    getPendingRequestsAssociatedWithUser: jest.fn(),
+    updateRequestById: jest.fn(),
   };
 });
 jest.mock('./../../../src/infrastructure/directories', () => {
