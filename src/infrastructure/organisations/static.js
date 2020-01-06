@@ -74,6 +74,14 @@ const putUserInOrganisation = async (userId, organisationId, role, correlationId
   return Promise.resolve();
 };
 
+const getPendingRequestsAssociatedWithUser = async (userId, correlationId) => {
+  return Promise.resolve();
+};
+
+const updateRequestById = async (requestId, status, actionedBy, actionedReason, actionedAt, correlationId) => {
+  return Promise.resolve();
+};
+
 module.exports = {
   getAllUserOrganisations,
   getInvitationOrganisations,
@@ -82,4 +90,6 @@ module.exports = {
   getOrganisationForUserV2,
   putInvitationInOrganisation,
   putUserInOrganisation,
+  getPendingRequestsAssociatedWithUser,
+  updateRequestById,
 };
