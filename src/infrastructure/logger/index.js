@@ -6,8 +6,6 @@ const WinstonSequelizeTransport = require('login.dfe.audit.winston-sequelize-tra
 const appInsights = require('applicationinsights');
 const AppInsightsTransport = require('login.dfe.winston-appinsights');
 
-appInsights.start();
-
 const logLevel = (config && config.loggerSettings && config.loggerSettings.logLevel) ? config.loggerSettings.logLevel : 'info';
 
 const loggerConfig = {
@@ -34,6 +32,16 @@ loggerConfig.transports.push(new (winston.transports.Console)({level: logLevel, 
 const sequelizeTransport = WinstonSequelizeTransport(config);
 if (sequelizeTransport) {
   loggerConfig.transports.push(sequelizeTransport);
+}
+
+if (config.hostingEnvironment.applicationInsights) {
+  appInsights.setup(config.hostingEnvironment.applicationInsights).setAutoCollectConsole(false, false).start();
+  loggerConfig.transports.push(new AppInsightsTransport({
+    client: appInsights.defaultClient,
+    applicationName: config.loggerSettings.applicationName || 'Manage',
+    type: 'event',
+    treatErrorsAsExceptions: true,
+  }));
 }
 
 const logger = new (winston.Logger)(loggerConfig);
