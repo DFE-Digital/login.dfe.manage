@@ -3,6 +3,10 @@
 const winston = require('winston');
 const config = require('./../config');
 const WinstonSequelizeTransport = require('login.dfe.audit.winston-sequelize-transport');
+const appInsights = require('applicationinsights');
+const AppInsightsTransport = require('login.dfe.winston-appinsights');
+
+appInsights.start();
 
 const logLevel = (config && config.loggerSettings && config.loggerSettings.logLevel) ? config.loggerSettings.logLevel : 'info';
 
