@@ -16,25 +16,13 @@ const oidc = require('./infrastructure/oidc');
 const session = require('cookie-session');
 const { setUserContext, isManageUser } = require('./infrastructure/utils');
 const { getErrorHandler, ejsErrorPages } = require('login.dfe.express-error-handling');
-const KeepAliveAgent = require('agentkeepalive');
 const moment = require('moment');
 
 const registerRoutes = require('./routes');
 
 configSchema.validate();
 
-http.GlobalAgent = new KeepAliveAgent({
-  maxSockets: config.hostingEnvironment.agentKeepAlive.maxSockets,
-  maxFreeSockets: config.hostingEnvironment.agentKeepAlive.maxFreeSockets,
-  timeout: config.hostingEnvironment.agentKeepAlive.timeout,
-  keepAliveTimeout: config.hostingEnvironment.agentKeepAlive.keepAliveTimeout,
-});
-https.GlobalAgent = new KeepAliveAgent({
-  maxSockets: config.hostingEnvironment.agentKeepAlive.maxSockets,
-  maxFreeSockets: config.hostingEnvironment.agentKeepAlive.maxFreeSockets,
-  timeout: config.hostingEnvironment.agentKeepAlive.timeout,
-  keepAliveTimeout: config.hostingEnvironment.agentKeepAlive.keepAliveTimeout,
-});
+https.globalAgent.maxSockets = http.globalAgent.maxSockets = config.hostingEnvironment.agentKeepAlive.maxSockets || 50;
 
 
 const init = async () => {
