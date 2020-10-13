@@ -32,7 +32,9 @@
     </div>
 </div>
 
-<%-include(process.cwd()+'/node_modules/dfe-frontend-toolkit/app/views/concepts/components/cookie-banner.html') %>
+<div id="global-cookie-message">
+    <p>GOV.UK uses cookies to make the site simpler. <a href="https://www.gov.uk/help/cookies">Find out more about cookies</a></p>
+</div>
 
 <div class="wrapper">
     <%if(app.environmentBannerMessage) {%>
