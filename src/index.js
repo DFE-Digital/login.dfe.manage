@@ -56,6 +56,7 @@ const init = async () => {
       title: 'DfE Sign-in Manage',
       environmentBannerMessage: config.hostingEnvironment.environmentBannerMessage,
     },
+    gaTrackingId: config.hostingEnvironment.gaTrackingId,
     assets: {
       version: config.assets.version,
     },
