@@ -40,7 +40,7 @@ const init = async () => {
     },
   }));
 
-  let assetsUrl = config.hostingEnvironment.assetsUrl || 'https://rawgit.com/DFE-Digital/dfe.ui.toolkit/master/dist/';
+  let assetsUrl = config.assets.url;
   assetsUrl = assetsUrl.endsWith('/') ? assetsUrl.substr(0, assetsUrl.length - 1) : assetsUrl;
   Object.assign(app.locals, {
     moment,
@@ -55,6 +55,10 @@ const init = async () => {
     app: {
       title: 'DfE Sign-in Manage',
       environmentBannerMessage: config.hostingEnvironment.environmentBannerMessage,
+    },
+    gaTrackingId: config.hostingEnvironment.gaTrackingId,
+    assets: {
+      version: config.assets.version,
     },
   });
 
@@ -80,7 +84,7 @@ const init = async () => {
 
   app.use(flash());
 
-  app.use(bodyParser.urlencoded({extended: true}));
+  app.use(bodyParser.urlencoded({ extended: true }));
   app.use(cookieParser());
   app.use(sanitization());
   app.set('view engine', 'ejs');

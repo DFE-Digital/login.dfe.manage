@@ -8,9 +8,9 @@
 
     <title><%=locals.title || (locals.app ? locals.app.title : null) || 'DfE Sign-in'%></title>
 
-    <link rel="stylesheet" href="<%= locals.urls.assets %>/css/govuk/fonts.css">
-    <link rel="stylesheet" href="<%= locals.urls.assets %>/css/govuk/govuk-template.css">
-    <link rel="stylesheet" href="<%= locals.urls.assets %>/css/screen.css">
+    <link rel="stylesheet" href="<%= locals.urls.assets %>/css/govuk/fonts.css?version=<%= locals.assets.version %>">
+    <link rel="stylesheet" href="<%= locals.urls.assets %>/css/govuk/govuk-template.css?version=<%= locals.assets.version %>">
+    <link rel="stylesheet" href="<%= locals.urls.assets %>/css/screen.css?version=<%= locals.assets.version %>">
 
     <link rel="shortcut icon" href="<%= locals.urls.assets %>/images/favicon.ico" type="image/x-icon" />
 
@@ -32,9 +32,7 @@
     </div>
 </div>
 
-<div id="global-cookie-message">
-    <p>GOV.UK uses cookies to make the site simpler. <a href="https://www.gov.uk/help/cookies">Find out more about cookies</a></p>
-</div>
+<%-include(process.cwd()+'/node_modules/dfe-frontend-toolkit/app/views/concepts/components/cookie-banner.html') %>
 
 <div class="wrapper">
     <%if(app.environmentBannerMessage) {%>
@@ -144,7 +142,13 @@
 </footer>
 
 <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-<script src="<%= locals.urls.assets %>/javascript/app.min.js"></script>
+<script type="text/javascript" src="<%= locals.urls.assets %>/javascript/vendors/vendors.min.js?version=<%= locals.assets.version %>"></script>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script>
+    window.gaTrackingId = '<%=locals.gaTrackingId || 'UA-114739594-1'%>';
+</script>
+<script src="<%= locals.urls.assets %>/javascript/app.min.js?version=<%= locals.assets.version %>"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=<%=locals.gaTrackingId || 'UA-114739594-1'%>"></script>
 <script src="/assets/javascript/niceware.js"></script>
 
 
