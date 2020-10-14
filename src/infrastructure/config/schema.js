@@ -14,7 +14,7 @@ const accessIdentifiers = new SimpleSchema({
   identifiers: {
     type: Object,
   },
-  'identifiers.service' : patterns.uuid,
+  'identifiers.service': patterns.uuid,
   'identifiers.organisation': patterns.uuid,
 });
 
@@ -35,6 +35,7 @@ const schema = new SimpleSchema({
   directories: schemas.apiClient,
   identifyingParty: identifyingPartySchema,
   notifications: notificationsSchema,
+  assets: schemas.assets,
 });
 
 
