@@ -41,17 +41,21 @@ const post = async (req, res) => {
   if (req.body.selectedOrganisation) {
     const userOrganisations = (req.params.uid && !req.params.uid.startsWith('inv-')) ? await getOrganisationForUserV2(req.params.uid, req.id) : undefined;
     const userAccessToSpecifiedOrganisation = userOrganisations ? userOrganisations.find(x => x.organisation.id.toLowerCase() === req.body.selectedOrganisation.toLowerCase()) : undefined;
-    const policyResult = await policyEngine.getPolicyApplicationResultsForUser(userAccessToSpecifiedOrganisation ? req.params.uid : undefined, req.body.selectedOrganisation, req.params.sid, req.id);
-
-    if (policyResult.rolesAvailableToUser.length > 0) {
-      const organisation = req.body.selectedOrganisation ? await getOrganisationByIdV2(req.body.selectedOrganisation) : undefined;
-      req.session.user.organisationName = organisation ? organisation.name : undefined;
-      req.session.user.organisationId = req.body.selectedOrganisation;
-      return res.redirect('organisation-permissions');
-    } else {
-      model.validationMessages.organisation = 'The organisation you have selected does not have access to this service';
+    
+    if(!userAccessToSpecifiedOrganisation){
+      const policyResult = await policyEngine.getPolicyApplicationResultsForUser(userAccessToSpecifiedOrganisation ? req.params.uid : undefined, req.body.selectedOrganisation, req.params.sid, req.id);
+      if (policyResult.rolesAvailableToUser.length > 0) {
+        const organisation = req.body.selectedOrganisation ? await getOrganisationByIdV2(req.body.selectedOrganisation) : undefined;
+        req.session.user.organisationName = organisation ? organisation.name : undefined;
+        req.session.user.organisationId = req.body.selectedOrganisation;
+        return res.redirect('organisation-permissions');
+      } else {
+        model.validationMessages.organisation = 'The organisation you have selected does not have access to this service';
+        return res.render('services/views/associateOrganisation', model);
+      }
+    }else {
+      model.validationMessages.organisation = `The user was already mapped to ${userAccessToSpecifiedOrganisation.organisation.name}`;
       return res.render('services/views/associateOrganisation', model);
-
     }
   }
   return res.render('services/views/associateOrganisation', model);
