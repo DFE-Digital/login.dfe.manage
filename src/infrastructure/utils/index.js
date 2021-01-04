@@ -64,6 +64,8 @@ const setUserContext = async (req, res, next) => {
     res.locals.displayName = getUserDisplayName(req.user);
     req.userServices = await getSingleUserService(req.user.sub, config.access.identifiers.service, config.access.identifiers.organisation, req.id);
   }
+
+  res.locals.gaClientId = req.session.gaClientId;
   next();
 };
 

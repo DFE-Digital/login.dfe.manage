@@ -17,6 +17,7 @@ const session = require('cookie-session');
 const { setUserContext, isManageUser } = require('./infrastructure/utils');
 const { getErrorHandler, ejsErrorPages } = require('login.dfe.express-error-handling');
 const moment = require('moment');
+const uuid = require('uuid/v4');
 
 const registerRoutes = require('./routes');
 
@@ -79,6 +80,7 @@ const init = async () => {
   }));
   app.use((req, res, next) => {
     req.session.now = Date.now();
+    req.session.gaClientId = req.session.gaClientId || uuid();
     next();
   });
 
