@@ -29,7 +29,7 @@
   "identifyingParty": {
     "url": "https://localhost:4430",
     "clientId": "manage",
-    "clientSecret":"some-secret",
+    "clientSecret":"some-3f8d828a-8325-4d8d-a8de-dc8dbfb94e30",
     "clockTolerance": 300
   }
 }
