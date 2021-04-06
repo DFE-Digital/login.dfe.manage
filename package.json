@@ -7,7 +7,7 @@
     "test": "./node_modules/.bin/jest"
   },
   "engines": {
-    "node": "10.x.x"
+    "node": "12.x.x"
   },
   "repository": {
     "type": "git",
@@ -25,16 +25,16 @@
     "cookie-parser": "^1.4.3",
     "cookie-session": "^2.0.0-beta.3",
     "csurf": "^1.9.0",
-    "ejs": "^2.5.7",
+    "ejs": "^3.1.6",
     "express": "^4.15.4",
     "express-ejs-layouts": "^2.3.1",
     "express-flash-2": "^1.0.1",
     "helmet": "^3.21.2",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "login.dfe.async-retry": "git+https://github.com/DFE-Digital/login.dfe.async-retry.git#v1.0",
     "login.dfe.audit.winston-sequelize-transport": "github:DFE-Digital/login.dfe.audit.winston-sequelize-transport#v2.12",
-    "login.dfe.config.schema.common": "git+https://github.com/DFE-Digital/login.dfe.config.schema.common.git#v1.4",
-    "login.dfe.express-error-handling": "git+https://github.com/DFE-Digital/login.dfe.express-error-handling.git#v1.5",
+    "login.dfe.config.schema.common": "git+https://github.com/DFE-Digital/login.dfe.config.schema.common.git#v1.8.1",
+    "login.dfe.express-error-handling": "git+https://github.com/DFE-Digital/login.dfe.express-error-handling.git#v1.6",
     "login.dfe.healthcheck": "git+https://github.com/DFE-Digital/login.dfe.healthcheck.git#v1.8",
     "login.dfe.jwt-strategies": "git+https://github.com/DFE-Digital/login.dfe.jwt-strategies.git#v3.0",
     "login.dfe.notifications.client": "git+https://github.com/DFE-Digital/login.dfe.notifications.client.git#v3.4.2",
