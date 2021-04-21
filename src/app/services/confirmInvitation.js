@@ -69,15 +69,6 @@ const post = async (req, res) => {
       await putInvitationInOrganisation(invitationId, organisationId, req.session.user.permission, req.id);
     }
     await addInvitationService(invitationId, req.params.sid, organisationId, req.session.user.roles, req.id);
-    logger.audit(`${req.user.email} (id: ${req.user.sub}) invited ${req.session.user.email} to ${req.session.user.organisationName} (id: ${organisationId}) (id: ${uid})`, {
-      type: 'manage',
-      subType: 'user-invited',
-      userId: req.user.sub,
-      userEmail: req.user.email,
-      invitedUserEmail: req.session.user.email,
-      invitedUser: uid,
-      organisationId: organisationId,
-    });
   } else {
     // put user in org
     if (!req.session.user.existingOrg) {
@@ -94,17 +85,18 @@ const post = async (req, res) => {
     await notificationClient.sendServiceAdded(req.session.user.email, req.session.user.firstName, req.session.user.lastName, req.session.user.organisationName, req.session.user.service);
   }
 
+  // audit invitation
+  logger.audit(`${req.user.email} (id: ${req.user.sub}) invited ${req.session.user.email} to ${req.session.user.organisationName} (id: ${organisationId}) (id: ${uid})`, {
+    type: 'manage',
+    subType: 'user-invited',
+    userId: req.user.sub,
+    userEmail: req.user.email,
+    invitedUserEmail: req.session.user.email,
+    invitedUser: uid,
+    organisationId: organisationId,
+  });
+
   if (isInvitation) {
-    // audit invitation
-    logger.audit(`${req.user.email} (id: ${req.user.sub}) invited ${req.session.user.email} to ${req.session.user.organisationName} (id: ${organisationId}) (id: ${uid})`, {
-      type: 'manage',
-      subType: 'user-invited',
-      userId: req.user.sub,
-      userEmail: req.user.email,
-      invitedUserEmail: req.session.user.email,
-      invitedUser: uid,
-      organisationId: organisationId,
-    });
 
     await createIndex(`${uid}`, req.id);
     await waitForIndexToUpdate(uid);
