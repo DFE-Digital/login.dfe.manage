@@ -54,7 +54,7 @@
                             <% if (locals.validationMessages.description !== undefined) { %>
                             <p class="error-message" id="validation-name"><%=locals.validationMessages.description %></p>
                             <% } %>
-                            <textarea class="form-control inputConfig" id="description" name="description" rows = '5' style="resize:none;"><%=locals.service.description%></textarea>
+                            <textarea disabled class="form-control inputConfig" id="description" name="description" rows = '5' style="resize:none;"><%=locals.service.description%></textarea>
                         </div>
                     </dd>
 
