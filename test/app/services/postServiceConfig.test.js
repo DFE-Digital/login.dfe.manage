@@ -16,7 +16,7 @@ describe('when editing the service configuration', () => {
     req = getRequestMock({
       body: {
         name: 'service two',
-        description: 'description',
+        description: 'service description',
         clientId: 'clientid2',
         clientSecret: 'outshine-wringing-imparting-submitted',
         serviceHome: 'https://www.servicehome2.com',
@@ -85,7 +85,7 @@ describe('when editing the service configuration', () => {
       service: {
         clientId: 'clientid2',
         clientSecret: 'outshine-wringing-imparting-submitted',
-        description: 'description',
+        description: 'service description',
         grantTypes: [
           'implicit'
         ],
@@ -121,7 +121,7 @@ describe('when editing the service configuration', () => {
         name: 'service two',
         clientId: 'clientid2',
         clientSecret: 'outshine-wringing-imparting-submitted',
-        description: 'description',
+        description: 'service description',
         grantTypes: [
           'implicit'
         ],
@@ -157,7 +157,7 @@ describe('when editing the service configuration', () => {
         name: 'service two',
         clientId: undefined,
         clientSecret: 'outshine-wringing-imparting-submitted',
-        description: 'description',
+        description: 'service description',
         grantTypes: [
           'implicit'
         ],
@@ -196,7 +196,7 @@ describe('when editing the service configuration', () => {
         name: 'service two',
         clientId: 'clientid2',
         clientSecret: 'outshine-wringing-imparting-submitted',
-        description: 'description',
+        description: 'service description',
         grantTypes: [
           'implicit'
         ],
@@ -224,7 +224,7 @@ describe('when editing the service configuration', () => {
 
     expect(updateService.mock.calls[0][1]).toEqual({
       name: 'service two',
-      description: 'description',
+      description: 'service description',
       clientId: 'clientid2',
       clientSecret: 'outshine-wringing-imparting-submitted',
       serviceHome: 'https://www.servicehome2.com',
