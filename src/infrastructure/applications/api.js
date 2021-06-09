@@ -70,7 +70,9 @@ const updateService = async (id, serviceDetails, correlationId) => {
   if (serviceDetails.apiSecret) {
     body.apiSecret = serviceDetails.apiSecret
   }
-  body.description = serviceDetails.description ? serviceDetails.description : null;
+  if (serviceDetails.description) {
+    body.description = serviceDetails.description;
+  }
   body.tokenEndpointAuthMethod = serviceDetails.tokenEndpointAuthMethod ? serviceDetails.tokenEndpointAuthMethod : null;
   body.postResetUrl = serviceDetails.postResetUrl ? serviceDetails.postResetUrl : null;
 
