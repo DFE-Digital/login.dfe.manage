@@ -55,7 +55,7 @@ const validate = async (req) => {
   const model = {
     service: {
       name: req.body.name,
-      description: req.body.description.trim(),
+      description: service.description || '', // field disabled in form so we don't pick it up from it but use current value
       clientId: req.body.clientId,
       clientSecret: req.body.clientSecret || '',
       serviceHome: req.body.serviceHome || '',
