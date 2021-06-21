@@ -33,12 +33,26 @@ const init = async () => {
     },
   });
   const app = express();
-  app.use(helmet({
-    noCache: true,
-    frameguard: {
-      action: 'deny',
-    },
-  }));
+
+  if (config.hostingEnvironment.hstsMaxAge) {
+    app.use(helmet({
+      noCache: true,
+      frameguard: {
+        action: 'deny',
+      },
+      hsts: {
+        maxAge: config.hostingEnvironment.hstsMaxAge,
+        preload: true,
+      }
+    }));
+  } else {
+    app.use(helmet({
+      noCache: true,
+      frameguard: {
+        action: 'deny',
+      }
+    }));
+  }
 
   let assetsUrl = config.assets.url;
   assetsUrl = assetsUrl.endsWith('/') ? assetsUrl.substr(0, assetsUrl.length - 1) : assetsUrl;
