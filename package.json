@@ -1,6 +1,6 @@
 {
   "name": "login.dfe.manage",
-  "version": "1.0.5",
+  "version": "1.0.0",
   "description": "",
   "scripts": {
     "dev": "settings='./config/login.dfe.manage.dev.json' node src/index.js",
@@ -34,10 +34,10 @@
     "login.dfe.async-retry": "git+https://github.com/DFE-Digital/login.dfe.async-retry.git#v1.0",
     "login.dfe.audit.winston-sequelize-transport": "github:DFE-Digital/login.dfe.audit.winston-sequelize-transport#v2.12",
     "login.dfe.config.schema.common": "git+https://github.com/DFE-Digital/login.dfe.config.schema.common.git#v1.9.3",
-    "login.dfe.express-error-handling": "git+https://github.com/DFE-Digital/login.dfe.express-error-handling.git#v1.6",
+    "login.dfe.express-error-handling": "git+https://github.com/DFE-Digital/login.dfe.express-error-handling.git#v1.7.0",
     "login.dfe.healthcheck": "git+https://github.com/DFE-Digital/login.dfe.healthcheck.git#v1.8",
     "login.dfe.jwt-strategies": "git+https://github.com/DFE-Digital/login.dfe.jwt-strategies.git#v3.0",
-    "login.dfe.notifications.client": "git+https://github.com/DFE-Digital/login.dfe.notifications.client.git#v3.4.2",
+    "login.dfe.notifications.client": "git+https://github.com/DFE-Digital/login.dfe.notifications.client.git#v5.0.0",
     "login.dfe.policy-engine": "git+https://github.com/DFE-Digital/login.dfe.policy-engine.git#v3.0",
     "login.dfe.request-promise-retry": "git+https://github.com/DFE-Digital/login.dfe.request-promise-retry.git#v2.1",
     "login.dfe.sanitization": "git+https://github.com/DFE-Digital/login.dfe.sanitization.git#v2.0.0",
