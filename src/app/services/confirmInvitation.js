@@ -80,9 +80,20 @@ const post = async (req, res) => {
         await updateRequestById(requestForOrg.id, 1, req.user.sub, null, Date.now(), req.id);
       }
     }
-
+    
+    const allRolesForService = await listRolesOfService(req.params.sid, req.id);
+    const selectedRoleIds = req.session.user.roles;
+    const roleDetails = allRolesForService.filter(x => selectedRoleIds.find(y => y.toLowerCase() === x.id.toLowerCase()));
+    
     await addUserService(uid, req.params.sid, organisationId, req.session.user.roles, req.id);
-    await notificationClient.sendServiceAdded(req.session.user.email, req.session.user.firstName, req.session.user.lastName, req.session.user.organisationName, req.session.user.service);
+    await notificationClient.sendServiceRequestApproved(
+      req.session.user.email, 
+      req.session.user.firstName, 
+      req.session.user.lastName, 
+      req.session.user.organisationName,
+      req.session.user.service,
+      roleDetails.map(i => i.name)
+    )
   }
 
   // audit invitation

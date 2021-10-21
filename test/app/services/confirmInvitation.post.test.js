@@ -4,8 +4,10 @@ jest.mock('./../../../src/infrastructure/access', () => {
   return {
     addUserService: jest.fn(),
     addInvitationService: jest.fn(),
+    listRolesOfService: jest.fn(),
   };
 });
+const { listRolesOfService } = require('./../../../src/infrastructure/access');
 jest.mock('./../../../src/infrastructure/organisations', () => {
   return {
     getOrganisationByIdV2: jest.fn(),
@@ -31,9 +33,11 @@ jest.mock('login.dfe.notifications.client');
 
 const NotificationClient = require('login.dfe.notifications.client');
 const sendServiceAdded = jest.fn();
+const sendServiceRequestApproved = jest.fn();
 NotificationClient.mockImplementation(() => {
   return {
     sendServiceAdded,
+    sendServiceRequestApproved,
   };
 });
 
@@ -111,12 +115,25 @@ describe('when inviting a new user', () => {
 
     updateIndex.mockReset();
 
+    listRolesOfService.mockReset();
+    listRolesOfService.mockReturnValue([{
+      code: 'role_code',
+      id: 'role_id',
+      name: 'role_name',
+      status: {
+        id: 'status_id'
+      },
+    }]);
+
     sendServiceAdded.mockReset();
+    sendServiceRequestApproved.mockReset();
+
     NotificationClient.mockReset();
 
     NotificationClient.mockImplementation(() => {
       return {
         sendServiceAdded,
+        sendServiceRequestApproved
       };
     });
 
@@ -188,12 +205,12 @@ describe('when inviting a new user', () => {
   it('then it should send support request job with form details', async () => {
     await postConfirmInvitation(req, res);
 
-    expect(sendServiceAdded.mock.calls).toHaveLength(1);
-    expect(sendServiceAdded.mock.calls[0][0]).toBe('john.doe@unit.test');
-    expect(sendServiceAdded.mock.calls[0][1]).toBe('John');
-    expect(sendServiceAdded.mock.calls[0][2]).toBe('Doe');
-    expect(sendServiceAdded.mock.calls[0][3]).toBe('organisation name');
-    expect(sendServiceAdded.mock.calls[0][4]).toBe('service name');
+    expect(sendServiceRequestApproved.mock.calls).toHaveLength(1);
+    expect(sendServiceRequestApproved.mock.calls[0][0]).toBe('john.doe@unit.test');
+    expect(sendServiceRequestApproved.mock.calls[0][1]).toBe('John');
+    expect(sendServiceRequestApproved.mock.calls[0][2]).toBe('Doe');
+    expect(sendServiceRequestApproved.mock.calls[0][3]).toBe('organisation name');
+    expect(sendServiceRequestApproved.mock.calls[0][4]).toBe('service name');
   });
 
   it('then it should not attempt to add user to organisation if existing user and existing org', async () => {
@@ -285,9 +302,9 @@ describe('when inviting a new user', () => {
   it('then it should should audit adding services to an existing user', async () => {
     await postConfirmInvitation(req, res);
 
-    expect(logger.audit.mock.calls).toHaveLength(1);
-    expect(logger.audit.mock.calls[0][0]).toBe('user@unit.test (id: user1) added services for organisation organisation name (id: org1) for user john.doe@unit.test (id: user1)');
-    expect(logger.audit.mock.calls[0][1]).toMatchObject({
+    expect(logger.audit.mock.calls).toHaveLength(2);
+    expect(logger.audit.mock.calls[1][0]).toBe('user@unit.test (id: user1) added services for organisation organisation name (id: org1) for user john.doe@unit.test (id: user1)');
+    expect(logger.audit.mock.calls[1][1]).toMatchObject({
       type: 'manage',
       subType: 'user-services-added',
       userId: 'user1',

@@ -50,6 +50,7 @@ const paginationModel = {
         <ol class="search-results">
             <%for (let i = 0; i < organisations.length; i += 1) {%>
                 <%const org = organisations[i];%>
+                <% if (org.status.id !==2) { %>
                 <li>
                     <article>
                         <h2 class="heading-medium">
@@ -83,7 +84,8 @@ const paginationModel = {
                         </dl>
                     </article>
                 </li>
-            <%}%>
+                <% } %>
+            <% } %>
         </ol>
     </div>
 </div>
