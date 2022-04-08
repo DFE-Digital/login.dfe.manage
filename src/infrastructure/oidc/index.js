@@ -1,8 +1,12 @@
 const config = require('../config');
 const passport = require('passport');
-const { Strategy, Issuer } = require('openid-client');
+const { Strategy, Issuer, custom } = require('openid-client');
 const logger = require('../logger');
 const asyncRetry = require('login.dfe.async-retry');
+
+custom.setHttpOptionsDefaults({
+  timeout: 10000
+})
 
 const getPassportStrategy = async () => {
 
@@ -14,7 +18,7 @@ const getPassportStrategy = async () => {
     client_secret: config.identifyingParty.clientSecret,
   });
   if (config.identifyingParty.clockTolerance && config.identifyingParty.clockTolerance > 0) {
-    client.CLOCK_TOLERANCE = config.identifyingParty.clockTolerance;
+    client[custom.clock_tolerance] = config.identifyingParty.clockTolerance;
   }
 
   return new Strategy({
@@ -24,7 +28,12 @@ const getPassportStrategy = async () => {
       scope: 'openid profile email'
     },
   }, (tokenset, authUserInfo, done) => {
-    done(null, { ...tokenset.claims, id_token: tokenset.id_token, id: tokenset.claims.sub, name: tokenset.sub });
+    done(null, { 
+      ...tokenset.claims(),
+      id_token: tokenset.id_token, 
+      id: tokenset.claims().sub,
+      name: tokenset.sub
+    });
   });
 };
 
