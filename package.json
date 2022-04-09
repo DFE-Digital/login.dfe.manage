@@ -44,7 +44,7 @@
     "login.dfe.service-notifications.jobs.client": "git+https://github.com/DFE-Digital/login.dfe.service-notifications.jobs.client.git#v1.4",
     "login.dfe.validation": "git+https://github.com/DFE-Digital/login.dfe.validation.git#v1.1.0",
     "login.dfe.winston-appinsights": "git+https://github.com/DFE-Digital/login.dfe.winston-appinsights.git#v3.0",
-    "moment": "^2.19.3",
+    "moment": "^2.29.2",
     "niceware": "^1.0.6",
     "openid-client": "^2.3.1",
     "passport": "^0.4.0",
