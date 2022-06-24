@@ -62,7 +62,8 @@ describe('when selecting a service', () => {
       selectedService: undefined,
       services: [{
         id: 'serviceid',
-        name: 'service one'
+        name: 'service one',
+        description: 'service description',
       }],
       title: 'Select service',
       validationMessages: {
