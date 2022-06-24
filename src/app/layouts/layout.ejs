@@ -114,45 +114,47 @@
                             Menu
                         </button>
                         <nav>
-                            <% if (locals.serviceId) { %>
                             <ul
-                                id="navigation"
-                                class="govuk-header__navigation"
-                                aria-label="Navigation menu">
-                                <li class="govuk-header__navigation-item">
-                                    <a class="govuk-header__link" href="/">
+                            id="navigation"
+                            class="govuk-header__navigation"
+                            aria-label="Navigation menu">
+                            
+                            <% if (locals.currentPage !== undefined) { %>
+
+                                <li class="govuk-header__navigation-item <%= locals.currentPage === '' ? 'govuk-header__navigation-item--active' : '' %>">
+                                    <a id="nav-dashboard" class="govuk-header__link" href="/services/<%=locals.serviceId%>">
                                         Dashboard
                                     </a>
                                 </li>
-
-                                <li class="govuk-header__navigation-item">
-                                    <a class="govuk-header__link" href="/">
+                                
+                                <% if (locals.userRoles && locals.userRoles.includes('serviceconfig')) { %>
+                                <li class="govuk-header__navigation-item <%= locals.currentPage === 'service-configuration' ? 'govuk-header__navigation-item--active' : '' %>">
+                                    <a id="nav-service-configuration" class="govuk-header__link" href="/services/<%=locals.serviceId%>/service-configuration">
                                         Configuration
                                     </a>
                                 </li>
+                                <% } %>
 
-                                <li class="govuk-header__navigation-item">
-                                    <a class="govuk-header__link" href="/">
+                                <% if (locals.userRoles && locals.userRoles.includes('accessManage' )) { %>
+                                <li class="govuk-header__navigation-item <%= locals.currentPage === 'policies' ? 'govuk-header__navigation-item--active' : '' %>">
+                                    <a id="nav-manage-policies" class="govuk-header__link" href="/services/<%= locals.serviceId %>/policies">
                                         Policies
                                     </a>
                                 </li>
+                                <% } %>
 
-                                <li class="govuk-header__navigation-item">
-                                    <a class="govuk-header__link" href="/">
-                                        Roles
-                                    </a>
-                                </li>
-
-                                <li class="govuk-header__navigation-item">
-                                    <a class="govuk-header__link" href="/">
+                                <% if (locals.userRoles && locals.userRoles.includes('serviceSup')) { %>
+                                    <li class="govuk-header__navigation-item <%= locals.currentPage === 'users' ? 'govuk-header__navigation-item--active' : '' %>">
+                                    <a id="nav-user-management" class="govuk-header__link" href="/services/<%=locals.serviceId %>/users">
                                         Users
                                     </a>
                                 </li>
                                 <% } %>
+
+                            <% } %>
+
                                 <li class="govuk-header__navigation-item">
-                                    <a
-                                        class="govuk-header__link"
-                                        href="/signout">
+                                    <a id="nav-signout" class="govuk-header__link" href="/signout">
                                         Sign out
                                     </a>
                                 </li>

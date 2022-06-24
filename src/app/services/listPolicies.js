@@ -10,6 +10,13 @@ const viewModel = async (req) => {
 
   const serviceDetails = await getServiceById(req.params.sid, req.id);
   const servicePolicies = await getPageOfPoliciesForService(req.params.sid, page, 25, req.id);
+  const allUserRoles = req.userServices.roles.map((role) => ({
+    serviceId: role.code.substr(0, role.code.indexOf('_')),
+    role: role.code.substr(role.code.lastIndexOf('_') + 1),
+  }));
+  const userRolesForService = allUserRoles.filter(x => x.serviceId === req.params.sid);
+  const manageRolesForService = userRolesForService.map(x => x.role);
+
   return {
     csrfToken: req.csrfToken(),
     backLink: true,
@@ -18,6 +25,9 @@ const viewModel = async (req) => {
     page: servicePolicies.page,
     totalNumberOfResults: servicePolicies.totalNumberOfRecords,
     numberOfPages: servicePolicies.totalNumberOfPages,
+    serviceId: req.params.sid,
+    userRoles: manageRolesForService,
+    currentPage: 'policies',
   }
 };
 

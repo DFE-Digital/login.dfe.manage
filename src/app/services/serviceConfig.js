@@ -5,6 +5,13 @@ const logger = require('./../../infrastructure/logger');
 
 const getServiceConfig = async (req, res) => {
   const service = await getServiceById(req.params.sid, req.id);
+  const allUserRoles = req.userServices.roles.map((role) => ({
+    serviceId: role.code.substr(0, role.code.indexOf('_')),
+    role: role.code.substr(role.code.lastIndexOf('_') + 1),
+  }));
+  const userRolesForService = allUserRoles.filter(x => x.serviceId === req.params.sid);
+  const manageRolesForService = userRolesForService.map(x => x.role);
+
   return res.render('services/views/serviceConfig', {
     csrfToken: req.csrfToken(),
     service: {
@@ -23,6 +30,9 @@ const getServiceConfig = async (req, res) => {
     },
     backLink: `/services/${req.params.sid}`,
     validationMessages: {},
+    serviceId: req.params.sid,
+    userRoles: manageRolesForService,
+    currentPage: 'service-configuration',
   });
 };
 

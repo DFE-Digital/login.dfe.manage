@@ -22,6 +22,11 @@ describe('When posting users search ', () => {
       params: {
         sid: 'service1'
       },
+      userServices: {
+        roles: [{
+          code: 'serviceid_serviceconfiguration'
+        }]
+      },
     });
 
     res = getResponseMock();

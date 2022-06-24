@@ -15,7 +15,12 @@ describe('when getting the service config page', () => {
     req = getRequestMock({
       params: {
         sid: 'service1'
-      }
+      },
+      userServices: {
+        roles: [{
+          code: 'serviceid_serviceconfiguration'
+        }]
+      },
     });
 
     getServiceById.mockReset();
