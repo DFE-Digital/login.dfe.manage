@@ -86,7 +86,7 @@
                 <% } %> 
                  -->
 
-                <!-- <% if (locals.userRoles.includes('serviceBanner')) { %> -->
+                <% if (locals.userRoles.includes('serviceBanner')) { %>
                 <div class="manage-card">
                     <h3 class="govuk-heading-s">
                         <a id="service-banner" class="govuk-link-bold" href="<%=locals.serviceId%>/service-banners">Create service 
@@ -95,7 +95,7 @@
                         Create a banner about your service that will be shown to users on DfE Sign-in.
                     </p>
                 </div>
-                <!-- <% } %> -->
+                <% } %>
 
                 <!-- TODO: update after Service Configuration functionality in place -->
                 <!--  <% if (locals.userRoles.includes('serviceconfig')) { %>
