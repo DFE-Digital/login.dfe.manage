@@ -15,7 +15,8 @@ const getServiceDetails = async (req) => {
   for (let i = 0; i < userServices.length; i++) {
     const service = userServices[i];
     const application = await getServiceById(service.id, req.id);
-    service.name = application.name
+    service.name = application.name;
+    service.description = application.description;
   }
   return sortBy(userServices, 'name');
 };
