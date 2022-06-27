@@ -81,6 +81,13 @@ const search = async (req) => {
 const viewModel = async (req) => {
   const result = await search(req);
   const service = await getServiceById(req.params.sid, req.id);
+  const allUserRoles = req.userServices.roles.map((role) => ({
+    serviceId: role.code.substr(0, role.code.indexOf('_')),
+    role: role.code.substr(role.code.lastIndexOf('_') + 1),
+  }));
+  const userRolesForService = allUserRoles.filter(x => x.serviceId === req.params.sid);
+  const manageRolesForService = userRolesForService.map(x => x.role);
+
   return {
     csrfToken: req.csrfToken(),
     serviceId: req.params.sid,
@@ -94,7 +101,9 @@ const viewModel = async (req) => {
     sortBy: result.sortBy,
     sortOrder: result.sortOrder,
     service,
-    allowInvite: !!(service.relyingParty && service.relyingParty.params && service.relyingParty.params.allowManageInvite === 'true')
+    allowInvite: !!(service.relyingParty && service.relyingParty.params && service.relyingParty.params.allowManageInvite === 'true'),
+    userRoles: manageRolesForService,
+    currentPage: 'users',
   };
 };
 
