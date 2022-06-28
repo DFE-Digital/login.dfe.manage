@@ -51,11 +51,10 @@
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                             Description
-                            <div>
-                                (
-                                <a class="govuk-link" href="<%= locals.urls.help%>/contact-us">Contact us</a>
+                            <p class="govuk-body">
+                                (<a class="govuk-link" href="<%= locals.urls.help%>/contact-us">Contact us</a>
                                 to request a change)
-                            </div>
+                            </p>
                         </dt>
                         <dd class="govuk-summary-list__value">
                             <div
@@ -77,8 +76,8 @@
                                     name="description"
                                     rows="5"
                                     style="resize: none">
-<%=locals.service.description%></textarea
-                                >
+<%=locals.service.description%>
+                                </textarea>
                             </div>
                         </dd>
                     </div>
@@ -286,29 +285,42 @@
                         </dt>
                         <dd class="govuk-summary-list__value">
                             <div class="govuk-form-group">
-                                <div class="multiple-choice">
-                                    <input id="authorization_code" class = "govuk-checkboxes__input" type="checkbox"
-                                    name="grant_types" value="authorization_code" <%=
-                                    (locals.service.grantTypes.indexOf('authorization_code') !== -1) ? 'checked' : ''%>>
-                                    <label for="authorization_code">authorization_code</label>
-                                </div>
-                                <div class="multiple-choice">
-                                    <input id="implicit" class = "govuk-checkboxes__input" type="checkbox"
-                                    name="grant_types" value="implicit" <%=
-                                    (locals.service.grantTypes.indexOf('implicit') !== -1) ? 'checked' : ''%>>
-                                    <label for="implicit">implicit</label>
-                                </div>
-                                <div class="multiple-choice">
-                                    <input id="client_credentials" class = "govuk-checkboxes__input" type="checkbox"
-                                    name="grant_types" value="client_credentials" <%=
-                                    (locals.service.grantTypes.indexOf('client_credentials') !== -1) ? 'checked' : ''%>>
-                                    <label for="client_credentials">client_credentials</label>
-                                </div>
-                                <div class="multiple-choice">
-                                    <input id="refresh_token" class = "govuk-checkboxes__input" type="checkbox"
-                                    name="grant_types" value="refresh_token" <%=
-                                    (locals.service.grantTypes.indexOf('refresh_token') !== -1) ? 'checked' : ''%>>
-                                    <label for="refresh_token">refresh_token</label>
+                                <div class="govuk-checkboxes">
+
+                                    <div class="multiple-choice govuk-checkboxes__item">
+                                        <input id="authorization_code" class="govuk-checkboxes__input" type="checkbox"
+                                        name="grant_types" value="authorization_code" <%=
+                                        (locals.service.grantTypes.indexOf('authorization_code') !== -1) ? 'checked' : ''%>>
+                                        <label class="govuk-label govuk-checkboxes__label" for="authorization_code">
+                                            authorization_code
+                                        </label>
+                                    </div>
+
+                                    <div class="multiple-choice govuk-checkboxes__item">
+                                        <input id="implicit" class="govuk-checkboxes__input" type="checkbox"
+                                        name="grant_types" value="implicit" <%=
+                                        (locals.service.grantTypes.indexOf('implicit') !== -1) ? 'checked' : ''%>>
+                                        <label class="govuk-label govuk-checkboxes__label" for="implicit">
+                                            implicit
+                                        </label>
+                                    </div>
+                                    <div class="multiple-choice govuk-checkboxes__item">
+                                        <input id="client_credentials" class="govuk-checkboxes__input" type="checkbox"
+                                        name="grant_types" value="client_credentials" <%=
+                                        (locals.service.grantTypes.indexOf('client_credentials') !== -1) ? 'checked' :
+                                        ''%>>
+                                        <label class="govuk-label govuk-checkboxes__label" for="client_credentials">
+                                            client_credentials
+                                        </label>
+                                    </div>
+                                    <div class="multiple-choice govuk-checkboxes__item">
+                                        <input id="refresh_token" class = "govuk-checkboxes__input" type="checkbox"
+                                        name="grant_types" value="refresh_token" <%=
+                                        (locals.service.grantTypes.indexOf('refresh_token') !== -1) ? 'checked' : ''%>>
+                                        <label class="govuk-label govuk-checkboxes__label" for="refresh_token">
+                                            refresh_token
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </dd>
@@ -320,23 +332,28 @@
                         </dt>
                         <dd class="govuk-summary-list__value">
                             <div class="govuk-form-group">
-                                <div class="multiple-choice">
-                                    <input id="code" class = "govuk-checkboxes__input" type="checkbox"
-                                    name="response_types" value="code" <%= (locals.service.responseTypes.indexOf('code')
-                                    !== -1) ? 'checked' : ''%>>
-                                    <label for="code">code</label>
-                                </div>
-                                <div class="multiple-choice">
-                                    <input id="id_token" class = "govuk-checkboxes__input" type="checkbox"
-                                    name="response_types" value="id_token" <%=
-                                    (locals.service.responseTypes.indexOf('id_token') !== -1) ? 'checked' : ''%>>
-                                    <label for="id_token">id_token</label>
-                                </div>
-                                <div class="multiple-choice">
-                                    <input id="token" class = "govuk-checkboxes__input" type="checkbox"
-                                    name="response_types" value="token" <%=
-                                    (locals.service.responseTypes.indexOf('token') !== -1) ? 'checked' : ''%>>
-                                    <label for="token">token</label>
+                                <div class="govuk-checkboxes">
+                                    <div class="multiple-choice govuk-checkboxes__item">
+                                        <input id="code" class ="govuk-checkboxes__input" type="checkbox"
+                                        name="response_types" value="code" <%=
+                                        (locals.service.responseTypes.indexOf('code') !== -1) ? 'checked' : ''%>>
+                                        <label class="govuk-label govuk-checkboxes__label" for="code">code</label>
+                                    </div>
+
+                                    <div class="multiple-choice govuk-checkboxes__item">
+                                        <input id="id_token" class = "govuk-checkboxes__input" type="checkbox"
+                                        name="response_types" value="id_token" <%=
+                                        (locals.service.responseTypes.indexOf('id_token') !== -1) ? 'checked' : ''%>>
+                                        <label class="govuk-label govuk-checkboxes__label" for="id_token">
+                                            id_token
+                                        </label>
+                                    </div>
+                                    <div class="multiple-choice govuk-checkboxes__item">
+                                        <input id="token" class = "govuk-checkboxes__input" type="checkbox"
+                                        name="response_types" value="token" <%=
+                                        (locals.service.responseTypes.indexOf('token') !== -1) ? 'checked' : ''%>>
+                                        <label class="govuk-label govuk-checkboxes__label" for="token">token</label>
+                                    </div>
                                 </div>
                             </div>
                         </dd>
@@ -351,13 +368,13 @@
                                 <label class="form-label govuk-visually-hidden" for="tokenEndpointAuthMethod">
                                     Token endpoint auth method
                                 </label>
-                                <select
+                                 <select
                                     class="govuk-select"
                                     id="tokenEndpointAuthMethod"
                                     name="tokenEndpointAuthMethod">
-                                <option disabled value>Select token endpoint authentication method</option>
-                                <option <%=((locals.service.tokenEndpointAuthMethod && locals.service.tokenEndpointAuthMethod) === 'client_secret_post') ? 'selected="selected"' : ''%> value="client_secret_post">client_secret_post</option>
-                                <option <%=!locals.service.tokenEndpointAuthMethod ? 'selected="selected"' : ''%>value="">none</option>
+                                    <option disabled value>Select token endpoint authentication method</option>
+                                    <option <%=((locals.service.tokenEndpointAuthMethod && locals.service.tokenEndpointAuthMethod) === 'client_secret_post') ? 'selected="selected"' : ''%> value="client_secret_post">client_secret_post</option>
+                                    <option <%=!locals.service.tokenEndpointAuthMethod ? 'selected="selected"' : ''%>value="">none</option>
                                 </select>
                             </div>
                         </dd>
