@@ -1,63 +1,67 @@
-<div class="row">
-    <div class="col-8">
-        <h1 class="heading-xlarge">
-            <span class="heading-secondary"><%=locals.serviceDetails.name%></span>
-            Manage policies
-        </h1>
+<div class="govuk-width-container">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-xl text-break">
+                <span class="govuk-caption-xl"><%=locals.serviceDetails.name%></span>
+                Manage policies
+            </h1>
+        </div>
     </div>
-</div>
 
-<%
-const paginationModel = {
-    method: 'post',
-    csrfToken,
-    currentPage: locals.page,
-    numberOfPages: locals.numberOfPages,
-    totalNumberOfResults: locals.totalNumberOfResults,
-    numberOfResultsOnPage: locals.policies.length,
-    data: [
-        { key: 'criteria', value: locals.criteria },
-        { key: 'sort', value: locals.sortBy },
-        { key: 'sortDir', value: locals.sortOrder },
-        { key: 'showFilters', value: locals.showFilters }
-    ]
-}
-%>
+    <%
+    const paginationModel = {
+        method: 'post',
+        csrfToken,
+        currentPage: locals.page,
+        numberOfPages: locals.numberOfPages,
+        totalNumberOfResults: locals.totalNumberOfResults,
+        numberOfResultsOnPage: locals.policies.length,
+        data: [
+            { key: 'criteria', value: locals.criteria },
+            { key: 'sort', value: locals.sortBy },
+            { key: 'sortDir', value: locals.sortOrder },
+            { key: 'showFilters', value: locals.showFilters }
+        ]
+    }
+    %>
 
-<div class="row">
-    <div class="col-12">
-        <%- include('../../layouts/pagination', paginationModel); %>
-        <table class="data">
-            <thead>
-            <tr class="sortable">
-                <th scope="col" class="cwp-55">
-                    Name</th>
-                <th scope="col" class="cwp-25">
-                    Roles</th>
-                <th scope="col" class="cwp-25">
-                    Conditions</th>
-                <th scope="col" class="cwp-25">
-                    Status</th>
-            </tr>
-            </thead>
-            <tbody>
-            <% if (locals.policies.length === 0) { %>
-                <tr>
-                    <td colspan="5"><span class="empty-state">No policies found for service</span></td>
-                </tr>
-            <% } %>
-            <% for (let i = 0; i < locals.policies.length; i++) {
-                const policy = locals.policies[i]%>
-
-            <tr>
-                <td><a href="policies/<%= policy.id %>/conditions"><%= policy.name %></a></td>
-                <td><%= policy.roles.length %></td>
-                <td><%= policy.conditions.length %></td>
-                <td><%= policy.status.id ===  1 ? 'Active' : 'Inactive'%></td>
-            </tr>
-            <% } %>
-            </tbody>
-        </table>
-        <%- include('../../layouts/pagination', paginationModel); %>
+    <div class="govuk-grid-row govuk-!-margin-top-9">
+        <div class="govuk-grid-column-full">
+            <%- include('../../layouts/pagination', paginationModel); %>
+            <table class="govuk-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row sortable">
+                        <th scope="col" class="govuk-table__header width-55">Name</th>
+                        <th scope="col" class="govuk-table__header width-20">Roles</th>
+                        <th scope="col" class="govuk-table__header width-20">Conditions</th>
+                        <th scope="col" class="govuk-table__header width-5 govuk-table__header--numeric">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    <% if (locals.policies.length === 0) { %>
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell" colspan="4">
+                                <div class="empty-state">
+                                    <p class="govuk-body">No policies found for service</p>
+                                </div>
+                            </td>
+                        </tr>
+                    <% } %>
+                    <% for (let i = 0; i < locals.policies.length; i++) {
+                        const policy = locals.policies[i];
+                    %>
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell">
+                                <a class="govuk-link" href="policies/<%= policy.id %>/conditions"><%= policy.name %></a>
+                            </td>
+                            <td class="govuk-table__cell"><%= policy.roles.length %></td>
+                            <td class="govuk-table__cell"><%= policy.conditions.length %></td>
+                            <td class="govuk-table__cell govuk-table__header--numeric"><%= policy.status.id ===  1 ? 'Active' : 'Inactive'%></td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+            <%- include('../../layouts/pagination', paginationModel); %>
+        </div>
     </div>
 </div>
