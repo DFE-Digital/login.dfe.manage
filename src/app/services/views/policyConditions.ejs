@@ -32,9 +32,9 @@
                                     <td class="govuk-table__cell"><%= condition.field %></td>
                                     <td class="govuk-table__cell"><%= condition.operator %></td>
                                 <% if (condition.value.length === 1) { %>
-                                    <td class="govuk-table__cell govuk-table__header--numeric"><%= condition.value[0] %></td>
+                                    <td class="govuk-table__cell govuk-table__cell--numeric"><%= condition.value[0] %></td>
                                 <% } else { %>
-                                    <td class="govuk-table__cell govuk-table__header--numeric">
+                                    <td class="govuk-table__cell govuk-table__cell--numeric">
                                         <details class="govuk-details" data-module="govuk-details">
                                             <summary class="govuk-details__summary">
                                                 <span class="govuk-details__summary-text">
