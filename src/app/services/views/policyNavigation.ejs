@@ -1,0 +1,31 @@
+<nav>
+    <h2 class="govuk-tabs__title">
+        Contents
+    </h2>
+    <ul class="govuk-tabs__list" role="tablist">
+        <% if(locals.area === 'conditions') { %>
+            <li class="govuk-tabs__list-item govuk-tabs__list-item--selected" id="policy-conditions-tab">
+                Conditions
+            </li>
+        <% } else { %>
+            <li class="govuk-tabs__list-item" id="policy-conditions-tab">
+                <a class="govuk-tabs__tab" href="conditions" role="tab">
+                    Conditions
+                </a>
+            </li>
+        <% } %>
+        <% if(!locals.isInvitation) { %>
+            <% if(locals.area === 'roles') { %>
+                <li class="govuk-tabs__list-item govuk-tabs__list-item--selected" id="policy-roles-tab">
+                    Roles
+                </li>
+            <% } else { %>
+                <li class="govuk-tabs__list-item" id="policy-roles-tab">
+                    <a class="govuk-tabs__tab" href="roles" role="tab">
+                        Roles
+                    </a>
+                </li>
+            <% } %>
+        <% } %>
+    </ul>
+</nav>
