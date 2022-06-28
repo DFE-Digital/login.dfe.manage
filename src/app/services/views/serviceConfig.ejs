@@ -1,293 +1,422 @@
-<% if (locals.flash.info) { %>
-<div class="row">
-    <div class="col-12">
-        <div class="notification notification-success">
-            <%=locals.flash.info%>
+<div class="govuk-width-container">
+    <!-- TODO:update to latest GDS standard - information needed  -->
+    <% if (locals.flash.info) { %>
+    <div class="govuk-grid-row">
+        <div class="col-12">
+            <div class="notification notification-success"><%=locals.flash.info%></div>
         </div>
     </div>
-</div>
-<% } %>
+    <% } %>
 
-<div class="row">
-    <div class="col-8">
-        <h1 class="heading-xlarge">
-            <span class="heading-secondary"><%=locals.service.name%></span>
-            Service configuration
-        </h1>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-xl text-break">
+                <span class="govuk-caption-xl"><%=locals.service.name%></span>
+                Service configuration
+            </h1>
+        </div>
     </div>
-</div>
 
-<div class="row">
-    <div class="col-12">
-        <form method="post" id="form-service-config">
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
-            <dl class="app-check-your-answers app-check-your-answers--short">
-                <div class="app-check-your-answers__contents">
-                    <dt class="app-check-your-answers__title">
-                        Service details
-                    </dt>
-                    <dd class="app-check-your-answers__change ">
-                    </dd>
-                </div>
-                <div class="app-check-your-answers__contents">
-                    <dt class="app-check-your-answers__question">
-                        Service name
-                    </dt>
-                    <dd class="app-check-your-answers__answer">
-                        <div class="form-group <%= (locals.validationMessages.name !== undefined) ? 'form-group-error' : '' %>">
-                            <label for="name" class="vh">Service name</label>
-                            <% if (locals.validationMessages.name !== undefined) { %>
-                            <p class="error-message" id="validation-name"><%=locals.validationMessages.name %></p>
-                            <% } %>
-                            <input class="form-control inputConfig" id="name" name="name" type="text" value="<%=locals.service.name%>">
-                        </div>
-                    </dd>
-                </div>
-
-                <div class="app-check-your-answers__contents">
-                    <dt class="app-check-your-answers__question">
-                        Description
-                        <div>(<a href="<%= locals.urls.help%>/contact-us">Contact us</a> to request a change)</div>
-                    </dt>
-                    <dd class="app-check-your-answers__answer">
-                        <div class="form-group <%= (locals.validationMessages.description !== undefined) ? 'form-group-error' : '' %>">
-                            <label for="description" class="vh">Service description</label>
-                            <% if (locals.validationMessages.description !== undefined) { %>
-                            <p class="error-message" id="validation-name"><%=locals.validationMessages.description %></p>
-                            <% } %>
-                            <textarea disabled class="form-control inputConfig" id="description" name="description" rows = '5' style="resize:none;"><%=locals.service.description%></textarea>
-                        </div>
-                    </dd>
-
-                </div>
-
-                <div class="app-check-your-answers__contents">
-                    <dt class="app-check-your-answers__question">
-                        Home Url
-                    </dt>
-                    <dd class="app-check-your-answers__answer">
-                        <div class="form-group <%= (locals.validationMessages.serviceHome !== undefined) ? 'form-group-error' : '' %>">
-                            <label for="serviceHome" class="vh">Home url</label>
-                            <% if (locals.validationMessages.serviceHome !== undefined) { %>
-                            <p class="error-message" id="validation-homeUrl"><%=locals.validationMessages.serviceHome %></p>
-                            <% } %>
-                            <input class="form-control inputConfig" id="serviceHome" name="serviceHome" type="text" value="<%=locals.service.serviceHome%>">
-                        </div>
-                    </dd>
-                </div>
-
-                <div class="app-check-your-answers__contents">
-                    <dt class="app-check-your-answers__question">
-                        Post-reset Url
-                    </dt>
-                    <dd class="app-check-your-answers__answer">
-                        <div class="form-group <%= (locals.validationMessages.postResetUrl !== undefined) ? 'form-group-error' : '' %>">
-                            <label for="postResetUrl" class="vh">Post-reset Url</label>
-                            <% if (locals.validationMessages.postResetUrl !== undefined) { %>
-                            <p class="error-message" id="validation-homeUrl"><%=locals.validationMessages.postResetUrl %></p>
-                            <% } %>
-                            <input class="form-control inputConfig" id="postResetUrl" name="postResetUrl" type="text" value="<%=locals.service.postResetUrl%>">
-                        </div>
-                    </dd>
-                </div>
-            </dl>
-
-            <dl class="app-check-your-answers app-check-your-answers--short">
-                <div class="app-check-your-answers__contents">
-                    <dt class="app-check-your-answers__title">
-                        OpenID Connect
-                    </dt>
-                    <dd class="app-check-your-answers__change ">
-                    </dd>
-                </div>
-                <div class="app-check-your-answers__contents">
-                    <dt class="app-check-your-answers__question">
-                        Client Id
-                    </dt>
-                    <dd class="app-check-your-answers__answer">
-                        <div class="form-group <%= (locals.validationMessages.clientId !== undefined) ? 'form-group-error' : '' %>">
-                            <label for="clientId" class="vh">Client Id</label>
-                            <% if (locals.validationMessages.clientId !== undefined) { %>
-                            <p class="error-message" id="validation-homeUrl"><%=locals.validationMessages.clientId %></p>
-                            <% } %>
-                            <input class="form-control inputConfig" id="clientId" name="clientId" type="text" value="<%=locals.service.clientId%>">
-                        </div>
-                    </dd>
-                </div>
-
-                <div class="app-check-your-answers__contents">
-                    <dt class="app-check-your-answers__question">
-                        Client secret
-                    </dt>
-                    <dd class="app-check-your-answers__answer">
-                        <div class="form-group <%= (locals.validationMessages.clientSecret !== undefined) ? 'form-group-error' : '' %>">
-                            <label for="clientSecret" class="vh">Client secret</label>
-                            <a href="" class="pull-right" id="generate-client-secret">Regenerate</a>
-                            <% if (locals.validationMessages.clientSecret !== undefined) { %>
-                            <p class="error-message" id="validation-homeUrl"><%=locals.validationMessages.clientSecret %></p>
-                            <% } %>
-                            <div class="show-password full-width" id="secret-input">
-                                <input class="form-control read-only-input" id="clientSecret" name="clientSecret" type="password" value="<%=locals.service.clientSecret%>" readonly="readonly">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <form method="post" class="prevent-form-double-submission" id="form-service-config">
+                <input type="hidden" name="_csrf" value="<%=csrfToken%>" />
+                <dl class="govuk-summary-list">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Service details</dt>
+                        <dd class="govuk-summary-list__value"></dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key govuk-!-font-weight-regular">Service name</dt>
+                        <dd class="govuk-summary-list__value">
+                            <div
+                                class="govuk-form-group <%= (locals.validationMessages.name !== undefined) ? 'govuk-form-group--error' : ''%>">
+                                <label class="govuk-label govuk-visually-hidden" for="name">Service name</label>
+                                <% if (locals.validationMessages.name !== undefined) { %>
+                                <span id="validation-name" class="govuk-error-message">
+                                    <span class="govuk-visually-hidden">Error:</span>
+                                    <%=locals.validationMessages.name %>
+                                </span>
+                                <% } %>
+                                <input
+                                    class="form-control inputConfig govuk-input"
+                                    id="name"
+                                    name="name"
+                                    type="text"
+                                    value="<%=locals.service.name%>" />
                             </div>
-                        </div>
-                    </dd>
+                        </dd>
+                    </div>
 
-                </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                            Description
+                            <p class="govuk-body">
+                                (<a class="govuk-link" href="<%= locals.urls.help%>/contact-us">Contact us</a>
+                                to request a change)
+                            </p>
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            <div
+                                class="govuk-form-group <%= (locals.validationMessages.description !== undefined) ? 'govuk-form-group--error' : ''%>">
+                                <label for="description" class="govuk-label govuk-visually-hidden">
+                                    Service description
+                                </label>
+                                <% if (locals.validationMessages.description !== undefined){ %>
+                                <span id="validation-description" class="govuk-error-message">
+                                    <span class="govuk-visually-hidden">Error:</span>
+                                    <%=locals.validationMessages.description %>
+                                </span>
+                                <% } %>
 
-                <div class="app-check-your-answers__contents">
-                    <dt class="app-check-your-answers__question">
-                        Redirect Urls
-                    </dt>
-                    <dd class="app-check-your-answers__answer">
-                        <div id ="redirect-url" class="form-group <%= (locals.validationMessages.redirect_uris !== undefined) ? 'form-group-error' : '' %>">
-                            <a href="" class="pull-right" id="add-redirect">Add Url</a>
-                            <% if (locals.service.redirectUris.length > 0) { %>
+                                <textarea
+                                    disabled
+                                    class="govuk-textarea form-control inputConfig"
+                                    id="description"
+                                    name="description"
+                                    rows="5"
+                                    style="resize: none">
+<%=locals.service.description%>
+                                </textarea>
+                            </div>
+                        </dd>
+                    </div>
+
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key govuk-!-font-weight-regular">Home Url</dt>
+                        <dd class="govuk-summary-list__value">
+                            <div
+                                class="govuk-form-group <%= (locals.validationMessages.serviceHome !== undefined) ? 'govuk-form-group--error' : ''%>">
+                                <label for="serviceHome" class="govuk-label govuk-visually-hidden">Home url</label>
+                                <% if (locals.validationMessages.serviceHome !== undefined){ %>
+                                <span id="validation-homeUrl" class="govuk-error-message">
+                                    <span class="govuk-visually-hidden">Error:</span>
+                                    <%=locals.validationMessages.serviceHome %>
+                                </span>
+                                <% } %>
+                                <input
+                                    class="form-control inputConfig govuk-input"
+                                    id="serviceHome"
+                                    name="serviceHome"
+                                    type="text"
+                                    value="<%=locals.service.serviceHome%>" />
+                            </div>
+                        </dd>
+                    </div>
+
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key govuk-!-font-weight-regular">Post-reset Url</dt>
+                        <dd class="govuk-summary-list__value">
+                            <div
+                                class="govuk-form-group <%= (locals.validationMessages.postResetUrl !== undefined) ? 'govuk-form-group--error' : ''%>">
+                                <label for="postResetUrl" class="govuk-label govuk-visually-hidden">
+                                    Post-reset Url
+                                </label>
+                                <% if (locals.validationMessages.postResetUrl !== undefined){ %>
+                                <span id="validation-postResetUrl" class="govuk-error-message">
+                                    <span class="govuk-visually-hidden">Error:</span>
+                                    <%=locals.validationMessages.postResetUrl %>
+                                </span>
+                                <% } %>
+
+                                <input
+                                    class="form-control inputConfig govuk-input"
+                                    id="postResetUrl"
+                                    name="postResetUrl"
+                                    type="text"
+                                    value="<%=locals.service.postResetUrl%>" />
+                            </div>
+                        </dd>
+                    </div>
+                </dl>
+
+                <dl class="govuk-summary-list">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">OpenID Connect</dt>
+                        <dd class="govuk-summary-list__value"></dd>
+                    </div>
+
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key govuk-!-font-weight-regular">Client Id</dt>
+                        <dd class="govuk-summary-list__value">
+                            <div
+                                class="govuk-form-group <%= (locals.validationMessages.clientId !== undefined) ? 'govuk-form-group--error' : ''%>">
+                                <label for="clientId" class="govuk-label govuk-visually-hidden">Client Id</label>
+                                <% if (locals.validationMessages.clientId !== undefined){ %>
+                                <span id="validation-clientId" class="govuk-error-message">
+                                    <span class="govuk-visually-hidden">Error:</span>
+                                    <%=locals.validationMessages.clientId %>
+                                </span>
+                                <% } %>
+
+                                <input
+                                    class="form-control inputConfig govuk-input"
+                                    id="clientId"
+                                    name="clientId"
+                                    type="text"
+                                    value="<%=locals.service.clientId%>" />
+                            </div>
+                        </dd>
+                    </div>
+
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key govuk-!-font-weight-regular">Client secret</dt>
+                        <dd class="govuk-summary-list__value">
+                            <div
+                                class="govuk-form-group <%= (locals.validationMessages.clientSecret !== undefined) ? 'govuk-form-group--error' : ''%>">
+                                <label for="clientSecret" class="govuk-label govuk-visually-hidden">
+                                    Client secret
+                                </label>
+                                <a href="" class="govuk-link pull-right" id="generate-client-secret">Regenerate</a>
+                                <% if (locals.validationMessages.clientSecret !== undefined){ %>
+                                <span id="validation-clientSecret" class="govuk-error-message">
+                                    <span class="govuk-visually-hidden">Error:</span>
+                                    <%=locals.validationMessages.clientSecret %>
+                                </span>
+                                <% } %>
+
+                                <div class="show-password full-width" id="secret-input">
+                                    <input
+                                        class="password-input form-control read-only-input govuk-input"
+                                        id="clientSecret"
+                                        name="clientSecret"
+                                        type="password"
+                                        value="<%=locals.service.clientSecret%>"
+                                        readonly="readonly" />
+                                </div>
+                            </div>
+                        </dd>
+                    </div>
+
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key govuk-!-font-weight-regular">Redirect Urls</dt>
+                        <dd class="govuk-summary-list__value">
+                            <div
+                                id="redirect-url"
+                                class="govuk-form-group <%= (locals.validationMessages.redirect_uris !== undefined) ? 'govuk-form-group--error' : '' %>">
+                                <a href="" class="govuk-link pull-right" id="add-redirect">Add Url</a>
+                                <% if (locals.service.redirectUris.length > 0) { %> <% if
+                                (locals.validationMessages.redirect_uris !== undefined) { %>
+                                <span id="validation-redirect_uris" class="govuk-error-message">
+                                    <span class="govuk-visually-hidden">Error:</span>
+                                    <%=locals.validationMessages.redirect_uris %>
+                                </span>
+                                <% } %> <% for (let i=0; i < locals.service.redirectUris.length; i++) { const
+                                redirect_uri = locals.service.redirectUris[i]%>
+                                <label for="<%=redirect_uri%>" class="govuk-label govuk-visually-hidden">
+                                    Redirect url
+                                </label>
+                                <p>
+                                    <input
+                                        class="form-control inputConfig govuk-input"
+                                        id="<%=redirect_uri%>"
+                                        name="redirect_uris"
+                                        value="<%=redirect_uri%>" />
+                                </p>
+                                <% } %> <% } else { %>
+                                <label for="redirect" class="govuk-label govuk-visually-hidden">Redirect url</label>
                                 <% if (locals.validationMessages.redirect_uris !== undefined) { %>
-                                <p class="error-message" id="validation-homeUrl"><%=locals.validationMessages.redirect_uris %></p>
+                                <span id="validation-homeUrl" class="govuk-error-message">
+                                    <span class="govuk-visually-hidden">Error:</span>
+                                    <%=locals.validationMessages.redirect_uris%>
+                                </span>
                                 <% } %>
-                                <% for (let i=0; i < locals.service.redirectUris.length; i++) {
-                                const redirect_uri = locals.service.redirectUris[i]%>
-                                <label for="<%=redirect_uri%>" class="vh">Redirect url</label>
-                                <p><input class="form-control inputConfig" id="<%=redirect_uri%>" name="redirect_uris" value="<%=redirect_uri%>"></p>
+                                <p>
+                                    <input
+                                        class="form-control inputConfig govuk-input"
+                                        id="redirect"
+                                        name="redirect_uris" />
+                                </p>
                                 <% } %>
-                            <% } else { %>
-                            <label for="redirect" class="vh">Redirect url</label>
-                                <% if (locals.validationMessages.redirect_uris !== undefined) { %>
-                                <p class="error-message" id="validation-homeUrl"><%=locals.validationMessages.redirect_uris %></p>
-                                <% } %>
-                            <p><input class="form-control inputConfig" id="redirect" name="redirect_uris"></p>
-                            <% } %>
-                        </div>
-                    </dd>
-                </div>
+                            </div>
+                        </dd>
+                    </div>
 
-                <div class="app-check-your-answers__contents">
-                    <dt class="app-check-your-answers__question">
-                        Logout redirect Urls
-                    </dt>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key govuk-!-font-weight-regular">Logout redirect Urls</dt>
 
-                    <dd class="app-check-your-answers__answer">
-                        <div id ="logout-url" class="form-group <%= (locals.validationMessages.post_logout_redirect_uris !== undefined) ? 'form-group-error' : '' %>">
-
-                            <a href="" class="pull-right" id="add-logout">Add Url</a>
-                            <% if (locals.service.postLogoutRedirectUris.length > 0) { %>
+                        <dd class="govuk-summary-list__value">
+                            <div
+                                id="logout-url"
+                                class="govuk-form-group <%= (locals.validationMessages.post_logout_redirect_uris !== undefined) ? 'govuk-form-group--error' : ''%>">
+                                <a href="" class="govuk-link pull-right" id="add-logout">Add Url</a>
+                                <% if (locals.service.postLogoutRedirectUris.length > 0) { %> <% if
+                                (locals.validationMessages.post_logout_redirect_uris !== undefined){ %>
+                                <span id="validation-homeUrl" class="govuk-error-message">
+                                    <span class="govuk-visually-hidden">Error:</span>
+                                    <%=locals.validationMessages.post_logout_redirect_uris%>
+                                </span>
+                                <% } %> <% for (let i=0; i < locals.service.postLogoutRedirectUris.length; i++) { const
+                                logout_redirect = locals.service.postLogoutRedirectUris[i]%>
+                                <label for="<%=logout_redirect%>" class="govuk-label govuk-visually-hidden">
+                                    Logout redirect Urls
+                                </label>
+                                <p>
+                                    <input
+                                        class="form-control inputConfig govuk-input"
+                                        id="<%=logout_redirect%>"
+                                        name="post_logout_redirect_uris"
+                                        value="<%=logout_redirect%>" />
+                                </p>
+                                <% } %> <% } else { %>
+                                <label for="post_logout_redirect_uris" class="govuk-label govuk-visually-hidden">
+                                    Redirect url
+                                </label>
                                 <% if (locals.validationMessages.post_logout_redirect_uris !== undefined) { %>
-                                <p class="error-message" id="validation-homeUrl"><%=locals.validationMessages.post_logout_redirect_uris %></p>
+                                <span id="validation-homeUrl" class="govuk-error-message">
+                                    <span class="govuk-visually-hidden">Error:</span>
+                                    <%=locals.validationMessages.post_logout_redirect_uris%>
+                                </span>
                                 <% } %>
-                                <% for (let i=0; i < locals.service.postLogoutRedirectUris.length; i++) {
-                                const logout_redirect = locals.service.postLogoutRedirectUris[i]%>
-                                <label for="<%=logout_redirect%>" class="vh">Logout redirect Urls</label>
-                                <p><input class="form-control inputConfig" id="<%=logout_redirect%>" name="post_logout_redirect_uris" value="<%=logout_redirect%>"></p>
+                                <p>
+                                    <input
+                                        class="form-control inputConfig govuk-input"
+                                        id="post_logout_redirect_uris"
+                                        name="post_logout_redirect_uris" />
+                                </p>
                                 <% } %>
-                            <% } else { %>
-                                <label for="post_logout_redirect_uris" class="vh">Redirect url</label>
-                                <% if (locals.validationMessages.post_logout_redirect_uris !== undefined) { %>
-                                <p class="error-message" id="validation-homeUrl"><%=locals.validationMessages.post_logout_redirect_uris %></p>
+                            </div>
+                        </dd>
+                    </div>
+
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                            <p class="check-your-answers-paragraph">Grant types</p>
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            <div class="govuk-form-group">
+                                <div class="govuk-checkboxes">
+
+                                    <div class="multiple-choice govuk-checkboxes__item">
+                                        <input id="authorization_code" class="govuk-checkboxes__input" type="checkbox"
+                                        name="grant_types" value="authorization_code" <%=
+                                        (locals.service.grantTypes.indexOf('authorization_code') !== -1) ? 'checked' : ''%>>
+                                        <label class="govuk-label govuk-checkboxes__label" for="authorization_code">
+                                            authorization_code
+                                        </label>
+                                    </div>
+
+                                    <div class="multiple-choice govuk-checkboxes__item">
+                                        <input id="implicit" class="govuk-checkboxes__input" type="checkbox"
+                                        name="grant_types" value="implicit" <%=
+                                        (locals.service.grantTypes.indexOf('implicit') !== -1) ? 'checked' : ''%>>
+                                        <label class="govuk-label govuk-checkboxes__label" for="implicit">
+                                            implicit
+                                        </label>
+                                    </div>
+                                    <div class="multiple-choice govuk-checkboxes__item">
+                                        <input id="client_credentials" class="govuk-checkboxes__input" type="checkbox"
+                                        name="grant_types" value="client_credentials" <%=
+                                        (locals.service.grantTypes.indexOf('client_credentials') !== -1) ? 'checked' :
+                                        ''%>>
+                                        <label class="govuk-label govuk-checkboxes__label" for="client_credentials">
+                                            client_credentials
+                                        </label>
+                                    </div>
+                                    <div class="multiple-choice govuk-checkboxes__item">
+                                        <input id="refresh_token" class = "govuk-checkboxes__input" type="checkbox"
+                                        name="grant_types" value="refresh_token" <%=
+                                        (locals.service.grantTypes.indexOf('refresh_token') !== -1) ? 'checked' : ''%>>
+                                        <label class="govuk-label govuk-checkboxes__label" for="refresh_token">
+                                            refresh_token
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </dd>
+                    </div>
+
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                            <p class="check-your-answers-paragraph">Response types</p>
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            <div class="govuk-form-group">
+                                <div class="govuk-checkboxes">
+                                    <div class="multiple-choice govuk-checkboxes__item">
+                                        <input id="code" class ="govuk-checkboxes__input" type="checkbox"
+                                        name="response_types" value="code" <%=
+                                        (locals.service.responseTypes.indexOf('code') !== -1) ? 'checked' : ''%>>
+                                        <label class="govuk-label govuk-checkboxes__label" for="code">code</label>
+                                    </div>
+
+                                    <div class="multiple-choice govuk-checkboxes__item">
+                                        <input id="id_token" class = "govuk-checkboxes__input" type="checkbox"
+                                        name="response_types" value="id_token" <%=
+                                        (locals.service.responseTypes.indexOf('id_token') !== -1) ? 'checked' : ''%>>
+                                        <label class="govuk-label govuk-checkboxes__label" for="id_token">
+                                            id_token
+                                        </label>
+                                    </div>
+                                    <div class="multiple-choice govuk-checkboxes__item">
+                                        <input id="token" class = "govuk-checkboxes__input" type="checkbox"
+                                        name="response_types" value="token" <%=
+                                        (locals.service.responseTypes.indexOf('token') !== -1) ? 'checked' : ''%>>
+                                        <label class="govuk-label govuk-checkboxes__label" for="token">token</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </dd>
+                    </div>
+
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
+                            Token endpoint authentication method
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            <div class="govuk-form-group">
+                                <label class="form-label govuk-visually-hidden" for="tokenEndpointAuthMethod">
+                                    Token endpoint auth method
+                                </label>
+                                 <select
+                                    class="govuk-select"
+                                    id="tokenEndpointAuthMethod"
+                                    name="tokenEndpointAuthMethod">
+                                    <option disabled value>Select token endpoint authentication method</option>
+                                    <option <%=((locals.service.tokenEndpointAuthMethod && locals.service.tokenEndpointAuthMethod) === 'client_secret_post') ? 'selected="selected"' : ''%> value="client_secret_post">client_secret_post</option>
+                                    <option <%=!locals.service.tokenEndpointAuthMethod ? 'selected="selected"' : ''%>value="">none</option>
+                                </select>
+                            </div>
+                        </dd>
+                    </div>
+                </dl>
+
+                <dl class="govuk-summary-list">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">API</dt>
+                        <dd class="govuk-summary-list__value"></dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key govuk-!-font-weight-regular">Secret</dt>
+                        <dd class="govuk-summary-list__value">
+                            <div
+                                class="govuk-form-group <%= (locals.validationMessages.apiSecret !== undefined) ? 'govuk-form-group--error' : '' %>">
+                                <label class="form-label vh" for="apiSecret"></label>
+                                <a href="" class="pull-right" id="generate-api-secret">Regenerate</a>
+                                <% if (locals.validationMessages.apiSecret !== undefined) { %>
+                                <p class="error-message" id="validation-homeUrl">
+                                    <%=locals.validationMessages.apiSecret %>
+                                </p>
                                 <% } %>
-                                <p><input class="form-control inputConfig" id="post_logout_redirect_uris" name="post_logout_redirect_uris"></p>
-                            <% } %>
-                        </div>
-                    </dd>
+                                <div class="show-password" id="secret-input">
+                                    <input
+                                        class="form-control read-only-input govuk-input password-input"
+                                        id="apiSecret"
+                                        name="apiSecret"
+                                        type="password"
+                                        value="<%=locals.service.apiSecret%>"
+                                        readonly="readonly" />
+                                </div>
+                            </div>
+                        </dd>
+                    </div>
+                </dl>
+
+                <div class="govuk-button-group auto-scroll-dest">
+                    <button type="submit" class="govuk-button">Save</button>
+                    <a href="<%= locals.backLink %>" class="govuk-button govuk-button--secondary">Cancel</a>
                 </div>
-
-                <div class="app-check-your-answers__contents">
-                    <dt class="app-check-your-answers__question">
-                        <p class="check-your-answers-paragraph">Grant types</p>
-                    </dt>
-                    <dd class="app-check-your-answers__answer">
-                        <div class="form-group">
-                            <div class="multiple-choice">
-                                <input id="authorization_code" type="checkbox" name="grant_types" value="authorization_code" <%= (locals.service.grantTypes.indexOf('authorization_code') !== -1) ? 'checked' : ''%>>
-                                <label for="authorization_code">authorization_code</label>
-                            </div>
-                            <div class="multiple-choice">
-                                <input id="implicit" type="checkbox" name="grant_types" value="implicit" <%= (locals.service.grantTypes.indexOf('implicit') !== -1) ? 'checked' : ''%>>
-                                <label for="implicit">implicit</label>
-                            </div>
-                            <div class="multiple-choice">
-                                <input id="client_credentials" type="checkbox" name="grant_types" value="client_credentials" <%= (locals.service.grantTypes.indexOf('client_credentials') !== -1) ? 'checked' : ''%>>
-                                <label for="client_credentials">client_credentials</label>
-                            </div>
-                            <div class="multiple-choice">
-                                <input id="refresh_token" type="checkbox" name="grant_types" value="refresh_token" <%= (locals.service.grantTypes.indexOf('refresh_token') !== -1) ? 'checked' : ''%>>
-                                <label for="refresh_token">refresh_token</label>
-                            </div>
-                        </div>
-                    </dd>
-                </div>
-
-                <div class="app-check-your-answers__contents">
-                    <dt class="app-check-your-answers__question">
-                        <p class="check-your-answers-paragraph">Response types</p>
-                    </dt>
-                    <dd class="app-check-your-answers__answer">
-                        <div class="form-group">
-                            <div class="multiple-choice">
-                                <input id="code" type="checkbox" name="response_types" value="code" <%= (locals.service.responseTypes.indexOf('code') !== -1) ? 'checked' : ''%>>
-                                <label for="code">code</label>
-                            </div>
-                            <div class="multiple-choice">
-                                <input id="id_token" type="checkbox" name="response_types" value="id_token" <%= (locals.service.responseTypes.indexOf('id_token') !== -1) ? 'checked' : ''%>>
-                                <label for="id_token">id_token</label>
-                            </div>
-                            <div class="multiple-choice">
-                                <input id="token" type="checkbox" name="response_types" value="token" <%= (locals.service.responseTypes.indexOf('token') !== -1) ? 'checked' : ''%>>
-                                <label for="token">token</label>
-                            </div>
-                        </div>
-                    </dd>
-                </div>
-
-                <div class="app-check-your-answers__contents">
-                    <dt class="app-check-your-answers__question">
-                        Token endpoint authentication method
-                    </dt>
-                    <dd class="app-check-your-answers__answer">
-                        <div class="form-group">
-                            <label class="form-label vh" for="tokenEndpointAuthMethod">Token endpoint auth method</label>
-                            <select class="form-control inputConfig" id="tokenEndpointAuthMethod" name="tokenEndpointAuthMethod">
-                                <option disabled value>Select token endpoint authentication method</option>
-                                <option <%= locals.service.tokenEndpointAuthMethod && locals.service.tokenEndpointAuthMethod === 'client_secret_post' ? 'selected="selected"' : ''%> value="client_secret_post">client_secret_post</option>
-                                <option <%= !locals.service.tokenEndpointAuthMethod ? 'selected="selected"' : ''%>value="">none</option>
-                            </select>
-                        </div>
-                    </dd>
-                </div>
-            </dl>
-
-            <dl class="app-check-your-answers app-check-your-answers--short">
-                <div class="app-check-your-answers__contents">
-                    <dt class="app-check-your-answers__title">
-                        API
-                    </dt>
-                    <dd class="app-check-your-answers__change ">
-                    </dd>
-                </div>
-                <div class="app-check-your-answers__contents">
-                    <dt class="app-check-your-answers__question">
-                        Secret
-                    </dt>
-                    <dd class="app-check-your-answers__answer">
-                        <div class="form-group <%= (locals.validationMessages.apiSecret !== undefined) ? 'form-group-error' : '' %>">
-                            <label class="form-label vh" for="apiSecret"></label>
-                            <a href="" class="pull-right" id="generate-api-secret">Regenerate</a>
-                            <% if (locals.validationMessages.apiSecret !== undefined) { %>
-                            <p class="error-message" id="validation-homeUrl"><%=locals.validationMessages.apiSecret %></p>
-                            <% } %>
-                            <div class="show-password full-width" id="secret-input">
-                                <input class="form-control read-only-input" id="apiSecret" name="apiSecret" type="password" value="<%=locals.service.apiSecret%>" readonly="readonly">
-                            </div>
-                        </div>
-                    </dd>
-                </div>
-            </dl>
-
-            <div class="form-submit submit-buttons">
-                <button type="submit" class="button">Save</button>
-                <a href="<%= locals.backLink %>" class="button button-secondary">Cancel</a>
-            </div>
-
-
-        </form>
+            </form>
+        </div>
     </div>
 </div>
