@@ -1,127 +1,141 @@
-<% if (locals.flash.info) { %>
-<div class="row">
-    <div class="col-12">
-        <div class="notification notification-success">
-            <%=locals.flash.info%>
-        </div>
-    </div>
-</div>
-<% } %>
-
-<div class="row">
-    <div class="col-8">
-        <h1 class="heading-xlarge">
-            <span class="heading-secondary"><%=locals.service.name%></span>
-            Users
-        </h1>
-    </div>
-
-</div>
-<%
-const paginationModel = {
-    method: 'post',
-    csrfToken,
-    currentPage: locals.page,
-    numberOfPages: locals.numberOfPages,
-    totalNumberOfResults: locals.totalNumberOfResults,
-    numberOfResultsOnPage: locals.users.length,
-    data: [
-        { key: 'criteria', value: locals.criteria },
-        { key: 'sort', value: locals.sortBy },
-        { key: 'sortDir', value: locals.sortOrder },
-        { key: 'showFilters', value: locals.showFilters }
-    ]
-}
-%>
-
-<div class="row row-spacer">
-    <div class="col-6">
-        <form method="post">
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
-
-            <div class="search-field">
-                <fieldset class="search-input">
-                    <label for="criteria" class="vh">Search by name, email or organisation</label>
-                    <input type="text" id="criteria" name="criteria" value="<%= criteria %>" class="form-control"
-                           placeholder="Search by name, email or organisation">
-                </fieldset>
-                <fieldset class="search-submit">
-                    <button type="submit" class="button">Search</button>
-                </fieldset>
-            </div>
-        </form>
-    </div>
-    <% if (locals.allowInvite) { %>
-    <div class="col-6">
-        <div class="pull-right">
-            <a href="users/new-user" class="button button-secondary">Invite user</a>
+<div class="govuk-width-container">
+    <% if (locals.flash.info) { %>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <div class="notification notification-success"><%=locals.flash.info%></div>
         </div>
     </div>
     <% } %>
 
-</div>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-xl text-break">
+                <span class="govuk-caption-xl"><%=locals.service.name%></span>
+                Users
+            </h1>
+        </div>
+    </div>
 
-<div class="row">
-    <div class="col-12">
-        <%- include('../../layouts/pagination', paginationModel); %>
-        <table class="data">
-            <thead>
-            <%
-            let baseSortUri = `?criteria=${criteria}&page=${page}`;
-            %>
-            <tr class="sortable">
-                <th scope="col" class="cwp-15">
-                    <a href="<%=baseSortUri%>&sort=name&sortdir=<%= sort.name.nextDirection %>"
-                       class="<% if (sort.name.applied) { %>sorted dir-<%= (sort.name.nextDirection === 'desc') ? 'd' : 'a' %> <% } %>"
-                    >Name</a></th>
-                <th scope="col" class="cwp-35">
-                    <a href="<%=baseSortUri%>&sort=email&sortdir=<%= sort.email.nextDirection %>"
-                       class="<% if (sort.email.applied) { %>sorted dir-<%= (sort.email.nextDirection === 'desc') ? 'd' : 'a' %> <% } %>"
-                    >Email</a></th>
-                <th scope="col" class="cwp-25">
-                    <a href="<%=baseSortUri%>&sort=organisation&sortdir=<%= sort.organisation.nextDirection %>"
-                       class="<% if (sort.organisation.applied) { %>sorted dir-<%= (sort.organisation.nextDirection === 'desc') ? 'd' : 'a' %> <% } %>"
-                    >Organisation</a></th>
-                <th scope="col" class="cwp-15">
-                    <a href="<%=baseSortUri%>&sort=lastlogin&sortdir=<%= sort.lastLogin.nextDirection %>"
-                       class="<% if (sort.lastLogin.applied) { %>sorted dir-<%= (sort.lastLogin.nextDirection === 'desc') ? 'd' : 'a' %> <% } %>"
-                    >Last Login</a></th>
-                <th scope="col" class="cwp-10">
-                    <a href="<%=baseSortUri%>&sort=status&sortdir=<%= sort.status.nextDirection %>"
-                       class="<% if (sort.status.applied) { %>sorted dir-<%= (sort.status.nextDirection === 'desc') ? 'd' : 'a' %> <% } %>"
-                    >Status</a></th>
-            </tr>
-            </thead>
-            <tbody>
-            <% if(locals.users.length === 0 && locals.criteria) { %>
-                <tr>
-                    <td colspan="5"><span class="empty-state">No users found</span></td>
-                </tr>
-            <% } %>
-            <% for (let i = 0; i < locals.users.length; i++) { %>
-                <tr>
-                    <td><a href="/services/<%= locals.serviceId %>/users/<%= users[i].id %>/organisations"><%= users[i].name %></a></td>
+    <% const paginationModel = { method: 'post', csrfToken, currentPage: locals.page, numberOfPages:
+    locals.numberOfPages, totalNumberOfResults: locals.totalNumberOfResults, numberOfResultsOnPage: locals.users.length,
+    data: [ { key: 'criteria', value: locals.criteria }, { key: 'sort', value: locals.sortBy }, { key: 'sortDir', value:
+    locals.sortOrder }, { key: 'showFilters', value: locals.showFilters } ] } %>
 
-                    <td><span class="breakable"><%= users[i].email %></span></td>
-                    <td>
-                        <% if(users[i].organisation) { %>
-                            <%= users[i].organisation.name %>
-                        <% }else { %>
-                            Unknown
-                        <% } %>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <form method="post">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+
+                <div class="govuk-grid-row govuk-!-margin-bottom-5">
+                    <div class="govuk-grid-column-two-thirds">
+                        <label for="criteria" class="govuk-visually-hidden">
+                            Search by name, email or organisation
+                        </label>
+                        <input
+                            class="govuk-input"
+                            type="text"
+                            id="criteria"
+                            name="criteria"
+                            value="<%= criteria %>"
+                            class="form-control"
+                            placeholder="Search by name, email or organisation" />
+                    </div>
+
+                    <button type="submit" class="govuk-button">Search</button>
+                </div>
+            </form>
+        </div>
+        <% if (locals.allowInvite) { %>
+
+        <div class="govuk-grid-column-one-quarter">
+            <a href="users/new-user" class="govuk-button govuk-button--secondary pull-right">Invite user</a>
+        </div>
+
+        <% } %>
+    </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <%- include('../../layouts/pagination', paginationModel); %>
+            <table class="govuk-table data">
+                <thead class="govuk-table__head">
+                    <% let baseSortUri = `?criteria=${criteria}&page=${page}`; %>
+                    <tr class="govuk-table__row sortable">
+                        <th scope="col" class="govuk-table__header width-20">
+                            <a
+                                href="<%=baseSortUri%>&sort=name&sortdir=<%= sort.name.nextDirection %>"
+                                class="govuk-link-bold govuk-link--no-underline <% if (sort.name.applied) { %>sorted dir-<%= (sort.name.nextDirection === 'desc') ? 'd' : 'a' %> <% } %>">
+                                Name
+                            </a>
+                        </th>
+                        <th scope="col" class="govuk-table__header width-30">
+                            <a
+                                href="<%=baseSortUri%>&sort=email&sortdir=<%= sort.email.nextDirection %>"
+                                class="govuk-link-bold govuk-link--no-underline <% if (sort.email.applied) { %>sorted dir-<%= (sort.email.nextDirection === 'desc') ? 'd' : 'a' %> <% } %>">
+                                Email
+                            </a>
+                        </th>
+                        <th scope="col" class="govuk-table__header width-25">
+                            <a
+                                href="<%=baseSortUri%>&sort=organisation&sortdir=<%= sort.organisation.nextDirection %>"
+                                class="govuk-link-bold govuk-link--no-underline <% if (sort.organisation.applied) { %>sorted dir-<%= (sort.organisation.nextDirection === 'desc') ? 'd' : 'a' %> <% } %>">
+                                Organisation
+                            </a>
+                        </th>
+                        <th scope="col" class="govuk-table__header width-15">
+                            <a
+                                href="<%=baseSortUri%>&sort=lastlogin&sortdir=<%= sort.lastLogin.nextDirection %>"
+                                class="govuk-link-bold govuk-link--no-underline <% if (sort.lastLogin.applied) { %>sorted dir-<%= (sort.lastLogin.nextDirection === 'desc') ? 'd' : 'a' %> <% } %>">
+                                Last Login
+                            </a>
+                        </th>
+                        <th scope="col" class="govuk-table__header width-10">
+                            <a
+                                href="<%=baseSortUri%>&sort=status&sortdir=<%= sort.status.nextDirection %>"
+                                class="govuk-link-bold govuk-link--no-underline <% if (sort.status.applied) { %>sorted dir-<%= (sort.status.nextDirection === 'desc') ? 'd' : 'a' %> <% } %>">
+                                Status
+                            </a>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    <% if(locals.users.length === 0 && locals.criteria) { %>
+                    <td class="govuk-table__cell" colspan="4">
+                        <div class="empty-state">
+                            <p class="govuk-body">No users found</p>
+                        </div>
                     </td>
-                    <td>
-                        <% if(locals.users[i].lastLogin) { %>
-                            <%= locals.moment(locals.users[i].lastLogin).fromNow() %>
-                        <% } else { %>
-                            Never
-                        <% } %>
-                    </td>
-                    <td><%= users[i].status.description %></td>
-                </tr>
-            <% } %>
-            </tbody>
-        </table>
-        <%- include('../../layouts/pagination', paginationModel); %>
+                    <% } %> <% for (let i = 0; i < locals.users.length; i++) { %>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__cell">
+                            <p class="service-link">
+                                <a
+                                    class="govuk-link-bold govuk-!-font-size-16"
+                                    href="/services/<%= locals.serviceId %>/users/<%= users[i].id %>/organisations">
+                                    <%= users[i].name %>
+                                </a>
+                            </p>
+                        </th>
+
+                        <td class="govuk-table__cell govuk-body govuk-!-font-size-16">
+                            <span class="breakable"><%= users[i].email %></span>
+                        </td>
+                        <td class="govuk-table__cell govuk-body govuk-!-font-size-16">
+                            <% if(users[i].organisation) { %> <%= users[i].organisation.name %> <% }else { %> Unknown <%
+                            } %>
+                        </td>
+                        <td class="govuk-table__cell govuk-body govuk-!-font-size-16">
+                            <% if(locals.users[i].lastLogin) { %> <%= locals.moment(locals.users[i].lastLogin).fromNow()
+                            %> <% } else { %> Never <% } %>
+                        </td>
+                        <td class="govuk-table__cell govuk-body govuk-!-font-size-16">
+                            <%= users[i].status.description %>
+                        </td>
+                    </tr>
+                    <% } %>
+                </tbody>
+            </table>
+            <%- include('../../layouts/pagination', paginationModel); %>
+        </div>
     </div>
 </div>
