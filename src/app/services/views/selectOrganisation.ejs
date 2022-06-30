@@ -1,44 +1,59 @@
-<div class="grid-row">
-    <div class="col-8">
-        <h1 class="heading-xlarge">
-            Select organisation
-        </h1>
-        <p><%= locals.user.firstName + ' ' + locals.user.lastName %> has a DfE Sign-in account and is associated with the following organisations.</p>
+<div class="govuk-width-container">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <h1 class="govuk-heading-xl">Select organisation</h1>
 
-        <form method="post">
-            <input type="hidden" name="_csrf" value="<%=csrfToken%>"/>
-            <div class="form-group <%= (locals.validationMessages.selectedOrganisation !== undefined) ? 'form-group-error' : '' %>">
-                <fieldset>
-                    <% if (locals.validationMessages.selectedOrganisation !== undefined) { %>
-                    <p class="error-message" id="validation-selected-organisation"><%=locals.validationMessages.selectedOrganisation %></p>
-                    <% } %>
-                    <legend>
-                        <span class="body-text">Select an organisation below or <a href="associate-organisation">add a new organisation</a></span>
-                    </legend>
-                    <% for(let i= 0; i < locals.organisations.length; i++) {
-                        const org = locals.organisations[i];
-                    %>
-                    <div class="multiple-choice">
-                        <input id="<%= org.organisation.id %>" type="radio" name="selectedOrganisation" value="<%= org.organisation.id %>">
-                        <label for="<%= org.organisation.id %>">
-                            <span class="form-label-bold">
-                                <%= org.organisation.name %>
-                                <%= org.organisation.status ? `(${org.organisation.status.name})` : ''%>
-                            </span>
-                            <% if (org.naturalIdentifiers) { %>
-                                <span class="form-hint">
-                                <%= org.naturalIdentifiers.join(', ') %>
-                            </span>
-                            <% } %>
-                        </label>
-                    </div>
-                    <% } %>
-                </fieldset>
-            </div>
-            <div class="form-submit submit-buttons">
-                <button class="button">Continue</button>
-                <a href="<%= locals.cancelLink %>" class="button button-secondary">Cancel</a>
-            </div>
-        </form>
+            <p class="govuk-body">
+                <%= locals.user.firstName + ' ' + locals.user.lastName %> has a DfE Sign-in account and is associated
+                with the following organisations.
+            </p>
+
+            <form method="post">
+                <input type="hidden" name="_csrf" value="<%=csrfToken%>" />
+                <div
+                    class="govuk-form-group <%= (locals.validationMessages.selectedOrganisation !== undefined) ? 'govuk-form-group--error' : '' %>">
+                    <fieldset class="govuk-fieldset">
+                        <% if (locals.validationMessages.selectedOrganisation !== undefined) { %>
+                        <span id="validation-selected-organisation" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span>
+                            <%=locals.validationMessages.selectedOrganisation %>
+                        </span>
+                        <% } %>
+                        <legend>
+                            <p class="govuk-body">
+                                Select an organisation below or
+                                <a class="govuk-link" href="associate-organisation">add a new organisation</a>
+                            </p>
+                        </legend>
+                        <div class="govuk-radios">
+                            <% for(let i= 0; i < locals.organisations.length; i++) { const org =
+                            locals.organisations[i]; %> <% if (org.organisation.status) { %>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input <%= locals.organisations.length > 2 ?
+                                'auto-scroll-on-change' : '' %>" id="<%= org.organisation.id %>" type="radio"
+                                name="selectedOrganisation" value="<%= org.organisation.id %>" <%= org.organisation.id
+                                === selectedOrganisation ? 'checked': ''%> >
+                                <label class="govuk-label govuk-radios__label" for="<%= org.organisation.id %>">
+                                    <span class="govuk-label govuk-label--s">
+                                        <%= org.organisation.name %> <%=org.organisation.status ?
+                                        `(${org.organisation.status.name})` : '' %>
+                                    </span>
+                                    <% if (org.naturalIdentifiers) { %>
+                                    <span class="govuk-hint govuk-label__hint">
+                                        <%= org.naturalIdentifiers.join(', ') %>
+                                    </span>
+                                </label>
+                                <% } %>
+                            </div>
+                            <% } %> <% } %>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="govuk-button-group">
+                    <button type="submit" class="govuk-button">Continue</button>
+                    <a href="<%= locals.cancelLink %>" class="govuk-button govuk-button--secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
