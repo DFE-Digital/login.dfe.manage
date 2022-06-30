@@ -21,8 +21,7 @@
 
             <form method="post">
                 <input type="hidden" name="_csrf" value="<%=csrfToken%>" />
-                <div
-                    class="govuk-form-group <%= (locals.validationMessages.roles !== undefined) ? 'govuk-form-group--error' : '' %>">
+                <div class="govuk-form-group <%= (locals.validationMessages.roles !== undefined) ? 'govuk-form-group--error' : '' %>">
                     <fieldset class="govuk-fieldset" id="roles">
                         <% if (locals.validationMessages.roles !== undefined) { %>
                         <span id="validation-selected-role" class="govuk-error-message">
@@ -34,8 +33,8 @@
                             <p class="govuk-body">Select all required roles</p>
                         </legend>
 
-                        <% for (let i = 0; i < locals.serviceRoles.length; i++) { %> <% const role =
-                        locals.serviceRoles[i]; %>
+                        <% for (let i = 0; i < locals.serviceRoles.length; i++) { %> 
+                            <% const role = locals.serviceRoles[i]; %>
                         <div class="govuk-checkboxes__item">
                             <input
                                 class="govuk-checkboxes__input"
@@ -47,12 +46,11 @@
                                 if
                                 (locals.selectedRoles
                                 &&
-                                locals.selectedRoles.length />
-                            0) { for (let i = 0; i < locals.selectedRoles.length; i++) { const selectedRole =
-                            locals.selectedRoles[i]; %> <%= role.id === selectedRole ? 'checked': ''%><% } }%>>
+                                locals.selectedRoles.length > 0) { for (let i = 0; i < locals.selectedRoles.length; i++) { const selectedRole =locals.selectedRoles[i]; %> <%= role.id === selectedRole ? 'checked': ''%><% } }%>>
                             <label class="govuk-label govuk-checkboxes__label" for="<%=role.id%>"><%=role.name%></label>
                         </div>
-                        <% } %> <% } else { %>
+                        <% } %> 
+                        <% } else { %>
                         <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                             <h2 class="govuk-fieldset__legend__heading govuk-heading-s">
                                 There are no available roles for <%= locals.service %>.
