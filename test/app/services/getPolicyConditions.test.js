@@ -21,6 +21,11 @@ describe('when displaying the confirm edit service view', () => {
         sid: 'service1',
         pid: 'policy1',
       },
+      userServices: {
+        roles: [{
+          code: 'serviceid_serviceconfiguration'
+        }]
+      },
     });
 
     getServiceById.mockReset();

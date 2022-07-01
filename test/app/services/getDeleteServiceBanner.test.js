@@ -16,7 +16,11 @@ describe('when getting the delete service banner', () => {
         sid: 'service1',
         bid: 'bannerId',
       },
-
+      userServices: {
+        roles: [{
+          code: 'serviceid_serviceconfiguration'
+        }]
+      },
     });
 
     getBannerById.mockReset();

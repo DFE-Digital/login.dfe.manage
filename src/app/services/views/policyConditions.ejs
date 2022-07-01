@@ -3,12 +3,12 @@
         <%- include('policySummary'); %>
     </div>
     <div class="govuk-grid-row govuk-!-margin-top-9">
-        <div class="govuk-tabs">
+        <div class="govuk-tabs" data-module="govuk-tabs">
             <%- include('policyNavigation', {area: 'conditions'}); %>
 
             <div class="govuk-tabs__panel" id="policy-roles-panel">
                 <h2 class="govuk-heading-l govuk-visually-hidden">Policy Conditions</h2>
-                <table class="data govuk-table">
+                <table class="govuk-table">
                     <thead class="govuk-table__head">
                         <tr class="govuk-table__row sortable">
                             <th scope="col" class="govuk-table__header width-40">Condition</th>
@@ -17,42 +17,42 @@
                         </tr>
                     </thead>
                     <tbody class="govuk-table__body">
-                        <% if (locals.policy.conditions.length === 0) { %>
-                            <tr class="govuk-table__row">
-                                <td class="govuk-table__cell" colspan="3">
-                                    <div class="empty-state">
-                                        <p class="govuk-body"><%= locals.policy.name %> has no conditions</p>
+                    <% if (locals.policy.conditions.length === 0) { %>
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell" colspan="3">
+                                <div class="empty-state">
+                                    <p class="govuk-body"><%= locals.policy.name %> has no conditions</p>
+                                </div>
+                            </td>
+                        </tr>
+                    <% } %>
+                    <% for (let i = 0; i < locals.policy.conditions.length; i++) { %>
+                        <% const condition = locals.policy.conditions[i];%>
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell"><%= condition.field %></td>
+                            <td class="govuk-table__cell"><%= condition.operator %></td>
+                        <% if (condition.value.length === 1) { %>
+                            <td class="govuk-table__cell govuk-table__cell--numeric"><%= condition.value[0] %></td>
+                        <% } else { %>
+                            <td class="govuk-table__cell govuk-table__cell--numeric">
+                                <details class="govuk-details" data-module="govuk-details">
+                                    <summary class="govuk-details__summary">
+                                        <span class="govuk-details__summary-text">
+                                            <%= condition.value.length %> values
+                                        </span>
+                                    </summary>
+                                    <div class="govuk-details__text">
+                                    <% for (let i = 0; i < condition.value.length; i++) {
+                                        const selectedcondition = condition.value[i];
+                                    %>
+                                        <p><%= selectedcondition %></p>
+                                    <% } %>
                                     </div>
-                                </td>
-                            </tr>
-                        <% } %>
-                        <% for (let i = 0; i < locals.policy.conditions.length; i++) { %>
-                            <% const condition = locals.policy.conditions[i];%>
-                            <tr class="govuk-table__row">
-                                    <td class="govuk-table__cell"><%= condition.field %></td>
-                                    <td class="govuk-table__cell"><%= condition.operator %></td>
-                                <% if (condition.value.length === 1) { %>
-                                    <td class="govuk-table__cell govuk-table__cell--numeric"><%= condition.value[0] %></td>
-                                <% } else { %>
-                                    <td class="govuk-table__cell govuk-table__cell--numeric">
-                                        <details class="govuk-details" data-module="govuk-details">
-                                            <summary class="govuk-details__summary">
-                                                <span class="govuk-details__summary-text">
-                                                    <%= condition.value.length %> values
-                                                </span>
-                                            </summary>
-                                            <div class="govuk-details__text">
-                                                <% for (let i = 0; i < condition.value.length; i++) {
-                                                    const selectedcondition = condition.value[i];
-                                                %>
-                                                    <p><%= selectedcondition %></p>
-                                                <% } %>
-                                            </div>
-                                        </details>
-                                    </td>
-                                <% }%>
-                            </tr>
-                        <% } %>
+                                </details>
+                            </td>
+                        <% }%>
+                        </tr>
+                    <% } %>
                     </tbody>
                 </table>
             </div>

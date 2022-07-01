@@ -4,6 +4,13 @@ const moment = require('moment');
 const logger = require('./../../infrastructure/logger');
 
 const get = async (req, res) => {
+  const allUserRoles = req.userServices.roles.map((role) => ({
+    serviceId: role.code.substr(0, role.code.indexOf('_')),
+    role: role.code.substr(role.code.lastIndexOf('_') + 1),
+  }));
+  const userRolesForService = allUserRoles.filter(x => x.serviceId === req.params.sid);
+  const manageRolesForService = userRolesForService.map(x => x.role);
+
   const model = {
     csrfToken: req.csrfToken(),
     backLink: `/services/${req.params.sid}/service-banners`,
@@ -26,6 +33,9 @@ const get = async (req, res) => {
     isEditExisting: false,
     bannerId: req.params.bid,
     validationMessages: {},
+    serviceId: req.params.sid,
+    userRoles: manageRolesForService,
+    currentPage: '',
   };
 
   if (req.params.bid) {
@@ -96,13 +106,13 @@ const validate = async (req) => {
   };
 
   if(!model.name) {
-    model.validationMessages.name = 'Please enter a banner name';
+    model.validationMessages.bannerName = 'Please enter a banner name';
   }
   if(!model.bannerTitle) {
-    model.validationMessages.title = 'Please enter a banner title';
+    model.validationMessages.bannerTitle = 'Please enter a banner title';
   }
   if(!model.message) {
-    model.validationMessages.message = 'Please enter a banner message';
+    model.validationMessages.bannerMesssage = 'Please enter a banner message';
   }
   if(!model.bannerDisplay) {
     model.validationMessages.bannerDisplay = 'Please select when you want the banner to be displayed'
