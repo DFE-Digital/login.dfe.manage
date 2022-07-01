@@ -1,16 +1,18 @@
-<div class="row">
-    <div class="col-12">
-        <h1 class="heading-xlarge">
-            Confirm sync of user
-        </h1>
-        <form method="post" id="form-ws-sync">
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
-            <fieldset>
-                <legend><p>Please confirm you would like to sync <strong><%=user.name%></strong> with all services that receive web services</p></legend>
-            </fieldset>
-            <div class="form-submit submit-buttons">
-                <button type="submit" class="button">Send WS Sync</button>
-            </div>
-        </form>
+<div class="govuk-width-container">
+    <div class="govuk-grid-row">    
+        <div class="govuk-grid-column-full">
+            <h1 class="govuk-heading-xl">
+                Confirm sync of user
+            </h1>
+            <form method="post" id="form-ws-sync">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--xs"><p>Please confirm you would like to sync <strong><%=user.name%></strong> with all services that receive web services</p></legend>
+                </fieldset>
+                <div class="govuk-button-group">
+                    <button type="submit" class="govuk-button">Send WS Sync</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
