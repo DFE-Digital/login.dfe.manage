@@ -123,7 +123,7 @@
                             
                             <% if (locals.currentPage !== undefined) { %>
 
-                                <li class="govuk-header__navigation-item <%= locals.currentPage === '' ? 'govuk-header__navigation-item--active' : '' %>">
+                                <li class="govuk-header__navigation-item <%= locals.currentPage === 'dashboard' ? 'govuk-header__navigation-item--active' : '' %>">
                                     <a id="nav-dashboard" class="govuk-header__link" href="/services/<%=locals.serviceId%>">
                                         Dashboard
                                     </a>

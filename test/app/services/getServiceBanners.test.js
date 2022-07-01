@@ -17,7 +17,12 @@ describe('when getting the list of service banners page', () => {
       },
       query: {
         page: 1
-      }
+      },
+      userServices: {
+        roles: [{
+          code: 'serviceid_serviceconfiguration'
+        }]
+      },
     });
 
     listBannersForService.mockReset();

@@ -4,12 +4,21 @@ const { removeBanner, getBannerById } = require('./../../infrastructure/applicat
 
 const get = async (req, res) => {
   const serviceBanners = await getBannerById(req.params.sid, req.params.bid, req.id);
+  const allUserRoles = req.userServices.roles.map((role) => ({
+    serviceId: role.code.substr(0, role.code.indexOf('_')),
+    role: role.code.substr(role.code.lastIndexOf('_') + 1),
+  }));
+  const userRolesForService = allUserRoles.filter(x => x.serviceId === req.params.sid);
+  const manageRolesForService = userRolesForService.map(x => x.role);
+
   return res.render('services/views/deleteServiceBanner', {
     csrfToken: req.csrfToken(),
     backLink: `/services/${req.params.sid}/service-banners/${req.params.bid}`,
     cancelLink: `/services/${req.params.sid}/service-banners/${req.params.bid}`,
     serviceId: req.params.sid,
     serviceBanners,
+    userRoles: manageRolesForService,
+    currentPage: '',
   });
 };
 

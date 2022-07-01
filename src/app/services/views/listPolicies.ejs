@@ -38,27 +38,27 @@
                     </tr>
                 </thead>
                 <tbody class="govuk-table__body">
-                    <% if (locals.policies.length === 0) { %>
-                        <tr class="govuk-table__row">
-                            <td class="govuk-table__cell" colspan="4">
-                                <div class="empty-state">
-                                    <p class="govuk-body">No policies found for service</p>
-                                </div>
-                            </td>
-                        </tr>
-                    <% } %>
-                    <% for (let i = 0; i < locals.policies.length; i++) {
-                        const policy = locals.policies[i];
-                    %>
-                        <tr class="govuk-table__row">
-                            <td class="govuk-table__cell">
-                                <a class="govuk-link" href="policies/<%= policy.id %>/conditions"><%= policy.name %></a>
-                            </td>
-                            <td class="govuk-table__cell"><%= policy.roles.length %></td>
-                            <td class="govuk-table__cell"><%= policy.conditions.length %></td>
-                            <td class="govuk-table__cell govuk-table__header--numeric"><%= policy.status.id ===  1 ? 'Active' : 'Inactive'%></td>
-                        </tr>
-                    <% } %>
+                <% if (locals.policies.length === 0) { %>
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell" colspan="4">
+                            <div class="empty-state">
+                                <p class="govuk-body">No policies found for service</p>
+                            </div>
+                        </td>
+                    </tr>
+                <% } %>
+                <% for (let i = 0; i < locals.policies.length; i++) {
+                    const policy = locals.policies[i];
+                %>
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell">
+                            <a class="govuk-link" href="policies/<%= policy.id %>/conditions"><%= policy.name %></a>
+                        </td>
+                        <td class="govuk-table__cell"><%= policy.roles.length %></td>
+                        <td class="govuk-table__cell"><%= policy.conditions.length %></td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric"><%= policy.status.id ===  1 ? 'Active' : 'Inactive'%></td>
+                    </tr>
+                <% } %>
                 </tbody>
             </table>
             <%- include('../../layouts/pagination', paginationModel); %>
