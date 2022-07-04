@@ -1,15 +1,12 @@
 'use strict';
-const { getBannerById, upsertBanner, listAllBannersForService } = require('./../../infrastructure/applications');
+
 const moment = require('moment');
-const logger = require('./../../infrastructure/logger');
+const { getBannerById, upsertBanner, listAllBannersForService } = require('../../infrastructure/applications');
+const logger = require('../../infrastructure/logger');
+const { getUserServiceRoles } = require('../../utils/getUserServiceRoles');
 
 const get = async (req, res) => {
-  const allUserRoles = req.userServices.roles.map((role) => ({
-    serviceId: role.code.substr(0, role.code.indexOf('_')),
-    role: role.code.substr(role.code.lastIndexOf('_') + 1),
-  }));
-  const userRolesForService = allUserRoles.filter(x => x.serviceId === req.params.sid);
-  const manageRolesForService = userRolesForService.map(x => x.role);
+  const manageRolesForService = await getUserServiceRoles(req);
 
   const model = {
     csrfToken: req.csrfToken(),
@@ -52,18 +49,18 @@ const get = async (req, res) => {
       } else if (existingBanner.validFrom && existingBanner.validTo) {
         model.bannerDisplay = 'date';
         // get existing dates if editing
-        const validFrom = existingBanner.validFrom;
-        const validTo = existingBanner.validTo;
-        model.fromYear = validFrom.substr(0,4);
-        model.fromMonth = validFrom.substr(5,2);
-        model.fromDay = validFrom.substr(8,2);
-        model.fromHour = validFrom.substr(11,2);
-        model.fromMinute = validFrom.substr(14,2);
-        model.toYear = validTo.substr(0,4);
-        model.toMonth = validTo.substr(5,2);
-        model.toDay = validTo.substr(8,2);
-        model.toHour = validTo.substr(11,2);
-        model.toMinute = validTo.substr(14,2);
+        const { validFrom } = existingBanner;
+        const { validTo } = existingBanner;
+        model.fromYear = validFrom.substr(0, 4);
+        model.fromMonth = validFrom.substr(5, 2);
+        model.fromDay = validFrom.substr(8, 2);
+        model.fromHour = validFrom.substr(11, 2);
+        model.fromMinute = validFrom.substr(14, 2);
+        model.toYear = validTo.substr(0, 4);
+        model.toMonth = validTo.substr(5, 2);
+        model.toDay = validTo.substr(8, 2);
+        model.toHour = validTo.substr(11, 2);
+        model.toMinute = validTo.substr(14, 2);
       } else {
         model.bannerDisplay = 'notActive';
       }
@@ -76,10 +73,10 @@ const validate = async (req) => {
   let fromDate;
   let toDate;
   if (req.body.bannerDisplay === 'date' && req.body.fromYear && req.body.fromMonth && req.body.fromDay && req.body.fromHour && req.body.fromMinute) {
-    fromDate = `${req.body.fromYear}-${req.body.fromMonth}-${req.body.fromDay} ${req.body.fromHour}:${req.body.fromMinute}`
+    fromDate = `${req.body.fromYear}-${req.body.fromMonth}-${req.body.fromDay} ${req.body.fromHour}:${req.body.fromMinute}`;
   }
   if (req.body.bannerDisplay === 'date' && req.body.toYear && req.body.toMonth && req.body.toDay && req.body.toHour && req.body.toMinute) {
-    toDate = `${req.body.toYear}-${req.body.toMonth}-${req.body.toDay} ${req.body.toHour}:${req.body.toMinute}`
+    toDate = `${req.body.toYear}-${req.body.toMonth}-${req.body.toDay} ${req.body.toHour}:${req.body.toMinute}`;
   }
   const model = {
     name: req.body.bannerName || '',
@@ -105,17 +102,17 @@ const validate = async (req) => {
     cancelLink: `/services/${req.params.sid}/service-banners`,
   };
 
-  if(!model.name) {
+  if (!model.name) {
     model.validationMessages.bannerName = 'Please enter a banner name';
   }
-  if(!model.bannerTitle) {
+  if (!model.bannerTitle) {
     model.validationMessages.bannerTitle = 'Please enter a banner title';
   }
-  if(!model.message) {
+  if (!model.message) {
     model.validationMessages.bannerMesssage = 'Please enter a banner message';
   }
-  if(!model.bannerDisplay) {
-    model.validationMessages.bannerDisplay = 'Please select when you want the banner to be displayed'
+  if (!model.bannerDisplay) {
+    model.validationMessages.bannerDisplay = 'Please select when you want the banner to be displayed';
   }
   if (model.bannerDisplay === 'date') {
     let validToDate = true;
@@ -123,50 +120,46 @@ const validate = async (req) => {
 
     if (!model.fromDate) {
       validFromDate = false;
-      model.validationMessages.fromDate = 'Please enter a from date'
+      model.validationMessages.fromDate = 'Please enter a from date';
+    } else if (!moment(new Date(model.fromDate)).isValid()) {
+      validFromDate = false;
+      model.validationMessages.fromDate = 'From date must be a valid date. For example, 31 03 1980 14:30';
     } else {
-      if (!moment(new Date(model.fromDate)).isValid()) {
+      const allCurrentServiceBanners = await listAllBannersForService(req.params.sid, req.id);
+      const isInRange = allCurrentServiceBanners.find((x) => moment(fromDate).isBetween(x.validFrom, x.validTo) === true && x.id !== req.params.bid);
+      if (isInRange) {
+        // TODO: link to the banner that exists
         validFromDate = false;
-        model.validationMessages.fromDate = 'From date must be a valid date. For example, 31 03 1980 14:30'
-      } else {
-        const allCurrentServiceBanners = await listAllBannersForService(req.params.sid, req.id);
-        const isInRange = allCurrentServiceBanners.find(x => moment(fromDate).isBetween(x.validFrom, x.validTo) === true && x.id !== req.params.bid);
-        if (isInRange) {
-          //TODO: link to the banner that exists
-          validFromDate = false;
-          model.validationMessages.fromDate = `Another banner exists between ${moment(isInRange.validFrom).format('DD MM YYYY HH:MM')} and ${moment(isInRange.validTo).format('DD MM YYYY HH:MM')}`
-        }
+        model.validationMessages.fromDate = `Another banner exists between ${moment(isInRange.validFrom).format('DD MM YYYY HH:MM')} and ${moment(isInRange.validTo).format('DD MM YYYY HH:MM')}`;
       }
     }
     if (!model.toDate) {
       validToDate = false;
-      model.validationMessages.toDate = 'Please enter a to date'
+      model.validationMessages.toDate = 'Please enter a to date';
+    } else if (!moment(new Date(model.toDate)).isValid()) {
+      validToDate = false;
+      model.validationMessages.toDate = 'To date must be a valid date. For example, 31 03 1980 14:30';
     } else {
-      if (!moment( new Date (model.toDate)).isValid()) {
+      const allCurrentServiceBanners = await listAllBannersForService(req.params.sid, req.id);
+      const isInRange = allCurrentServiceBanners.find((x) => moment(toDate).isBetween(x.validFrom, x.validTo) === true && x.id !== req.params.bid);
+      if (isInRange) {
+        // TODO: link to the banner that exists
         validToDate = false;
-        model.validationMessages.toDate = 'To date must be a valid date. For example, 31 03 1980 14:30'
-      } else {
-        const allCurrentServiceBanners = await listAllBannersForService(req.params.sid, req.id);
-        const isInRange = allCurrentServiceBanners.find(x => moment(toDate).isBetween(x.validFrom, x.validTo) === true && x.id !== req.params.bid);
-        if (isInRange) {
-          //TODO: link to the banner that exists
-          validToDate = false;
-          model.validationMessages.toDate = `Another banner exists between ${moment(isInRange.validFrom).format('DD MM YYYY HH:MM')} and ${moment(isInRange.validTo).format('DD MM YYYY HH:MM')}`
-        }
+        model.validationMessages.toDate = `Another banner exists between ${moment(isInRange.validFrom).format('DD MM YYYY HH:MM')} and ${moment(isInRange.validTo).format('DD MM YYYY HH:MM')}`;
       }
     }
 
     if (validToDate && validFromDate && !(moment(toDate).isAfter(fromDate))) {
-      model.validationMessages.toDate = 'To date must be after from date'
+      model.validationMessages.toDate = 'To date must be after from date';
     }
   }
 
   if (model.bannerDisplay === 'isActive') {
-    //TODO: link to the existing banner that is always display
+    // TODO: link to the existing banner that is always display
     const allCurrentServiceBanners = await listAllBannersForService(req.params.sid, req.id);
-    const isAlwaysOnBanner = allCurrentServiceBanners.find(x => x.isActive === true && x.id !== req.params.bid);
+    const isAlwaysOnBanner = allCurrentServiceBanners.find((x) => x.isActive === true && x.id !== req.params.bid);
     if (isAlwaysOnBanner) {
-      model.validationMessages.bannerDisplay = 'A banner is already set to always display'
+      model.validationMessages.bannerDisplay = 'A banner is already set to always display';
     } else {
       model.isActive = true;
     }
@@ -178,7 +171,7 @@ const validate = async (req) => {
 const post = async (req, res) => {
   const model = await validate(req);
 
-  if(Object.keys(model.validationMessages).length > 0) {
+  if (Object.keys(model.validationMessages).length > 0) {
     model.csrfToken = req.csrfToken();
     return res.render('services/views/newServiceBanner', model);
   }

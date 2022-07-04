@@ -10,7 +10,7 @@ const mapRole = (roleId) => {
 
 const render = async (req, res, dataSource) => {
   const organisation = await getOrganisationByIdV2(req.params.oid, req.id);
-  let pageNumber = dataSource.page ? parseInt(dataSource.page) : 1;
+  let pageNumber = dataSource.page ? parseInt(dataSource.page, 10) : 1;
   if (isNaN(pageNumber)) {
     pageNumber = 1;
   }
