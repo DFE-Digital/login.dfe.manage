@@ -1,12 +1,8 @@
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-        <h1 class="govuk-heading-xl text-break">
-            <span class="govuk-caption-xl"><%= locals.service.name %></span>
-            <%= locals.policy.name %>
-        </h1>
-        <dl class="inline">
-            <dt class="govuk-label">Status:</dt>
-            <dd class="govuk-label"><%= locals.policy.status && locals.policy.status.id === 1 ? 'Active' : 'Inactive' %></dd>
-        </dl>
-    </div>
-</div>
+<h1 class="govuk-heading-xl text-break">
+    <span class="govuk-caption-xl"><%= locals.service.name %></span>
+    <%= locals.policy.name %>
+</h1>
+<dl class="inline">
+    <dt class="govuk-label">Status:</dt>
+    <dd class="govuk-label"><%= locals.policy.status && locals.policy.status.id === 1 ? 'Active' : 'Inactive' %></dd>
+</dl>
