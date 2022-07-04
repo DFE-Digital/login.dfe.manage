@@ -29,6 +29,11 @@ describe('when searching for organisations', () => {
     it(`then it should send page of organisations (${method} / ${dataLocation})`, async () => {
       const req = getRequestMock({
         method,
+        userServices: {
+          roles: [{
+            code: 'serviceid_serviceconfiguration'
+          }]
+        },
       });
       req[dataLocation] = {
         criteria: 'org1',
@@ -44,6 +49,11 @@ describe('when searching for organisations', () => {
     it(`then it should search orgs with criteria specified (${method} / ${dataLocation})`, async () => {
       const req = getRequestMock({
         method,
+        userServices: {
+          roles: [{
+            code: 'serviceid_serviceconfiguration'
+          }]
+        },
       });
       req[dataLocation] = {
         criteria: 'org1',
@@ -59,6 +69,11 @@ describe('when searching for organisations', () => {
     it(`then it should search orgs with no criteria if none specified (${method} / ${dataLocation})`, async () => {
       const req = getRequestMock({
         method,
+        userServices: {
+          roles: [{
+            code: 'serviceid_serviceconfiguration'
+          }]
+        },
       });
       req[dataLocation] = {
         criteria: undefined,
@@ -74,6 +89,11 @@ describe('when searching for organisations', () => {
     it(`then it should request page 1 if no page specified (${method} / ${dataLocation})`, async () => {
       const req = getRequestMock({
         method,
+        userServices: {
+          roles: [{
+            code: 'serviceid_serviceconfiguration'
+          }]
+        },
       });
       req[dataLocation] = {
         criteria: 'org1',
