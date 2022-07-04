@@ -1,64 +1,73 @@
 <% if (locals.flash.info) { %>
-    <div class="row">
-        <div class="col-12">
-            <div class="notification notification-success">
-                <%= locals.flash.info %>
-            </div>
-        </div>
+<div class="row">
+    <div class="col-12">
+        <div class="notification notification-success"><%= locals.flash.info %></div>
     </div>
+</div>
 <% } %>
 
-<div class="row">
-    <div class="col-8">
-        <h1 class="heading-xlarge">
-            <span class="heading-secondary"><%= user.email %></span>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+        <h1 class="govuk-heading-xl text-break">
+            <span class="govuk-caption-xl"><%= user.email %></span>
             <%= user.name %>
         </h1>
-        <dl class="inline condensed">
-            <dt class="label">Last login:</dt>
-            <dd><%= locals.user.lastLogin ? locals.moment(locals.user.lastLogin).format('DD MMM YYYY, HH:mm:ss') : 'Never' %></dd>
-            <dt class="label">Account status:</dt>
-            <dd><%= user.status.description %></dd>
-            <dt class="label">Number of logins in last 12 months:</dt>
-            <dd><%= user.loginsInPast12Months.successful %></dd>
+        <dl class="inline">
+            <dt class="govuk-label">Last login:</dt>
+            <dd class="govuk-label">
+                <%= locals.user.lastLogin ? locals.moment(locals.user.lastLogin).format('DD MMM YYYY, HH:mm:ss') :
+                'Never' %>
+            </dd>
+            <dt class="govuk-label">Account status:</dt>
+            <dd class="govuk-label"><%= user.status.description %></dd>
+            <dt class="govuk-label">Number of logins in last 12 months:</dt>
+            <dd class="govuk-label"><%= user.loginsInPast12Months.successful %></dd>
         </dl>
     </div>
 
-    <div class="col-4">
-        <% if(!locals.isInvitation) { %>
-            <aside>
-                <h2 class="heading-medium">Actions</h2>
-                <ul class="list">
-                    <li><a href="web-service-sync">Send WS Sync</a></li>
-                </ul>
-            </aside>
-        <% } else if (locals.isInvitation && !locals.user.deactivated) { %>
-            <aside>
-                <h2 class="heading-medium">Actions</h2>
-                <ul class="list">
-                    <li><a href="resend-invitation">Resend invitation email</a></li>
-                </ul>
-            </aside>
-        <% } %>
+    <div class="govuk-grid-column-one-quarter">
+        <aside id="actions" class="govuk-!-margin-top-9">
+            <h2 class="govuk-heading-m">Actions</h2>
+            <ul class="govuk-list">
+                <li>
+                    <% if(!locals.isInvitation) { %>
+                    <h3 class="govuk-heading-s">
+                        <a id="change-service" class="govuk-link-bold" href="web-service-sync">Send WS Sync</a>
+                    </h3>
+                    <% } else if (locals.isInvitation && !locals.user.deactivated) { %>
+                    <h3 class="govuk-heading-s">
+                        <a id="change-service" class="govuk-link-bold" href="resend-invitation">
+                            Resend invitation email
+                        </a>
+                    </h3>
+                    <% } %>
+                </li>
+            </ul>
+        </aside>
     </div>
 </div>
 
-<nav>
-    <ul class="tabs" role="tablist">
-
-        <% if(locals.area === 'organisations') { %>
-            <li class="active">Organisations</li>
-        <% } else { %>
-            <li><a href="organisations" role="tab">Organisations</a></li>
-        <% } %>
-
-        <% if(!locals.isInvitation && locals.isAudit) { %>
-            <% if(locals.area === 'audit') { %>
-                <li class="active">Audit</li>
-            <% } else { %>
-                <li><a href="audit" role="tab">Audit</a></li>
-            <% } %>
-        <% } %>
-
-    </ul>
-</nav>
+<div class="govuk-grid-row govuk-!-margin-top-9">
+    <div class="govuk-tabs">
+        <nav>
+            <h2 class="govuk-tabs__title govuk-visually-hidden">Contents</h2>
+            <ul class="govuk-tabs__list" role="tablist">
+                <% if(locals.area === 'organisations') { %>
+                <li class="govuk-tabs__list-item govuk-tabs__list-item--selected" id="organisations-tab">
+                    Organisations
+                </li>
+                <% } else { %>
+                <li class="govuk-tabs__list-item" id="organisations-tab">
+                    <a class="govuk-tabs__tab" href="organisations" role="tab">Organisations</a>
+                </li>
+                <% } %> <% if(!locals.isInvitation && locals.isAudit) { %> <% if(locals.area === 'audit') { %>
+                <li class="govuk-tabs__list-item govuk-tabs__list-item--selected" id="audit-tab">Audit</li>
+                <% } else { %>
+                <li class="govuk-tabs__list-item" id="audit-tab">
+                    <a class="govuk-tabs__tab" href="audit" role="tab">Audit</a>
+                </li>
+                <% } %> <% } %>
+            </ul>
+        </nav>
+    </div>
+</div>

@@ -1,33 +1,33 @@
-<div class="row">
-    <div class="col-8">
-        <h1 class="heading-xlarge">
+<div class="govuk-width-container">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <h1 class="govuk-heading-xl">
             Edit service
-        </h1>
-        <dl class="app-check-your-answers app-check-your-answers--short">
-
-            <div class="app-check-your-answers__contents">
-                <dt class="app-check-your-answers__title">
+            </h1>
+        <dl class="govuk-summary-list">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
                     User
                 </dt>
-                <dd class="app-check-your-answers__answer">
+                <dd class="govuk-summary-list__value">
                     <%= locals.user.firstName %> <%= locals.user.lastName %>
                 </dd>
             </div>
 
-            <div class="app-check-your-answers__contents">
-                <dt class="app-check-your-answers__title">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
                     Organisation
                 </dt>
-                <dd class="app-check-your-answers__answer">
+                <dd class="govuk-summary-list__value">
                     <%=locals.organisation.name%>
                 </dd>
             </div>
 
-            <div class="app-check-your-answers__contents">
-                <dt class="app-check-your-answers__title">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
                     Service
                 </dt>
-                <dd class="app-check-your-answers__answer">
+                <dd class="govuk-summary-list__value">
                     <%= locals.service.name%>
                 </dd>
             </div>
@@ -35,42 +35,54 @@
         <% if (locals.serviceRoles.length > 0) { %>
         <form method="post">
             <input type="hidden" name="_csrf" value="<%=csrfToken%>" />
-            <div class="form-group  <%= (locals.validationMessages.roles !== undefined) ? 'form-group-error' : '' %>">
-                <fieldset>
+            <div class="govuk-form-group <%= (locals.validationMessages.roles !== undefined) ? 'govuk-form-group--error' : '' %>">
+                <fieldset class="govuk-fieldset" id="roles">
                     <% if (locals.validationMessages.roles !== undefined) { %>
-                    <p class="error-message" id="validation-selected-role"><%=locals.validationMessages.roles%></p>
-                    <% } %>
-                        <legend>
-                            <span class="body-text">Select all required roles</span>
-                        </legend>
+                        <span id="validation-selected-role" class="govuk-error-message">
+                        <span class="govuk-visually-hidden">Error:</span>
+                        <%=locals.validationMessages.roles%>
+                            </span>
+                            <% } %> <% if (locals.serviceRoles.length > 0) { %>
+                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--xs">
+                                <p class="govuk-body">Select all required roles</p>
+                            </legend>
+                      <% } %> 
+                        
                         <% for (let i = 0; i < locals.serviceRoles.length; i++) { %>
                             <% const role = locals.serviceRoles[i]; %>
-                            <div class="multiple-choice">
-                                <input id="<%=role.id%>" type="checkbox" name="role" value="<%=role.id%>"
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" id="<%=role.id%>" type="checkbox" name="role" value="<%=role.id%>"
                                         <% if (locals.service.roles.length > 0) {
                                         for (let i = 0; i < locals.service.roles.length; i++) {
                                             const existingRole = locals.service.roles[i];
                                         %>
                                         <%= role.id === existingRole.id ? "checked" : ""%><% } }%>>
-                                <label for="<%=role.id%>"><%=role.name%></label>
+                                <label class="govuk-label govuk-checkboxes__label" for="<%=role.id%>"><%=role.name%></label>
                             </div>
                         <% } %>
                 </fieldset>
             </div>
-            <div class="form-submit submit-buttons">
-                <button type="submit" class="button">Save</button>
-                <a href="<%= locals.cancelLink %>" class="button button-secondary">Cancel</a>
+
+            <div class="govuk-button-group">
+                <button type="submit" class="govuk-button">Save</button>
+                <a href="<%= locals.cancelLink %>" class="govuk-button govuk-button--secondary">Cancel</a>
             </div>
+
         </form>
         <% } else { %>
-            <legend><h2 class="heading-small">There are no available roles for <%= locals.service.name %>.</h2></legend>
+            <legend class="govuk-fieldset__legend"><h2 class="heading-small">There are no available roles for <%= locals.service.name %>.</h2></legend>
         <% } %>
     </div>
-    <div class="col-4">
-        <aside>
-            <h2 class="heading-medium">Actions</h2>
-            <ul class="list">
-                <li><a href="<%= locals.organisation.id %>/remove-service">Remove service</a> </li>
+
+    <div class="govuk-grid-column-one-quarter ">
+        <aside id="actions" class="govuk-!-margin-top-9">
+            <h2 class="govuk-heading-m">Actions</h2>
+            <ul class="govuk-list">
+                <li>
+                    <h3 class="govuk-heading-s">
+                        <a class="govuk-link-bold" href="<%= locals.organisation.id %>/remove-service">Remove service</a>
+                   </h3>
+                </li>
             </ul>
         </aside>
     </div>
