@@ -10,6 +10,12 @@ const mapRole = (roleId) => {
 
 const render = async (req, res, dataSource) => {
   const organisation = await getOrganisationByIdV2(req.params.oid, req.id);
+  const allUserRoles = req.userServices.roles.map((role) => ({
+    serviceId: role.code.substr(0, role.code.indexOf('_')),
+    role: role.code.substr(role.code.lastIndexOf('_') + 1),
+  }));
+  const userRolesForService = allUserRoles.filter(x => x.serviceId === req.params.sid);
+  const manageRolesForService = userRolesForService.map(x => x.role);
   let pageNumber = dataSource.page ? parseInt(dataSource.page) : 1;
   if (isNaN(pageNumber)) {
     pageNumber = 1;
@@ -35,6 +41,8 @@ const render = async (req, res, dataSource) => {
     page: pageNumber,
     numberOfPages: results.numberOfPages,
     totalNumberOfResults: results.totalNumberOfResults,
+    userRoles: manageRolesForService,
+    currentPage: '',
   })
 };
 
