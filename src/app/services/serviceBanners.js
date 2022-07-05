@@ -1,20 +1,17 @@
 'use strict';
-const { listBannersForService, getServiceById } = require('./../../infrastructure/applications');
+
+const { listBannersForService, getServiceById } = require('../../infrastructure/applications');
+const { getUserServiceRoles } = require('./utils');
 
 const get = async (req, res) => {
   const paramsSource = req.method === 'POST' ? req.body : req.query;
-  let page = paramsSource.page ? parseInt(paramsSource.page) : 1;
+  let page = paramsSource.page ? parseInt(paramsSource.page, 10) : 1;
   if (isNaN(page)) {
     page = 1;
   }
-  const serviceBanners = await listBannersForService(req.params.sid,10, page, req.id);
+  const serviceBanners = await listBannersForService(req.params.sid, 10, page, req.id);
   const serviceDetails = await getServiceById(req.params.sid, req.id);
-  const allUserRoles = req.userServices.roles.map((role) => ({
-    serviceId: role.code.substr(0, role.code.indexOf('_')),
-    role: role.code.substr(role.code.lastIndexOf('_') + 1),
-  }));
-  const userRolesForService = allUserRoles.filter(x => x.serviceId === req.params.sid);
-  const manageRolesForService = userRolesForService.map(x => x.role);
+  const manageRolesForService = await getUserServiceRoles(req);
 
   return res.render('services/views/serviceBanners', {
     csrfToken: req.csrfToken(),
@@ -36,7 +33,7 @@ const post = async (req, res) => {
   if (isNaN(page)) {
     page = 1;
   }
-  const serviceBanners = await listBannersForService(req.params.sid,10, page, req.id);
+  const serviceBanners = await listBannersForService(req.params.sid, 10, page, req.id);
   const serviceDetails = await getServiceById(req.params.sid, req.id);
 
   return res.render('services/views/serviceBanners', {

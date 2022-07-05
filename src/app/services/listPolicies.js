@@ -1,5 +1,6 @@
-const { getServiceById } = require('./../../infrastructure/applications');
-const { getPageOfPoliciesForService } = require('./../../infrastructure/access');
+const { getServiceById } = require('../../infrastructure/applications');
+const { getPageOfPoliciesForService } = require('../../infrastructure/access');
+const { getUserServiceRoles } = require('./utils');
 
 const viewModel = async (req) => {
   const paramsSource = req.method === 'POST' ? req.body : req.query;
@@ -10,12 +11,7 @@ const viewModel = async (req) => {
 
   const serviceDetails = await getServiceById(req.params.sid, req.id);
   const servicePolicies = await getPageOfPoliciesForService(req.params.sid, page, 25, req.id);
-  const allUserRoles = req.userServices.roles.map((role) => ({
-    serviceId: role.code.substr(0, role.code.indexOf('_')),
-    role: role.code.substr(role.code.lastIndexOf('_') + 1),
-  }));
-  const userRolesForService = allUserRoles.filter(x => x.serviceId === req.params.sid);
-  const manageRolesForService = userRolesForService.map(x => x.role);
+  const manageRolesForService = await getUserServiceRoles(req);
 
   return {
     csrfToken: req.csrfToken(),
@@ -28,7 +24,7 @@ const viewModel = async (req) => {
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
     currentPage: 'policies',
-  }
+  };
 };
 
 const get = async (req, res) => {

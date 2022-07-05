@@ -1,14 +1,11 @@
 'use strict';
-const { getServiceById } = require('./../../infrastructure/applications');
-const getDashboard = async (req, res) => {
 
+const { getServiceById } = require('../../infrastructure/applications');
+const { getUserServiceRoles } = require('./utils');
+
+const getDashboard = async (req, res) => {
   const serviceDetails = await getServiceById(req.params.sid, req.id);
-  const allUserRoles = req.userServices.roles.map((role) => ({
-    serviceId: role.code.substr(0, role.code.indexOf('_')),
-    role: role.code.substr(role.code.lastIndexOf('_') + 1),
-  }));
-  const userRolesForService = allUserRoles.filter(x => x.serviceId === req.params.sid);
-  const manageRolesForService = userRolesForService.map(x => x.role);
+  const manageRolesForService = await getUserServiceRoles(req);
 
   return res.render('services/views/dashboard.ejs', {
     csrfToken: req.csrfToken(),

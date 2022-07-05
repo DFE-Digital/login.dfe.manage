@@ -1,6 +1,6 @@
-const { getSingleUserService } = require('../../infrastructure/access');
-const { getServiceById } = require('./../../infrastructure/applications');
-const config = require('../../infrastructure/config');
+const { getSingleUserService } = require('../access');
+const { getServiceById } = require('../applications');
+const config = require('../config');
 
 const isLoggedIn = (req, res, next) => {
   if (req.isAuthenticated()) {
@@ -22,41 +22,38 @@ const isManageUserForService = (req, res, next) => {
     const services = [];
     for (let i = 0; i < req.userServices.roles.length; i++) {
       const role = req.userServices.roles[i];
-      services.push({id: role.code.substr(0, role.code.indexOf('_'))})
+      services.push({ id: role.code.substr(0, role.code.indexOf('_')) });
     }
-    if (services.find(x => x.id.toLowerCase() === req.params.sid.toLowerCase())) {
+    if (services.find((x) => x.id.toLowerCase() === req.params.sid.toLowerCase())) {
       return next();
     }
   }
   return res.status(401).render('errors/views/notAuthorised');
 };
 
-const hasRole = (role) => {
-  return (req, res, next) => {
-    if (req.userServices && req.userServices.roles.length > 0) {
-      const allUserRoles = req.userServices.roles.map((role) => ({
-        serviceId: role.code.substr(0, role.code.indexOf('_')),
-        role: role.code.substr(role.code.lastIndexOf('_') + 1),
-      }));
-      const userRolesForService = allUserRoles.filter(x => x.serviceId === req.params.sid);
-      if (userRolesForService.find(x => x.role === role)) {
-        return next();
-      }
+const hasRole = (role) => (req, res, next) => {
+  if (req.userServices && req.userServices.roles.length > 0) {
+    const allUserRoles = req.userServices.roles.map((role) => ({
+      serviceId: role.code.substr(0, role.code.indexOf('_')),
+      role: role.code.substr(role.code.lastIndexOf('_') + 1),
+    }));
+    const userRolesForService = allUserRoles.filter((x) => x.serviceId === req.params.sid);
+    if (userRolesForService.find((x) => x.role === role)) {
+      return next();
     }
-    return res.status(401).render('errors/views/notAuthorised');
   }
+  return res.status(401).render('errors/views/notAuthorised');
 };
 
-const hasInvite =  async (req, res, next) => {
+const hasInvite = async (req, res, next) => {
   const service = await getServiceById(req.params.sid, req.id);
   if (service.relyingParty && service.relyingParty.params && service.relyingParty.params.allowManageInvite === 'true') {
     return next();
   }
   return res.status(401).render('errors/views/notFound');
-
 };
 
-const getUserDisplayName = user => `${user.given_name || ''} ${user.family_name || ''}`.trim();
+const getUserDisplayName = (user) => `${user.given_name || ''} ${user.family_name || ''}`.trim();
 
 const setUserContext = async (req, res, next) => {
   if (req.user) {

@@ -1,15 +1,12 @@
-const { searchOrganisations } = require('./../../infrastructure/organisations');
+const { searchOrganisations } = require('../../infrastructure/organisations');
+const { getUserServiceRoles } = require('./utils');
 
 const buildModel = async (req) => {
   const inputSource = req.method.toUpperCase() === 'POST' ? req.body : req.query;
   const criteria = inputSource.criteria ? inputSource.criteria.trim() : '';
-  const allUserRoles = req.userServices.roles.map((role) => ({
-    serviceId: role.code.substr(0, role.code.indexOf('_')),
-    role: role.code.substr(role.code.lastIndexOf('_') + 1),
-  }));
-  const userRolesForService = allUserRoles.filter(x => x.serviceId === req.params.sid);
-  const manageRolesForService = userRolesForService.map(x => x.role);
-  let pageNumber = parseInt(inputSource.page) || 1;
+  const manageRolesForService = await getUserServiceRoles(req);
+
+  let pageNumber = parseInt(inputSource.page, 10) || 1;
   if (isNaN(pageNumber)) {
     pageNumber = 1;
   }
@@ -18,7 +15,7 @@ const buildModel = async (req) => {
   return {
     csrfToken: req.csrfToken(),
     backLink: true,
-    criteria: criteria,
+    criteria,
     page: pageNumber,
     numberOfPages: pageOfOrganisations.totalNumberOfPages,
     totalNumberOfResults: pageOfOrganisations.totalNumberOfRecords,
@@ -26,7 +23,7 @@ const buildModel = async (req) => {
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
     currentPage: '',
-  }
+  };
 };
 
 const get = async (req, res) => {

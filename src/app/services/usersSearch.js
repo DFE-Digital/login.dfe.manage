@@ -1,6 +1,7 @@
-const { searchForUsers } = require('./../../infrastructure/search');
-const logger = require('./../../infrastructure/logger');
-const { getServiceById } = require('./../../infrastructure/applications');
+const { searchForUsers } = require('../../infrastructure/search');
+const logger = require('../../infrastructure/logger');
+const { getServiceById } = require('../../infrastructure/applications');
+const { getUserServiceRoles } = require('./utils');
 
 const clearNewUserSessionData = (req) => {
   if (req.session.user) {
@@ -12,24 +13,24 @@ const search = async (req) => {
   const serviceId = req.params.sid;
   const paramsSource = req.method === 'POST' ? req.body : req.query;
 
-  let criteria = paramsSource.criteria;
+  let { criteria } = paramsSource;
   if (!criteria) {
     criteria = '';
   }
-  let safeCriteria = criteria;
+  const safeCriteria = criteria;
   if (criteria.indexOf('-') !== -1) {
     criteria = "\"" + criteria + "\"";
   }
 
-  let page = paramsSource.page ? parseInt(paramsSource.page) : 1;
+  let page = paramsSource.page ? parseInt(paramsSource.page, 10) : 1;
   if (isNaN(page)) {
     page = 1;
   }
 
-  let sortBy = paramsSource.sort ? paramsSource.sort.toLowerCase() : 'name';
-  let sortAsc = (paramsSource.sortdir ? paramsSource.sortdir : 'asc').toLowerCase() === 'asc';
+  const sortBy = paramsSource.sort ? paramsSource.sort.toLowerCase() : 'name';
+  const sortAsc = (paramsSource.sortdir ? paramsSource.sortdir : 'asc').toLowerCase() === 'asc';
 
-  const results = await searchForUsers(criteria + '*', page, sortBy, sortAsc ? 'asc' : 'desc', {
+  const results = await searchForUsers(`${criteria}*`, page, sortBy, sortAsc ? 'asc' : 'desc', {
     services: [serviceId],
   });
 
@@ -38,7 +39,7 @@ const search = async (req) => {
     subType: 'user-search',
     userId: req.user.sub,
     userEmail: req.user.email,
-    criteria: criteria,
+    criteria,
     pageNumber: page,
     numberOfPages: results.numberOfPages,
     sortedBy: sortBy,
@@ -74,24 +75,19 @@ const search = async (req) => {
         nextDirection: sortBy === 'status' ? (sortAsc ? 'desc' : 'asc') : 'asc',
         applied: sortBy === 'status',
       },
-    }
-  }
+    },
+  };
 };
 
 const viewModel = async (req) => {
   const result = await search(req);
   const service = await getServiceById(req.params.sid, req.id);
-  const allUserRoles = req.userServices.roles.map((role) => ({
-    serviceId: role.code.substr(0, role.code.indexOf('_')),
-    role: role.code.substr(role.code.lastIndexOf('_') + 1),
-  }));
-  const userRolesForService = allUserRoles.filter(x => x.serviceId === req.params.sid);
-  const manageRolesForService = userRolesForService.map(x => x.role);
+  const manageRolesForService = await getUserServiceRoles(req);
 
   return {
     csrfToken: req.csrfToken(),
     serviceId: req.params.sid,
-    backLink: true,
+    backLink: `/services/${req.params.sid}`,
     criteria: result.criteria,
     page: result.page,
     numberOfPages: result.numberOfPages,

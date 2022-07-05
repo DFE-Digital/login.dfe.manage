@@ -1,16 +1,13 @@
 'use strict';
-const { getServiceById, updateService } = require('./../../infrastructure/applications');
+
 const niceware = require('niceware');
-const logger = require('./../../infrastructure/logger');
+const { getServiceById, updateService } = require('../../infrastructure/applications');
+const logger = require('../../infrastructure/logger');
+const { getUserServiceRoles } = require('./utils');
 
 const getServiceConfig = async (req, res) => {
   const service = await getServiceById(req.params.sid, req.id);
-  const allUserRoles = req.userServices.roles.map((role) => ({
-    serviceId: role.code.substr(0, role.code.indexOf('_')),
-    role: role.code.substr(role.code.lastIndexOf('_') + 1),
-  }));
-  const userRolesForService = allUserRoles.filter(x => x.serviceId === req.params.sid);
-  const manageRolesForService = userRolesForService.map(x => x.role);
+  const manageRolesForService = await getUserServiceRoles(req);
 
   return res.render('services/views/serviceConfig', {
     csrfToken: req.csrfToken(),
@@ -41,26 +38,26 @@ const validate = async (req) => {
   const urlValidation = new RegExp('^https?:\\/\\/(.*)');
 
   let grantTypes = req.body.grant_types ? req.body.grant_types : [];
-  if(!(grantTypes instanceof Array)) {
-    grantTypes = [req.body.grant_types]
+  if (!(grantTypes instanceof Array)) {
+    grantTypes = [req.body.grant_types];
   }
 
   let responseTypes = req.body.response_types ? req.body.response_types : [];
-  if(!(responseTypes instanceof Array)) {
-    responseTypes = [req.body.response_types]
+  if (!(responseTypes instanceof Array)) {
+    responseTypes = [req.body.response_types];
   }
 
   let selectedRedirects = req.body.redirect_uris ? req.body.redirect_uris : [];
-  if(!(selectedRedirects instanceof Array)) {
+  if (!(selectedRedirects instanceof Array)) {
     selectedRedirects = [req.body.redirect_uris];
   }
-  selectedRedirects = selectedRedirects.filter(x => x.trim() !== '');
+  selectedRedirects = selectedRedirects.filter((x) => x.trim() !== '');
 
   let selectedLogout = req.body.post_logout_redirect_uris ? req.body.post_logout_redirect_uris : [];
   if (!(selectedLogout instanceof Array)) {
-    selectedLogout = [req.body.post_logout_redirect_uris]
+    selectedLogout = [req.body.post_logout_redirect_uris];
   }
-  selectedLogout = selectedLogout.filter(x => x.trim() !== '');
+  selectedLogout = selectedLogout.filter((x) => x.trim() !== '');
 
   const model = {
     service: {
@@ -81,41 +78,41 @@ const validate = async (req) => {
     validationMessages: {},
   };
 
-  if(!model.service.name) {
-    model.validationMessages.name = 'Service name must be present'
+  if (!model.service.name) {
+    model.validationMessages.name = 'Service name must be present';
   }
 
   if (model.service.serviceHome && !urlValidation.test(model.service.serviceHome)) {
-    model.validationMessages.serviceHome = 'Please enter a valid home url'
+    model.validationMessages.serviceHome = 'Please enter a valid home url';
   }
 
-  if(!model.service.clientId) {
-    model.validationMessages.clientId = 'Client Id must be present'
+  if (!model.service.clientId) {
+    model.validationMessages.clientId = 'Client Id must be present';
   }
 
-  if(!urlValidation.test(model.service.postResetUrl) && model.service.postResetUrl.trim() !== '') {
-    model.validationMessages.postResetUrl = 'Please enter a valid Post-reset url'
+  if (!urlValidation.test(model.service.postResetUrl) && model.service.postResetUrl.trim() !== '') {
+    model.validationMessages.postResetUrl = 'Please enter a valid Post-reset url';
   }
 
-  if(!model.service.redirectUris || !model.service.redirectUris.length > 0) {
-    model.validationMessages.redirect_uris = 'At least one redirect url must be specified'
-  } else if (model.service.redirectUris.some(x => !urlValidation.test(x))) {
-    model.validationMessages.redirect_uris = 'Invalid redirect url'
+  if (!model.service.redirectUris || !model.service.redirectUris.length > 0) {
+    model.validationMessages.redirect_uris = 'At least one redirect url must be specified';
+  } else if (model.service.redirectUris.some((x) => !urlValidation.test(x))) {
+    model.validationMessages.redirect_uris = 'Invalid redirect url';
   } else if (model.service.redirectUris.some((value, i) => model.service.redirectUris.indexOf(value) !== i)) {
-    model.validationMessages.redirect_uris = 'Redirect urls must be unique'
+    model.validationMessages.redirect_uris = 'Redirect urls must be unique';
   }
 
-  if(!model.service.postLogoutRedirectUris || !model.service.postLogoutRedirectUris.length > 0) {
-    model.validationMessages.post_logout_redirect_uris = 'At least one logout redirect url must be specified'
-  } else if (model.service.postLogoutRedirectUris.some(x => !urlValidation.test(x))) {
-    model.validationMessages.post_logout_redirect_uris = 'Invalid logout redirect url'
+  if (!model.service.postLogoutRedirectUris || !model.service.postLogoutRedirectUris.length > 0) {
+    model.validationMessages.post_logout_redirect_uris = 'At least one logout redirect url must be specified';
+  } else if (model.service.postLogoutRedirectUris.some((x) => !urlValidation.test(x))) {
+    model.validationMessages.post_logout_redirect_uris = 'Invalid logout redirect url';
   } else if (model.service.postLogoutRedirectUris.some((value, i) => model.service.postLogoutRedirectUris.indexOf(value) !== i)) {
-    model.validationMessages.post_logout_redirect_uris = 'Logout redirect urls must be unique'
+    model.validationMessages.post_logout_redirect_uris = 'Logout redirect urls must be unique';
   }
   if (model.service.clientSecret !== service.relyingParty.client_secret) {
     try {
       const validateClientSecret = niceware.passphraseToBytes(model.service.clientSecret.split('-'));
-      if(validateClientSecret.length < 8) {
+      if (validateClientSecret.length < 8) {
         model.validationMessages.clientSecret = 'Invalid client secret';
       }
     } catch (e) {
@@ -170,10 +167,10 @@ const postServiceConfig = async (req, res) => {
   await updateService(req.params.sid, updatedService, req.id);
 
   res.flash('info', 'Service configuration updated successfully');
-  return res.redirect(`service-configuration`);
+  return res.redirect('service-configuration');
 };
 
 module.exports = {
   getServiceConfig,
-  postServiceConfig
+  postServiceConfig,
 };

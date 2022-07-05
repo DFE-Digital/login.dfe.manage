@@ -1,17 +1,24 @@
 const { emailPolicy } = require('login.dfe.validation');
-const { getUserDetails, waitForIndexToUpdate } = require('./utils');
-const { getUserById, getInvitationByEmail, resendInvitation, updateInvite } = require('./../../infrastructure/directories');
-const { updateIndex } = require('./../../infrastructure/search');
-const logger = require('./../../infrastructure/logger');
+const { getUserDetails, waitForIndexToUpdate, getUserServiceRoles } = require('./utils');
+const {
+  getUserById, getInvitationByEmail, resendInvitation, updateInvite,
+} = require('../../infrastructure/directories');
+const { updateIndex } = require('../../infrastructure/search');
+const logger = require('../../infrastructure/logger');
 
 const get = async (req, res) => {
   const user = await getUserDetails(req);
+  const manageRolesForService = await getUserServiceRoles(req);
+
   return res.render('services/views/confirmResendInvitation', {
     backLink: true,
     csrfToken: req.csrfToken(),
     user,
     email: user.email,
     validationMessages: {},
+    serviceId: req.params.sid,
+    userRoles: manageRolesForService,
+    currentPage: 'confirm-resend-invitation',
   });
 };
 
@@ -58,7 +65,7 @@ const post = async (req, res) => {
     await resendInvitation(req.params.uid.substr(4), req.id);
   } else {
     await updateInvite(req.params.uid.substr(4), model.email, req.id);
-    await updateIndex(req.params.uid, { email: model.email}, req.id);
+    await updateIndex(req.params.uid, { email: model.email }, req.id);
     await waitForIndexToUpdate(req.params.uid, (updated) => (updated ? updated.email : '') === model.email);
   }
 

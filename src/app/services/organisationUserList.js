@@ -1,5 +1,6 @@
-const { searchForUsers } = require('./../../infrastructure/search');
-const { getOrganisationByIdV2 } = require('./../../infrastructure/organisations');
+const { searchForUsers } = require('../../infrastructure/search');
+const { getOrganisationByIdV2 } = require('../../infrastructure/organisations');
+const { getUserServiceRoles } = require('./utils');
 
 const mapRole = (roleId) => {
   if (roleId === 10000) {
@@ -10,13 +11,8 @@ const mapRole = (roleId) => {
 
 const render = async (req, res, dataSource) => {
   const organisation = await getOrganisationByIdV2(req.params.oid, req.id);
-  const allUserRoles = req.userServices.roles.map((role) => ({
-    serviceId: role.code.substr(0, role.code.indexOf('_')),
-    role: role.code.substr(role.code.lastIndexOf('_') + 1),
-  }));
-  const userRolesForService = allUserRoles.filter(x => x.serviceId === req.params.sid);
-  const manageRolesForService = userRolesForService.map(x => x.role);
-  let pageNumber = dataSource.page ? parseInt(dataSource.page) : 1;
+  const manageRolesForService = await getUserServiceRoles(req);
+  let pageNumber = dataSource.page ? parseInt(dataSource.page, 10) : 1;
   if (isNaN(pageNumber)) {
     pageNumber = 1;
   }
@@ -26,8 +22,8 @@ const render = async (req, res, dataSource) => {
   });
 
   const users = results.users.map((user) => {
-    const viewUser = Object.assign({}, user);
-    viewUser.organisation = Object.assign({}, user.organisations.find(o => o.id.toUpperCase() === organisation.id.toUpperCase()));
+    const viewUser = { ...user };
+    viewUser.organisation = { ...user.organisations.find((o) => o.id.toUpperCase() === organisation.id.toUpperCase()) };
     viewUser.organisation.role = mapRole(viewUser.organisation.roleId);
     return viewUser;
   });
@@ -43,15 +39,11 @@ const render = async (req, res, dataSource) => {
     totalNumberOfResults: results.totalNumberOfResults,
     userRoles: manageRolesForService,
     currentPage: '',
-  })
+  });
 };
 
-const get = async (req, res) => {
-  return render(req, res, req.query);
-};
-const post = async (req, res) => {
-  return render(req, res, req.body);
-};
+const get = async (req, res) => render(req, res, req.query);
+const post = async (req, res) => render(req, res, req.body);
 
 module.exports = {
   get,

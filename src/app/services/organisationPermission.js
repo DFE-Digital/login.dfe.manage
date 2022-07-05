@@ -1,10 +1,12 @@
-const { getServiceById } = require('./../../infrastructure/applications');
+const { getServiceById } = require('../../infrastructure/applications');
+const { getUserServiceRoles } = require('./utils');
 
 const get = async (req, res) => {
   if (!req.session.user) {
-    return res.redirect(`/services/${req.params.sid}/users`)
+    return res.redirect(`/services/${req.params.sid}/users`);
   }
   const service = await getServiceById(req.params.sid, req.id);
+  const manageRolesForService = await getUserServiceRoles(req);
 
   return res.render('services/views/organisationPermission', {
     csrfToken: req.csrfToken(),
@@ -15,7 +17,10 @@ const get = async (req, res) => {
     service,
     selectedLevel: null,
     validationMessages: {},
-  })
+    serviceId: req.params.sid,
+    userRoles: manageRolesForService,
+    currentPage: 'organisation-permissions',
+  });
 };
 
 const validate = async (req) => {
@@ -36,7 +41,7 @@ const validate = async (req) => {
 
   if (model.selectedLevel === undefined || model.selectedLevel === null) {
     model.validationMessages.selectedLevel = 'Please select a permission level';
-  } else if (validPermissionLevels.find(x => x === model.selectedLevel) === undefined) {
+  } else if (validPermissionLevels.find((x) => x === model.selectedLevel) === undefined) {
     model.validationMessages.selectedLevel = 'Please select a permission level';
   }
   return model;
@@ -44,7 +49,7 @@ const validate = async (req) => {
 
 const post = async (req, res) => {
   if (!req.session.user) {
-    return res.redirect(`/services/${req.params.sid}/users`)
+    return res.redirect(`/services/${req.params.sid}/users`);
   }
   const model = await validate(req);
 
@@ -55,7 +60,7 @@ const post = async (req, res) => {
 
   req.session.user.service = model.service.name;
   req.session.user.permission = model.selectedLevel;
-  return res.redirect('associate-roles')
+  return res.redirect('associate-roles');
 };
 
 module.exports = {

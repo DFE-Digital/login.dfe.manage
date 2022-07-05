@@ -47,6 +47,11 @@ const getRequestMock = (customRequest = {}) => {
       sub: 'user1',
       email: 'user@unit.test',
     },
+    userServices: {
+      roles: [{
+        code: 'serviceid_serviceconfiguration',
+      }],
+    },
     session: {},
   }, customRequest);
 };

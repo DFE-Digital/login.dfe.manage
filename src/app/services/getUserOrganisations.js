@@ -1,9 +1,9 @@
-const { getAllUserOrganisations, getInvitationOrganisations } = require('./../../infrastructure/organisations');
-const { getUsersByIdV2 } = require('./../../infrastructure/directories');
-const { getUserDetails } = require('./utils');
 const flatten = require('lodash/flatten');
 const uniq = require('lodash/uniq');
-const logger = require('./../../infrastructure/logger');
+const { getAllUserOrganisations, getInvitationOrganisations } = require('../../infrastructure/organisations');
+const { getUsersByIdV2 } = require('../../infrastructure/directories');
+const { getUserDetails, getUserServiceRoles } = require('./utils');
+const logger = require('../../infrastructure/logger');
 
 const getApproverDetails = async (organisation, correlationId) => {
   const allApproverIds = flatten(organisation.map((org) => org.approvers));
@@ -19,13 +19,11 @@ const getOrganisations = async (userId, serviceId, correlationId) => {
   if (!orgMapping) {
     return [];
   }
-  const orgsForService = orgMapping.filter(x => x.services.find(y => y.id.toLowerCase() === serviceId.toLowerCase()));
+  const orgsForService = orgMapping.filter((x) => x.services.find((y) => y.id.toLowerCase() === serviceId.toLowerCase()));
   const allApprovers = await getApproverDetails(orgsForService, correlationId);
 
   return await Promise.all(orgsForService.map(async (invitation) => {
-    const approvers = invitation.approvers.map((approverId) => {
-      return allApprovers.find(x => x.sub.toLowerCase() === approverId.toLowerCase());
-    }).filter(x => x);
+    const approvers = invitation.approvers.map((approverId) => allApprovers.find((x) => x.sub.toLowerCase() === approverId.toLowerCase())).filter((x) => x);
     return {
       id: invitation.organisation.id,
       name: invitation.organisation.name,
@@ -43,6 +41,7 @@ const getOrganisations = async (userId, serviceId, correlationId) => {
 const getUserOrganisations = async (req, res) => {
   const user = await getUserDetails(req);
   const organisations = await getOrganisations(user.id, req.params.sid, req.id);
+  const manageRolesForService = await getUserServiceRoles(req);
 
   logger.audit(`${req.user.email} (id: ${req.user.sub}) viewed user ${user.email} (id: ${user.id})`, {
     type: 'organisations',
@@ -58,7 +57,10 @@ const getUserOrganisations = async (req, res) => {
     organisations,
     isInvitation: req.params.uid.startsWith('inv-'),
     backLink: true,
-  })
+    serviceId: req.params.sid,
+    userRoles: manageRolesForService,
+    currentPage: 'user-organisations',
+  });
 };
 
 module.exports = getUserOrganisations;
