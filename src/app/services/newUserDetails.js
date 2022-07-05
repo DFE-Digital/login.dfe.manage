@@ -1,7 +1,9 @@
 const { emailPolicy } = require('login.dfe.validation');
-const { getUserById, getInvitationByEmail } = require('./../../infrastructure/directories');
+const { getUserById, getInvitationByEmail } = require('../../infrastructure/directories');
+const { getUserServiceRoles } = require('./utils');
 
 const get = async (req, res) => {
+  const manageRolesForService = await getUserServiceRoles(req);
   const model = {
     csrfToken: req.csrfToken(),
     firstName: '',
@@ -10,6 +12,9 @@ const get = async (req, res) => {
     backLink: true,
     cancelLink: `/services/${req.params.sid}/users`,
     validationMessages: {},
+    userRoles: manageRolesForService,
+    currentPage: 'new-user',
+    serviceId: req.params.sid,
   };
 
   if (req.session.user) {
@@ -21,6 +26,8 @@ const get = async (req, res) => {
 };
 
 const validate = async (req) => {
+  const manageRolesForService = await getUserServiceRoles(req);
+
   const model = {
     firstName: req.body.firstName || '',
     lastName: req.body.lastName || '',
@@ -33,7 +40,7 @@ const validate = async (req) => {
   };
 
   if (!model.firstName) {
-    model.validationMessages.firstName = 'Please enter a first name'
+    model.validationMessages.firstName = 'Please enter a first name';
   }
 
   if (!model.lastName) {
@@ -81,10 +88,9 @@ const post = async (req, res) => {
   req.session.user.email = model.email;
 
   if (model.isDSIUser) {
-    return res.redirect(`${model.uid}/select-organisation`)
-  } else {
-    return res.redirect('associate-organisation')
+    return res.redirect(`${model.uid}/select-organisation`);
   }
+  return res.redirect('associate-organisation');
 };
 
 module.exports = {

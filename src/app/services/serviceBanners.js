@@ -1,7 +1,7 @@
 'use strict';
 
 const { listBannersForService, getServiceById } = require('../../infrastructure/applications');
-const { getUserServiceRoles } = require('../../utils/getUserServiceRoles');
+const { getUserServiceRoles } = require('./utils');
 
 const get = async (req, res) => {
   const paramsSource = req.method === 'POST' ? req.body : req.query;

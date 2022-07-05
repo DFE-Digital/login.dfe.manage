@@ -3,7 +3,7 @@
 const niceware = require('niceware');
 const { getServiceById, updateService } = require('../../infrastructure/applications');
 const logger = require('../../infrastructure/logger');
-const { getUserServiceRoles } = require('../../utils/getUserServiceRoles');
+const { getUserServiceRoles } = require('./utils');
 
 const getServiceConfig = async (req, res) => {
   const service = await getServiceById(req.params.sid, req.id);

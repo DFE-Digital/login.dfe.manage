@@ -1,12 +1,12 @@
-jest.mock('./../../../src/infrastructure/config', () => require('./../../utils').configMockFactory());
-jest.mock('./../../../src/infrastructure/logger', () => require('./../../utils').loggerMockFactory());
+jest.mock('./../../../src/infrastructure/config', () => require('../../utils').configMockFactory());
+jest.mock('./../../../src/infrastructure/logger', () => require('../../utils').loggerMockFactory());
 
-const { getRequestMock, getResponseMock } = require('./../../utils');
+const { getRequestMock, getResponseMock } = require('../../utils');
+
 const res = getResponseMock();
-const getNewUserDetails = require('./../../../src/app/services/newUserDetails').get;
+const getNewUserDetails = require('../../../src/app/services/newUserDetails').get;
 
 describe('when displaying the user details view', () => {
-
   let req;
 
   beforeEach(() => {

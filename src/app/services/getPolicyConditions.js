@@ -1,8 +1,7 @@
 const { getPolicyById } = require('../../infrastructure/access');
 const { getServiceById } = require('../../infrastructure/applications');
-const { getFriendlyFieldName, getFriendlyValues } = require('./utils');
+const { getFriendlyFieldName, getFriendlyValues, getUserServiceRoles } = require('./utils');
 const { forEachAsync } = require('../../utils/asyncHelpers');
-const { getUserServiceRoles } = require('../../utils/getUserServiceRoles');
 
 const mapPolicyConstraints = async (policy, correlationId) => {
   await forEachAsync(policy.conditions, async (condition) => {

@@ -1,6 +1,6 @@
 const { getServiceById } = require('../../infrastructure/applications');
 const { getPageOfPoliciesForService } = require('../../infrastructure/access');
-const { getUserServiceRoles } = require('../../utils/getUserServiceRoles');
+const { getUserServiceRoles } = require('./utils');
 
 const viewModel = async (req) => {
   const paramsSource = req.method === 'POST' ? req.body : req.query;

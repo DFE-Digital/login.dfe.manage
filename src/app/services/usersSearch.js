@@ -1,7 +1,7 @@
 const { searchForUsers } = require('../../infrastructure/search');
 const logger = require('../../infrastructure/logger');
 const { getServiceById } = require('../../infrastructure/applications');
-const { getUserServiceRoles } = require('../../utils/getUserServiceRoles');
+const { getUserServiceRoles } = require('./utils');
 
 const clearNewUserSessionData = (req) => {
   if (req.session.user) {
@@ -87,7 +87,7 @@ const viewModel = async (req) => {
   return {
     csrfToken: req.csrfToken(),
     serviceId: req.params.sid,
-    backLink: true,
+    backLink: `/services/${req.params.sid}`,
     criteria: result.criteria,
     page: result.page,
     numberOfPages: result.numberOfPages,

@@ -1,7 +1,7 @@
 'use strict';
 
 const { getServiceById } = require('../../infrastructure/applications');
-const { getUserServiceRoles } = require('../../utils/getUserServiceRoles');
+const { getUserServiceRoles } = require('./utils');
 
 const getDashboard = async (req, res) => {
   const serviceDetails = await getServiceById(req.params.sid, req.id);

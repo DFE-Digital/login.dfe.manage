@@ -1,6 +1,6 @@
 const { getPolicyById } = require('../../infrastructure/access');
 const { getServiceById } = require('../../infrastructure/applications');
-const { getUserServiceRoles } = require('../../utils/getUserServiceRoles');
+const { getUserServiceRoles } = require('./utils');
 
 const getPolicyRoles = async (req, res) => {
   const service = await getServiceById(req.params.sid, req.id);

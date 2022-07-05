@@ -2,7 +2,7 @@
 
 const logger = require('../../infrastructure/logger');
 const { removeBanner, getBannerById } = require('../../infrastructure/applications');
-const { getUserServiceRoles } = require('../../utils/getUserServiceRoles');
+const { getUserServiceRoles } = require('./utils');
 
 const get = async (req, res) => {
   const serviceBanners = await getBannerById(req.params.sid, req.params.bid, req.id);

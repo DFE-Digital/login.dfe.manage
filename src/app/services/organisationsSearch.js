@@ -1,5 +1,5 @@
 const { searchOrganisations } = require('../../infrastructure/organisations');
-const { getUserServiceRoles } = require('../../utils/getUserServiceRoles');
+const { getUserServiceRoles } = require('./utils');
 
 const buildModel = async (req) => {
   const inputSource = req.method.toUpperCase() === 'POST' ? req.body : req.query;

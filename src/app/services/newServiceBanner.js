@@ -3,7 +3,7 @@
 const moment = require('moment');
 const { getBannerById, upsertBanner, listAllBannersForService } = require('../../infrastructure/applications');
 const logger = require('../../infrastructure/logger');
-const { getUserServiceRoles } = require('../../utils/getUserServiceRoles');
+const { getUserServiceRoles } = require('./utils');
 
 const get = async (req, res) => {
   const manageRolesForService = await getUserServiceRoles(req);
