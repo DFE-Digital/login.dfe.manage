@@ -4,7 +4,6 @@ const { getUserDetails, getUserServiceRoles } = require('./utils');
 const { getOrganisationByIdV2 } = require('../../infrastructure/organisations');
 const logger = require('../../infrastructure/logger');
 
-
 const getModel = async (req) => {
   const service = await getServiceById(req.params.sid, req.id);
   const allRolesForService = await listRolesOfService(req.params.sid, req.id);
