@@ -1,44 +1,40 @@
-<div class="grid-row">
-    <div class="col-8">
-        <h1 class="heading-xlarge">
-            Confirm delete banner
-        </h1>
-        <p class="lede">Confirm that you want to permanently delete this banner.</p>
-
-        <dl class="app-check-your-answers app-check-your-answers--short">
-
-            <div class="app-check-your-answers__contents">
-                <dt class="app-check-your-answers__title">
-                    Banner name
-                </dt>
-                <dd class="app-check-your-answers__answer">
-                    <%=locals.serviceBanners.name%>
-                </dd>
-            </div>
-
-            <div class="app-check-your-answers__contents">
-                <dt class="app-check-your-answers__title">
-                    Banner title
-                </dt>
-                <dd class="app-check-your-answers__answer">
-                    <%=locals.serviceBanners.title%>
-                </dd>
-            </div>
-
-            <div class="app-check-your-answers__contents">
-                <dt class="app-check-your-answers__title">
-                    Banner message
-                </dt>
-                <dd class="app-check-your-answers__answer">
-                    <%=locals.serviceBanners.message%>
-                </dd>
-            </div>
-
-            <div class="app-check-your-answers__contents">
-                <dt class="app-check-your-answers__title">
-                    Status
-                </dt>
-                <dd class="app-check-your-answers__answer">
+<div class="govuk-width-container">
+    <div class="govuk-grid-row govuk-!-margin-top-9">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-l">
+                Confirm delete banner
+            </h1>
+            <p class="govuk-body">Confirm that you want to permanently delete this banner.</p>
+            <dl class="govuk-summary-list">
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Banner name
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        <%=locals.serviceBanners.name%>
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Banner title
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        <%=locals.serviceBanners.title%>
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Banner message
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        <%=locals.serviceBanners.message%>
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Status
+                    </dt>
+                    <dd class="govuk-summary-list__value">
                     <% if (locals.serviceBanners.isActive) { %>
                         Always show this banner until I stop it
                     <% } else if (locals.serviceBanners.validFrom && locals.serviceBanners.validTo) { %>
@@ -46,16 +42,16 @@
                     <% } else { %>
                         Not active
                     <% } %>
-                </dd>
-            </div>
-        </dl>
-
-        <form method="post">
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
-            <div class="form-submit submit-buttons">
-                <button type="submit" class="button">Continue</button>
-                <a href="<%=locals.cancelLink%>" class="button button-secondary">Cancel</a>
-            </div>
-        </form>
+                    </dd>
+                </div>
+            </dl>
+            <form method="post">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
+                <div class="govuk-button-group">
+                    <button type="submit" class="govuk-button" data-module="govuk-button">Continue</button>
+                    <a href="<%=locals.cancelLink%>" class="govuk-button govuk-button--secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>

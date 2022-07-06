@@ -48,6 +48,11 @@ describe('when displaying organisation users', () => {
         params: {
           id: orgResult.id,
         },
+        userServices: {
+          roles: [{
+            code: 'serviceid_serviceconfiguration'
+          }]
+        },
       });
       req[dataLocation] = {
         page: 2,
@@ -95,6 +100,11 @@ describe('when displaying organisation users', () => {
           id: orgResult.id,
           sid: 'service-1',
         },
+        userServices: {
+          roles: [{
+            code: 'serviceid_serviceconfiguration'
+          }]
+        },
       });
       req[dataLocation] = {
         page: 2,
@@ -116,6 +126,11 @@ describe('when displaying organisation users', () => {
           id: orgResult.id,
           sid: 'service-1',
         },
+        userServices: {
+          roles: [{
+            code: 'serviceid_serviceconfiguration'
+          }]
+        },
       });
       req[dataLocation] = {
         page: undefined,
@@ -136,6 +151,11 @@ describe('when displaying organisation users', () => {
         params: {
           id: orgResult.id,
           oid: orgResult.id,
+        },
+        userServices: {
+          roles: [{
+            code: 'serviceid_serviceconfiguration'
+          }]
         },
       });
       req[dataLocation] = {

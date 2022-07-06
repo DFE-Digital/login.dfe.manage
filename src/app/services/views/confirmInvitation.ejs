@@ -1,99 +1,79 @@
-<div class="grid-row">
-    <div class="col-8">
-        <h1 class="heading-xlarge">
+<div class="govuk-width-container govuk-!-margin-top-9">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-l">
             Review invitation
         </h1>
         <% if (locals.user.isExistingUser) { %>
-            <p>The user will receive an email to confirm they have access to this service.</p>
+            <p class="govuk-body-l">The user will receive an email to confirm they have access to this service.</p>
         <% } else { %>
-            <p>The user will have to confirm their email address and create a password before their account is active.</p>
+            <p class="govuk-body-l">The user will have to confirm their email address and create a password before their account is active.</p>
         <% } %>
 
-        <dl class="app-check-your-answers app-check-your-answers--short">
-            <div class="app-check-your-answers__contents">
-                <dt class="app-check-your-answers__title">
-                    Personal details
-                </dt>
-                <dd class="app-check-your-answers__change ">
-                </dd>
-            </div>
-            <div class="app-check-your-answers__contents">
-                <dt class="app-check-your-answers__question">
+        <h2 class="govuk-heading-m">Personal details</h2>
+        <dl class="govuk-summary-list">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     First name
                 </dt>
-                <dd class="app-check-your-answers__answer">
+                <dd class="govuk-summary-list__value">
                     <%= locals.user.firstName %>
                 </dd>
             </div>
-
-            <div class="app-check-your-answers__contents">
-                <dt class="app-check-your-answers__question">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     Last name
                 </dt>
-                <dd class="app-check-your-answers__answer">
+                <dd class="govuk-summary-list__value">
                     <%= locals.user.lastName %>
                 </dd>
 
             </div>
-
-            <div class="app-check-your-answers__contents">
-                <dt class="app-check-your-answers__question">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     Email Address
                 </dt>
-                <dd class="app-check-your-answers__answer">
+                <dd class="govuk-summary-list__value">
                     <%= locals.user.email %>
                 </dd>
             </div>
         </dl>
 
-
-        <dl class="app-check-your-answers app-check-your-answers--short">
-            <div class="app-check-your-answers__contents">
-                <dt class="app-check-your-answers__title">
-                    Organisation
-                </dt>
-                <dd class="app-check-your-answers__answer"></dd>
-            </div>
-            <div class="app-check-your-answers__contents">
-                <dt class="app-check-your-answers__question">
+        <h2 class="govuk-heading-m">Organisation</h2>
+        <dl class="govuk-summary-list">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     Name
                 </dt>
-                <dd class="app-check-your-answers__answer">
+                <dd class="govuk-summary-list__value">
                     <%= locals.organisation.name %>
                 </dd>
             </div>
-            <div class="app-check-your-answers__contents">
-                <dt class="app-check-your-answers__question">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     Permission level
                 </dt>
-                <dd class="app-check-your-answers__answer">
+                <dd class="govuk-summary-list__value">
                     <%= locals.organisation.permissionLevel %>
                 </dd>
             </div>
         </dl>
 
-        <dl class="app-check-your-answers app-check-your-answers--short">
-            <div class="app-check-your-answers__contents">
-                <dt class="app-check-your-answers__title">
-                    Service
-                </dt>
-                <dd class="app-check-your-answers__answer"></dd>
-
-            </div>
-
-            <div class="app-check-your-answers__contents">
-                <dt class="app-check-your-answers__question">
+        <h2 class="govuk-heading-m">Service</h2>
+        <dl class="govuk-summary-list">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     Name
                 </dt>
-                <dd class="app-check-your-answers__answer">
+                <dd class="govuk-summary-list__value">
                     <%= locals.service.name %>
                 </dd>
             </div>
-            <div class="app-check-your-answers__contents">
-                <dt class="app-check-your-answers__question">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     Roles
                 </dt>
-                <dd class="app-check-your-answers__answer">
+                <dd class="govuk-summary-list__value">
                     <% if (locals.service.roles.length > 0) { %>
                         <% for (let i = 0; i < locals.service.roles.length; i++) { %>
                             <% const role = locals.service.roles[i]; %>
@@ -108,10 +88,11 @@
 
         <form method="post">
             <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
-            <div class="form-submit submit-buttons">
-                <button type="submit" class="button">Submit</button>
-                <a href="<%= locals.cancelLink %>" class="button button-secondary">Cancel</a>
+            <div class="govuk-button-group">
+                <button type="submit" class="govuk-button">Submit</button>
+                <a href="<%= locals.cancelLink %>" class="govuk-button govuk-button--secondary">Cancel</a>
             </div>
         </form>
     </div>
+</div>
 </div>

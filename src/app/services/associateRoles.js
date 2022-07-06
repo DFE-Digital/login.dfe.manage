@@ -1,15 +1,18 @@
-const config = require('./../../infrastructure/config');
 const PolicyEngine = require('login.dfe.policy-engine');
+const config = require('../../infrastructure/config');
+
 const policyEngine = new PolicyEngine(config);
-const { getOrganisationForUserV2 } = require('./../../infrastructure/organisations');
+const { getOrganisationForUserV2 } = require('../../infrastructure/organisations');
+const { getUserServiceRoles } = require('./utils');
 
 const getViewModel = async (req) => {
-  const organisationId = req.session.user.organisationId;
+  const { organisationId } = req.session.user;
   const userOrganisations = (req.params.uid && !req.params.uid.startsWith('inv-')) ? await getOrganisationForUserV2(req.params.uid, req.id) : undefined;
-  const userAccessToSpecifiedOrganisation = userOrganisations ? userOrganisations.find(x => x.organisation.id.toLowerCase() === organisationId.toLowerCase()) : undefined;
+  const userAccessToSpecifiedOrganisation = userOrganisations ? userOrganisations.find((x) => x.organisation.id.toLowerCase() === organisationId.toLowerCase()) : undefined;
   const policyResult = await policyEngine.getPolicyApplicationResultsForUser(userAccessToSpecifiedOrganisation ? req.params.uid : undefined, organisationId, req.params.sid, req.id);
 
   const serviceRoles = policyResult.rolesAvailableToUser;
+  const manageRolesForService = await getUserServiceRoles(req);
 
   return {
     csrfToken: req.csrfToken(),
@@ -21,12 +24,15 @@ const getViewModel = async (req) => {
     user: `${req.session.user.firstName} ${req.session.user.lastName}`,
     organisation: req.session.user.organisationName,
     validationMessages: {},
+    serviceId: req.params.sid,
+    userRoles: manageRolesForService,
+    currentPage: 'associate-roles',
   };
 };
 
 const get = async (req, res) => {
   if (!req.session.user) {
-    return res.redirect(`/services/${req.params.sid}/users`)
+    return res.redirect(`/services/${req.params.sid}/users`);
   }
 
   const model = await getViewModel(req);
@@ -36,7 +42,7 @@ const get = async (req, res) => {
 
 const post = async (req, res) => {
   if (!req.session.user) {
-    return res.redirect(`/services/${req.params.sid}/users`)
+    return res.redirect(`/services/${req.params.sid}/users`);
   }
 
   let selectedRoles = req.body.role ? req.body.role : [];
@@ -44,21 +50,20 @@ const post = async (req, res) => {
     selectedRoles = [req.body.role];
   }
 
-  const organisationId = req.session.user.organisationId;
+  const { organisationId } = req.session.user;
   const userOrganisations = (req.params.uid && !req.params.uid.startsWith('inv-')) ? await getOrganisationForUserV2(req.params.uid, req.id) : undefined;
-  const userAccessToSpecifiedOrganisation = userOrganisations ? userOrganisations.find(x => x.organisation.id.toLowerCase() === organisationId.toLowerCase()) : undefined;
+  const userAccessToSpecifiedOrganisation = userOrganisations ? userOrganisations.find((x) => x.organisation.id.toLowerCase() === organisationId.toLowerCase()) : undefined;
   const policyValidationResult = await policyEngine.validate(userAccessToSpecifiedOrganisation ? req.params.uid : undefined, organisationId, req.params.sid, selectedRoles, req.id);
 
   req.session.user.roles = selectedRoles;
 
   if (policyValidationResult.length > 0) {
     const model = await getViewModel(req);
-    model.validationMessages.roles = policyValidationResult.map(x => x.message);
+    model.validationMessages.roles = policyValidationResult.map((x) => x.message);
     return res.render('services/views/associateRoles', model);
   }
 
   return res.redirect(req.params.uid ? 'confirm-details' : 'confirm-new-user');
-
 };
 
 module.exports = {

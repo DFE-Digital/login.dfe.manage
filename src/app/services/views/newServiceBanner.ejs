@@ -1,151 +1,227 @@
-<div class="row">
-    <div class="col-8">
-        <h1 class="heading-xlarge"><%= locals.isEditExisting ? 'Edit banner' : 'Create banner'%></h1>
-    </div>
-    <% if (locals.isEditExisting) { %>
-    <div class="col-4">
-        <aside>
-            <h2 class="heading-medium">Actions</h2>
-            <nav class="subnav">
-                <ul>
-                    <li><a href="<%=locals.bannerId%>/delete-banner">Delete banner</a></li>
-                </ul>
-            </nav>
-        </aside>
-    </div>
-    <% } %>
-</div>
-
-<div class="grid-row">
-    <div class="col-12">
-        <form method="post" id="form-new-banner">
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
-            <div class="form-group <%= (locals.validationMessages.name !== undefined) ? 'form-group-error' : '' %>">
-                <label class="form-label" for="bannerName">Name</label>
-                <% if (locals.validationMessages.name !== undefined) { %>
-                    <p class="error-message" id="validation-name"><%= locals.validationMessages.name %></p>
+<div class="govuk-width-container govuk-!-margin-top-9">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <h1 class="govuk-heading-l">
+                <%= locals.isEditExisting ? 'Edit banner' : 'Create banner'%>
+            </h1>
+            <form method="post" class="prevent-form-double-submission" id="form-new-banner">
+                <input type="hidden" name="_csrf" value="<%=csrfToken%>" />
+                
+                <div class="govuk-form-group <%= (locals.validationMessages.bannerName !== undefined) ? 'govuk-form-group--error' : '' %>">
+                    <label class="govuk-label govuk-label--s" for="bannerName">Name</label>
+                <% if (locals.validationMessages.bannerName !== undefined) { %>
+                    <p id="validation-bannerName" class="govuk-error-message">
+                        <span class="govuk-visually-hidden">Error:</span> <%=locals.validationMessages.bannerName %>
+                    </p>
                 <% } %>
-                <input class="form-control banner-input" id="bannerName" name="bannerName" maxlength="20" value="<%=locals.name%>">
-            </div>
-            <div class="form-group <%= (locals.validationMessages.title !== undefined) ? 'form-group-error' : '' %>">
-                <label class="form-label" for="bannerTitle">Title</label>
-                <% if (locals.validationMessages.title !== undefined) { %>
-                    <p class="error-message" id="validation-title"><%= locals.validationMessages.title %></p>
-                <% } %>
-                <input class="form-control banner-input" id="bannerTitle" name="bannerTitle" maxlength="80" value="<%=locals.bannerTitle%>">
-            </div>
-            <div class="form-group <%= (locals.validationMessages.message !== undefined) ? 'form-group-error' : '' %>">
-                <label class="form-label" for="bannerMesssage">
-                    Message
-                </label>
-                <% if (locals.validationMessages.message !== undefined) { %>
-                    <p class="error-message" id="validation-message"><%= locals.validationMessages.message %></p>
-                <% } %>
-                <textarea class="form-control banner-input" name="bannerMesssage" id="bannerMesssage" rows="4" maxlength="400"><%=locals.message%></textarea>
-            </div>
-
-            <div class="form-group <%= (locals.validationMessages.bannerDisplay !== undefined) ? 'form-group-error' : '' %>">
-                <fieldset>
-                    <legend>
-                        When do you want this banner to be displayed?
-                    </legend>
-                    <% if (locals.validationMessages.bannerDisplay !== undefined) { %>
-                        <p class="error-message" id="validation-display"><%= locals.validationMessages.bannerDisplay %></p>
-                    <% } %>
-                    <div class="multiple-choice">
-                        <input id="notActive" type="radio" name="bannerDisplay" value="notActive" <%=locals.bannerDisplay === 'notActive' ? 'checked' : 'checked'%>>
-                        <label for="notActive">Don't display</label>
-                    </div>
-                    <div class="multiple-choice">
-                        <input id="alwayson" type="radio" name="bannerDisplay" value="isActive" <%=locals.bannerDisplay === 'isActive' ? 'checked' : ''%>>
-                        <label for="alwayson">Always show this banner until I stop it</label>
-                    </div>
-                    <div class="multiple-choice" data-target="date">
-                        <input id="date-radio" type="radio" name="bannerDisplay" value="date" <%=locals.bannerDisplay === 'date' ? 'checked' : ''%>>
-                        <label for="date-radio">Only display this banner between a specific date and time</label>
-                    </div>
-                </fieldset>
-                <div class="panel panel-border-narrow js-hidden" id="date">
-                    <div class="row row-spacer">
-                        <div class="col-12">
-                            <div class="form-group <%= (locals.validationMessages.fromDate !== undefined) ? 'form-group-error' : '' %>">
-                                <fieldset>
-                                    <legend>
-                                        <span class="form-label-bold">From date</span>
-                                        <span class="form-hint">For example, 31 03 1980 14:30</span>
-                                    </legend>
-                                    <% if (locals.validationMessages.fromDate !== undefined) { %>
-                                        <p class="error-message" id="validation-display"><%= locals.validationMessages.fromDate %></p>
-                                    <% } %>
-                                    <div class="form-date">
-                                        <div class="form-group form-group-day">
-                                            <label class="form-label" for="fromDay">Day</label>
-                                            <input class="form-control" id="fromDay" name="fromDay" type="number" pattern="[0-9]*" value="<%=locals.fromDay%>">
-                                        </div>
-                                        <div class="form-group form-group-month">
-                                            <label class="form-label" for="fromMonth">Month</label>
-                                            <input class="form-control" id="fromMonth" name="fromMonth" type="number" pattern="[0-9]*" value="<%=locals.fromMonth%>">
-                                        </div>
-                                        <div class="form-group form-group-year">
-                                            <label class="form-label" for="fromYear">Year</label>
-                                            <input class="form-control" id="fromYear" name="fromYear" type="number" pattern="[0-9]*" value="<%=locals.fromYear%>">
-                                        </div>
-                                        <div class="form-group form-group-day">
-                                            <label class="form-label" for="fromHour">Hour</label>
-                                            <input class="form-control" id="fromHour" name="fromHour" type="number" pattern="[0-9]*" value="<%=locals.fromHour%>">
-                                        </div>
-                                        <div class="form-group form-group-day">
-                                            <label class="form-label" for="fromMinute">Minute</label>
-                                            <input class="form-control" id="fromMinute" name="fromMinute" type="number" pattern="[0-9]*" value="<%=locals.fromMinute%>">
-                                        </div>
-                                    </div>
-                                </fieldset>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="form-group <%= (locals.validationMessages.toDate !== undefined) ? 'form-group-error' : '' %>">
-                                <fieldset>
-                                    <legend>
-                                        <span class="form-label-bold">To date</span>
-                                        <span class="form-hint">For example, 31 03 1980 14:30</span>
-                                    </legend>
-                                    <% if (locals.validationMessages.toDate !== undefined) { %>
-                                        <p class="error-message" id="validation-display"><%= locals.validationMessages.toDate %></p>
-                                    <% } %>
-                                    <div class="form-date">
-                                        <div class="form-group form-group-day">
-                                            <label class="form-label" for="toDay">Day</label>
-                                            <input class="form-control" id="toDay" name="toDay" type="number" pattern="[0-9]*" value="<%=locals.toDay%>">
-                                        </div>
-                                        <div class="form-group form-group-month">
-                                            <label class="form-label" for="toMonth">Month</label>
-                                            <input class="form-control" id="toMonth" name="toMonth" type="number" pattern="[0-9]*" value="<%=locals.toMonth%>">
-                                        </div>
-                                        <div class="form-group form-group-year">
-                                            <label class="form-label" for="toYear">Year</label>
-                                            <input class="form-control" id="toYear" name="toYear" type="number" pattern="[0-9]*" value="<%=locals.toYear%>">
-                                        </div>
-                                        <div class="form-group form-group-day">
-                                            <label class="form-label" for="toHour">Hour</label>
-                                            <input class="form-control" id="toHour" name="toHour" type="number" pattern="[0-9]*" value="<%=locals.toHour%>">
-                                        </div>
-                                        <div class="form-group form-group-day">
-                                            <label class="form-label" for="toMinute">Minute</label>
-                                            <input class="form-control" id="toMinute" name="toMinute" type="number" pattern="[0-9]*" value="<%=locals.toMinute%>">
-                                        </div>
-                                    </div>
-                                </fieldset>
-                            </div>
-                        </div>
-                    </div>
+                    <input type="text" id="bannerName" name="bannerName" value="<%=locals.name%>" class="govuk-input govuk-!-width-three-quarters" maxlength="20"<% if (locals.validationMessages.bannerName) { %> aria-invalid="true" aria-describedby="validation-bannerName" <% } %>>
                 </div>
-            </div>
-            <div class="form-submit submit-buttons">
-                <button type="submit" class="button">Save</button>
-                <a href="<%=locals.cancelLink%>" class="button button-secondary">Cancel</a>
-            </div>
-        </form>
+
+                <div class="govuk-form-group <%= (locals.validationMessages.bannerTitle !== undefined) ? 'govuk-form-group--error' : '' %>">
+                    <label class="govuk-label govuk-label--s" for="bannerTitle">Title</label>
+                <% if (locals.validationMessages.bannerTitle !== undefined) { %>
+                    <p id="validation-bannerTitle" class="govuk-error-message">
+                        <span class="govuk-visually-hidden">Error:</span> <%=locals.validationMessages.bannerTitle %>
+                    </p>
+                <% } %>
+                    <input type="text" id="bannerTitle" name="bannerTitle" value="<%=locals.bannerTitle%>" class="govuk-input govuk-!-width-three-quarters" maxlength="80"<% if (locals.validationMessages.bannerTitle) { %> aria-invalid="true" aria-describedby="validation-bannerTitle" <% } %>>
+                </div>
+
+                <div class="govuk-form-group <%= (locals.validationMessages.bannerMesssage !== undefined) ? 'govuk-form-group--error' : '' %>">
+                    <label class="govuk-label govuk-label--s" for="bannerMesssage">Message</label>
+                <% if (locals.validationMessages.bannerMesssage !== undefined) { %>
+                    <p id="validation-bannerMesssage" class="govuk-error-message">
+                        <span class="govuk-visually-hidden">Error:</span> <%=locals.validationMessages.bannerMesssage %>
+                    </p>
+                <% } %>
+                    <textarea type="text" id="bannerMesssage" name="bannerMesssage" value="<%=locals.message%>" class="govuk-textarea govuk-!-width-three-quarters" rows="4" maxlength="400"<% if (locals.validationMessages.bannerMesssage) { %> aria-invalid="true" aria-describedby="validation-bannerMesssage" <% } %>><%=locals.message%></textarea>
+                </div>
+
+                <!-- Display condition selection -->
+                <div class="govuk-form-group <%= (locals.validationMessages.bannerDisplay !== undefined) ? 'govuk-form-group--error' : '' %>">
+                    <fieldset class="govuk-fieldset">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                            When do you want this banner to be displayed?
+                        </legend>
+                    <% if (locals.validationMessages.bannerDisplay !== undefined) { %>
+                        <p id="validation-selected-organisation" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span> <%=locals.validationMessages.bannerDisplay %>
+                        </p>
+                    <% } %>
+                        <div class="govuk-radios">
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="notActive" name="bannerDisplay" type="radio" value="notActive" <%=locals.bannerDisplay === 'notActive' ? 'checked' : 'checked'%>>
+                                <label class="govuk-label govuk-radios__label" for="notActive">
+                                    Don't display
+                                </label>
+                            </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="alwayson" name="bannerDisplay" type="radio" value="isActive" <%=locals.bannerDisplay === 'isActive' ? 'checked' : ''%>>
+                                <label class="govuk-label govuk-radios__label" for="alwayson">
+                                    Always show this banner until I stop it
+                                </label>
+                            </div>
+                            <div class="govuk-radios__item" data-target="date">
+                                <input class="govuk-radios__input" id="date-radio" name="bannerDisplay" type="radio" value="date" <%=locals.bannerDisplay === 'date' ? 'checked' : ''%>>
+                                <label class="govuk-label govuk-radios__label" for="date-radio">
+                                    Only display this banner between a specific date and time
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <!-- Display date range -->
+                <div class="panel panel-border-narrow js-hidden" id="date">
+
+                    <!-- From date -->
+                    <div class="govuk-form-group <%= (locals.validationMessages.fromDate !== undefined) ? 'govuk-form-group--error' : '' %>">
+                        <fieldset class="govuk-fieldset">
+                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--s" id="fromDate">
+                                From date
+                            </legend>
+                            <div class="govuk-hint">For example, 31 03 1980 14:30</div>
+                        <% if (locals.validationMessages.fromDate !== undefined) { %>
+                            <p id="validation-selected-organisation" class="govuk-error-message">
+                                <span class="govuk-visually-hidden">Error:</span> <%=locals.validationMessages.fromDate %>
+                            </p>
+                        <% } %>
+                            <div class="govuk-date-input">
+                                
+                                <div class="govuk-date-input__item">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label govuk-date-input__label" for="fromDay">
+                                            Day
+                                        </label>
+                                        <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="fromDay" name="fromDay" type="text" inputmode="numeric" maxlength="2" pattern="[0-9]" value="<%=locals.fromDay%>">
+                                    </div>
+                                </div>
+
+                                <div class="govuk-date-input__item">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label govuk-date-input__label" for="fromMonth">
+                                            Month
+                                        </label>
+                                        <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="fromMonth" name="fromMonth" type="text" inputmode="numeric" maxlength="2" pattern="[0-9]" value="<%=locals.fromMonth%>">
+                                    </div>
+                                </div>
+
+                                <div class="govuk-date-input__item">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label govuk-date-input__label" for="fromYear">
+                                            Year
+                                        </label>
+                                        <input class="govuk-input govuk-date-input__input govuk-input--width-4" id="fromYear" name="fromYear" type="text" inputmode="numeric" maxlength="4" pattern="[0-9]" value="<%=locals.fromYear%>">
+                                    </div>
+                                </div>
+
+                                <div class="govuk-date-input__item">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label govuk-date-input__label" for="fromHour">
+                                            Hour
+                                        </label>
+                                        <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="fromHour" name="fromHour" type="text" inputmode="numeric" maxlength="2" pattern="[0-9]" value="<%=locals.fromHour%>">
+                                    </div>
+                                </div>
+
+                                <div class="govuk-date-input__item">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label govuk-date-input__label" for="fromMinute">
+                                            Minute
+                                        </label>
+                                        <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="fromMinute" name="fromMinute" type="text" inputmode="numeric" maxlength="2" pattern="[0-9]" value="<%=locals.fromMinute%>">
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            
+                        </fieldset>
+                    </div>
+
+                    <!-- To date -->
+                    <div class="govuk-form-group <%= (locals.validationMessages.toDate !== undefined) ? 'govuk-form-group--error' : '' %>">
+                        <fieldset class="govuk-fieldset">
+                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--s" id="toDate">
+                                To date
+                            </legend>
+                            <div class="govuk-hint">For example, 31 03 1980 14:30</div>
+                        <% if (locals.validationMessages.toDate !== undefined) { %>
+                            <p id="validation-selected-organisation" class="govuk-error-message">
+                                <span class="govuk-visually-hidden">Error:</span> <%=locals.validationMessages.toDate %>
+                            </p>
+                        <% } %>
+                            <div class="govuk-date-input">
+                                
+                                <div class="govuk-date-input__item">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label govuk-date-input__label" for="toDay">
+                                            Day
+                                        </label>
+                                        <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="toDay" name="toDay" type="text" inputmode="numeric" maxlength="2" pattern="[0-9]" value="<%=locals.toDay%>">
+                                    </div>
+                                </div>
+
+                                <div class="govuk-date-input__item">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label govuk-date-input__label" for="toMonth">
+                                            Month
+                                        </label>
+                                        <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="toMonth" name="toMonth" type="text" inputmode="numeric" maxlength="2" pattern="[0-9]" value="<%=locals.toMonth%>">
+                                    </div>
+                                </div>
+
+                                <div class="govuk-date-input__item">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label govuk-date-input__label" for="toYear">
+                                            Year
+                                        </label>
+                                        <input class="govuk-input govuk-date-input__input govuk-input--width-4" id="toYear" name="toYear" type="text" inputmode="numeric" maxlength="4" pattern="[0-9]" value="<%=locals.toYear%>">
+                                    </div>
+                                </div>
+
+                                <div class="govuk-date-input__item">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label govuk-date-input__label" for="toHour">
+                                            Hour
+                                        </label>
+                                        <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="toHour" name="toHour" type="text" inputmode="numeric" maxlength="2" pattern="[0-9]" value="<%=locals.toHour%>">
+                                    </div>
+                                </div>
+
+                                <div class="govuk-date-input__item">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label govuk-date-input__label" for="toMinute">
+                                            Minute
+                                        </label>
+                                        <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="toMinute" name="toMinute" type="text" inputmode="numeric" maxlength="2" pattern="[0-9]" value="<%=locals.toMinute%>">
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            
+                        </fieldset>
+                    </div>
+
+                </div>
+
+                <div class="govuk-button-group">
+                    <button type="submit" class="govuk-button" data-module="govuk-button">Save</button>
+                    <a href="<%=locals.cancelLink%>" class="govuk-button govuk-button--secondary">Cancel</a>
+                </div>
+
+            </form>
+        </div>
+    <% if (locals.isEditExisting) { %>
+        <div class="govuk-grid-column-one-quarter">
+            <aside id="related-actions" class="govuk-!-margin-top-0">
+                <h2 class="govuk-heading-m">Actions</h2>
+                <ul class="govuk-list">
+                    <li>
+                        <a class="govuk-link-bold" href="<%=locals.bannerId%>/delete-banner">Delete banner</a>
+                    </li>
+                </ul>
+            </aside>
+        </div>
+    <% } %>
     </div>
 </div>

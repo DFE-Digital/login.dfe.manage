@@ -1,80 +1,79 @@
-<div class="row">
-    <div class="col-6">
-        <h1 class="heading-xlarge">Organisations</h1>
-    </div>
-</div>
-
-<%
-const paginationModel = {
-    method: 'post',
-    csrfToken,
-    currentPage: locals.page,
-    numberOfPages: locals.numberOfPages,
-    totalNumberOfResults: locals.totalNumberOfResults,
-    numberOfResultsOnPage: locals.organisations.length,
-    data: [
-        { key: 'criteria', value: locals.criteria },
-    ]
-}
-%>
-
-<div class="row row-spacer">
-    <div class="col-6">
-        <form method="post">
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
-
-            <div class="search-field">
-                <fieldset class="search-input">
-                    <label for="criteria" class="vh">Search by name, urn, uid or ukprn</label>
-                    <input type="text" id="criteria" name="criteria" value="<%= criteria %>" class="form-control"
-                           placeholder="Search by name, urn, uid or ukprn">
+<div class="govuk-width-container govuk-!-margin-top-9">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <h1 class="govuk-heading-xl govuk-!-margin-top-0">
+                Organisations
+            </h1>
+            <form method="post" id="form-organisation-search">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                <fieldset class="govuk-fieldset">
+                    <div class="govuk-form-group">
+                        <label for="criteria" class="govuk-label govuk-label--s govuk-visually-hidden">
+                            Search by name, urn, uid or ukprn
+                        </label>
+                        <input class="govuk-input govuk-!-width-three-quarters" type="text" id="criteria" name="criteria" value="<%= criteria %>" placeholder="Search by name, urn, uid or ukprn">
+                        <button type="submit" class="govuk-button" data-module="govuk-button">
+                            Search
+                        </button>
+                    </div>
                 </fieldset>
-                <fieldset class="search-submit">
-                    <button type="submit" class="button">Search</button>
-                </fieldset>
-            </div>
-        </form>
-    </div>
-
-    <div class="col-6">
-        <div class="buttons pull-right">
+            </form>
         </div>
     </div>
-</div>
+    
+    <%
+    const paginationModel = {
+        method: 'post',
+        csrfToken,
+        currentPage: locals.page,
+        numberOfPages: locals.numberOfPages,
+        totalNumberOfResults: locals.totalNumberOfResults,
+        numberOfResultsOnPage: locals.organisations.length,
+        data: [
+            { key: 'criteria', value: locals.criteria },
+        ]
+    }
+    %>
 
-
-<div class="row">
-    <div class="col-12">
-        <%- include('../../layouts/pagination', paginationModel); %>
-        <table class="data">
-            <thead>
-            <tr class="sortable">
-                <th scope="col" class="cwp-35">Name</th>
-                <th scope="col" class="cwp-20">Type</th>
-                <th scope="col" class="cwp-10">URN</th>
-                <th scope="col" class="cwp-10">UID</th>
-                <th scope="col" class="cwp-10">UKPRN</th>
-                <th scope="col" class="cwp-10">Status</th>
-            </tr>
-            </thead>
-            <tbody>
-            <% if(locals.organisations.length === 0 && locals.criteria) { %>
-                <tr>
-                    <td colspan="5"><span class="empty-state">No organisations found</span></td>
-                </tr>
-            <% } %>
-            <% for (let i = 0; i < locals.organisations.length; i++) { %>
-                <tr>
-                    <td><a href="organisations/<%= organisations[i].id %>/users"><%= organisations[i].name %></a></td>
-                    <td><%= organisations[i].category.name %></td>
-                    <td><%= organisations[i].urn %></td>
-                    <td><%= organisations[i].uid %></td>
-                    <td><%= organisations[i].ukprn %></td>
-                    <td><%= organisations[i].status!==undefined ? organisations[i].status.name : '' %></td>
-                </tr>
-            <% } %>
-            </tbody>
-        </table>
-        <%- include('../../layouts/pagination', paginationModel); %>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <%- include('../../layouts/pagination', paginationModel); %>
+            <table class="govuk-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row sortable">
+                        <th scope="col" class="govuk-table__header width-35">Name</th>
+                        <th scope="col" class="govuk-table__header width-20">Type</th>
+                        <th scope="col" class="govuk-table__header width-10">URN</th>
+                        <th scope="col" class="govuk-table__header width-10">UID</th>
+                        <th scope="col" class="govuk-table__header width-10">UKPRN</th>
+                        <th scope="col" class="govuk-table__header width-15 govuk-table__header--numeric">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    <% if(locals.organisations.length === 0 && locals.criteria) { %>
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell" colspan="6">
+                            <div class="empty-state">
+                                <p class="govuk-body">No organisations found</p>
+                            </div>
+                        </td>
+                    </tr>
+                <% } %>
+                <% for (let i = 0; i < locals.organisations.length; i++) { %>
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell">
+                            <a class="govuk-link" href="organisations/<%= organisations[i].id %>/users"><%= organisations[i].name %></a>
+                        </td>
+                        <td class="govuk-table__cell"><%= organisations[i].category.name %></td>
+                        <td class="govuk-table__cell"><%= organisations[i].urn %></td>
+                        <td class="govuk-table__cell"><%= organisations[i].uid %></td>
+                        <td class="govuk-table__cell"><%= organisations[i].ukprn %></td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric"><%= organisations[i].status!==undefined ? organisations[i].status.name : '' %></td>
+                    </tr>
+                <% } %>
+                </tbody>
+            </table>
+            <%- include('../../layouts/pagination', paginationModel); %>
+        </div>
     </div>
 </div>

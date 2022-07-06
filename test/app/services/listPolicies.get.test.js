@@ -18,6 +18,11 @@ describe('when getting the list of service policies', () => {
       params: {
         sid: 'service1'
       },
+      userServices: {
+        roles: [{
+          code: 'serviceid_serviceconfiguration'
+        }]
+      },
       query: {
         page: 1,
         pageSize: 25,

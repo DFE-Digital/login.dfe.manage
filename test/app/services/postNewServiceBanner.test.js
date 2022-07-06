@@ -85,7 +85,7 @@ describe('when creating a new service banner', () => {
       toYear: '2019',
       bannerId: 'bannerId',
       validationMessages: {
-        name: 'Please enter a banner name',
+        bannerName: 'Please enter a banner name',
       },
     });
   });
@@ -118,7 +118,7 @@ describe('when creating a new service banner', () => {
       toYear: '2019',
       bannerId: 'bannerId',
       validationMessages: {
-        title: 'Please enter a banner title',
+        bannerTitle: 'Please enter a banner title',
       },
     });
   });
@@ -151,7 +151,7 @@ describe('when creating a new service banner', () => {
       toYear: '2019',
       bannerId: 'bannerId',
       validationMessages: {
-        message: 'Please enter a banner message',
+        bannerMesssage: 'Please enter a banner message',
       },
     });
   });

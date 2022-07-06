@@ -123,6 +123,7 @@ const getFriendlyOrganisationRegion = async (regionCodeId) => {
 };
 const getFriendlyOrganisationStatus = async (statusId) => {
   const organisationStatus = [
+    { id: '0', name: 'Hidden' },
     { id: '1', name: 'Open' },
     { id: '2', name: 'Closed' },
     { id: '3', name: 'Proposed to close' },
@@ -242,9 +243,19 @@ const waitForIndexToUpdate = async (uid, updatedCheck) => {
   }
 };
 
+const getUserServiceRoles = async (req) => {
+  const allUserRoles = req.userServices.roles.map((role) => ({
+    serviceId: role.code.substr(0, role.code.indexOf('_')),
+    role: role.code.substr(role.code.lastIndexOf('_') + 1),
+  }));
+  const userRolesForService = allUserRoles.filter((x) => x.serviceId === req.params.sid);
+  return userRolesForService.map((x) => x.role);
+};
+
 module.exports = {
   getUserDetails,
   getFriendlyFieldName,
   getFriendlyValues,
   waitForIndexToUpdate,
+  getUserServiceRoles,
 };

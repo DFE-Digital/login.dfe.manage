@@ -1,13 +1,18 @@
-const config = require('./../../infrastructure/config');
-const { getUserDetails } = require('./utils');
 const ServiceNotificationsClient = require('login.dfe.service-notifications.jobs.client');
+const config = require('../../infrastructure/config');
+const { getUserDetails, getUserServiceRoles } = require('./utils');
 
 const get = async (req, res) => {
   const user = await getUserDetails(req);
+  const manageRolesForService = await getUserServiceRoles(req);
+
   return res.render('services/views/webServiceSync', {
     user,
     csrfToken: req.csrfToken(),
     backLink: true,
+    serviceId: req.params.sid,
+    userRoles: manageRolesForService,
+    currentPage: 'web-service-sync',
   });
 };
 

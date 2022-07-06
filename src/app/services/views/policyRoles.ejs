@@ -1,29 +1,48 @@
-<%- include('policySummary', {area: 'roles'}); %>
-
-<% if (locals.policy.roles.length > 0) { %>
-    <table class="data no-borders">
-        <thead>
-        <tr>
-            <th scope="col" class="cwp-40">Name</th>
-            <th scope="col" class="cwp-20">Code</th>
-            <th scope="col" class="cwp-30">ID</th>
-            <th scope="col" class="cwp-30">Status</th>
-        </tr>
-        </thead>
-        <tbody>
-        <% for (let i = 0; i < locals.policy.roles.length; i++) { %>
-            <% const role = locals.policy.roles[i];%>
-            <tr>
-                <td> <%= role.name %></td>
-                <td><%= role.code %></td>
-                <td><%= role.numericId %></td>
-                <td><%= role.status ? role.status.id : '' %></td>
-            </tr>
-        <% } %>
-        </tbody>
-    </table>
-<% } else { %>
-    <div class="empty-state">
-        <p><%= locals.policy.name %> has no roles</p>
+<div class="govuk-width-container">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <%- include('policySummary'); %>
+        </div>
     </div>
-<% } %>
+    <div class="govuk-grid-row govuk-!-margin-top-9">
+        <div class="govuk-grid-column-full">
+            <div class="govuk-tabs" data-module="govuk-tabs">
+                <%- include('policyNavigation', {area: 'roles'}); %>
+
+                <div class="govuk-tabs__panel" id="policy-roles-panel">
+                    <h2 class="govuk-heading-l govuk-visually-hidden">Policy Roles</h2>
+                    <table class="govuk-table">
+                        <thead class="govuk-table__head">
+                            <tr class="govuk-table__row sortable">
+                                <th scope="col" class="govuk-table__header width-40">Name</th>
+                                <th scope="col" class="govuk-table__header width-20">Code</th>
+                                <th scope="col" class="govuk-table__header width-30">ID</th>
+                                <th scope="col" class="govuk-table__header width-10 govuk-table__header--numeric">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="govuk-table__body">
+                        <% if (locals.policy.roles.length === 0) { %>
+                            <tr class="govuk-table__row">
+                                <td class="govuk-table__cell" colspan="4">
+                                    <div class="empty-state">
+                                        <p class="govuk-body"><%= locals.policy.name %> has no roles</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% } %>
+                        <% for (let i = 0; i < locals.policy.roles.length; i++) { %>
+                            <% const role = locals.policy.roles[i];%>
+                            <tr class="govuk-table__row">
+                                <td class="govuk-table__cell"><%= role.name %></td>
+                                <td class="govuk-table__cell"><%= role.code %></td>
+                                <td class="govuk-table__cell"><%= role.numericId %></td>
+                                <td class="govuk-table__cell govuk-table__cell--numeric"><%= role.status ? role.status.id : '' %></td>
+                            </tr>
+                        <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

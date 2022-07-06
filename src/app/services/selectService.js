@@ -1,13 +1,13 @@
 'use strict';
-const { getServiceById } = require('./../../infrastructure/applications');
+
 const uniqBy = require('lodash/uniqBy');
 const sortBy = require('lodash/sortBy');
+const { getServiceById } = require('../../infrastructure/applications');
 
 const getServiceDetails = async (req) => {
-
   let userServices = req.userServices.roles.map((role) => ({
     id: role.code.substr(0, role.code.indexOf('_')),
-    name: ''
+    name: '',
   }));
 
   userServices = uniqBy(userServices, 'id');
@@ -15,7 +15,8 @@ const getServiceDetails = async (req) => {
   for (let i = 0; i < userServices.length; i++) {
     const service = userServices[i];
     const application = await getServiceById(service.id, req.id);
-    service.name = application.name
+    service.name = application.name;
+    service.description = application.description;
   }
   return sortBy(userServices, 'name');
 };
@@ -34,12 +35,12 @@ const get = async (req, res) => {
     title: 'Select service',
     services: userServices,
     validationMessages: {},
-  })
+  });
 };
 
 const validate = async (req) => {
   const userServices = await getServiceDetails(req);
-  const selectedService = req.body.selectedService;
+  const { selectedService } = req.body;
   const model = {
     title: 'Select service',
     services: userServices,
@@ -47,7 +48,7 @@ const validate = async (req) => {
     validationMessages: {},
   };
   if (model.selectedService === undefined || model.selectedService === null) {
-    model.validationMessages.selectedService = 'Please select a service'
+    model.validationMessages.selectedService = 'Please select a service';
   }
   return model;
 };
@@ -59,7 +60,7 @@ const post = async (req, res) => {
     model.csrfToken = req.csrfToken();
     return res.render('services/views/selectService', model);
   }
-  return res.redirect(`/services/${model.selectedService}`)
+  return res.redirect(`/services/${model.selectedService}`);
 };
 
 module.exports = {

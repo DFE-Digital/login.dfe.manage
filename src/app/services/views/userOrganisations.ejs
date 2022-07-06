@@ -1,77 +1,96 @@
-<%- include('summaryPartial', {area: 'organisations', user: locals.user, isInvitation: locals.isInvitation}); %>
+<div class="govuk-width-container govuk-!-margin-top-9">
+    <%- include('summaryPartial', {area: 'organisations', user: locals.user, isInvitation: locals.isInvitation}); %>
+    <div class="govuk-grid-row govuk-!-margin-top-9">
+        <div class="govuk-grid-column-full">
+            <div class="govuk-tabs" data-module="govuk-tabs">
+                <%- include('organisationNavigation', {area: 'organisations', isInvitation: locals.isInvitation, isAudit: locals.isAudit}); %>
 
-<% if (locals.organisations.length > 0) {%>
-    <table class="data no-borders">
-        <thead>
-        <tr>
-            <th scope="col" class="cwp-40">Organisation</th>
-            <% if (!locals.isInvitation ) {%>
-                <th scope="col" class="cwp-20">Legacy ID/Name</th>
-            <% }%>
-            <th scope="col" class="cwp-20">Permission level</th>
-            <th scope="col" class="cwp-30">Action</th>
-        </tr>
-        </thead>
-        <tbody>
-        <% for (let o = 0; o < locals.organisations.length; o++) { %>
-            <% const org = locals.organisations[o];%>
-            <tr>
-                <td> <%=org.name%> <br>
-                    <article class="organisation-services" style="margin-bottom: 0">
-                        <section class="organisation">
-                            <div class="user">
-                                <a href="" class="info-link">Information and approvers <span class="vh">for <%=org.name%></span> </a>
-                            </div>
-                            <div class="meta js-hidden">
-                                <div class="approvers">
-                                    <dl class="inline condensed small-dt">
-                                        <% if (org.urn) { %>
-                                        <dt><abbr title="Unique Reference Number">URN:</abbr></dt>
-                                        <dd><%=org.urn%></dd>
-                                        <% } %>
+                <div class="govuk-tabs__panel" id="policy-roles-panel">
+                    <h2 class="govuk-heading-l govuk-visually-hidden">Organisations</h2>
+                    <table class="data govuk-table custom-manage-table">
+                        <thead class="govuk-table__head">
+                            <tr class="govuk-table__row">
+                                <th scope="col" class="govuk-table__header width-40">Organisation</th>
+                                <% if (!locals.isInvitation ) {%>
+                                <th scope="col" class="govuk-table__header width-20">Legacy ID/Name</th>
+                                <% }%>
+                                <th scope="col" class="govuk-table__header width-20">Permission level</th>
+                                <th scope="col" class="govuk-table__header width-30">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="govuk-table__body">
+                            <% if (locals.organisations.length === 0) { %>
+                                <tr class="govuk-table__row">
+                                    <td class="govuk-table__cell" colspan="4">
+                                        <div class="empty-state">
+                                            <p class="govuk-body"><%= user.name %> is not associated with any organisations</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% } %>
+                            <% for (let o = 0; o < locals.organisations.length; o++) { %> <% const org = locals.organisations[o];%>
+                            <tr class="govuk-table__row">
+                                <td>
+                                    <%=org.name%>
+                                    <br />
 
-                                        <% if (org.uid) { %>
-                                        <dt><abbr title="Unique Identifier">UID:</abbr></dt>
-                                        <dd><%=org.uid%></dd>
-                                        <% } %>
+                                    <details class="govuk-details govuk-!-margin-bottom-0" data-module="govuk-details">
+                                        <summary class="govuk-details__summary">
+                                            <span class="govuk-details__summary-text">Information and approvers</span>
+                                        </summary>
 
-                                        <% if (org.ukprn) { %>
-                                        <dt><abbr title="UK Provider Reference Number">UKPRN:</abbr></dt>
-                                        <dd><%=org.ukprn%></dd>
-                                        <% } %>
-
-                                        <% if (org.approvers.length > 0) { %>
-                                            <dt>Approvers:</dt>
-                                            <dd>
-                                                <ul>
-                                                    <% for (let a = 0; a < org.approvers.length; a++) { %>
-                                                    <li><%=org.approvers[a].name%> <a href="mailto:<%=org.approvers[a].email%>"><%=org.approvers[a].email%></a></li>
+                                        <div class="govuk-details__text govuk-!-margin-top-0">
+                                            <div class="approvers">
+                                                <dl class="inline govuk-!-margin-bottom-0 govuk-!-margin-top-0">
+                                                    <% if (org.urn) { %>
+                                                    <dt class="govuk-label"><abbr title="Unique Reference Number">URN:</abbr></dt>
+                                                    <dd class="govuk-label"><%=org.urn%></dd>
+                                                    <% } %> <% if (org.uid) { %>
+                                                    <dt class="govuk-label"><abbr title="Unique Identifier">UID:</abbr></dt>
+                                                    <dd class="govuk-label"><%=org.uid%></dd>
+                                                    <% } %> <% if (org.ukprn) { %>
+                                                    <dt class="govuk-label">
+                                                        <abbr title="UK Provider Reference Number">UKPRN:</abbr>
+                                                    </dt>
+                                                    <dd class="govuk-label"><%=org.ukprn%></dd>
+                                                    <% } %> <% if (org.approvers.length > 0) { %>
+                                                    <dt class="govuk-label">Approvers:</dt>
+                                                    <dd class="govuk-label">
+                                                        <ul class="govuk-list govuk-!-margin-bottom-0">
+                                                            <% for (let a = 0; a < org.approvers.length; a++) { %>
+                                                            <li>
+                                                                <%=org.approvers[a].name%>
+                                                                <a class="govuk-link" href="mailto:<%=org.approvers[a].email%>">
+                                                                    <%=org.approvers[a].email%>
+                                                                </a>
+                                                            </li>
+                                                            <% } %>
+                                                        </ul>
+                                                    </dd>
                                                     <% } %>
-                                                </ul>
-                                            </dd>
-                                        <% } %>
-                                    </dl>
-                                </div>
-                            </div>
-                        </section>
-                    </article>
-                </td>
-                <% if (!locals.isInvitation ) {%>
-                    <td><%= org.numericIdentifier && org.textIdentifier ? `${org.numericIdentifier} / ${org.textIdentifier}` : '' -%></td>
-                <% }%>
-                <% if (org.role) { %>
-                <td><%=org.role.name%></td>
-                <% } else { %>
-                    <td>Unknown</td>
-                <% } %>
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </details>
+                                </td>
+                                <% if (!locals.isInvitation ) {%>
+                                <td>
+                                    <%= org.numericIdentifier && org.textIdentifier ? `${org.numericIdentifier} /
+                                    ${org.textIdentifier}` : '' -%>
+                                </td>
+                                <% }%> <% if (org.role) { %>
+                                <td><%=org.role.name%></td>
+                                <% } else { %>
+                                <td>Unknown</td>
+                                <% } %>
 
-                <td><a href="organisations/<%= org.id %>">Edit service</a></td>
-            </tr>
-        <%}%>
-        </tbody>
-    </table>
-<% } else { %>
-    <div class="empty-state">
-        <p><%= user.name %> is not associated with any organisations</p>
+                                <td><a class="govuk-link" href="organisations/<%= org.id %>">Edit service</a></td>
+                            </tr>
+                            <%}%>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
-<% } %>
+</div>

@@ -1,64 +1,141 @@
-<div class="row">
-    <div class="col-8">
-        <h1 class="heading-xlarge">
-            <span class="heading-secondary"><%=locals.serviceDetails.name%></span>
-            Manage service
-        </h1>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-12">
-        <div class="manage-cards">
-            <div class="<%=locals.userRoles.includes('serviceconfig') ? 'manage-card' : 'manage-card-disabled'%>">
-                <% if (locals.userRoles.includes('serviceconfig')) { %>
-                <a href="<%=locals.serviceId%>/service-configuration"></a>
-                <% } %>
-                <h2 class="heading-large">Service configuration</h2>
-                <p>Manage the urls and secret keys for your service.</p>
-            </div>
-
-            <div class="<%=locals.userRoles.includes('serviceBanner') ? 'manage-card' : 'manage-card-disabled'%>">
-                <% if (locals.userRoles.includes('serviceBanner')) { %>
-                <a href="<%=locals.serviceId%>/service-banners"></a>
-                <% } %>
-                <h2 class="heading-large">Manage banners</h2>
-                <p>Manage banners that will be displayed on the DfE Sign-in page for your service.</p>
-            </div>
-
-            <div class="manage-card-disabled">
-                <h2 class="heading-large">Access Management</h2>
-                <p>Manage the policies and roles of your service.</p>
-                <% if (locals.userRoles.includes('accessManage')) { %>
-                    <p class="manage-link"><a href="<%= locals.serviceId %>/policies">Manage policies</a></p>
-                    <p class="manage-link"><a href="<%= locals.serviceId %>/roles">Manage roles</a></p>
-                <% } %>
-            </div>
-
-            <div class="<%=locals.userRoles.includes('serviceReport') ? 'manage-card' : 'manage-card-disabled'%>">
-                <% if (locals.userRoles.includes('serviceReport')) { %>
-                    <a href=""></a>
-                <% } %>
-                    <h2 class="heading-large">Reports</h2>
-                <p>View reports for the users of your service.</p>
-            </div>
-
-            <div class="manage-card-disabled">
-                <h2 class="heading-large">Support</h2>
-                <p>Manage the organisations, approvers and users of your service.</p>
-                <% if (locals.userRoles.includes('serviceSup')) { %>
-                    <p class="manage-link"><a href="<%= locals.serviceId %>/users">Users</a></p>
-                    <p class="manage-link"><a href="<%= locals.serviceId %>/organisations">Organisations</a></p>
-                <% } %>
-            </div>
-
-            <div class="<%=locals.userRoles.includes('serviceTeam') ? 'manage-card' : 'manage-card-disabled'%>">
-                <% if (locals.userRoles.includes('serviceTeam')) { %>
-                    <a href=""></a>
-                <% } %>
-                <h2 class="heading-large">Manage team</h2>
-                <p>Manage the roles and access permissions of your team.</p>
+<div id="home-top" class="home-top">
+    <div class="govuk-width-container">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <h1 class="govuk-heading-xl govuk-!-margin-top-5 govuk-!-margin-bottom-5">DfE Manage</h1>
+                <h3 class="govuk-heading-m">
+                    Here you can manage and configure your service and its policies, as well as determine who has access
+                    to your service.
+                </h3>
             </div>
         </div>
     </div>
+</div>
+<div class="govuk-width-container govuk-!-margin-top-9">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <h1 id="service-name" class="govuk-heading-xl govuk-!-margin-top-0">
+                <%=locals.serviceDetails.name%>
+            </h1>
+        </div>
+        <!-- side menu with related actions -->
+        <div class="govuk-grid-column-one-quarter">
+            <aside id="related-actions" class="govuk-!-margin-top-0">
+                <h2 class="govuk-heading-m">Related actions</h2>
+                <ul class="govuk-list">
+                    <li>
+                        <a id="change-service" class="govuk-link-bold" href="/">Change service</a>
+                    </li>
+                </ul>
+            </aside>
+        </div>
+    </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h1 class="govuk-heading-m govuk-!-margin-bottom-0">Set up and configure your service</h1>
+            <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible govuk-!-margin-top-1" />
+        </div>
+    </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <div class="manage-cards">
+                <% if (locals.userRoles.includes('serviceconfig')) { %>
+                <div class="manage-card">
+                    <h3 class="govuk-heading-s">
+                        <a
+                            id="service-configuration"
+                            class="govuk-link-bold"
+                            href="<%=locals.serviceId%>/service-configuration"
+                            >Service configuration</a
+                        >
+                    </h3>
+                    <p class="govuk-body">See your service configuration information.</p>
+                </div>
+
+                <% } %> <% if (locals.userRoles.includes('accessManage')) { %>
+
+                <div class="manage-card">
+                    <h3 class="govuk-heading-s">
+                        <a id="manage-policies" class="govuk-link-bold" href="<%= locals.serviceId %>/policies"
+                            >Manage policies</a
+                        >
+                    </h3>
+                    <p class="govuk-body">
+                        Change your service policies to determine who can and cannot access your service.
+                    </p>
+                </div>
+                <% } %>
+
+                <!-- TODO: - add after the Manage Roles functionality in place -->
+                <!-- <% if (locals.userRoles.includes('accessManage')) { %>
+
+                <div class="manage-card">
+                    <h3 class="govuk-heading-s">
+                        <a id="manage-roles" class="govuk-link-bold" href="<%= locals.serviceId %>/roles">Manage roles</a>
+                    </h3>
+                    <p class="govuk-body">
+                        Change your service roles to provide different levels of access to your service.
+                    </p>
+                </div>
+                <% } %> 
+                 -->
+
+                <% if (locals.userRoles.includes('serviceBanner')) { %>
+                <div class="manage-card">
+                    <h3 class="govuk-heading-s">
+                        <a id="service-banner" class="govuk-link-bold" href="<%=locals.serviceId%>/service-banners">Create service banner</a>
+                    </h3>
+                    <p class="govuk-body">
+                        Create a banner about your service that will be shown to users on DfE Sign-in.
+                    </p>
+                </div>
+                <% } %>
+
+                <!-- TODO: update after Service Configuration functionality in place -->
+                <!--  <% if (locals.userRoles.includes('serviceconfig')) { %>
+                <div class="manage-card">
+                    <h3 class="govuk-heading-s">
+                        <a class="govuk-link-bold" href="<%=locals.serviceId%>/service-configuration"
+                            >Update service description</a
+                        >
+                    </h3>
+                    <p class="govuk-body">Create or modify your service's description.</p>
+                </div>
+                <% } %> -->
+            </div>
+        </div>
+    </div>
+    <% if (locals.userRoles.includes('serviceSup')) { %>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h1 class="govuk-heading-m govuk-!-margin-bottom-0">Manage your service's users</h1>
+            <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible govuk-!-margin-top-1" />
+        </div>
+    </div>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <div class="manage-cards">
+                <div class="manage-card">
+                    <h3 class="govuk-heading-s">
+                        <a id="user-management" class="govuk-link-bold" href="<%=locals.serviceId %>/users"
+                            >User management</a
+                        >
+                    </h3>
+                    <p class="govuk-body">Manage those who use your service and invite new users.</p>
+                </div>
+
+                <div class="manage-card">
+                    <h3 class="govuk-heading-s">
+                        <a id="organisation-search" class="govuk-link-bold" href="<%=locals.serviceId %>/organisations"
+                            >Organisation search</a
+                        >
+                    </h3>
+                    <p class="govuk-body">Search for an organisation</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <% } %>
 </div>

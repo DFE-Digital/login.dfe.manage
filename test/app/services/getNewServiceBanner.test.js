@@ -16,7 +16,11 @@ describe('when getting the create new service banner view', () => {
         sid: 'service1',
         bid: 'bannerId',
       },
-
+      userServices: {
+        roles: [{
+          code: 'serviceid_serviceconfiguration'
+        }]
+      },
     });
 
     getBannerById.mockReset();

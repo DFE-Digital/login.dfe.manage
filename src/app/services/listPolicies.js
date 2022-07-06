@@ -1,5 +1,6 @@
-const { getServiceById } = require('./../../infrastructure/applications');
-const { getPageOfPoliciesForService } = require('./../../infrastructure/access');
+const { getServiceById } = require('../../infrastructure/applications');
+const { getPageOfPoliciesForService } = require('../../infrastructure/access');
+const { getUserServiceRoles } = require('./utils');
 
 const viewModel = async (req) => {
   const paramsSource = req.method === 'POST' ? req.body : req.query;
@@ -10,6 +11,8 @@ const viewModel = async (req) => {
 
   const serviceDetails = await getServiceById(req.params.sid, req.id);
   const servicePolicies = await getPageOfPoliciesForService(req.params.sid, page, 25, req.id);
+  const manageRolesForService = await getUserServiceRoles(req);
+
   return {
     csrfToken: req.csrfToken(),
     backLink: true,
@@ -18,7 +21,10 @@ const viewModel = async (req) => {
     page: servicePolicies.page,
     totalNumberOfResults: servicePolicies.totalNumberOfRecords,
     numberOfPages: servicePolicies.totalNumberOfPages,
-  }
+    serviceId: req.params.sid,
+    userRoles: manageRolesForService,
+    currentPage: 'policies',
+  };
 };
 
 const get = async (req, res) => {
