@@ -11,26 +11,20 @@
         </div>
     </div>
 </div>
-<div class="govuk-width-container">
+<div class="govuk-width-container govuk-!-margin-top-9">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-three-quarters">
-            <div class="row">
-                <div class="col-8">
-                    <h1 id="service-name" class="govuk-heading-xl govuk-!-margin-top-5">
-                        <%=locals.serviceDetails.name%>
-                    </h1>
-                </div>
-            </div>
+            <h1 id="service-name" class="govuk-heading-xl govuk-!-margin-top-0">
+                <%=locals.serviceDetails.name%>
+            </h1>
         </div>
         <!-- side menu with related actions -->
         <div class="govuk-grid-column-one-quarter">
-            <aside id="related-actions">
+            <aside id="related-actions" class="govuk-!-margin-top-0">
                 <h2 class="govuk-heading-m">Related actions</h2>
                 <ul class="govuk-list">
                     <li>
-                        <h3 class="govuk-heading-s">
-                            <a id="change-service" class="govuk-link-bold" href="/">Change service</a>
-                        </h3>
+                        <a id="change-service" class="govuk-link-bold" href="/">Change service</a>
                     </li>
                 </ul>
             </aside>
@@ -38,12 +32,14 @@
     </div>
 
     <div class="govuk-grid-row">
-        <h1 class="govuk-heading-m govuk-!-margin-bottom-0">Set up and configure your service</h1>
-        <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible govuk-!-margin-top-1" />
+        <div class="govuk-grid-column-full">
+            <h1 class="govuk-heading-m govuk-!-margin-bottom-0">Set up and configure your service</h1>
+            <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible govuk-!-margin-top-1" />
+        </div>
     </div>
 
     <div class="govuk-grid-row">
-        <div class="col-12">
+        <div class="govuk-grid-column-full">
             <div class="manage-cards">
                 <% if (locals.userRoles.includes('serviceconfig')) { %>
                 <div class="manage-card">
@@ -113,11 +109,13 @@
     </div>
     <% if (locals.userRoles.includes('serviceSup')) { %>
     <div class="govuk-grid-row">
-        <h1 class="govuk-heading-m govuk-!-margin-bottom-0">Manage your service's users</h1>
-        <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible govuk-!-margin-top-1" />
+        <div class="govuk-grid-column-full">
+            <h1 class="govuk-heading-m govuk-!-margin-bottom-0">Manage your service's users</h1>
+            <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible govuk-!-margin-top-1" />
+        </div>
     </div>
     <div class="govuk-grid-row">
-        <div class="col-12">
+        <div class="govuk-grid-column-full">
             <div class="manage-cards">
                 <div class="manage-card">
                     <h3 class="govuk-heading-s">

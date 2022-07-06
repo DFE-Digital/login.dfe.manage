@@ -1,7 +1,7 @@
-<div class="govuk-width-container">
+<div class="govuk-width-container govuk-!-margin-top-9">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <h1 class="govuk-heading-xl text-break">
+            <h1 class="govuk-heading-l">
             Review invitation
         </h1>
         <% if (locals.user.isExistingUser) { %>
@@ -10,14 +10,8 @@
             <p class="govuk-body-l">The user will have to confirm their email address and create a password before their account is active.</p>
         <% } %>
 
+        <h2 class="govuk-heading-m">Personal details</h2>
         <dl class="govuk-summary-list">
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    Personal details
-                </dt>
-                <dd class="govuk-summary-list__value">
-                </dd>
-            </div>
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     First name
@@ -26,7 +20,6 @@
                     <%= locals.user.firstName %>
                 </dd>
             </div>
-
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     Last name
@@ -36,7 +29,6 @@
                 </dd>
 
             </div>
-
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     Email Address
@@ -47,14 +39,8 @@
             </div>
         </dl>
 
-
+        <h2 class="govuk-heading-m">Organisation</h2>
         <dl class="govuk-summary-list">
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    Organisation
-                </dt>
-                <dd class="govuk-summary-list__value"></dd>
-            </div>
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     Name
@@ -73,15 +59,8 @@
             </div>
         </dl>
 
+        <h2 class="govuk-heading-m">Service</h2>
         <dl class="govuk-summary-list">
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    Service
-                </dt>
-                <dd class="govuk-summary-list__value"></dd>
-
-            </div>
-
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-!-font-weight-regular">
                     Name

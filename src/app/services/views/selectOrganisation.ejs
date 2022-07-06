@@ -1,7 +1,7 @@
-<div class="govuk-width-container">
+<div class="govuk-width-container govuk-!-margin-top-9">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-three-quarters">
-            <h1 class="govuk-heading-xl">Select organisation</h1>
+            <h1 class="govuk-heading-l">Select organisation</h1>
 
             <p class="govuk-body">
                 <%= locals.user.firstName + ' ' + locals.user.lastName %> has a DfE Sign-in account and is associated
@@ -14,38 +14,36 @@
                     class="govuk-form-group <%= (locals.validationMessages.selectedOrganisation !== undefined) ? 'govuk-form-group--error' : '' %>">
                     <fieldset class="govuk-fieldset">
                         <% if (locals.validationMessages.selectedOrganisation !== undefined) { %>
-                        <span id="validation-selected-organisation" class="govuk-error-message">
+                        <p id="validation-selected-organisation" class="govuk-error-message">
                             <span class="govuk-visually-hidden">Error:</span>
                             <%=locals.validationMessages.selectedOrganisation %>
-                        </span>
+                        </p>
                         <% } %>
-                        <legend>
-                            <p class="govuk-body">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                                 Select an organisation below or
                                 <a class="govuk-link" href="associate-organisation">add a new organisation</a>
-                            </p>
                         </legend>
                         <div class="govuk-radios">
                             <% for(let i= 0; i < locals.organisations.length; i++) { const org =
-                            locals.organisations[i]; %> <% if (org.organisation.status) { %>
-                            <div class="govuk-radios__item">
-                                <input class="govuk-radios__input <%= locals.organisations.length > 2 ?
-                                'auto-scroll-on-change' : '' %>" id="<%= org.organisation.id %>" type="radio"
-                                name="selectedOrganisation" value="<%= org.organisation.id %>" <%= org.organisation.id
-                                === selectedOrganisation ? 'checked': ''%> >
-                                <label class="govuk-label govuk-radios__label" for="<%= org.organisation.id %>">
-                                    <span class="govuk-label govuk-label--s">
-                                        <%= org.organisation.name %> <%=org.organisation.status ?
-                                        `(${org.organisation.status.name})` : '' %>
-                                    </span>
+                            locals.organisations[i]; %>
+                                <% if (org.organisation.status) { %>
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input <%= locals.organisations.length > 2 ?
+                                    'auto-scroll-on-change' : '' %>" id="<%= org.organisation.id %>" type="radio"
+                                    name="selectedOrganisation" value="<%= org.organisation.id %>" <%= org.organisation.id
+                                    === selectedOrganisation ? 'checked': ''%> >
+                                    <label class="govuk-label govuk-radios__label" for="<%= org.organisation.id %>">
+                                        <%= org.organisation.name %>
+                                        <%=org.organisation.status ? `(${org.organisation.status.name})` : '' %>
+                                    </label>
                                     <% if (org.naturalIdentifiers) { %>
-                                    <span class="govuk-hint govuk-label__hint">
+                                    <div class="govuk-hint govuk-radios__hint">
                                         <%= org.naturalIdentifiers.join(', ') %>
-                                    </span>
-                                </label>
+                                    </div>
+                                    <% } %>
+                                </div>
                                 <% } %>
-                            </div>
-                            <% } %> <% } %>
+                            <% } %>
                         </div>
                     </fieldset>
                 </div>
