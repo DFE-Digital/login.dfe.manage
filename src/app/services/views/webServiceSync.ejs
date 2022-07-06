@@ -1,14 +1,12 @@
-<div class="govuk-width-container">
+<div class="govuk-width-container govuk-!-margin-top-9">
     <div class="govuk-grid-row">    
         <div class="govuk-grid-column-full">
-            <h1 class="govuk-heading-xl">
+            <h1 class="govuk-heading-l">
                 Confirm sync of user
             </h1>
+            <p class="govuk-body">Please confirm you would like to sync <strong><%=user.name%></strong> with all services that receive web services</p>
             <form method="post" id="form-ws-sync">
                 <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
-                <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--xs"><p>Please confirm you would like to sync <strong><%=user.name%></strong> with all services that receive web services</p></legend>
-                </fieldset>
                 <div class="govuk-button-group">
                     <button type="submit" class="govuk-button">Send WS Sync</button>
                 </div>

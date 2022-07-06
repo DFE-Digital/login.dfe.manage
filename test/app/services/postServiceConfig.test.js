@@ -115,7 +115,7 @@ describe('when editing the service configuration', () => {
       csrfToken: 'token',
       backLink: '/services/service1',
       validationMessages: {
-        serviceHome: 'Please enter a valid home url',
+        serviceHome: 'Please enter a valid home Url',
       },
       service: {
         name: 'service two',
@@ -190,7 +190,7 @@ describe('when editing the service configuration', () => {
       csrfToken: 'token',
       backLink: '/services/service1',
       validationMessages: {
-        redirect_uris: 'Redirect urls must be unique',
+        redirect_uris: 'Redirect Urls must be unique',
       },
       service: {
         name: 'service two',

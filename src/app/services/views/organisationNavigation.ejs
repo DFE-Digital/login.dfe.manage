@@ -1,18 +1,20 @@
 <nav>
-    <h2 class="govuk-tabs__title">
-        Contents
-    </h2>
+    <h2 class="govuk-tabs__title govuk-visually-hidden">Contents</h2>
     <ul class="govuk-tabs__list" role="tablist">
-        <% if(locals.area === 'users') { %>
-            <li class="govuk-tabs__list-item govuk-tabs__list-item--selected" id="policy-conditions-tab">
-                Users
-            </li>
+        <% if(locals.area === 'organisations') { %>
+        <li class="govuk-tabs__list-item govuk-tabs__list-item--selected" id="organisations-tab">
+            Organisations
+        </li>
         <% } else { %>
-            <li class="govuk-tabs__list-item" id="policy-conditions-tab">
-                <a class="govuk-tabs__tab" href="users" role="tab">
-                    Users
-                </a>
-            </li>
-        <% } %>
+        <li class="govuk-tabs__list-item" id="organisations-tab">
+            <a class="govuk-tabs__tab" href="organisations" role="tab">Organisations</a>
+        </li>
+        <% } %> <% if(!locals.isInvitation && locals.isAudit) { %> <% if(locals.area === 'audit') { %>
+        <li class="govuk-tabs__list-item govuk-tabs__list-item--selected" id="audit-tab">Audit</li>
+        <% } else { %>
+        <li class="govuk-tabs__list-item" id="audit-tab">
+            <a class="govuk-tabs__tab" href="audit" role="tab">Audit</a>
+        </li>
+        <% } %> <% } %>
     </ul>
 </nav>

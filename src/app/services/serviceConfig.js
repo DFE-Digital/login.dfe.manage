@@ -83,7 +83,7 @@ const validate = async (req) => {
   }
 
   if (model.service.serviceHome && !urlValidation.test(model.service.serviceHome)) {
-    model.validationMessages.serviceHome = 'Please enter a valid home url';
+    model.validationMessages.serviceHome = 'Please enter a valid home Url';
   }
 
   if (!model.service.clientId) {
@@ -91,23 +91,23 @@ const validate = async (req) => {
   }
 
   if (!urlValidation.test(model.service.postResetUrl) && model.service.postResetUrl.trim() !== '') {
-    model.validationMessages.postResetUrl = 'Please enter a valid Post-reset url';
+    model.validationMessages.postResetUrl = 'Please enter a valid Post-reset Url';
   }
 
   if (!model.service.redirectUris || !model.service.redirectUris.length > 0) {
-    model.validationMessages.redirect_uris = 'At least one redirect url must be specified';
+    model.validationMessages.redirect_uris = 'At least one redirect Url must be specified';
   } else if (model.service.redirectUris.some((x) => !urlValidation.test(x))) {
-    model.validationMessages.redirect_uris = 'Invalid redirect url';
+    model.validationMessages.redirect_uris = 'Invalid redirect Url';
   } else if (model.service.redirectUris.some((value, i) => model.service.redirectUris.indexOf(value) !== i)) {
-    model.validationMessages.redirect_uris = 'Redirect urls must be unique';
+    model.validationMessages.redirect_uris = 'Redirect Urls must be unique';
   }
 
   if (!model.service.postLogoutRedirectUris || !model.service.postLogoutRedirectUris.length > 0) {
-    model.validationMessages.post_logout_redirect_uris = 'At least one logout redirect url must be specified';
+    model.validationMessages.post_logout_redirect_uris = 'At least one logout redirect Url must be specified';
   } else if (model.service.postLogoutRedirectUris.some((x) => !urlValidation.test(x))) {
-    model.validationMessages.post_logout_redirect_uris = 'Invalid logout redirect url';
+    model.validationMessages.post_logout_redirect_uris = 'Invalid logout redirect Url';
   } else if (model.service.postLogoutRedirectUris.some((value, i) => model.service.postLogoutRedirectUris.indexOf(value) !== i)) {
-    model.validationMessages.post_logout_redirect_uris = 'Logout redirect urls must be unique';
+    model.validationMessages.post_logout_redirect_uris = 'Logout redirect Urls must be unique';
   }
   if (model.service.clientSecret !== service.relyingParty.client_secret) {
     try {

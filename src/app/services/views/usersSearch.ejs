@@ -1,4 +1,4 @@
-<div class="govuk-width-container">
+<div class="govuk-width-container govuk-!-margin-top-9">
     <% if (locals.flash.info) { %>
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
@@ -8,8 +8,8 @@
     <% } %>
 
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds">
-            <h1 class="govuk-heading-xl text-break">
+        <div class="govuk-grid-column-three-quarters">
+            <h1 class="govuk-heading-xl govuk-!-margin-top-0 text-break">
                 <span class="govuk-caption-xl"><%=locals.service.name%></span>
                 Users
             </h1>
@@ -23,26 +23,26 @@
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-three-quarters">
-            <form method="post">
+            <form method="post" id="form-user-search">
                 <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-
-                <div class="govuk-grid-row govuk-!-margin-bottom-5">
-                    <div class="govuk-grid-column-two-thirds">
-                        <label for="criteria" class="govuk-visually-hidden">
+                <fieldset class="govuk-fieldset">
+                    <div class="govuk-form-group">
+                        <label for="criteria" class="govuk-label govuk-label--s govuk-visually-hidden">
                             Search by name, email or organisation
                         </label>
                         <input
-                            class="govuk-input"
+                            class="govuk-input govuk-!-width-three-quarters"
                             type="text"
                             id="criteria"
                             name="criteria"
                             value="<%= criteria %>"
                             class="form-control"
                             placeholder="Search by name, email or organisation" />
+                        <button type="submit" class="govuk-button" data-module="govuk-button">
+                            Search
+                        </button>
                     </div>
-
-                    <button type="submit" class="govuk-button">Search</button>
-                </div>
+                </fieldset>
             </form>
         </div>
         <% if (locals.allowInvite) { %>
