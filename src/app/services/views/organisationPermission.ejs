@@ -1,7 +1,7 @@
-<div class="govuk-width-container">
+<div class="govuk-width-container govuk-!-margin-top-9">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-three-quarters">
-            <h1 class="govuk-heading-xl">
+            <h1 class="govuk-heading-l">
                 Permission level
             </h1>
 
@@ -43,11 +43,11 @@
             <input type="hidden" name="_csrf" value="<%=csrfToken%>"/>
             <div class="govuk-form-group <%= (locals.validationMessages.selectedLevel !== undefined) ? 'govuk-form-group--error' : '' %>">
                 <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--xs">
-                        <p class="govuk-body">Select the permission level</p>
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                        Select the permission level
                     </legend>
                     <% if (locals.validationMessages.selectedLevel !== undefined) { %>
-                    <span class="govuk-error-message" id="validation-permission-level"><span class="govuk-visually-hidden">Error:</span> <%=locals.validationMessages.selectedLevel %></span>
+                    <p class="govuk-error-message" id="validation-permission-level"><span class="govuk-visually-hidden">Error:</span> <%=locals.validationMessages.selectedLevel %></p>
                     <% } %>
                     <div class="govuk-radios">
                         <div class="govuk-radios__item">
