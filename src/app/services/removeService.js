@@ -21,7 +21,7 @@ const getModel = async (req) => {
     service,
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
-    currentPage: 'remove-service',
+    currentNavigation: 'users',
 
   };
 };

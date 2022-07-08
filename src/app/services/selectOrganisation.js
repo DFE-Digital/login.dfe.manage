@@ -32,6 +32,7 @@ const getOrgsForUser = async (req) => {
 
 const get = async (req, res) => {
   const manageRolesForService = await getUserServiceRoles(req);
+
   if (!req.session.user) {
     return res.redirect(`/services/${req.params.sid}/users`);
   }
@@ -50,9 +51,9 @@ const get = async (req, res) => {
     user: req.session.user,
     selectedOrganisation: null,
     organisations,
-    userRoles: manageRolesForService,
-    currentPage: 'select-organisation',
     serviceId: req.params.sid,
+    userRoles: manageRolesForService,
+    currentNavigation: 'users',
   });
 };
 
@@ -60,6 +61,7 @@ const validate = async (req) => {
   const userOrganisations = await getOrgsForUser(req);
   const selectedOrg = req.body.selectedOrganisation;
   const policyResult = selectedOrg ? await policyEngine.getPolicyApplicationResultsForUser(req.params.uid.startsWith('inv-') ? undefined : req.params.uid, selectedOrg, req.params.sid, req.id) : false;
+  const manageRolesForService = await getUserServiceRoles(req);
 
   const model = {
     selectedOrganisation: selectedOrg,
@@ -68,6 +70,9 @@ const validate = async (req) => {
     backLink: true,
     cancelLink: `/services/${req.params.sid}/users`,
     validationMessages: {},
+    serviceId: req.params.sid,
+    userRoles: manageRolesForService,
+    currentNavigation: 'users',
   };
 
   if (model.selectedOrganisation === undefined || model.selectedOrganisation === null) {

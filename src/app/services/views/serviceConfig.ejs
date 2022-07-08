@@ -1,4 +1,4 @@
-<div class="govuk-width-container govuk-!-margin-top-9">
+<div class="govuk-width-container govuk-main-wrapper">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-three-quarters">
         <% if (locals.flash.info) { %>
@@ -224,13 +224,13 @@
                                         <% for (let i=0; i < locals.service.redirectUris.length; i++) { 
                                             const redirect_uri = locals.service.redirectUris[i];
                                         %>
-                                            <label for="redirect-<%=i%>" class="govuk-label govuk-label--s govuk-visually-hidden">
+                                            <label for="redirect_uris<%= i > 0 ? `-${i}`  : '' %>" class="govuk-label govuk-label--s govuk-visually-hidden">
                                                 Redirect Url
                                             </label>
                                             <p class="govuk-body">
                                                 <input
                                                     class="form-control inputConfig govuk-input"
-                                                    id="redirect-<%=i%>"
+                                                    id="redirect_uris<%= i > 0 ? `-${i}`  : '' %>"
                                                     name="redirect_uris"
                                                     value="<%=redirect_uri%>" />
                                             </p>
@@ -248,7 +248,7 @@
                                         <p class="govuk-body">
                                             <input
                                                 class="form-control inputConfig govuk-input"
-                                                id="redirect"
+                                                id="redirect_uris"
                                                 name="redirect_uris" />
                                         </p>
                                     <% } %>
@@ -278,13 +278,13 @@
                                         <% for (let i=0; i < locals.service.postLogoutRedirectUris.length; i++) {
                                             const logout_redirect = locals.service.postLogoutRedirectUris[i];
                                         %>
-                                            <label for="post_logout_redirect_uris-<%=i%>" class="govuk-label govuk-label--s govuk-visually-hidden">
+                                            <label for="post_logout_redirect_uris<%= i > 0 ? `-${i}`  : '' %>" class="govuk-label govuk-label--s govuk-visually-hidden">
                                                 Logout redirect Url
                                             </label>
                                             <p class="govuk-body">
                                                 <input
                                                     class="form-control inputConfig govuk-input"
-                                                    id="post_logout_redirect_uris-<%=i%>"
+                                                    id="post_logout_redirect_uris<%= i > 0 ? `-${i}`  : '' %>"
                                                     name="post_logout_redirect_uris"
                                                     value="<%=logout_redirect%>" />
                                             </p>

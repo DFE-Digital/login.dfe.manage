@@ -12,7 +12,7 @@ const get = async (req, res) => {
     backLink: true,
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
-    currentPage: 'web-service-sync',
+    currentNavigation: 'users',
   });
 };
 

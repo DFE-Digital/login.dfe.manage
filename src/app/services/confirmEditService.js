@@ -23,7 +23,7 @@ const getModel = async (req) => {
     organisation,
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
-    currentPage: 'confirm-edit-service',
+    currentNavigation: 'users',
   };
 };
 

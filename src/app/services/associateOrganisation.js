@@ -24,7 +24,7 @@ const buildModel = async (req) => {
     organisations: pageOfOrganisations.organisations,
     validationMessages: {},
     userRoles: manageRolesForService,
-    currentPage: 'associateOrganisation',
+    currentNavigation: 'users',
     serviceId: req.params.sid,
   };
 };

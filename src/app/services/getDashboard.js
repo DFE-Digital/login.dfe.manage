@@ -12,7 +12,7 @@ const getDashboard = async (req, res) => {
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
     serviceDetails,
-    currentPage: 'dashboard',
+    currentNavigation: 'dashboard',
   });
 };
 

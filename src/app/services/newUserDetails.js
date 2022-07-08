@@ -12,9 +12,9 @@ const get = async (req, res) => {
     backLink: true,
     cancelLink: `/services/${req.params.sid}/users`,
     validationMessages: {},
-    userRoles: manageRolesForService,
-    currentPage: 'new-user',
     serviceId: req.params.sid,
+    userRoles: manageRolesForService,
+    currentNavigation: 'users',
   };
 
   if (req.session.user) {
@@ -37,6 +37,9 @@ const validate = async (req) => {
     backLink: true,
     cancelLink: `/services/${req.params.sid}/users`,
     validationMessages: {},
+    serviceId: req.params.sid,
+    userRoles: manageRolesForService,
+    currentNavigation: 'users',
   };
 
   if (!model.firstName) {

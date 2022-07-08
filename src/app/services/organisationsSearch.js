@@ -22,7 +22,7 @@ const buildModel = async (req) => {
     organisations: pageOfOrganisations.organisations,
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
-    currentPage: '',
+    currentNavigation: 'organisations',
   };
 };
 

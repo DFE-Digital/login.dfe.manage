@@ -44,7 +44,7 @@ const get = async (req, res) => {
     },
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
-    currentPage: 'confirm-new-user',
+    currentNavigation: 'users',
   });
 };
 

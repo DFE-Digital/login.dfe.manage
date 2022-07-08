@@ -23,7 +23,7 @@ const viewModel = async (req) => {
     numberOfPages: servicePolicies.totalNumberOfPages,
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
-    currentPage: 'policies',
+    currentNavigation: 'policies',
   };
 };
 

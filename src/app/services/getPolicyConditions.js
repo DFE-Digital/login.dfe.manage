@@ -23,7 +23,7 @@ const getPolicyConditions = async (req, res) => {
     backLink: `/services/${req.params.sid}/policies`,
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
-    currentPage: 'policies',
+    currentNavigation: 'policies',
   });
 };
 

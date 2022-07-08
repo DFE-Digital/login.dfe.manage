@@ -47,6 +47,7 @@ describe('when displaying the select permission page', () => {
     expect(res.render.mock.calls[0][0]).toBe(`services/views/organisationPermission`);
     expect(res.render.mock.calls[0][1]).toEqual({
       csrfToken: 'token',
+      currentNavigation: 'users',
       backLink: true,
       selectedLevel: undefined,
       organisation: 'org name',
@@ -57,7 +58,9 @@ describe('when displaying the select permission page', () => {
         name: 'service name',
         status: 'active',
       },
+      serviceId: 'service1',
       user: 'John Doe',
+      userRoles: [],
       validationMessages: {
         selectedLevel: 'Please select a permission level',
       },
@@ -72,6 +75,7 @@ describe('when displaying the select permission page', () => {
     expect(res.render.mock.calls[0][0]).toBe(`services/views/organisationPermission`);
     expect(res.render.mock.calls[0][1]).toEqual({
       csrfToken: 'token',
+      currentNavigation: 'users',
       backLink: true,
       selectedLevel: 10,
       organisation: 'org name',
@@ -82,7 +86,9 @@ describe('when displaying the select permission page', () => {
         name: 'service name',
         status: 'active',
       },
+      serviceId: 'service1',
       user: 'John Doe',
+      userRoles: [],
       validationMessages: {
         selectedLevel: 'Please select a permission level',
       },

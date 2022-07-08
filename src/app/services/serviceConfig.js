@@ -29,13 +29,14 @@ const getServiceConfig = async (req, res) => {
     validationMessages: {},
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
-    currentPage: 'service-configuration',
+    currentNavigation: 'configuration',
   });
 };
 
 const validate = async (req) => {
   const service = await getServiceById(req.params.sid, req.id);
   const urlValidation = new RegExp('^https?:\\/\\/(.*)');
+  const manageRolesForService = await getUserServiceRoles(req);
 
   let grantTypes = req.body.grant_types ? req.body.grant_types : [];
   if (!(grantTypes instanceof Array)) {
@@ -76,6 +77,9 @@ const validate = async (req) => {
     },
     backLink: `/services/${req.params.sid}`,
     validationMessages: {},
+    serviceId: req.params.sid,
+    userRoles: manageRolesForService,
+    currentNavigation: 'configuration',
   };
 
   if (!model.service.name) {

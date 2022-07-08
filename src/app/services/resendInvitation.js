@@ -18,7 +18,7 @@ const get = async (req, res) => {
     validationMessages: {},
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
-    currentPage: 'confirm-resend-invitation',
+    currentNavigation: 'users',
   });
 };
 

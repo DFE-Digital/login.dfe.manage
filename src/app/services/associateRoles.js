@@ -26,7 +26,7 @@ const getViewModel = async (req) => {
     validationMessages: {},
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
-    currentPage: 'associate-roles',
+    currentNavigation: 'users',
   };
 };
 

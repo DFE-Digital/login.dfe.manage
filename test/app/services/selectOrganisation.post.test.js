@@ -116,18 +116,10 @@ describe('when selecting an organisation', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][0]).toBe(`services/views/selectOrganisation`);
     expect(res.render.mock.calls[0][1]).toEqual({
-      csrfToken: 'token',
       backLink: true,
+      csrfToken: 'token',
+      currentNavigation: 'users',
       cancelLink: '/services/service1/users',
-      selectedOrganisation: undefined,
-      validationMessages: {
-        selectedOrganisation: 'Please select an organisation',
-      },
-      user: {
-        email: 'john.doe@example.com',
-        firstName: 'John',
-        lastName: 'Doe',
-      },
       organisations: [
         {
           approvers: [
@@ -160,6 +152,17 @@ describe('when selecting an organisation', () => {
           ]
         }
       ],
+      selectedOrganisation: undefined,
+      serviceId: 'service1',
+      user: {
+        email: 'john.doe@example.com',
+        firstName: 'John',
+        lastName: 'Doe',
+      },
+      userRoles: [],
+      validationMessages: {
+        selectedOrganisation: 'Please select an organisation',
+      },
     });
   });
 
