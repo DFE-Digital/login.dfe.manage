@@ -42,7 +42,7 @@
             <form method="post">
             <input type="hidden" name="_csrf" value="<%=csrfToken%>"/>
             <div class="govuk-form-group <%= (locals.validationMessages.selectedLevel !== undefined) ? 'govuk-form-group--error' : '' %>">
-                <fieldset class="govuk-fieldset">
+                <fieldset class="govuk-fieldset" id="selectedLevel">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                         Select the permission level
                     </legend>

@@ -12,7 +12,7 @@
                 <input type="hidden" name="_csrf" value="<%=csrfToken%>" />
                 <div
                     class="govuk-form-group <%= (locals.validationMessages.selectedOrganisation !== undefined) ? 'govuk-form-group--error' : '' %>">
-                    <fieldset class="govuk-fieldset">
+                    <fieldset class="govuk-fieldset" id="selectedOrganisation">
                         <% if (locals.validationMessages.selectedOrganisation !== undefined) { %>
                         <p id="validation-selected-organisation" class="govuk-error-message">
                             <span class="govuk-visually-hidden">Error:</span>
