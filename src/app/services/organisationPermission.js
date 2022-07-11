@@ -19,15 +19,15 @@ const get = async (req, res) => {
     validationMessages: {},
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
-    currentPage: 'organisation-permissions',
+    currentNavigation: 'users',
   });
 };
 
 const validate = async (req) => {
   const validPermissionLevels = [0, 10000];
-
   const level = parseInt(req.body.selectedLevel);
   const service = await getServiceById(req.params.sid, req.id);
+  const manageRolesForService = await getUserServiceRoles(req);
 
   const model = {
     backLink: true,
@@ -37,6 +37,9 @@ const validate = async (req) => {
     service,
     selectedLevel: isNaN(level) ? undefined : level,
     validationMessages: {},
+    serviceId: req.params.sid,
+    userRoles: manageRolesForService,
+    currentNavigation: 'users',
   };
 
   if (model.selectedLevel === undefined || model.selectedLevel === null) {

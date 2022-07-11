@@ -13,7 +13,7 @@ const get = async (req, res) => {
     organisation,
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
-    currentPage: 'web-service-sync-organisation',
+    currentNavigation: 'organisations',
   });
 };
 const post = async (req, res) => {

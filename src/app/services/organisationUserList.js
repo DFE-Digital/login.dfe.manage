@@ -38,7 +38,7 @@ const render = async (req, res, dataSource) => {
     numberOfPages: results.numberOfPages,
     totalNumberOfResults: results.totalNumberOfResults,
     userRoles: manageRolesForService,
-    currentPage: '',
+    currentNavigation: 'organisations',
   });
 };
 

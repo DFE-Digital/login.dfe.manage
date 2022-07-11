@@ -51,13 +51,16 @@ describe('when entering a new users details', () => {
     expect(res.render.mock.calls[0][0]).toBe('services/views/newUserDetails');
     expect(res.render.mock.calls[0][1]).toEqual({
       csrfToken: 'token',
+      currentNavigation: 'users',
       firstName: '',
       lastName: 'Doe',
       email: 'johndoe@gmail.com',
       backLink: true,
       cancelLink: '/services/service1/users',
       isDSIUser: false,
+      serviceId: 'service1',
       uid: '',
+      userRoles: [],
       validationMessages: {
         firstName: 'Please enter a first name',
       },
@@ -73,13 +76,16 @@ describe('when entering a new users details', () => {
     expect(res.render.mock.calls[0][0]).toBe('services/views/newUserDetails');
     expect(res.render.mock.calls[0][1]).toEqual({
       csrfToken: 'token',
+      currentNavigation: 'users',
       firstName: 'John',
       lastName: '',
       email: 'johndoe@gmail.com',
       backLink: true,
       cancelLink: '/services/service1/users',
       isDSIUser: false,
+      serviceId: 'service1',
       uid: '',
+      userRoles: [],
       validationMessages: {
         lastName: 'Please enter a last name',
       },
@@ -95,13 +101,16 @@ describe('when entering a new users details', () => {
     expect(res.render.mock.calls[0][0]).toBe('services/views/newUserDetails');
     expect(res.render.mock.calls[0][1]).toEqual({
       csrfToken: 'token',
+      currentNavigation: 'users',
       firstName: 'John',
       lastName: 'Doe',
       email: '',
       backLink: true,
       cancelLink: '/services/service1/users',
       isDSIUser: false,
+      serviceId: 'service1',
       uid: '',
+      userRoles: [],
       validationMessages: {
         email: 'Please enter an email address',
       },
@@ -117,13 +126,16 @@ describe('when entering a new users details', () => {
     expect(res.render.mock.calls[0][0]).toBe('services/views/newUserDetails');
     expect(res.render.mock.calls[0][1]).toEqual({
       csrfToken: 'token',
+      currentNavigation: 'users',
       firstName: 'John',
       lastName: 'Doe',
       email: 'not-an-email',
       backLink: true,
       cancelLink: '/services/service1/users',
       isDSIUser: false,
+      serviceId: 'service1',
       uid: '',
+      userRoles: [],
       validationMessages: {
         email: 'Please enter a valid email address',
       },

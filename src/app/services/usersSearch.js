@@ -99,7 +99,7 @@ const viewModel = async (req) => {
     service,
     allowInvite: !!(service.relyingParty && service.relyingParty.params && service.relyingParty.params.allowManageInvite === 'true'),
     userRoles: manageRolesForService,
-    currentPage: 'users',
+    currentNavigation: 'users',
   };
 };
 

@@ -32,7 +32,7 @@ const get = async (req, res) => {
     validationMessages: {},
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
-    currentPage: '',
+    currentNavigation: 'banners',
   };
 
   if (req.params.bid) {
@@ -70,6 +70,7 @@ const get = async (req, res) => {
 };
 
 const validate = async (req) => {
+  const manageRolesForService = await getUserServiceRoles(req);
   let fromDate;
   let toDate;
   if (req.body.bannerDisplay === 'date' && req.body.fromYear && req.body.fromMonth && req.body.fromDay && req.body.fromHour && req.body.fromMinute) {
@@ -100,6 +101,9 @@ const validate = async (req) => {
     validationMessages: {},
     backLink: true,
     cancelLink: `/services/${req.params.sid}/service-banners`,
+    serviceId: req.params.sid,
+    userRoles: manageRolesForService,
+    currentNavigation: 'banners',
   };
 
   if (!model.name) {

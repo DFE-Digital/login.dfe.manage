@@ -1,4 +1,4 @@
-<div class="govuk-width-container govuk-!-margin-top-9">
+<div class="govuk-width-container govuk-main-wrapper">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-three-quarters">
             <h1 class="govuk-heading-l">
@@ -42,7 +42,7 @@
             <form method="post">
             <input type="hidden" name="_csrf" value="<%=csrfToken%>"/>
             <div class="govuk-form-group <%= (locals.validationMessages.selectedLevel !== undefined) ? 'govuk-form-group--error' : '' %>">
-                <fieldset class="govuk-fieldset">
+                <fieldset class="govuk-fieldset" id="selectedLevel">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                         Select the permission level
                     </legend>
@@ -65,7 +65,7 @@
                 </fieldset>
             </div>
             <div class="govuk-button-group">
-                <button type="submit" class="govuk-button">Continue</button>
+                <button type="submit" class="govuk-button" data-module="govuk-button">Continue</button>
                 <a href="<%= locals.cancelLink %>" class="govuk-button govuk-button--secondary">Cancel</a>
             </div>
             </form>

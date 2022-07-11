@@ -59,7 +59,7 @@ const getUserOrganisations = async (req, res) => {
     backLink: true,
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
-    currentPage: 'user-organisations',
+    currentNavigation: 'users',
   });
 };
 

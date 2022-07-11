@@ -77,11 +77,9 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][0]).toBe('services/views/serviceConfig');
     expect(res.render.mock.calls[0][1]).toEqual({
-      csrfToken: 'token',
       backLink: '/services/service1',
-      validationMessages: {
-        name: 'Service name must be present',
-      },
+      csrfToken: 'token',
+      currentNavigation: 'configuration',
       service: {
         clientId: 'clientid2',
         clientSecret: 'outshine-wringing-imparting-submitted',
@@ -100,7 +98,12 @@ describe('when editing the service configuration', () => {
         responseTypes: [
           'code'
         ],
-        serviceHome: 'https://www.servicehome2.com'
+        serviceHome: 'https://www.servicehome2.com',
+      },
+      serviceId: 'service1',
+      userRoles: [],
+      validationMessages: {
+        name: 'Service name must be present',
       },
     });
   });
@@ -112,11 +115,9 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][0]).toBe('services/views/serviceConfig');
     expect(res.render.mock.calls[0][1]).toEqual({
-      csrfToken: 'token',
       backLink: '/services/service1',
-      validationMessages: {
-        serviceHome: 'Please enter a valid home Url',
-      },
+      csrfToken: 'token',
+      currentNavigation: 'configuration',
       service: {
         name: 'service two',
         clientId: 'clientid2',
@@ -138,6 +139,11 @@ describe('when editing the service configuration', () => {
         ],
         serviceHome: 'not-a-url'
       },
+      serviceId: 'service1',
+      userRoles: [],
+      validationMessages: {
+        serviceHome: 'Please enter a valid home Url',
+      },
     });
   });
 
@@ -148,11 +154,9 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][0]).toBe('services/views/serviceConfig');
     expect(res.render.mock.calls[0][1]).toEqual({
-      csrfToken: 'token',
       backLink: '/services/service1',
-      validationMessages: {
-        clientId: 'Client Id must be present',
-      },
+      csrfToken: 'token',
+      currentNavigation: 'configuration',
       service: {
         name: 'service two',
         clientId: undefined,
@@ -174,6 +178,11 @@ describe('when editing the service configuration', () => {
         ],
         serviceHome: 'https://www.servicehome2.com'
       },
+      serviceId: 'service1',
+      userRoles: [],
+      validationMessages: {
+        clientId: 'Client Id must be present',
+      },
     });
   });
 
@@ -187,11 +196,9 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][0]).toBe('services/views/serviceConfig');
     expect(res.render.mock.calls[0][1]).toEqual({
-      csrfToken: 'token',
       backLink: '/services/service1',
-      validationMessages: {
-        redirect_uris: 'Redirect Urls must be unique',
-      },
+      csrfToken: 'token',
+      currentNavigation: 'configuration',
       service: {
         name: 'service two',
         clientId: 'clientid2',
@@ -212,6 +219,11 @@ describe('when editing the service configuration', () => {
           'code'
         ],
         serviceHome: 'https://www.servicehome2.com'
+      },
+      serviceId: 'service1',
+      userRoles: [],
+      validationMessages: {
+        redirect_uris: 'Redirect Urls must be unique',
       },
     });
   });

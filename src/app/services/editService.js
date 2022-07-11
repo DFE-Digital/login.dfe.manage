@@ -42,7 +42,7 @@ const getViewModel = async (req) => {
     validationMessages: {},
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
-    currentPage: 'edit-service',
+    currentNavigation: 'users',
   };
 };
 

@@ -23,7 +23,7 @@ const get = async (req, res) => {
     serviceId: req.params.sid,
     serviceDetails,
     userRoles: manageRolesForService,
-    currentPage: '',
+    currentNavigation: 'banners',
   });
 };
 

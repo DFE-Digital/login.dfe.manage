@@ -1,4 +1,4 @@
-<div class="govuk-width-container govuk-!-margin-top-9">
+<div class="govuk-width-container govuk-main-wrapper">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-three-quarters">
             <h1 class="govuk-heading-l">
@@ -35,7 +35,7 @@
             <form method="post">
                 <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
                 <div class="govuk-button-group">
-                    <button type="submit" class="govuk-button">Continue</button>
+                    <button type="submit" class="govuk-button govuk-button--warning" data-module="govuk-button">Remove</button>
                     <a href="<%= locals.cancelLink %>" class="govuk-button govuk-button--secondary">Cancel</a>
                 </div>
             </form>
