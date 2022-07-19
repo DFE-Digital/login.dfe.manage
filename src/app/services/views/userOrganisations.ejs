@@ -7,7 +7,7 @@
 
                 <div class="govuk-tabs__panel" id="policy-roles-panel">
                     <h2 class="govuk-heading-m govuk-visually-hidden">Organisations</h2>
-                    <table class="data govuk-table custom-manage-table">
+                    <table class="data govuk-table cell-align-top">
                         <thead class="govuk-table__head">
                             <tr class="govuk-table__row">
                                 <th scope="col" class="govuk-table__header width-40">Organisation</th>
@@ -15,7 +15,7 @@
                                 <th scope="col" class="govuk-table__header width-20">Legacy ID/Name</th>
                                 <% }%>
                                 <th scope="col" class="govuk-table__header width-20">Permission level</th>
-                                <th scope="col" class="govuk-table__header width-30">Action</th>
+                                <th scope="col" class="govuk-table__header width-30 govuk-table__header--numeric">Action</th>
                             </tr>
                         </thead>
                         <tbody class="govuk-table__body">
@@ -30,7 +30,7 @@
                             <% } %>
                             <% for (let o = 0; o < locals.organisations.length; o++) { %> <% const org = locals.organisations[o];%>
                             <tr class="govuk-table__row">
-                                <td>
+                                <td class="govuk-table__cell">
                                     <%=org.name%>
                                     <br />
 
@@ -74,17 +74,17 @@
                                     </details>
                                 </td>
                                 <% if (!locals.isInvitation ) {%>
-                                <td>
+                                <td class="govuk-table__cell">
                                     <%= org.numericIdentifier && org.textIdentifier ? `${org.numericIdentifier} /
                                     ${org.textIdentifier}` : '' -%>
                                 </td>
                                 <% }%> <% if (org.role) { %>
-                                <td><%=org.role.name%></td>
+                                <td class="govuk-table__cell"><%=org.role.name%></td>
                                 <% } else { %>
-                                <td>Unknown</td>
+                                <td class="govuk-table__cell">Unknown</td>
                                 <% } %>
 
-                                <td><a class="govuk-link" href="organisations/<%= org.id %>">Edit service</a></td>
+                                <td class="govuk-table__cell govuk-table__cell--numeric"><a class="govuk-link" href="organisations/<%= org.id %>">Edit service</a></td>
                             </tr>
                             <%}%>
                         </tbody>
