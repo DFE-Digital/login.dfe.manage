@@ -11,7 +11,7 @@
 
                 <div class="govuk-tabs__panel" id="policy-roles-panel">
                     <h2 class="govuk-heading-m govuk-visually-hidden">Policy Conditions</h2>
-                    <table class="govuk-table custom-manage-table">
+                    <table class="govuk-table cell-align-top">
                         <thead class="govuk-table__head">
                             <tr class="govuk-table__row sortable">
                                 <th scope="col" class="govuk-table__header width-40">Condition</th>
@@ -32,8 +32,8 @@
                         <% for (let i = 0; i < locals.policy.conditions.length; i++) { %>
                             <% const condition = locals.policy.conditions[i];%>
                             <tr class="govuk-table__row">
-                                <td><%= condition.field %></td>
-                                <td><%= condition.operator %></td>
+                                <td class="govuk-table__cell"><%= condition.field %></td>
+                                <td class="govuk-table__cell"><%= condition.operator %></td>
                             <% if (condition.value.length === 1) { %>
                                 <td class="govuk-table__cell govuk-table__cell--numeric"><%= condition.value[0] %></td>
                             <% } else { %>
