@@ -26,6 +26,7 @@ const get = async (req, res) => {
 };
 
 const validate = async (req) => {
+  console.log(req);
   const manageRolesForService = await getUserServiceRoles(req);
 
   const model = {
@@ -42,12 +43,18 @@ const validate = async (req) => {
     currentNavigation: 'users',
   };
 
+  const userRegex = /^[^±!£$%^&*+§¡€#¢§¶•ªº«\\/<>?:;|=,~"]{1,60}$/i;
+
   if (!model.firstName) {
     model.validationMessages.firstName = 'Please enter a first name';
+  } else if (!userRegex.test(model.firstName)) {
+    model.validationMessages.firstName = 'Special characters cannot be used';
   }
 
   if (!model.lastName) {
     model.validationMessages.lastName = 'Please enter a last name';
+  } else if (!userRegex.test(model.lastName)) {
+    model.validationMessages.lastName = 'Special characters cannot be used';
   }
 
   if (!model.email) {
