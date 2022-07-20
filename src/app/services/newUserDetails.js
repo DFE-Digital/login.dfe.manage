@@ -26,7 +26,6 @@ const get = async (req, res) => {
 };
 
 const validate = async (req) => {
-  console.log(req);
   const manageRolesForService = await getUserServiceRoles(req);
 
   const model = {
