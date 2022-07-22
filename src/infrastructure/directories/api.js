@@ -93,13 +93,15 @@ const getInvitationByEmail = async (email, correlationId) => {
   }
 };
 
-const createInvite = async (firstName, lastName, email, clientId, redirectUri, correlationId) => {
+const createInvite = async (firstName, lastName, email, clientId, redirectUri, correlationId, isApprover, orgName) => {
   const token = await jwtStrategy(config.directories.service).getBearerToken();
 
   const body = {
     firstName,
     lastName,
     email,
+    isApprover,
+    orgName,
     origin: {
       clientId,
       redirectUri,
