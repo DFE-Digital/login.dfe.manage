@@ -60,7 +60,7 @@ const post = async (req, res) => {
   // new user create invite
   if (!uid) {
     const redirectUri = `${config.hostingEnvironment.servicesUrl}/auth`;
-    const isApprover = req.session.user.permission === 1000;
+    const isApprover = req.session.user.permission === 10000;
     const invitationId = await createInvite(req.session.user.firstName, req.session.user.lastName, req.session.user.email, 'services', redirectUri, req.id, isApprover, req.session.user.organisationName);
     uid = `inv-${invitationId}`;
     isInvitation = true;
