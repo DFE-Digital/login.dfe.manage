@@ -2,6 +2,7 @@
 
 const { listBannersForService, getServiceById } = require('../../infrastructure/applications');
 const { getUserServiceRoles } = require('./utils');
+const moment = require('moment');
 
 const get = async (req, res) => {
   const paramsSource = req.method === 'POST' ? req.body : req.query;
@@ -12,6 +13,11 @@ const get = async (req, res) => {
   const serviceBanners = await listBannersForService(req.params.sid, 10, page, req.id);
   const serviceDetails = await getServiceById(req.params.sid, req.id);
   const manageRolesForService = await getUserServiceRoles(req);
+  const now = moment();
+  let activeBannerIndex = serviceBanners.banners.findIndex((banner) => moment(now).isBetween(banner.validFrom, banner.validTo) === true);
+  if (activeBannerIndex === -1) {
+    activeBannerIndex = serviceBanners.banners.findIndex((banner) => banner.isActive === true);
+  }
 
   return res.render('services/views/serviceBanners', {
     csrfToken: req.csrfToken(),
@@ -24,6 +30,7 @@ const get = async (req, res) => {
     serviceDetails,
     userRoles: manageRolesForService,
     currentNavigation: 'banners',
+    activeBannerIndex,
   });
 };
 
