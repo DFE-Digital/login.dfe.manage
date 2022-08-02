@@ -14,7 +14,6 @@ const get = async (req, res) => {
   const serviceDetails = await getServiceById(req.params.sid, req.id);
   const manageRolesForService = await getUserServiceRoles(req);
   const now = moment();
-  // "Date-time range" type of banner has precedence over "Olwasy on' type
   let activeBannerIndex = serviceBanners.banners.findIndex((banner) => moment(now).isBetween(banner.validFrom, banner.validTo) === true);
   if (activeBannerIndex === -1) {
     activeBannerIndex = serviceBanners.banners.findIndex((banner) => banner.isActive === true);
