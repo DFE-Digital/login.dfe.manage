@@ -13,7 +13,8 @@ const getApproverDetails = async (organisation, correlationId) => {
   if (distinctApproverIds.length === 0) {
     return [];
   }
-  return await getUsersByIdV2(distinctApproverIds, correlationId);
+  const approverDetails = await getUsersByIdV2(distinctApproverIds, correlationId);
+  return approverDetails;
 };
 
 const getOrganisations = async (userId, correlationId) => {
@@ -36,12 +37,12 @@ const getOrganisations = async (userId, correlationId) => {
     })));
     const selectedUserServices = await getServicesForUser(userId);
 
-    const filtered = selectedUserServices.filter((s) => s.organisationId === invitation.organisation.id);
+    const userOrgServices = selectedUserServices.filter((s) => s.organisationId === invitation.organisation.id);
 
     services.map((service) => {
-      const serviceRole = filtered.find((sr) => service.id === sr.serviceId);
-      if (serviceRole) {
-        service.serviceRoles = serviceRole.roles;
+      const userServiceRole = userOrgServices.find((orgService) => service.id === orgService.serviceId);
+      if (userServiceRole) {
+        service.serviceRoles.push(...userServiceRole.roles);
       }
       return service;
     });

@@ -102,7 +102,7 @@
                     </td>
                 </tr>
                 <% }%>
-                <% for (let o = 0; o < locals.organisations.length; o++) { %> <% const org = locals.organisations[o];%> 
+                <% for (let i = 0; i < locals.organisations.length; i++) { %> <% const org = locals.organisations[i];%> 
            
             <dl class="inline">
                 <dt class="govuk-label"><%=org.name%></dt>
@@ -118,18 +118,36 @@
             <table class="data govuk-table cell-align-top govuk-!-margin-bottom-9">
                 <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
-                        <th scope="col" class="govuk-table__header width-40">Service</th>
+                        <th scope="col" class="govuk-table__header width-35">Service</th>
                         <% if (!locals.isInvitation ) {%>
-                        <th scope="col" class="govuk-table__header width-20">Role</th>
+                        <th scope="col" class="govuk-table__header width-50">Role</th>
                         <% }%>
-                        <th scope="col" class="govuk-table__header width-20">Access granted on</th>
+                        <th scope="col" class="govuk-table__header width-15">Access granted on</th>
                     </tr>
              
                 </thead>
                 <tbody>
                     <% for (let i = 0; i < org.services.length; i++) { %> <% const service = org.services[i];%> 
-                  <tr><th><%=service.name%></th></tr> 
+                  <tr class="govuk-table__row" <% if (service.serviceRoles.length > 1) { %> rowspan="<%= service.serviceRoles.length %>"<% } %>>
+                    <td class="govuk-table__cell"><%=service.name%></td>
+                    <% if (service.serviceRoles.length > 0) { %>
+                       
+                        <td class="govuk-table__cell">
+                                <% for (let i = 0; i < service.serviceRoles.length; i++) { %> <% const serviceRole = service.serviceRoles[i];%> 
+                           <p>
+                            <%=serviceRole.name%>
+                           </p>
+
+                        <% } %> 
+                        </td>
+                        <% } else { %>
+                            <td class="govuk-table__cell">No Service Role</td>
+                            <% } %>  
+                         <td class="govuk-table__cell">DATE</td>
+       
+                  </tr> 
        <% } %>
+     
                 </tbody>
             </table>
 
