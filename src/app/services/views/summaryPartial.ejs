@@ -20,35 +20,51 @@
         </div>
     <% } %>
         <h1 class="govuk-heading-l text-break">
-            <span class="govuk-caption-l"><%= user.email %></span>
+            <span class="govuk-caption-l"><%= currentService.name %></span>
             <%= user.name %>
         </h1>
         <dl class="inline">
+            <dt class="govuk-label">Account Status:</dt>
+            <%
+                let tagColour = 'govuk-tag--'; 
+                if(user.status.id === 1) {
+                    tagColour += 'green';
+                } else if(user.status.id === 0) {
+                    tagColour += 'red';
+                } else if(user.status.id === -1) {
+                    tagColour += 'blue';
+                } else if(user.status.id === -2) {
+                    tagColour += 'orange';
+                }
+            %>
+            <dd class="govuk-label govuk-tag <%= tagColour %>"><strong><%=user.status.description%></strong></dd>
+        </dl>
+        <dl class="inline">
+            <dt class="govuk-label">Email:</dt>
+            <dd class="govuk-label"><%= user.email %></dd>
             <dt class="govuk-label">Last login:</dt>
             <dd class="govuk-label">
-                <%= locals.user.lastLogin ? locals.moment(locals.user.lastLogin).format('DD MMM YYYY, HH:mm:ss') :
+                <%= user.lastLogin ? moment(user.lastLogin).format('DD MMM YYYY, HH:mm:ss') :
                 'Never' %>
             </dd>
-            <dt class="govuk-label">Account status:</dt>
-            <dd class="govuk-label"><%= user.status.description %></dd>
-            <dt class="govuk-label">Number of logins in last 12 months:</dt>
-            <dd class="govuk-label"><%= user.loginsInPast12Months.successful %></dd>
         </dl>
     </div>
 
     <div class="govuk-grid-column-one-quarter">
         <aside id="actions" class="govuk-!-margin-top-0">
-            <h2 class="govuk-heading-m">Actions</h2>
+            <h2 class="govuk-heading-m">Related actions</h2>
             <ul class="govuk-list">
+               <!-- TODO: update redirection link when the sing-in audit page will be created -->
                 <li>
-                    <% if(!locals.isInvitation) { %>
-                    <a id="change-service" class="govuk-link-bold" href="web-service-sync">Send WS Sync</a>
-                    <% } else if (locals.isInvitation && !locals.user.deactivated) { %>
+                    <a id="change-service" class="govuk-link-bold" href="web-service-sync">View user sign in audit</a>
+                </li>
+                <% if(locals.isInvitation && !locals.user.deactivated) { %>
+                <li>
                     <a id="change-service" class="govuk-link-bold" href="resend-invitation">
                         Resend invitation email
                     </a>
-                    <% } %>
                 </li>
+                <% } %>
             </ul>
         </aside>
     </div>

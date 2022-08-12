@@ -4,6 +4,8 @@ const { getAllUserOrganisations, getInvitationOrganisations } = require('../../i
 const { getUsersByIdV2 } = require('../../infrastructure/directories');
 const { getUserDetails, getUserServiceRoles } = require('./utils');
 const logger = require('../../infrastructure/logger');
+const { getServiceById } = require('../../infrastructure/applications');
+const { getServicesForUser } = require('../../infrastructure/access');
 
 const getApproverDetails = async (organisation, correlationId) => {
   const allApproverIds = flatten(organisation.map((org) => org.approvers));
@@ -14,16 +16,35 @@ const getApproverDetails = async (organisation, correlationId) => {
   return await getUsersByIdV2(distinctApproverIds, correlationId);
 };
 
-const getOrganisations = async (userId, serviceId, correlationId) => {
+const getOrganisations = async (userId, correlationId) => {
   const orgMapping = userId.startsWith('inv-') ? await getInvitationOrganisations(userId.substr(4), correlationId) : await getAllUserOrganisations(userId, correlationId);
   if (!orgMapping) {
     return [];
   }
-  const orgsForService = orgMapping.filter((x) => x.services.find((y) => y.id.toLowerCase() === serviceId.toLowerCase()));
-  const allApprovers = await getApproverDetails(orgsForService, correlationId);
 
-  return await Promise.all(orgsForService.map(async (invitation) => {
+  const allApprovers = await getApproverDetails(orgMapping, correlationId);
+
+  return Promise.all(orgMapping.map(async (invitation) => {
     const approvers = invitation.approvers.map((approverId) => allApprovers.find((x) => x.sub.toLowerCase() === approverId.toLowerCase())).filter((x) => x);
+
+    const services = await Promise.all(invitation.services.map(async (service) => ({
+      id: service.id,
+      name: service.name,
+      userType: invitation.role,
+      grantedAccessOn: service.requestDate ? new Date(service.requestDate) : null,
+      serviceRoles: [],
+    })));
+    const selectedUserServices = await getServicesForUser(userId);
+
+    const filtered = selectedUserServices.filter((s) => s.organisationId === invitation.organisation.id);
+
+    services.map((service) => {
+      const serviceRole = filtered.find((sr) => service.id === sr.serviceId);
+      if (serviceRole) {
+        service.serviceRoles = serviceRole.roles;
+      }
+      return service;
+    });
     return {
       id: invitation.organisation.id,
       name: invitation.organisation.name,
@@ -34,14 +55,18 @@ const getOrganisations = async (userId, serviceId, correlationId) => {
       numericIdentifier: invitation.numericIdentifier,
       textIdentifier: invitation.textIdentifier,
       approvers,
+      services,
     };
   }));
 };
 
 const getUserOrganisations = async (req, res) => {
   const user = await getUserDetails(req);
-  const organisations = await getOrganisations(user.id, req.params.sid, req.id);
+
+  const organisations = await getOrganisations(user.id, req.id);
+
   const manageRolesForService = await getUserServiceRoles(req);
+  const currentService = await getServiceById(req.params.sid, req.id);
 
   logger.audit(`${req.user.email} (id: ${req.user.sub}) viewed user ${user.email} (id: ${user.id})`, {
     type: 'organisations',
@@ -60,6 +85,7 @@ const getUserOrganisations = async (req, res) => {
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
     currentNavigation: 'users',
+    currentService,
   });
 };
 

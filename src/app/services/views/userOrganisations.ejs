@@ -1,11 +1,12 @@
 <div class="govuk-width-container govuk-main-wrapper">
-    <%- include('summaryPartial', {area: 'organisations', user: locals.user, isInvitation: locals.isInvitation}); %>
+    <%- include('summaryPartial', {area: 'organisations', user: locals.user, isInvitation: locals.isInvitation, service: locals.currentService}); %>
     <div class="govuk-grid-row govuk-!-margin-top-6">
         <div class="govuk-grid-column-full">
-            <div class="govuk-tabs" data-module="govuk-tabs">
+            <!-- <div class="govuk-tabs" data-module="govuk-tabs">
                 <%- include('organisationNavigation', {area: 'organisations', isInvitation: locals.isInvitation, isAudit: locals.isAudit}); %>
 
                 <div class="govuk-tabs__panel" id="policy-roles-panel">
+
                     <h2 class="govuk-heading-m govuk-visually-hidden">Organisations</h2>
                     <table class="data govuk-table cell-align-top">
                         <thead class="govuk-table__head">
@@ -90,7 +91,50 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
+            </div> -->
+
+            <% if (locals.organisations.length === 0) { %>
+                <tr class="govuk-table__row">
+                    <td class="govuk-table__cell" colspan="4">
+                        <div class="empty-state">
+                            <p class="govuk-body"><%= user.name %> is not associated with any organisations</p>
+                        </div>
+                    </td>
+                </tr>
+                <% }%>
+                <% for (let o = 0; o < locals.organisations.length; o++) { %> <% const org = locals.organisations[o];%> 
+           
+            <dl class="inline">
+                <dt class="govuk-label"><%=org.name%></dt>
+                <dt class="govuk-label">Legacy ID:</dt>
+                <dd class="govuk-label"><%= org.numericIdentifier %></dd>
+                <dt class="govuk-label">Permission:</dt>
+                <% if (org.role) { %>
+                    <dd class="govuk-label"><%=org.role.name%></dd>
+                    <% } else { %>
+                    <dd class="govuk-label">Unknown</dd>
+                    <% } %>  
+            </dl>
+            <table class="data govuk-table cell-align-top govuk-!-margin-bottom-9">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header width-40">Service</th>
+                        <% if (!locals.isInvitation ) {%>
+                        <th scope="col" class="govuk-table__header width-20">Role</th>
+                        <% }%>
+                        <th scope="col" class="govuk-table__header width-20">Access granted on</th>
+                    </tr>
+             
+                </thead>
+                <tbody>
+                    <% for (let i = 0; i < org.services.length; i++) { %> <% const service = org.services[i];%> 
+                  <tr><th><%=service.name%></th></tr> 
+       <% } %>
+                </tbody>
+            </table>
+
+            <% } %>
+
         </div>
     </div>
 </div>
