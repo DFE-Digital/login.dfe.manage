@@ -10,6 +10,7 @@ const clearNewUserSessionData = (req) => {
 };
 
 const search = async (req) => {
+  const serviceId = req.params.sid;
   const paramsSource = req.method === 'POST' ? req.body : req.query;
 
   let { criteria } = paramsSource;
@@ -28,8 +29,15 @@ const search = async (req) => {
 
   const sortBy = paramsSource.sort ? paramsSource.sort.toLowerCase() : 'name';
   const sortAsc = (paramsSource.sortdir ? paramsSource.sortdir : 'asc').toLowerCase() === 'asc';
+  const showServices = paramsSource.showServices || paramsSource.services || 'all';
 
-  const results = await searchForUsers(`${criteria}*`, page, sortBy, sortAsc ? 'asc' : 'desc', {});
+  const results = await searchForUsers(
+    `${criteria}*`,
+    page,
+    sortBy,
+    sortAsc ? 'asc' : 'desc',
+    showServices === 'current' ? { services: [serviceId] } : {},
+  );
 
   logger.audit(`${req.user.email} (id: ${req.user.sub}) searched for users in manage using criteria "${criteria}"`, {
     type: 'manage',
@@ -41,6 +49,7 @@ const search = async (req) => {
     numberOfPages: results.numberOfPages,
     sortedBy: sortBy,
     sortDirection: sortAsc ? 'asc' : 'desc',
+    showServices,
   });
 
   return {
@@ -51,6 +60,7 @@ const search = async (req) => {
     numberOfPages: results.numberOfPages,
     totalNumberOfResults: results.totalNumberOfResults,
     users: results.users,
+    services: showServices,
     sort: {
       name: {
         nextDirection: sortBy === 'name' ? (sortAsc ? 'desc' : 'asc') : 'asc',
@@ -94,6 +104,7 @@ const viewModel = async (req) => {
     sortBy: result.sortBy,
     sortOrder: result.sortOrder,
     service,
+    services: result.services,
     userRoles: manageRolesForService,
     currentNavigation: 'users',
   };
