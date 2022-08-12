@@ -1,20 +1,20 @@
 const jwtStrategy = require('login.dfe.jwt-strategies');
-const config = require('./../config');
 const rp = require('login.dfe.request-promise-retry');
-const { mapUserStatus } = require('./../../infrastructure/utils');
+const config = require('../config');
+const { mapUserStatus, mapUserRole } = require('../utils');
 
 const callApi = async (endpoint, method, body, correlationId) => {
   const token = await jwtStrategy(config.search.service).getBearerToken();
 
   try {
     return await rp({
-      method: method,
+      method,
       uri: `${config.search.service.url}${endpoint}`,
       headers: {
         authorization: `bearer ${token}`,
         'x-correlation-id': correlationId,
       },
-      body: body,
+      body,
       json: true,
       strictSSL: config.hostingEnvironment.env.toLowerCase() !== 'dev',
     });
@@ -27,24 +27,30 @@ const callApi = async (endpoint, method, body, correlationId) => {
   }
 };
 
-const mapSearchUserToSupportModel = (user) => {
-  return {
-    id: user.id,
-    name: `${user.firstName} ${user.lastName}`,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    email: user.email,
-    organisation: user.primaryOrganisation ? {
-      name: user.primaryOrganisation
-    } : null,
-    organisations: user.organisations,
-    services: user.services,
-    lastLogin: user.lastLogin ? new Date(user.lastLogin) : null,
-    successfulLoginsInPast12Months: user.numberOfSuccessfulLoginsInPast12Months,
-    status: mapUserStatus(user.statusId, user.statusLastChangedOn),
-    pendingEmail: user.pendingEmail,
-  };
-};
+const mapSearchUserToSupportModel = (user) => ({
+  id: user.id,
+  name: `${user.firstName} ${user.lastName}`,
+  firstName: user.firstName,
+  lastName: user.lastName,
+  email: user.email,
+  organisation: user.primaryOrganisation ? {
+    name: user.primaryOrganisation,
+  } : null,
+  organisations: user.organisations.map((organisation) => {
+    if (!organisation.roleName) {
+      return {
+        ...organisation,
+        roleName: mapUserRole(organisation.roleId).description,
+      };
+    }
+    return organisation;
+  }),
+  services: user.services,
+  lastLogin: user.lastLogin ? new Date(user.lastLogin) : null,
+  successfulLoginsInPast12Months: user.numberOfSuccessfulLoginsInPast12Months,
+  status: mapUserStatus(user.statusId, user.statusLastChangedOn),
+  pendingEmail: user.pendingEmail,
+});
 
 const mapSupportUserSortByToSearchApi = (supportSortBy) => {
   switch (supportSortBy.toLowerCase()) {
@@ -76,15 +82,15 @@ const searchForUsers = async (criteria, pageNumber, sortBy, sortDirection, filte
       const properties = Object.keys(filters);
       properties.forEach((property) => {
         const values = filters[property];
-        endpoint += values.map(v => `&filter_${property}=${v}`).join('');
+        endpoint += values.map((v) => `&filter_${property}=${v}`).join('');
       });
     }
     const results = await callApi(endpoint, 'GET');
     return {
       numberOfPages: results.numberOfPages,
       totalNumberOfResults: results.totalNumberOfResults,
-      users: results.users.map(mapSearchUserToSupportModel)
-    }
+      users: results.users.map(mapSearchUserToSupportModel),
+    };
   } catch (e) {
     throw new Error(`Error searching for users with criteria ${criteria} (page: ${pageNumber}) - ${e.message}`);
   }
@@ -105,12 +111,10 @@ const updateIndex = async (userId, body, correlationId) => {
 
 const createIndex = async (id, correlationId) => {
   const body = {
-    id
+    id,
   };
   await callApi('/users/update-index', 'POST', body, correlationId);
 };
-
-
 
 module.exports = {
   searchForUsers,

@@ -10,7 +10,6 @@ const clearNewUserSessionData = (req) => {
 };
 
 const search = async (req) => {
-  const serviceId = req.params.sid;
   const paramsSource = req.method === 'POST' ? req.body : req.query;
 
   let { criteria } = paramsSource;
@@ -30,9 +29,7 @@ const search = async (req) => {
   const sortBy = paramsSource.sort ? paramsSource.sort.toLowerCase() : 'name';
   const sortAsc = (paramsSource.sortdir ? paramsSource.sortdir : 'asc').toLowerCase() === 'asc';
 
-  const results = await searchForUsers(`${criteria}*`, page, sortBy, sortAsc ? 'asc' : 'desc', {
-    services: [serviceId],
-  });
+  const results = await searchForUsers(`${criteria}*`, page, sortBy, sortAsc ? 'asc' : 'desc', {});
 
   logger.audit(`${req.user.email} (id: ${req.user.sub}) searched for users in manage using criteria "${criteria}"`, {
     type: 'manage',
@@ -97,7 +94,6 @@ const viewModel = async (req) => {
     sortBy: result.sortBy,
     sortOrder: result.sortOrder,
     service,
-    allowInvite: !!(service.relyingParty && service.relyingParty.params && service.relyingParty.params.allowManageInvite === 'true'),
     userRoles: manageRolesForService,
     currentNavigation: 'users',
   };
