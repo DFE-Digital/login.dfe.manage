@@ -23,6 +23,7 @@ const getOrganisations = async (userId, correlationId) => {
     return [];
   }
 
+
   const allApprovers = await getApproverDetails(orgMapping, correlationId);
 
   return Promise.all(orgMapping.map(async (invitation) => {
@@ -35,9 +36,9 @@ const getOrganisations = async (userId, correlationId) => {
       grantedAccessOn: service.requestDate ? new Date(service.requestDate) : null,
       serviceRoles: [],
     })));
-    const selectedUserServices = await getServicesForUser(userId);
+    const selectedUserServices = userId.startsWith('inv-') ? await getServicesForUser(userId.substr(4), correlationId) : await getServicesForUser(userId, correlationId);
 
-    const userOrgServices = selectedUserServices.filter((s) => s.organisationId === invitation.organisation.id);
+    const userOrgServices = selectedUserServices?.filter((s) => s.organisationId === invitation.organisation.id)|| [];
 
     services.map((service) => {
       const userServiceRole = userOrgServices.find((orgService) => service.id === orgService.serviceId);
