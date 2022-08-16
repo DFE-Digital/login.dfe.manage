@@ -78,6 +78,13 @@ const mapUserStatus = (status, changedOn = null) => {
   return { id: 1, description: 'Active', changedOn };
 };
 
+const mapUserRole = (roleId) => {
+  if (roleId === 10000) {
+    return { id: 10000, description: 'Approver' };
+  }
+  return { id: 1, description: 'End user' };
+};
+
 module.exports = {
   isLoggedIn,
   setUserContext,
@@ -85,5 +92,6 @@ module.exports = {
   isManageUserForService,
   hasRole,
   mapUserStatus,
+  mapUserRole,
   hasInvite,
 };
