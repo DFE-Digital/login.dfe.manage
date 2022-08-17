@@ -9,6 +9,11 @@ const signUserOut = (req, res) => {
     const idToken = req.user.id_token;
     const issuer = passport._strategies.oidc._issuer;
     let returnUrl = `${config.hostingEnvironment.protocol}://${config.hostingEnvironment.host}:${config.hostingEnvironment.port}/signout/complete`;
+
+    if (req.query.timeout === '1') {
+      returnUrl = `${config.hostingEnvironment.protocol}://${config.hostingEnvironment.host}:${config.hostingEnvironment.port}/signout/session-timeout`;
+    }
+
     req.logout();
     res.redirect(url.format(Object.assign(url.parse(issuer.end_session_endpoint), {
       search: null,
@@ -23,4 +28,3 @@ const signUserOut = (req, res) => {
 };
 
 module.exports = signUserOut;
-

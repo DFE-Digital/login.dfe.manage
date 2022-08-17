@@ -4,6 +4,7 @@ const config = require('../config');
 
 const isLoggedIn = (req, res, next) => {
   if (req.isAuthenticated()) {
+    res.locals.isLoggedIn = true;
     return next();
   }
   req.session.redirectUrl = req.originalUrl;
