@@ -38,6 +38,8 @@ const getSingleInvitationService = async (iid, sid, oid, correlationId) => {
   return callApi('GET', `invitations/${iid}/services/${sid}/organisations/${oid}`, correlationId, undefined);
 };
 
+const getAllInvitationServices = async (iid, correlationId) => callApi('GET', `invitations/${iid}/services`, correlationId, undefined);
+
 const listRolesOfService = async (sid, correlationId) => {
   return callApi('GET', `services/${sid}/roles`, correlationId, undefined);
 };
@@ -99,4 +101,5 @@ module.exports = {
   getPolicyById,
   addUserService,
   addInvitationService,
+  getAllInvitationServices,
 };

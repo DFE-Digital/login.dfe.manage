@@ -2,7 +2,7 @@
     <div class="govuk-grid-column-three-quarters">
     <% if (locals.flash.info) { %>
         <div class="govuk-grid-row">
-            <div class="govuk-grid-column-two-thirds">
+            <div class="govuk-grid-column-full">
                 <div id="notification-wrapper" class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
                     <div class="govuk-notification-banner__header">
                         <span class="close-button">x</span>
@@ -24,7 +24,7 @@
             <%= user.name %>
         </h1>
         <dl class="inline">
-            <dt class="govuk-label">Account Status:</dt>
+            <dt class="govuk-label">Account status:</dt>
             <%
                 let tagColour = 'govuk-tag--'; 
                 if(user.status.id === 1) {
@@ -44,7 +44,7 @@
             <dd class="govuk-label"><%= user.email %></dd>
             <dt class="govuk-label">Last login:</dt>
             <dd class="govuk-label">
-                <%= user.lastLogin ? moment(user.lastLogin).format('DD MMM YYYY, HH:mm:ss') :
+                <%= user.lastLogin ? moment(user.lastLogin).format('DD MMM YYYY, HH:mm') :
                 'Never' %>
             </dd>
         </dl>
@@ -56,15 +56,8 @@
             <ul class="govuk-list">
                <!-- TODO: update redirection link when the sing-in audit page will be created -->
                 <li>
-                    <a id="change-service" class="govuk-link-bold" href="web-service-sync">View user sign in audit</a>
+                    <a id="change-service" class="govuk-link-bold" href="#">View user sign in audit</a>
                 </li>
-                <% if(locals.isInvitation && !locals.user.deactivated) { %>
-                <li>
-                    <a id="change-service" class="govuk-link-bold" href="resend-invitation">
-                        Resend invitation email
-                    </a>
-                </li>
-                <% } %>
             </ul>
         </aside>
     </div>

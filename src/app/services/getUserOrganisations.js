@@ -5,7 +5,7 @@ const { getUsersByIdV2 } = require('../../infrastructure/directories');
 const { getUserDetails, getUserServiceRoles } = require('./utils');
 const logger = require('../../infrastructure/logger');
 const { getServiceById } = require('../../infrastructure/applications');
-const { getServicesForUser } = require('../../infrastructure/access');
+const { getServicesForUser, getAllInvitationServices } = require('../../infrastructure/access');
 
 const getApproverDetails = async (organisation, correlationId) => {
   const allApproverIds = flatten(organisation.map((org) => org.approvers));
@@ -36,7 +36,9 @@ const getOrganisations = async (userId, correlationId) => {
       grantedAccessOn: service.requestDate ? new Date(service.requestDate) : null,
       serviceRoles: [],
     })));
-    const selectedUserServices = userId.startsWith('inv-') ? await getServicesForUser(userId.substr(4), correlationId) : await getServicesForUser(userId, correlationId);
+
+    const selectedUserServices = userId.startsWith('inv-') ? await getAllInvitationServices(userId.substr(4),correlationId)
+    : await getServicesForUser(userId, correlationId);
 
     const userOrgServices = selectedUserServices?.filter((s) => s.organisationId === invitation.organisation.id)|| [];
 
@@ -67,6 +69,7 @@ const getUserOrganisations = async (req, res) => {
   const user = await getUserDetails(req);
 
   const organisations = await getOrganisations(user.id, req.id);
+  const visibleOrganisations = organisations.filter(o => o.status?.id !== 0)
 
   const manageRolesForService = await getUserServiceRoles(req);
   const currentService = await getServiceById(req.params.sid, req.id);
@@ -82,7 +85,7 @@ const getUserOrganisations = async (req, res) => {
   return res.render('services/views/userOrganisations', {
     csrfToken: req.csrfToken(),
     user,
-    organisations,
+    organisations: visibleOrganisations,
     isInvitation: req.params.uid.startsWith('inv-'),
     backLink: `/services/${req.params.sid}/users`,
     serviceId: req.params.sid,

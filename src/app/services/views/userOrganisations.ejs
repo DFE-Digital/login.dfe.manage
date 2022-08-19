@@ -1,12 +1,12 @@
 <div class="govuk-width-container govuk-main-wrapper">
 	<%- include('summaryPartial', {area: 'organisations', user: locals.user,
 	isInvitation: locals.isInvitation, service: locals.currentService}); %>
-	<div class="govuk-grid-row govuk-!-margin-top-6">
+	<div class="govuk-grid-row">
 		<div class="govuk-grid-column-full">
 			<% if (locals.organisations.length === 0) { %>
 			<tr class="govuk-table__row">
 				<td class="govuk-table__cell" colspan="3">
-					<div class="empty-state">
+					<div class="empty-state govuk-!-margin-top-3">
 						<p class="govuk-body">
 							<%= user.name %> is not associated with any organisations
 						</p>
@@ -19,37 +19,29 @@
 				<div class="govuk-grid-column-full">
 					<dl class="inline">
 						<dt class="govuk-label"><%=org.name%></dt>
+						<% if (!locals.isInvitation) { %>
 						<dt class="govuk-label govuk-!-font-weight-regular">Legacy ID:</dt>
 						<dd class="govuk-label"><%= org.numericIdentifier %></dd>
-						<dt class="govuk-label govuk-!-font-weight-regular">Permission:</dt>
+						<% } %>
+						<dt class="govuk-label govuk-!-font-weight-regular">Permission level:</dt>
 						<% if (org.role) { %>
 						<dd class="govuk-label"><%=org.role.name%></dd>
 						<% } else { %>
 						<dd class="govuk-label">Unknown</dd>
 						<% } %> <% let isOrgAssociatdWithCurrentService =
 						org.services.some(s => s.id === currentService.id); %> <% if
-						(!isOrgAssociatdWithCurrentService) { %>
+						(!isOrgAssociatdWithCurrentService && (user.status.id !== -2 && user.status.id !== 0)) { %>
 						<dt class="govuk-label"><a class ="govuk-link" href="#">Give access to service</a></dt>
 						<% }%>
 					</dl>
 
-					<table
-						class="data govuk-table cell-align-top govuk-!-margin-bottom-9"
-					>
+					<table class="data govuk-table cell-align-top govuk-!-margin-bottom-9 cell-align-top">
 						<thead class="govuk-table__head">
 							<tr class="govuk-table__row">
 								<th scope="col" class="govuk-table__header width-35">
 									Service
 								</th>
-							
 								<th scope="col" class="govuk-table__header width-45">Role</th>
-						
-								<th
-									scope="col"
-									class="govuk-table__header width-20 govuk-table__header--numeric"
-								>
-									Access granted on
-								</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -58,7 +50,7 @@
 								<td class="govuk-table__cell" colspan="3">
 									<div class="empty-state">
 										<p class="govuk-body">
-											No services associated for this organisation
+											No services associated with this organisation
 										</p>
 									</div>
 								</td>
@@ -67,21 +59,16 @@
 							%> <% const service = org.services[i];%>
 							<tr class="govuk-table__row">
 								<td class="govuk-table__cell">
-									<ul class="govuk-list govuk-!-margin-bottom-0">
-										<li
-											class="govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-2"
+								
+										<span
+											class="govuk-!-font-weight-bold"
 										>
 											<%=service.name%>
-										</li>
-
-										<% if (service.id === currentService.id) { %>
-										<li
-											class="govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-2"
-										>
-											<a href="#" class="govuk-link">Edit service</a>
-										</li>
-										<% }%>
-									</ul>
+										<% if (service.id === currentService.id && (user.status.id !== -2 && user.status.id !== 0)) { %>
+								<div>
+									<a href="organisations/<%=org.id%>" class="govuk-link govuk-!-font-weight-bold">Edit service</a>
+								</div>
+									<% }%>
 								</td>
 								<% if (service.serviceRoles.length > 0) { %>
 
@@ -89,8 +76,7 @@
 									<ul class="govuk-list govuk-!-margin-bottom-0">
 										<% for (let i = 0; i < service.serviceRoles.length; i++) {
 										%> <% const serviceRole = service.serviceRoles[i];%>
-										<li
-											class="govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-2"
+										<li	
 										>
 											<%=serviceRole.name%>
 										</li>
@@ -98,13 +84,8 @@
 									</ul>
 								</td>
 								<% } else { %>
-								<td class="govuk-table__cell">No Service Role</td>
+								<td class="govuk-table__cell">No service role</td>
 								<% } %>
-								<td class="govuk-table__cell govuk-table__cell--numeric">
-									<%=service.grantedAccessOn ?
-									moment(service.grantedAccessOn).format('DD MMM YYYY') :
-									'Unknown'%> %>
-								</td>
 							</tr>
 							<% } %> 
                             <% } %>
