@@ -23,6 +23,27 @@ const getSingleUserService = (id, sid, oid, correlationId) => Promise.resolve([]
 
 const getSingleInvitationService = (iid, sid, oid, correlationId) => Promise.resolve([]);
 
+const getAllInvitationServices = (iid, corellationId)=> Promise.resolve(
+  [
+    {
+      invitationId: 'D212N-12312-31231-312-56465',
+      serviceId: 'D212N-12312-31231-312-56465',
+      organisationId: 'D212N-12312-31231-312-56465',
+      roles: [
+        {
+          id: 'D212N-12312-31231-312-56465',
+          name: 'Test office',
+          code: 'test_code',
+          numericId: '00000',
+          status: { id: 1 },
+        },
+      ],
+      identifiers: [],
+      accessGrantedOn: '2022-07-25T16:13:54.621Z',
+    },
+  ],
+);
+
 const listRolesOfService = async (sid, correlationId) => Promise.resolve([]);
 
 const updateUserService = async (uid, sid, oid, role, correlationId) => Promise.resolve(null);
@@ -68,4 +89,5 @@ module.exports = {
   getPolicyById,
   addInvitationService,
   addUserService,
+  getAllInvitationServices,
 };
