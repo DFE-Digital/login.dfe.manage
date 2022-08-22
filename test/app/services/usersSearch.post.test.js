@@ -38,10 +38,11 @@ describe('When posting users search ', () => {
         organisation: {
           name: 'Testco'
         },
+        organisations:[],
         lastLogin: new Date(2018, 0, 11, 11, 30, 57),
         status: {
-          description: 'Active'
-        }
+          description: 'Active',
+        },
       },
     ];
 
