@@ -67,7 +67,10 @@ const post = async (req, res) => {
   if (policyValidationResult.length > 0) {
     const model = await getViewModel(req);
     const roles = {};
-    model.service.roles = selectedRoles.map((x) => roles[x] = { id: x });
+    model.service.roles = selectedRoles.map((x) => {
+      roles[x] = { id: x };
+      return roles;
+    });
     model.validationMessages.roles = policyValidationResult.map((x) => x.message);
     return res.render('services/views/editService', model);
   }

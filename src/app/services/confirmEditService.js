@@ -27,6 +27,12 @@ const getModel = async (req) => {
   };
 };
 
+const updateService = async (uid, sid, oid, selectedRoles, reqId) => {
+  const update = uid.startsWith('inv-') ? await updateInvitationService(uid.substr(4), sid, oid, selectedRoles, reqId)
+    : updateUserService(uid, sid, oid, selectedRoles, reqId);
+  return update;
+};
+
 const get = async (req, res) => {
   const model = await getModel(req);
 
@@ -37,8 +43,8 @@ const post = async (req, res) => {
   const model = await getModel(req);
 
   const selectedRoles = req.session.service.roles;
-  req.params.uid.startsWith('inv-') ? await updateInvitationService(req.params.uid.substr(4), req.params.sid, req.params.oid, selectedRoles, req.id)
-    : updateUserService(req.params.uid, req.params.sid, req.params.oid, selectedRoles, req.id);
+
+  await updateService(req.params.uid, req.params.sid, req.params.oid, selectedRoles, req.id);
 
   logger.audit(`${req.user.email} (id: ${req.user.sub}) updated service ${model.service.name} for organisation ${model.organisation.name} (id: ${model.organisation.id}) for user ${model.user.email} (id: ${model.user.id})`, {
     type: 'manage',
@@ -52,7 +58,10 @@ const post = async (req, res) => {
     }],
   });
 
-  res.flash('info', 'Service roles updated successfully');
+  res.flash('title', 'Success');
+  res.flash('heading', `Service updated: ${model.service.name}`);
+  res.flash('message', 'Approvers at the relevant organisation have been notified of this change.');
+
   return res.redirect(`/services/${req.params.sid}/users/${req.params.uid}/organisations`);
 };
 
