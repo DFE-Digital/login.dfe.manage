@@ -1,15 +1,17 @@
-jest.mock('./../../../src/infrastructure/config', () => require('./../../utils').configMockFactory());
-jest.mock('./../../../src/infrastructure/logger', () => require('./../../utils').loggerMockFactory());
+jest.mock('./../../../src/infrastructure/config', () => require('../../utils').configMockFactory());
+jest.mock('./../../../src/infrastructure/logger', () => require('../../utils').loggerMockFactory());
 jest.mock('./../../../src/app/services/utils');
 jest.mock('./../../../src/infrastructure/organisations');
 jest.mock('./../../../src/infrastructure/directories');
+jest.mock('../../../src/infrastructure/access');
 
-const logger = require('./../../../src/infrastructure/logger');
-const { getRequestMock, getResponseMock } = require('./../../utils');
-const getUserOrganisations = require('./../../../src/app/services/getUserOrganisations');
-const { getAllUserOrganisations, getInvitationOrganisations } = require('./../../../src/infrastructure/organisations');
-const { getUsersByIdV2 } = require('./../../../src/infrastructure/directories');
-const { getUserDetails } = require('./../../../src/app/services/utils');
+const logger = require('../../../src/infrastructure/logger');
+const { getRequestMock, getResponseMock } = require('../../utils');
+const getUserOrganisations = require('../../../src/app/services/getUserOrganisations');
+const { getAllUserOrganisations, getInvitationOrganisations } = require('../../../src/infrastructure/organisations');
+const { getUsersByIdV2 } = require('../../../src/infrastructure/directories');
+const { getUserDetails } = require('../../../src/app/services/utils');
+
 const res = getResponseMock();
 
 describe('when getting users organisation details', () => {
@@ -41,12 +43,12 @@ describe('when getting users organisation details', () => {
           name: 'Great Big School',
         },
         approvers: [
-          "user1",
+          'user1',
         ],
         services: [
           {
-           id: 'service1',
-          }
+            id: 'service1',
+          },
         ],
       },
       {
@@ -55,13 +57,13 @@ describe('when getting users organisation details', () => {
           name: 'Little Tiny School',
         },
         approvers: [
-          "user1",
+          'user1',
         ],
         services: [
           {
             id: 'service1',
-          }
-        ]
+          },
+        ],
       },
     ]);
 
@@ -73,12 +75,12 @@ describe('when getting users organisation details', () => {
           name: 'Great Big School',
         },
         approvers: [
-          "user1",
+          'user1',
         ],
         services: [
           {
             id: 'service1',
-          }
+          },
         ],
       },
       {
@@ -87,12 +89,12 @@ describe('when getting users organisation details', () => {
           name: 'Little Tiny School',
         },
         approvers: [
-          "user1",
+          'user1',
         ],
         services: [
           {
             id: 'service1',
-          }
+          },
         ],
       },
     ]);
@@ -100,10 +102,16 @@ describe('when getting users organisation details', () => {
     getUsersByIdV2.mockReset();
     getUsersByIdV2.mockReturnValue(
       [
-        {sub: 'user1', given_name: 'User', family_name: 'One', email: 'user.one@unit.tests'},
-        {sub: 'user6', given_name: 'User', family_name: 'Six', email: 'user.six@unit.tests'},
-        {sub: 'user11', given_name: 'User', family_name: 'Eleven', email: 'user.eleven@unit.tests'},
-      ]
+        {
+          sub: 'user1', given_name: 'User', family_name: 'One', email: 'user.one@unit.tests',
+        },
+        {
+          sub: 'user6', given_name: 'User', family_name: 'Six', email: 'user.six@unit.tests',
+        },
+        {
+          sub: 'user11', given_name: 'User', family_name: 'Eleven', email: 'user.eleven@unit.tests',
+        },
+      ],
     );
   });
 

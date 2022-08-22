@@ -91,6 +91,11 @@ const viewModel = async (req) => {
   const service = await getServiceById(req.params.sid, req.id);
   const manageRolesForService = await getUserServiceRoles(req);
 
+  // remove hidden organisations from displaying
+  const users = result.users.map((u) => ({
+    ...u, organisations: u.organisations.filter((o) => (o.statusId && (o.statusId !== 0))),
+  }));
+
   return {
     csrfToken: req.csrfToken(),
     serviceId: req.params.sid,
@@ -99,7 +104,7 @@ const viewModel = async (req) => {
     page: result.page,
     numberOfPages: result.numberOfPages,
     totalNumberOfResults: result.totalNumberOfResults,
-    users: result.users,
+    users,
     sort: result.sort,
     sortBy: result.sortBy,
     sortOrder: result.sortOrder,

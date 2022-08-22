@@ -1,96 +1,99 @@
 <div class="govuk-width-container govuk-main-wrapper">
-    <%- include('summaryPartial', {area: 'organisations', user: locals.user, isInvitation: locals.isInvitation}); %>
-    <div class="govuk-grid-row govuk-!-margin-top-6">
-        <div class="govuk-grid-column-full">
-            <div class="govuk-tabs" data-module="govuk-tabs">
-                <%- include('organisationNavigation', {area: 'organisations', isInvitation: locals.isInvitation, isAudit: locals.isAudit}); %>
+	<%- include('summaryPartial', {area: 'organisations', user: locals.user,
+	isInvitation: locals.isInvitation, service: locals.currentService}); %>
+	<div class="govuk-grid-row">
+		<div class="govuk-grid-column-full">
+			<% if (locals.organisations.length === 0) { %>
+			<tr class="govuk-table__row">
+				<td class="govuk-table__cell" colspan="3">
+					<div class="empty-state govuk-!-margin-top-3">
+						<p class="govuk-body">
+							<%= user.name %> is not associated with any organisations
+						</p>
+					</div>
+				</td>
+			</tr>
+			<% }%> <% for (let i = 0; i < locals.organisations.length; i++) { %> <%
+			const org = locals.organisations[i];%>
+			<div class="govuk-grid-row govuk-!-margin-top-6 govuk-!-margin-bottom-6">
+				<div class="govuk-grid-column-full">
+					<dl class="inline">
+						<dt class="govuk-label"><%=org.name%></dt>
+						<% if (!locals.isInvitation) { %>
+						<dt class="govuk-label govuk-!-font-weight-regular">Legacy ID:</dt>
+						<dd class="govuk-label"><%= org.numericIdentifier %></dd>
+						<% } %>
+						<dt class="govuk-label govuk-!-font-weight-regular">Permission level:</dt>
+						<% if (org.role) { %>
+						<dd class="govuk-label"><%=org.role.name%></dd>
+						<% } else { %>
+						<dd class="govuk-label">Unknown</dd>
+						<% } %> <% let isOrgAssociatdWithCurrentService =
+						org.services.some(s => s.id === currentService.id); %> <% if
+						(!isOrgAssociatdWithCurrentService && (user.status.id !== -2 && user.status.id !== 0)) { %>
+						<dt class="govuk-label"><a class ="govuk-link" href="#">Give access to service</a></dt>
+						<% }%>
+					</dl>
 
-                <div class="govuk-tabs__panel" id="policy-roles-panel">
-                    <h2 class="govuk-heading-m govuk-visually-hidden">Organisations</h2>
-                    <table class="data govuk-table cell-align-top">
-                        <thead class="govuk-table__head">
-                            <tr class="govuk-table__row">
-                                <th scope="col" class="govuk-table__header width-40">Organisation</th>
-                                <% if (!locals.isInvitation ) {%>
-                                <th scope="col" class="govuk-table__header width-20">Legacy ID/Name</th>
-                                <% }%>
-                                <th scope="col" class="govuk-table__header width-20">Permission level</th>
-                                <th scope="col" class="govuk-table__header width-30 govuk-table__header--numeric">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="govuk-table__body">
-                            <% if (locals.organisations.length === 0) { %>
-                                <tr class="govuk-table__row">
-                                    <td class="govuk-table__cell" colspan="4">
-                                        <div class="empty-state">
-                                            <p class="govuk-body"><%= user.name %> is not associated with any organisations</p>
-                                        </div>
-                                    </td>
-                                </tr>
+					<table class="data govuk-table cell-align-top govuk-!-margin-bottom-9 cell-align-top">
+						<thead class="govuk-table__head">
+							<tr class="govuk-table__row">
+								<th scope="col" class="govuk-table__header width-35">
+									Service
+								</th>
+								<th scope="col" class="govuk-table__header width-45">Role</th>
+							</tr>
+						</thead>
+						<tbody>
+							<% if (org.services.length === 0) { %>
+							<tr class="govuk-table__row">
+								<td class="govuk-table__cell" colspan="3">
+									<div class="empty-state">
+										<p class="govuk-body">
+											No services associated with this organisation
+										</p>
+									</div>
+								</td>
+							</tr>
+							<% } else { %> <% for (let i = 0; i < org.services.length; i++) {
+							%> <% const service = org.services[i];%>
+							<tr class="govuk-table__row">
+								<td class="govuk-table__cell">
+								
+										<span
+											class="govuk-!-font-weight-bold"
+										>
+											<%=service.name%>
+										<% if (service.id === currentService.id && (user.status.id !== -2 && user.status.id !== 0)) { %>
+								<div>
+									<a href="organisations/<%=org.id%>" class="govuk-link govuk-!-font-weight-bold">Edit service</a>
+								</div>
+									<% }%>
+								</td>
+								<% if (service.serviceRoles.length > 0) { %>
+
+								<td class="govuk-table__cell">
+									<ul class="govuk-list govuk-!-margin-bottom-0">
+										<% for (let i = 0; i < service.serviceRoles.length; i++) {
+										%> <% const serviceRole = service.serviceRoles[i];%>
+										<li	
+										>
+											<%=serviceRole.name%>
+										</li>
+										<% } %>
+									</ul>
+								</td>
+								<% } else { %>
+								<td class="govuk-table__cell">No service role</td>
+								<% } %>
+							</tr>
+							<% } %> 
                             <% } %>
-                            <% for (let o = 0; o < locals.organisations.length; o++) { %> <% const org = locals.organisations[o];%>
-                            <tr class="govuk-table__row">
-                                <td class="govuk-table__cell">
-                                    <%=org.name%>
-                                    <br />
-
-                                    <details class="govuk-details govuk-!-margin-bottom-0" data-module="govuk-details">
-                                        <summary class="govuk-details__summary">
-                                            <span class="govuk-details__summary-text">Information and approvers</span>
-                                        </summary>
-
-                                        <div class="govuk-details__text govuk-!-margin-top-0">
-                                            <div class="approvers">
-                                                <dl class="inline govuk-!-margin-bottom-0 govuk-!-margin-top-0">
-                                                    <% if (org.urn) { %>
-                                                    <dt class="govuk-label"><abbr title="Unique Reference Number">URN:</abbr></dt>
-                                                    <dd class="govuk-label"><%=org.urn%></dd>
-                                                    <% } %> <% if (org.uid) { %>
-                                                    <dt class="govuk-label"><abbr title="Unique Identifier">UID:</abbr></dt>
-                                                    <dd class="govuk-label"><%=org.uid%></dd>
-                                                    <% } %> <% if (org.ukprn) { %>
-                                                    <dt class="govuk-label">
-                                                        <abbr title="UK Provider Reference Number">UKPRN:</abbr>
-                                                    </dt>
-                                                    <dd class="govuk-label"><%=org.ukprn%></dd>
-                                                    <% } %> <% if (org.approvers.length > 0) { %>
-                                                    <dt class="govuk-label">Approvers:</dt>
-                                                    <dd class="govuk-label">
-                                                        <ul class="govuk-list govuk-!-margin-bottom-0">
-                                                            <% for (let a = 0; a < org.approvers.length; a++) { %>
-                                                            <li>
-                                                                <%=org.approvers[a].name%>
-                                                                <a class="govuk-link" href="mailto:<%=org.approvers[a].email%>">
-                                                                    <%=org.approvers[a].email%>
-                                                                </a>
-                                                            </li>
-                                                            <% } %>
-                                                        </ul>
-                                                    </dd>
-                                                    <% } %>
-                                                </dl>
-                                            </div>
-                                        </div>
-                                    </details>
-                                </td>
-                                <% if (!locals.isInvitation ) {%>
-                                <td class="govuk-table__cell">
-                                    <%= org.numericIdentifier && org.textIdentifier ? `${org.numericIdentifier} /
-                                    ${org.textIdentifier}` : '' -%>
-                                </td>
-                                <% }%> <% if (org.role) { %>
-                                <td class="govuk-table__cell"><%=org.role.name%></td>
-                                <% } else { %>
-                                <td class="govuk-table__cell">Unknown</td>
-                                <% } %>
-
-                                <td class="govuk-table__cell govuk-table__cell--numeric"><a class="govuk-link" href="organisations/<%= org.id %>">Edit service</a></td>
-                            </tr>
-                            <%}%>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<% } %>
+		</div>
+	</div>
 </div>
