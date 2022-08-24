@@ -5,13 +5,14 @@ const passport = require('passport');
 const config = require('./../../infrastructure/config');
 
 const signUserOut = (req, res) => {
+  const baseUrl = `${config.hostingEnvironment.protocol}://${config.hostingEnvironment.host}:${config.hostingEnvironment.port}`;
   if (req.user && req.user.id_token) {
     const idToken = req.user.id_token;
     const issuer = passport._strategies.oidc._issuer;
-    let returnUrl = `${config.hostingEnvironment.protocol}://${config.hostingEnvironment.host}:${config.hostingEnvironment.port}/signout/complete`;
+    let returnUrl = `${baseUrl}/signout/complete`;
 
     if (req.query.timeout === '1') {
-      returnUrl = `${config.hostingEnvironment.protocol}://${config.hostingEnvironment.host}:${config.hostingEnvironment.port}/signout/session-timeout`;
+      returnUrl = `${baseUrl}/signout/session-timeout`;
     }
 
     req.logout();
@@ -23,6 +24,12 @@ const signUserOut = (req, res) => {
       },
     })));
   } else {
+    if (req.query.timeout === '1') {
+      req.logout();
+      req.session = null;
+      return res.redirect(`${baseUrl}/signout/session-timeout`);
+    }
+
     res.redirect('/');
   }
 };
