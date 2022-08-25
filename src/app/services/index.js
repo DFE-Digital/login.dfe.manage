@@ -2,9 +2,9 @@
 
 const express = require('express');
 const { asyncWrapper } = require('login.dfe.express-error-handling');
-const uniqBy = require('lodash/uniqBy');
 const logger = require('../../infrastructure/logger');
-const { isLoggedIn, isManageUserForService, hasRole, hasInvite } = require('../../infrastructure/utils');
+const { isLoggedIn, isManageUserForService, hasRole, hasInvite 
+} = require('../../infrastructure/utils');
 
 const { getDashboard } = require('./getDashboard');
 const { getServiceConfig, postServiceConfig } = require('./serviceConfig');
@@ -21,6 +21,7 @@ const { get: getWebServiceSyncOrg, post: postWebServiceSyncOrg } = require('./we
 const { get: getEditService, post: postEditService } = require('./editService');
 const { get: getConfirmEditService, post: postConfirmEditService } = require('./confirmEditService');
 const { get: getRemoveService, post: postRemoveService } = require('./removeService');
+const { get: getAssociateService, post: postAssociateService } = require('./associateService');
 const { get: getListPolicies, post: postListPolicies } = require('./listPolicies');
 const getPolicyConditions = require('./getPolicyConditions');
 const getPolicyRoles = require('./getPolicyRoles');
@@ -38,7 +39,7 @@ const services = (csrf) => {
     if (!req.userServices || req.userServices.roles.length === 0) {
       return res.status(401).render('errors/views/notAuthorised');
     }
-    return res.redirect(`services/select-service`);
+    return res.redirect('services/select-service');
   }));
 
   router.get('/select-service', csrf, asyncWrapper(getSelectService));
@@ -86,6 +87,9 @@ const services = (csrf) => {
 
   router.get('/:sid/users/:uid/organisations/:oid/remove-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getRemoveService));
   router.post('/:sid/users/:uid/organisations/:oid/remove-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postRemoveService));
+
+  router.get('/:sid/users/:uid/organisations/:oid/associate-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getAssociateService));
+  router.post('/:sid/users/:uid/organisations/:oid/associate-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postAssociateService));
 
   router.get('/:sid/users/:uid/web-service-sync',csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getWebServiceSync));
   router.post('/:sid/users/:uid/web-service-sync',csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postWebServiceSync));

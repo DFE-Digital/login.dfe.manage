@@ -31,7 +31,7 @@
 						<% } %> <% let isOrgAssociatdWithCurrentService =
 						org.services.some(s => s.id === currentService.id); %> <% if
 						(!isOrgAssociatdWithCurrentService && (user.status.id !== -2 && user.status.id !== 0)) { %>
-						<dt class="govuk-label"><a class ="govuk-link" href="#">Give access to service</a></dt>
+						<dt class="govuk-label"><a class ="govuk-link" href="organisations/<%=org.id%>/associate-service">Give access to service</a></dt>
 						<% }%>
 					</dl>
 
