@@ -23,7 +23,6 @@ const getModel = async (req) => {
     roles: roleDetails,
     user,
     organisation,
-    serviceId: req.params.sid,
     userRoles: manageRolesForService,
     currentNavigation: 'users',
   };
@@ -36,40 +35,46 @@ const get = async (req, res) => {
 
 const post = async (req, res) => {
   const model = await getModel(req);
-  const uid = model.user.id;
+  const {
+    user, organisation, service, roles,
+  } = model;
+
   const selectedRoles = req.session.service.roles;
   const notificationClient = new NotificationClient({ connectionString: config.notifications.connectionString });
-  if (uid.startsWith('inv-')) {
-    const invitationId = uid.substr(4);
-    await addInvitationService(invitationId, req.params.sid, req.params.oid, selectedRoles, req.id);
+  if (user.id.startsWith('inv-')) {
+    const invitationId = user.id.substr(4);
+    await addInvitationService(invitationId, service.id, organisation.id, selectedRoles, req.id);
   } else {
-    await addUserService(req.params.uid, req.params.sid, req.params.oid, selectedRoles, req.id);
+    await addUserService(user.id, service.id, organisation.id, selectedRoles, req.id);
   }
 
   await notificationClient.sendServiceRequestApproved(
-    model.user.email,
-    model.user.firstName,
-    model.user.lastName,
-    model.organisation.name,
-    model.service.name,
-    model.roles.map((r) => r.name),
+    user.email,
+    user.firstName,
+    user.lastName,
+    organisation.name,
+    service.name,
+    roles.map((r) => r.name),
   );
 
-  logger.audit(`${req.user.email} (id: ${req.user.sub}) added service ${model.service.name} for organisation ${model.organisation.name} (id: ${model.organisation.id}) for user ${model.user.email} (id: ${model.user.id})`, {
+  logger.audit(`${req.user.email} (id: ${req.user.sub}) added service ${service.name} for organisation ${organisation.name} (id: ${model.organisation.id}) for user ${user.email} (id: ${user.id})`, {
     type: 'manage',
     subType: 'user-service-added',
     userId: req.user.sub,
     userEmail: req.user.email,
-    editedUser: model.user.id,
-    organisationId: model.organisation.id,
+    organisationId: organisation.id,
     editedFields: [{
-      name: 'add_service',
-      newValue: selectedRoles,
+      name: 'add_services',
+      newValue: {
+        id: service.id,
+        roles: selectedRoles,
+      },
     }],
+    editedUser: user.id,
   });
 
   res.flash('title', 'Success');
-  res.flash('heading', `Service added: ${model.service.name}`);
+  res.flash('heading', `Service added: ${service.name}`);
   res.flash('message', 'Approvers at the relevant organisation have been notified of this change.');
 
   return res.redirect(`/services/${req.params.sid}/users/${req.params.uid}/organisations`);
