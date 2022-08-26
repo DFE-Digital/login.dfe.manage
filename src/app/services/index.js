@@ -22,6 +22,7 @@ const { get: getEditService, post: postEditService } = require('./editService');
 const { get: getConfirmEditService, post: postConfirmEditService } = require('./confirmEditService');
 const { get: getRemoveService, post: postRemoveService } = require('./removeService');
 const { get: getAssociateService, post: postAssociateService } = require('./associateService');
+const { get: getConfirmAssociateService, post: postConfirmAssociateService } = require('./confirmAssociateService');
 const { get: getListPolicies, post: postListPolicies } = require('./listPolicies');
 const getPolicyConditions = require('./getPolicyConditions');
 const getPolicyRoles = require('./getPolicyRoles');
@@ -90,6 +91,9 @@ const services = (csrf) => {
 
   router.get('/:sid/users/:uid/organisations/:oid/associate-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getAssociateService));
   router.post('/:sid/users/:uid/organisations/:oid/associate-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postAssociateService));
+
+  router.get('/:sid/users/:uid/organisations/:oid/confirm-associate-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getConfirmAssociateService));
+  router.post('/:sid/users/:uid/organisations/:oid/confirm-associate-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postConfirmAssociateService));
 
   router.get('/:sid/users/:uid/web-service-sync',csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getWebServiceSync));
   router.post('/:sid/users/:uid/web-service-sync',csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postWebServiceSync));

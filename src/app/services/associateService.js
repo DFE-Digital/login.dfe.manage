@@ -1,12 +1,10 @@
 const PolicyEngine = require('login.dfe.policy-engine');
 const config = require('../../infrastructure/config');
-const { getSingleUserService, getSingleInvitationService } = require('../../infrastructure/access');
 const { getServiceById } = require('../../infrastructure/applications');
 const { getUserDetails, getUserServiceRoles } = require('./utils');
 const { getOrganisationByIdV2 } = require('../../infrastructure/organisations');
 
 const policyEngine = new PolicyEngine(config);
-
 
 const getViewModel = async (req) => {
   const user = await getUserDetails(req);
@@ -60,9 +58,7 @@ const post = async (req, res) => {
     roles: selectedRoles,
   };
 
-console.log(req.session)
-  // return res.redirect(`${req.params.oid}/confirm-edit-service`);
-  // console.log(model.selectedRoles)
+  return res.redirect('confirm-associate-service');
 };
 
 module.exports = {
