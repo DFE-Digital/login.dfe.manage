@@ -41,6 +41,7 @@ const post = async (req, res) => {
 
   const selectedRoles = req.session.service.roles;
   const notificationClient = new NotificationClient({ connectionString: config.notifications.connectionString });
+
   if (user.id.startsWith('inv-')) {
     const invitationId = user.id.substr(4);
     await addInvitationService(invitationId, service.id, organisation.id, selectedRoles, req.id);
