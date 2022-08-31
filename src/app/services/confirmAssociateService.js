@@ -17,7 +17,7 @@ const getModel = async (req) => {
 
   return {
     csrfToken: req.csrfToken(),
-    backLink: true,
+    backLink: `/services/${req.params.sid}/users/${req.params.uid}/organisations/${organisation.id}/associate-service`,
     cancelLink: `/services/${req.params.sid}/users/${req.params.uid}/organisations`,
     service,
     roles: roleDetails,

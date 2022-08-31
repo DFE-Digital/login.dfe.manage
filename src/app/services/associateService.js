@@ -21,7 +21,7 @@ const getViewModel = async (req) => {
     serviceRoles,
     selectedRoles: [],
     user,
-    backLink: true,
+    backLink: `/services/${req.params.sid}/users/${req.params.uid}/organisations`,
     organisation,
     validationMessages: {},
     serviceId: req.params.sid,
