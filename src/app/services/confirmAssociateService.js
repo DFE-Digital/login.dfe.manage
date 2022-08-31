@@ -23,6 +23,7 @@ const getModel = async (req) => {
     roles: roleDetails,
     user,
     organisation,
+    serviceId: req.params.sid,
     userRoles: manageRolesForService,
     currentNavigation: 'users',
   };
