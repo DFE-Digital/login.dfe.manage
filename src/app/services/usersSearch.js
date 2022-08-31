@@ -28,7 +28,7 @@ const search = async (req) => {
   }
 
   const sortBy = paramsSource.sort ? paramsSource.sort.toLowerCase() : 'name';
-  const sortAsc = (paramsSource.sortdir ? paramsSource.sortdir : 'asc').toLowerCase() === 'asc';
+  const sortAsc = (paramsSource.sortDir ? paramsSource.sortDir : 'asc').toLowerCase() === 'asc';
   const showServices = paramsSource.showServices || paramsSource.services || 'all';
 
   const results = await searchForUsers(
