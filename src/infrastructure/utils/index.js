@@ -83,7 +83,7 @@ const mapUserRole = (roleId) => {
   if (roleId === 10000) {
     return { id: 10000, description: 'Approver' };
   }
-  return { id: 1, description: 'End User' };
+  return { id: 1, description: 'End user' };
 };
 
 module.exports = {
