@@ -33,7 +33,8 @@
                     { key: 'criteria', value: locals.criteria },
                     { key: 'sort', value: locals.sortBy },
                     { key: 'sortDir', value: locals.sortOrder },
-                    { key: 'showFilters', value: locals.showFilters }
+                    { key: 'showFilters', value: locals.showFilters },
+                    { key: 'showServices', value: locals.services === 'current' ? 'current' : 'all' }
                 ]
             }
             %>
@@ -88,21 +89,21 @@
                     <tr class="govuk-table__row sortable">
                         <th scope="col" class="govuk-table__header width-18">
                             <a
-                                href="<%=baseSortUri%>&sort=name&sortdir=<%= sort.name.nextDirection %>"
+                                href="<%=baseSortUri%>&sort=name&sortDir=<%= sort.name.nextDirection %>"
                                 class="govuk-link <% if (sort.name.applied) { %>sorted dir-<%= (sort.name.nextDirection === 'desc') ? 'd' : 'a' %> <% } %>">
                                 Name
                             </a>
                         </th>
                         <th scope="col" class="govuk-table__header width-32">
                             <a
-                                href="<%=baseSortUri%>&sort=email&sortdir=<%= sort.email.nextDirection %>"
+                                href="<%=baseSortUri%>&sort=email&sortDir=<%= sort.email.nextDirection %>"
                                 class="govuk-link <% if (sort.email.applied) { %>sorted dir-<%= (sort.email.nextDirection === 'desc') ? 'd' : 'a' %> <% } %>">
                                 Email
                             </a>
                         </th>
                         <th scope="col" class="govuk-table__header width-20">
                             <a
-                                href="<%=baseSortUri%>&sort=organisation&sortdir=<%= sort.organisation.nextDirection %>"
+                                href="<%=baseSortUri%>&sort=organisation&sortDir=<%= sort.organisation.nextDirection %>"
                                 class="govuk-link <% if (sort.organisation.applied) { %>sorted dir-<%= (sort.organisation.nextDirection === 'desc') ? 'd' : 'a' %> <% } %>">
                                 Organisation
                             </a>
@@ -112,14 +113,14 @@
                         </th>
                         <th scope="col" class="govuk-table__header width-10">
                             <a
-                                href="<%=baseSortUri%>&sort=status&sortdir=<%= sort.status.nextDirection %>"
+                                href="<%=baseSortUri%>&sort=status&sortDir=<%= sort.status.nextDirection %>"
                                 class="govuk-link <% if (sort.status.applied) { %>sorted dir-<%= (sort.status.nextDirection === 'desc') ? 'd' : 'a' %> <% } %>">
                                 Status
                             </a>
                         </th>
                         <th scope="col" class="govuk-table__header width-12 govuk-table__header--numeric">
                             <a
-                                href="<%=baseSortUri%>&sort=lastlogin&sortdir=<%= sort.lastLogin.nextDirection %>"
+                                href="<%=baseSortUri%>&sort=lastlogin&sortDir=<%= sort.lastLogin.nextDirection %>"
                                 class="govuk-link <% if (sort.lastLogin.applied) { %>sorted dir-<%= (sort.lastLogin.nextDirection === 'desc') ? 'd' : 'a' %> <% } %>">
                                 Last Login
                             </a>
@@ -144,7 +145,7 @@
                         <tr class="govuk-table__row">
                             <th scope="row" class="govuk-table__header govuk-!-padding-bottom-4 govuk-!-padding-top-4"<% if (numberOfOrgs > 1) { %> rowspan="<%= numberOfOrgs %>"<% } %>>
                                     <a
-                                        class="govuk-link"
+                                        class="govuk-link breakable"
                                         href="/services/<%= locals.serviceId %>/users/<%= users[i].id %>/organisations">
                                         <%= users[i].name %>
                                     </a>
