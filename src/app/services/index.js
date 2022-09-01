@@ -2,9 +2,9 @@
 
 const express = require('express');
 const { asyncWrapper } = require('login.dfe.express-error-handling');
-const uniqBy = require('lodash/uniqBy');
 const logger = require('../../infrastructure/logger');
-const { isLoggedIn, isManageUserForService, hasRole, hasInvite } = require('../../infrastructure/utils');
+const { isLoggedIn, isManageUserForService, hasRole, hasInvite 
+} = require('../../infrastructure/utils');
 
 const { getDashboard } = require('./getDashboard');
 const { getServiceConfig, postServiceConfig } = require('./serviceConfig');
@@ -21,12 +21,13 @@ const { get: getWebServiceSyncOrg, post: postWebServiceSyncOrg } = require('./we
 const { get: getEditService, post: postEditService } = require('./editService');
 const { get: getConfirmEditService, post: postConfirmEditService } = require('./confirmEditService');
 const { get: getRemoveService, post: postRemoveService } = require('./removeService');
+const { get: getAssociateService, post: postAssociateService } = require('./associateService');
+const { get: getConfirmAssociateService, post: postConfirmAssociateService } = require('./confirmAssociateService');
 const { get: getListPolicies, post: postListPolicies } = require('./listPolicies');
 const getPolicyConditions = require('./getPolicyConditions');
 const getPolicyRoles = require('./getPolicyRoles');
 const { get: getAssociateRoles, post: postAssociateRoles } = require('./associateRoles');
 const { get: getConfirmInvitation, post: postConfirmInvitation } = require('./confirmInvitation');
-const { get: getResendInvitation, post: postResendInvitation } = require('./resendInvitation');
 
 const router = express.Router({ mergeParams: true });
 
@@ -38,7 +39,7 @@ const services = (csrf) => {
     if (!req.userServices || req.userServices.roles.length === 0) {
       return res.status(401).render('errors/views/notAuthorised');
     }
-    return res.redirect(`services/select-service`);
+    return res.redirect('services/select-service');
   }));
 
   router.get('/select-service', csrf, asyncWrapper(getSelectService));
@@ -87,11 +88,14 @@ const services = (csrf) => {
   router.get('/:sid/users/:uid/organisations/:oid/remove-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getRemoveService));
   router.post('/:sid/users/:uid/organisations/:oid/remove-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postRemoveService));
 
+  router.get('/:sid/users/:uid/organisations/:oid/associate-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getAssociateService));
+  router.post('/:sid/users/:uid/organisations/:oid/associate-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postAssociateService));
+
+  router.get('/:sid/users/:uid/organisations/:oid/confirm-associate-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getConfirmAssociateService));
+  router.post('/:sid/users/:uid/organisations/:oid/confirm-associate-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postConfirmAssociateService));
+
   router.get('/:sid/users/:uid/web-service-sync',csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getWebServiceSync));
   router.post('/:sid/users/:uid/web-service-sync',csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postWebServiceSync));
-
-  router.get('/:sid/users/:uid/resend-invitation', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getResendInvitation));
-  router.post('/:sid/users/:uid/resend-invitation', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postResendInvitation));
 
   router.get('/:sid/organisations', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getOrganisationsSearch));
   router.post('/:sid/organisations', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postOrganisationsSearch));
