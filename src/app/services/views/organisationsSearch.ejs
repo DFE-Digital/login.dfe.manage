@@ -31,6 +31,8 @@
         numberOfResultsOnPage: locals.organisations.length,
         data: [
             { key: 'criteria', value: locals.criteria },
+            { key: 'sort', value: locals.sortBy },
+            { key: 'sortDir', value: locals.sortOrder }
         ]
     }
     %>
@@ -40,19 +42,58 @@
             <%- include('../../layouts/pagination', paginationModel); %>
             <table class="govuk-table">
                 <thead class="govuk-table__head">
-                    <tr class="govuk-table__row">
-                        <th scope="col" class="govuk-table__header width-35">Name</th>
-                        <th scope="col" class="govuk-table__header width-20">Type</th>
-                        <th scope="col" class="govuk-table__header width-10">URN</th>
-                        <th scope="col" class="govuk-table__header width-10">UID</th>
-                        <th scope="col" class="govuk-table__header width-10">UKPRN</th>
-                        <th scope="col" class="govuk-table__header width-15 govuk-table__header--numeric">Status</th>
+                    <% let baseSortUri = `?criteria=${criteria}&page=${page}`; %>
+                    <tr class="govuk-table__row sortable">
+                        <th scope="col" class="govuk-table__header width-35">
+                            <a
+                            href="<%=baseSortUri%>&sort=name&sortDir=<%= sort.name.nextDirection %>"
+                            class="govuk-link <% if (sort.name.applied) { %>sorted dir-<%= (sort.name.nextDirection === 'asc') ? 'd' : 'a' %> <% } %>">
+                            Name
+                            </a>
+                        <th scope="col" class="govuk-table__header width-15">
+                            <a
+                            href="<%=baseSortUri%>&sort=type&sortDir=<%= sort.type.nextDirection %>"
+                            class="govuk-link <% if (sort.type.applied) { %>sorted dir-<%= (sort.type.nextDirection === 'asc') ? 'd' : 'a' %> <% } %>">
+                            Type
+                            </a>
+                        </th>
+                        <th scope="col" class="govuk-table__header width-10">
+                            <a
+                            href="<%=baseSortUri%>&sort=urn&sortDir=<%= sort.urn.nextDirection %>"
+                            class="govuk-link <% if (sort.urn.applied) { %>sorted dir-<%= (sort.urn.nextDirection === 'asc') ? 'd' : 'a' %> <% } %>">
+                            URN
+                            </a>
+                        </th>
+                        <th scope="col" class="govuk-table__header width-10">
+                            <a
+                            href="<%=baseSortUri%>&sort=uid&sortDir=<%= sort.uid.nextDirection %>"
+                            class="govuk-link <% if (sort.uid.applied) { %>sorted dir-<%= (sort.uid.nextDirection === 'asc') ? 'd' : 'a' %> <% } %>">
+                            UID
+                            </a>
+                        </th>
+                        <th scope="col" class="govuk-table__header width-10">
+                            UPIN
+                        </th>
+                        <th scope="col" class="govuk-table__header width-15">
+                            <a
+                            href="<%=baseSortUri%>&sort=ukprn&sortDir=<%= sort.ukprn.nextDirection %>"
+                            class="govuk-link <% if (sort.ukprn.applied) { %>sorted dir-<%= (sort.ukprn.nextDirection === 'asc') ? 'd' : 'a' %> <% } %>">
+                            UKPRN
+                            </a>
+                        </th>
+                        <th scope="col" class="govuk-table__header width-15 govuk-table__header--numeric">
+                            <a
+                            href="<%=baseSortUri%>&sort=status&sortDir=<%= sort.status.nextDirection %>"
+                            class="govuk-link <% if (sort.status.applied) { %>sorted dir-<%= (sort.status.nextDirection === 'asc') ? 'd' : 'a' %> <% } %>">
+                            Status
+                            </a>                            
+                        </th>
                     </tr>
                 </thead>
                 <tbody class="govuk-table__body">
                     <% if(locals.organisations.length === 0 && locals.criteria) { %>
                     <tr class="govuk-table__row">
-                        <td class="govuk-table__cell" colspan="6">
+                        <td class="govuk-table__cell" colspan="7">
                             <div class="empty-state">
                                 <p class="govuk-body">No organisations found</p>
                             </div>
@@ -67,6 +108,7 @@
                         <td class="govuk-table__cell govuk-!-font-size-16"><%= organisations[i].category.name %></td>
                         <td class="govuk-table__cell govuk-!-font-size-16"><%= organisations[i].urn %></td>
                         <td class="govuk-table__cell govuk-!-font-size-16"><%= organisations[i].uid %></td>
+                        <td class="govuk-table__cell govuk-!-font-size-16"><%= organisations[i].upin ? organisations[i].upin : '' %></td>
                         <td class="govuk-table__cell govuk-!-font-size-16"><%= organisations[i].ukprn %></td>
                         <td class="govuk-table__cell govuk-!-font-size-16 govuk-table__cell--numeric"><%= organisations[i].status!==undefined ? organisations[i].status.name : '' %></td>
                     </tr>

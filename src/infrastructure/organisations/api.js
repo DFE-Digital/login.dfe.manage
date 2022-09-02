@@ -2,6 +2,27 @@ const jwtStrategy = require('login.dfe.jwt-strategies');
 const config = require('./../config');
 const rp = require('login.dfe.request-promise-retry');
 
+const mapOrgSortByToSearchApi = (supportSortBy) => {
+  switch (supportSortBy.toLowerCase()) {
+    case 'name':
+      return 'name';
+    case 'type':
+      return 'category';
+    case 'urn':
+      return 'urn';
+    case 'uid':
+      return 'uid';
+    case 'upin':
+      return 'upin';
+    case 'ukprn':
+      return 'ukprn';
+    case 'status':
+      return 'status';
+    default:
+      throw new Error(`Unexpected user sort field ${supportSortBy}`);
+  }
+};
+
 const callOrganisationsApi = async (endpoint, method, body, correlationId) => {
   const token = await jwtStrategy(config.organisations.service).getBearerToken();
 
@@ -37,8 +58,14 @@ const getInvitationOrganisations = async (invitationId, correlationId) => {
   return await callOrganisationsApi(`invitations/v2/${invitationId}`, 'GET', undefined, correlationId);
 };
 
-const searchOrganisations = async (criteria, filterByCategories, pageNumber, correlationId) => {
+const searchOrganisations = async (criteria, filterByCategories, pageNumber, sortBy, sortDirection, correlationId) => {
   let uri = `organisations?search=${criteria}&page=${pageNumber}`;
+  if (sortBy) {
+    uri += `&sortBy=${mapOrgSortByToSearchApi(sortBy)}`;
+  }
+  if (sortDirection) {
+    uri += `&sortDirection=${sortDirection}`;
+  }
   if (filterByCategories) {
     filterByCategories.forEach((category) => {
       uri += `&filtercategory=${category}`;
