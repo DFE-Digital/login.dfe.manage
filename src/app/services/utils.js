@@ -1,13 +1,32 @@
 const { getSearchDetailsForUserById } = require('./../../infrastructure/search');
 const { getInvitation, getUserById } = require('./../../infrastructure/directories');
+const { getServicesForUser } = require('../../infrastructure/access');
 const { mapUserStatus } = require('./../../infrastructure/utils');
 const { getOrganisationByIdV2 } = require('./../../infrastructure/organisations');
 const { mapAsync } = require('./../../utils/asyncHelpers');
+const config = require('./../../infrastructure/config');
 
-const getUserDetails = async (req) => {
-  const uid = req.params.uid;
+const mapUserToSupportModel = (user, userFromSearch) => {
+  return {
+    id: user.sub,
+    name: `${user.given_name} ${user.family_name}`,
+    firstName: user.given_name,
+    lastName: user.family_name,
+    email: user.email,
+    organisation: userFromSearch.primaryOrganisation ? {
+      name: userFromSearch.primaryOrganisation
+    } : null,
+    organisations: userFromSearch.organisations,
+    lastLogin: userFromSearch.lastLogin ? new Date(userFromSearch.lastLogin) : null,
+    successfulLoginsInPast12Months: userFromSearch.numberOfSuccessfulLoginsInPast12Months,
+    status: mapUserStatus(userFromSearch.status.id, userFromSearch.statusLastChangedOn),
+    pendingEmail: userFromSearch.pendingEmail,
+  };
+};
+
+const getUserDetailsById = async (uid, correlationId) => {
   if (uid.startsWith('inv-')) {
-    const invitation = await getInvitation(uid.substr(4), req.id);
+    const invitation = await getInvitation(uid.substr(4), correlationId);
     return {
       id: uid,
       name: `${invitation.firstName} ${invitation.lastName}`,
@@ -20,9 +39,22 @@ const getUserDetails = async (req) => {
         successful: 0,
       },
       deactivated: invitation.deactivated
-    }
+    };
   } else {
-    const user = await getSearchDetailsForUserById(uid);
+    const userSearch = await getSearchDetailsForUserById(uid);
+    const rawUser = await getUserById(uid, correlationId);
+    const user = mapUserToSupportModel(rawUser, userSearch);
+    const serviceDetails = await getServicesForUser(uid, correlationId);
+
+    const ktsDetails = serviceDetails ? serviceDetails.find((c) => c.serviceId.toLowerCase() === config.serviceMapping.key2SuccessServiceId.toLowerCase()) : undefined;
+    let externalIdentifier = '';
+    if (ktsDetails && ktsDetails.identifiers) {
+      const key = ktsDetails.identifiers.find((a) => a.key = 'k2s-id');
+      if (key) {
+        externalIdentifier = key.value;
+      }
+    }
+
     return {
       id: uid,
       name: user.name,
@@ -34,9 +66,16 @@ const getUserDetails = async (req) => {
       loginsInPast12Months: {
         successful: user.successfulLoginsInPast12Months,
       },
+      serviceId: config.serviceMapping.key2SuccessServiceId,
+      orgId: ktsDetails ? ktsDetails.organisationId : '',
+      ktsId: externalIdentifier,
       pendingEmail: user.pendingEmail,
-    }
+    };
   }
+};
+
+const getUserDetails = async (req) => {
+  return getUserDetailsById(req.params.uid, req.id);
 };
 
 const getFriendlyUser = async (userId, correlationId) => {
@@ -253,7 +292,9 @@ const getUserServiceRoles = async (req) => {
 };
 
 module.exports = {
+  mapUserToSupportModel,
   getUserDetails,
+  getUserDetailsById,
   getFriendlyFieldName,
   getFriendlyValues,
   waitForIndexToUpdate,

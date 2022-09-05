@@ -200,6 +200,12 @@
                     "certificateThumbprint": {
                         "value": "[reference(concat(parameters('appServiceName'), '-certificate')).outputs.certificateThumbprint.value]"
                     },
+                    "additionalAppSettings": {
+                        "value": {
+                            "AUDIT_HTTP_TRIGGER_URL": "[parameters('auditHttpTriggerInvokeUrl')]",
+                            "AUDIT_HTTP_TRIGGER_KEY": "[parameters('auditHttpTriggerFunctionKey')]"
+                        }
+                    },
                     "subnetResourceId": {
                         "value": "[variables('serviceSubnetResourceId')]"
                     },

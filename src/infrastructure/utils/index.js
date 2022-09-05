@@ -1,5 +1,6 @@
 const { getSingleUserService } = require('../access');
 const { getServiceById } = require('../applications');
+const sendResult = require('./sendResult');
 const config = require('../config');
 
 const isLoggedIn = (req, res, next) => {
@@ -95,4 +96,5 @@ module.exports = {
   mapUserStatus,
   mapUserRole,
   hasInvite,
+  sendResult,
 };

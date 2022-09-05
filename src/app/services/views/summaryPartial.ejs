@@ -42,8 +42,9 @@
         </div>
         <% } %>
         <h1 class="govuk-heading-l text-break">
-            <span class="govuk-caption-l"><%= currentService.name %></span>
+            <span class="govuk-caption-l"><%= locals.currentService.name %></span>
             <%= user.name %>
+            <%= area === 'audit' ? 'sign in audit' : '' %>
         </h1>
         <dl class="inline">
             <dt class="govuk-label">Account status:</dt>
@@ -76,9 +77,12 @@
         <aside id="actions" class="govuk-!-margin-top-0">
             <h2 class="govuk-heading-m">Related actions</h2>
             <ul class="govuk-list">
-               <!-- TODO: update redirection link when the sing-in audit page will be created -->
                 <li>
-                    <a id="change-service" class="govuk-link-bold" href="#">View user sign in audit</a>
+                <% if (area==='audit' ) { %>
+                    <a id="change-service" class="govuk-link-bold" href="/services/<%= locals.serviceId %>/users/<%=user.id%>/organisations">View user details</a>
+                <% } else { %>
+                    <a id="change-service" class="govuk-link-bold" href="/services/<%= locals.serviceId %>/users/<%=user.id%>/audit">View user sign in audit</a>
+                <% } %>
                 </li>
             </ul>
         </aside>

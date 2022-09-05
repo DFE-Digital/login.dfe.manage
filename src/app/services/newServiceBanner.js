@@ -134,7 +134,7 @@ const validate = async (req) => {
       if (isInRange) {
         // TODO: link to the banner that exists
         validFromDate = false;
-        model.validationMessages.fromDate = `Another banner exists between ${moment(isInRange.validFrom).format('DD MM YYYY HH:MM')} and ${moment(isInRange.validTo).format('DD MM YYYY HH:MM')}`;
+        model.validationMessages.fromDate = `Another banner exists between ${moment(isInRange.validFrom).format('DD MM YYYY HH:mm')} and ${moment(isInRange.validTo).format('DD MM YYYY HH:mm')}`;
       }
     }
     if (!model.toDate) {
@@ -149,7 +149,7 @@ const validate = async (req) => {
       if (isInRange) {
         // TODO: link to the banner that exists
         validToDate = false;
-        model.validationMessages.toDate = `Another banner exists between ${moment(isInRange.validFrom).format('DD MM YYYY HH:MM')} and ${moment(isInRange.validTo).format('DD MM YYYY HH:MM')}`;
+        model.validationMessages.toDate = `Another banner exists between ${moment(isInRange.validFrom).format('DD MM YYYY HH:mm')} and ${moment(isInRange.validTo).format('DD MM YYYY HH:mm')}`;
       }
     }
 

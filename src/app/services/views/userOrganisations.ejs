@@ -4,15 +4,11 @@
 	<div class="govuk-grid-row">
 		<div class="govuk-grid-column-full">
 			<% if (locals.organisations.length === 0) { %>
-			<tr class="govuk-table__row">
-				<td class="govuk-table__cell" colspan="3">
-					<div class="empty-state govuk-!-margin-top-3">
-						<p class="govuk-body">
-							<%= user.name %> is not associated with any organisations
-						</p>
-					</div>
-				</td>
-			</tr>
+			<div class="empty-state govuk-!-margin-top-3">
+				<p class="govuk-body">
+					<%= user.name %> is not associated with any organisations
+				</p>
+			</div>
 			<% }%> <% for (let i = 0; i < locals.organisations.length; i++) { %> <%
 			const org = locals.organisations[i];%>
 			<div class="govuk-grid-row govuk-!-margin-top-6 govuk-!-margin-bottom-6">

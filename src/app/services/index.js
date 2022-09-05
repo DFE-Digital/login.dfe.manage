@@ -27,6 +27,8 @@ const getPolicyRoles = require('./getPolicyRoles');
 const { get: getAssociateRoles, post: postAssociateRoles } = require('./associateRoles');
 const { get: getConfirmInvitation, post: postConfirmInvitation } = require('./confirmInvitation');
 const { get: getResendInvitation, post: postResendInvitation } = require('./resendInvitation');
+const getAudit = require('./getAudit');
+const postUpdateAuditLog = require('./postUpdateAuditLog');
 
 const router = express.Router({ mergeParams: true });
 
@@ -92,6 +94,9 @@ const services = (csrf) => {
 
   router.get('/:sid/users/:uid/resend-invitation', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getResendInvitation));
   router.post('/:sid/users/:uid/resend-invitation', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postResendInvitation));
+
+  router.get('/:sid/users/:uid/audit', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getAudit));
+  router.post('/:sid/users/:uid/audit', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postUpdateAuditLog));
 
   router.get('/:sid/organisations', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getOrganisationsSearch));
   router.post('/:sid/organisations', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postOrganisationsSearch));
