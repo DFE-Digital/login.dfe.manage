@@ -129,7 +129,13 @@
                                 </a>
                             </li>
                             <% } %>
-
+                            <% if (locals.userRoles && locals.userRoles.includes('serviceSup')) { %>
+                                <li class="govuk-header__navigation-item <%= locals.currentNavigation === 'organisations' ? 'govuk-header__navigation-item--active' : '' %>">
+                                <a id="nav-user-management" class="govuk-header__link" href="/services/<%=locals.serviceId %>/organisations">
+                                    Organisations
+                                </a>
+                            </li>
+                            <% } %>
                         <% } %>
 
                             <li class="govuk-header__navigation-item">
