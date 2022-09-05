@@ -1,4 +1,4 @@
-const { sendResult, mapUserStatus } = require('./../../infrastructure/utils');
+const { mapUserStatus } = require('./../../infrastructure/utils');
 const { getUserDetailsById, getUserServiceRoles } = require('./utils');
 const { getPageOfUserAudits, cache } = require('./../../infrastructure/audit');
 const logger = require('./../../infrastructure/logger');
@@ -181,7 +181,7 @@ const getAudit = async (req, res) => {
     });
   }
 
-  sendResult(req, res, 'services/views/audit', {
+  res.render('services/views/audit', {
     csrfToken: req.csrfToken(),
     user,
     organisations: userOrganisations,

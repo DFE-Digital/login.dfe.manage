@@ -8,7 +8,6 @@ jest.mock('./../../../src/infrastructure/audit');
 jest.mock('ioredis');
 
 const { getUserDetails, getUserDetailsById } = require('./../../../src/app/services/utils');
-const { sendResult } = require('./../../../src/infrastructure/utils');
 const { getPageOfUserAudits, getUserChangeHistory } = require('./../../../src/infrastructure/audit');
 const {getServiceIdForClientId} = require('./../../../src/infrastructure/serviceMapping');
 const { getServiceById } = require('./../../../src/infrastructure/applications');
@@ -49,7 +48,7 @@ describe('when getting users audit details', () => {
       id: 'user1',
     });
 
-    sendResult.mockReset();
+    res.render.mockReset();
 
     getPageOfUserAudits.mockReset();
     getPageOfUserAudits.mockReturnValue({
@@ -131,16 +130,14 @@ describe('when getting users audit details', () => {
   it('then it should send result using audit view', async () => {
     await getAudit(req, res);
 
-    expect(sendResult.mock.calls).toHaveLength(1);
-    expect(sendResult.mock.calls[0][0]).toBe(req);
-    expect(sendResult.mock.calls[0][1]).toBe(res);
-    expect(sendResult.mock.calls[0][2]).toBe('services/views/audit');
+    expect(res.render.mock.calls).toHaveLength(1);
+    expect(res.render.mock.calls[0][0]).toBe('services/views/audit');
   });
 
   it('then it should include csrf token in model', async () => {
     await getAudit(req, res);
 
-    expect(sendResult.mock.calls[0][3]).toMatchObject({
+    expect(res.render.mock.calls[0][1]).toMatchObject({
       csrfToken: 'token',
     });
   });
@@ -148,7 +145,7 @@ describe('when getting users audit details', () => {
   it('then it should include user details in model', async () => {
     await getAudit(req, res);
 
-    expect(sendResult.mock.calls[0][3]).toMatchObject({
+    expect(res.render.mock.calls[0][1]).toMatchObject({
       user: {
         id: 'user1'
       },
@@ -158,7 +155,7 @@ describe('when getting users audit details', () => {
   it('then it should include number of pages of audits in model', async () => {
     await getAudit(req, res);
 
-    expect(sendResult.mock.calls[0][3]).toMatchObject({
+    expect(res.render.mock.calls[0][1]).toMatchObject({
       numberOfPages: 3,
     });
   });
@@ -166,7 +163,7 @@ describe('when getting users audit details', () => {
   it('then it should include current page of audits in model', async () => {
     await getAudit(req, res);
 
-    expect(sendResult.mock.calls[0][3]).toMatchObject({
+    expect(res.render.mock.calls[0][1]).toMatchObject({
       audits: [
         {
           timestamp: new Date('2018-01-30T10:31:00.000Z'),
@@ -225,7 +222,7 @@ describe('when getting users audit details', () => {
   it('then it should include page number in model', async () => {
     await getAudit(req, res);
 
-    expect(sendResult.mock.calls[0][3]).toMatchObject({
+    expect(res.render.mock.calls[0][1]).toMatchObject({
       page: 3,
     });
   });
@@ -233,7 +230,7 @@ describe('when getting users audit details', () => {
   it('then it should include total number of records in model', async () => {
     await getAudit(req, res);
 
-    expect(sendResult.mock.calls[0][3]).toMatchObject({
+    expect(res.render.mock.calls[0][1]).toMatchObject({
       totalNumberOfResults: 56,
     });
   });
