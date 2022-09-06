@@ -110,7 +110,7 @@ const get = async (req, res) => {
 
 const post = async (req, res) => {
   const model = await buildModel(req);
-  res.redirect(`/services/${req.params.sid}/organisations?page=1&criteria=${model.criteria}`);
+  return res.render('services/views/organisationsSearch', model);
 };
 
 module.exports = {

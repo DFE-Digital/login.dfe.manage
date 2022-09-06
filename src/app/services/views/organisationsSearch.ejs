@@ -42,7 +42,7 @@
                 <thead class="govuk-table__head">
                     <% let baseSortUri = `?page=${page}&criteria=${criteria}`; %>
                     <tr class="govuk-table__row sortable">
-                        <th scope="col" class="govuk-table__header width-35">
+                        <th scope="col" class="govuk-table__header width-30">
                             <a
                             href="<%=baseSortUri%>&sort=name&sortDir=<%= sort.name.nextDirection %>"
                             class="govuk-link <% if (sort.name.applied) { %>sorted dir-<%= (sort.name.nextDirection === 'asc') ? 'd' : 'a' %> <% } %>">
@@ -79,7 +79,7 @@
                             UKPRN
                             </a>
                         </th>
-                        <th scope="col" class="govuk-table__header width-15 govuk-table__header--numeric">
+                        <th scope="col" class="govuk-table__header width-20 govuk-table__header--numeric">
                             <a
                             href="<%=baseSortUri%>&sort=status&sortDir=<%= sort.status.nextDirection %>"
                             class="govuk-link <% if (sort.status.applied) { %>sorted dir-<%= (sort.status.nextDirection === 'asc') ? 'd' : 'a' %> <% } %>">
