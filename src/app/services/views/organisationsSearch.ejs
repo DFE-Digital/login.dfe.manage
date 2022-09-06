@@ -23,8 +23,6 @@
     
     <%
     const paginationModel = {
-        method: 'post',
-        csrfToken,
         currentPage: locals.page,
         numberOfPages: locals.numberOfPages,
         totalNumberOfResults: locals.totalNumberOfResults,
@@ -42,7 +40,7 @@
             <%- include('../../layouts/pagination', paginationModel); %>
             <table class="govuk-table">
                 <thead class="govuk-table__head">
-                    <% let baseSortUri = `?criteria=${criteria}&page=${page}`; %>
+                    <% let baseSortUri = `?page=${page}&criteria=${criteria}`; %>
                     <tr class="govuk-table__row sortable">
                         <th scope="col" class="govuk-table__header width-35">
                             <a
