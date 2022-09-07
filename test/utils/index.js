@@ -29,6 +29,12 @@ const configMockFactory = (customConfig) => {
     directories: {
       type: 'static',
     },
+    audit: {
+      type: 'static',
+    },
+    serviceMapping: {
+      type: 'static',
+    },
     notifications:{
       connectionString: 'test',
     },

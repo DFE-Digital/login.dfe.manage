@@ -24,6 +24,49 @@ const notificationsSchema = new SimpleSchema({
   connectionString: patterns.redis
 });
 
+const auditSchema = new SimpleSchema({
+  type: {
+    type: String,
+    allowedValues: ['static', 'sequelize']
+  },
+  params: {
+    type: schemas.sequelizeConnection,
+    optional: true,
+    custom: function () {
+      if (this.siblingField('type').value === 'sequelize' && !this.isSet) {
+        return SimpleSchema.ErrorTypes.REQUIRED
+      }
+    },
+  },
+  cacheConnectionString: patterns.redis,
+});
+
+const serviceMappingSchema = new SimpleSchema({
+  type: {
+    type: String,
+    allowedValues: ['redis'],
+  },
+  params: {
+    type: Object,
+    optional: true,
+    custom: function () {
+      if (this.siblingField('type').value === 'redis' && !this.isSet) {
+        return SimpleSchema.ErrorTypes.REQUIRED
+      }
+    }
+  },
+  'params.connectionString': {
+    type: String,
+    regEx: patterns.redis,
+    optional: true,
+    custom: function () {
+      if (this.field('type').value === 'redis' && !this.isSet) {
+        return SimpleSchema.ErrorTypes.REQUIRED
+      }
+    },
+  },
+  key2SuccessServiceId: patterns.uuid,
+});
 
 const schema = new SimpleSchema({
   loggerSettings: schemas.loggerSettings,
@@ -35,6 +78,8 @@ const schema = new SimpleSchema({
   directories: schemas.apiClient,
   identifyingParty: identifyingPartySchema,
   notifications: notificationsSchema,
+  audit: auditSchema,
+  serviceMapping: serviceMappingSchema,
   assets: schemas.assets,
 });
 

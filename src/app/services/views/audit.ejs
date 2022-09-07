@@ -1,0 +1,92 @@
+<div class="govuk-width-container govuk-main-wrapper">
+    <%- include('summaryPartial', {area: 'audit', user: locals.user}); %>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full govuk-!-margin-top-4">
+            <form method="post" id="form-audit-update">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                <% if (!locals.updateInProgress) {%>
+                    <button class="govuk-button govuk-!-margin-bottom-6" type="submit" onclick="this.form.submit(); this.disabled=true; this.innerText='Processing Update';">
+                        Update and refresh
+                    </button>
+                <%} else {%>
+                    <button class="govuk-button govuk-!-margin-bottom-6" type="submit" disabled>
+                        Processing Update
+                    </button>
+                <% } %>
+            </form>
+
+            <%
+            const paginationModel = {
+                currentPage: locals.page,
+                numberOfPages: locals.numberOfPages,
+                totalNumberOfResults: locals.totalNumberOfResults,
+                numberOfResultsOnPage: locals.audits.length,
+                data: [],
+            }
+            %>
+
+            <%- include('../../layouts/pagination', paginationModel); %>
+            <table class="govuk-table data">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header width-20">
+                            Date
+                        </th>
+                        <th scope="col" class="govuk-table__header width-20">
+                            Event
+                        </th>
+                        <th scope="col" class="govuk-table__header width-20">
+                            Service
+                        </th>
+                        <th scope="col" class="govuk-table__header width-20">
+                            Organisation
+                        </th>
+                        <th scope="col" class="govuk-table__header width-10">
+                            Result
+                        </th>
+                        <th scope="col" class="govuk-table__header width-10">
+                            User
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    <% if(locals.audits.length === 0) { %>
+                    <tr class="govuk-table__row"></tr>
+                        <td class="govuk-table__cell" colspan="6">
+                            <div class="empty-state">
+                                <p class="govuk-body">No audit history found for <%= user.name %>.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    <% } %>
+                    <%
+                        for (let i = 0; i < locals.audits.length; i++) {
+                            const audit = locals.audits[i];
+                    %>
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell govuk-!-font-size-16">
+                                <%= locals.moment(audit.timestamp).format('DD MMM YYYY HH:mm') %>
+                            </td>
+                            <td class="govuk-table__cell govuk-!-font-size-16">
+                                <%= audit.event.description %>
+                            </td>
+                            <td class="govuk-table__cell govuk-!-font-size-16">
+                                <%= audit.service ? audit.service.name : '' %>
+                            </td>
+                            <td class="govuk-table__cell govuk-!-font-size-16">
+                                <%= audit.organisation ? audit.organisation.name: '' %>
+                            </td>
+                            <td class="govuk-table__cell govuk-!-font-size-16">
+                                <%= audit.result ? 'Success' : 'Failure' %>
+                            </td>
+                            <td class="govuk-table__cell govuk-!-font-size-16">
+                                <%= audit.user ? audit.user.name : '' %>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+            <%- include('../../layouts/pagination', paginationModel); %>
+        </div>
+    </div>
+</div>
