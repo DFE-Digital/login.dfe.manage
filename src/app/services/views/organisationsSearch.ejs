@@ -1,17 +1,23 @@
 <div class="govuk-width-container govuk-main-wrapper">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-three-quarters">
-            <h1 class="govuk-heading-xl govuk-!-margin-top-0">
-                Organisations
+            <h1 class="govuk-heading-xl govuk-!-margin-top-0 text-break">
+                <span class="govuk-caption-xl"><%=locals.service.name%></span>
+                Organisation search
             </h1>
             <form method="post" id="form-organisation-search">
                 <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
                 <fieldset class="govuk-fieldset">
                     <div class="govuk-form-group">
-                        <label for="criteria" class="govuk-label govuk-label--s govuk-visually-hidden">
-                            Search by name, urn, uid or ukprn
-                        </label>
-                        <input class="govuk-input govuk-!-width-three-quarters" type="text" id="criteria" name="criteria" value="<%= criteria %>" placeholder="Search by name, urn, uid or ukprn">
+                        <h2 class="govuk-label-wrapper">
+                            <label for="criteria" class="govuk-label govuk-label--m">
+                                Search organisations
+                            </label>
+                        </h2>
+                        <div id="event-name-hint" class="govuk-hint">
+                            Search by name, URN, UID, UPIN or UKPRN
+                        </div>
+                        <input class="govuk-input govuk-!-width-three-quarters" type="text" id="criteria" name="criteria" value="<%= criteria %>">
                         <button type="submit" class="govuk-button" data-module="govuk-button">
                             Search
                         </button>

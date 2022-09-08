@@ -1,5 +1,6 @@
 /* eslint-disable no-nested-ternary */
 const { searchOrganisations } = require('../../infrastructure/organisations');
+const { getServiceById } = require('../../infrastructure/applications');
 const { getUserServiceRoles } = require('./utils');
 const logger = require('../../infrastructure/logger');
 
@@ -83,13 +84,13 @@ const search = async (req) => {
 };
 
 const buildModel = async (req) => {
+  const service = await getServiceById(req.params.sid, req.id);
   const manageRolesForService = await getUserServiceRoles(req);
-
   const pageOfOrganisations = await search(req);
 
   return {
     csrfToken: req.csrfToken(),
-    backLink: true,
+    backLink: `/services/${req.params.sid}`,
     criteria: pageOfOrganisations.criteria,
     sort: pageOfOrganisations.sort,
     sortBy: pageOfOrganisations.sortBy,
@@ -99,6 +100,7 @@ const buildModel = async (req) => {
     totalNumberOfResults: pageOfOrganisations.totalNumberOfRecords,
     organisations: pageOfOrganisations.organisations,
     serviceId: req.params.sid,
+    service,
     userRoles: manageRolesForService,
     currentNavigation: 'organisations',
   };
