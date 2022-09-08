@@ -103,6 +103,20 @@
             "metadata": {
                 "description": "Enable Route All to send all traffic through the virtual network"
             }
+        },
+        "auditHttpTriggerInvokeUrl": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Audit HTTP trigger invoke URL"
+            }
+        },
+        "auditHttpTriggerFunctionKey": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Audit HTTP triger Function Key"
+            }
         }
     },
     "variables": {
