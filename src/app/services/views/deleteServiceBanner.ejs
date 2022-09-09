@@ -38,7 +38,7 @@
                     <% if (locals.serviceBanners.isActive) { %>
                         Always show this banner until I stop it
                     <% } else if (locals.serviceBanners.validFrom && locals.serviceBanners.validTo) { %>
-                        Display banner from <%=locals.moment(locals.serviceBanners.validFrom).format('DD MMM YYYY HH:MM')%> to <%=locals.moment(locals.serviceBanners.validTo).format('DD MMM YYYY HH:MM')%>
+                        Display banner from <%=locals.moment(locals.serviceBanners.validFrom).format('DD MMM YYYY HH:mm')%> to <%=locals.moment(locals.serviceBanners.validTo).format('DD MMM YYYY HH:mm')%>
                     <% } else { %>
                         Not active
                     <% } %>
