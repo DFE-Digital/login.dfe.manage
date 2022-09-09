@@ -29,6 +29,8 @@
     
     <%
     const paginationModel = {
+        method: 'post',
+        csrfToken,
         currentPage: locals.page,
         numberOfPages: locals.numberOfPages,
         totalNumberOfResults: locals.totalNumberOfResults,
@@ -51,27 +53,27 @@
                         <th scope="col" class="govuk-table__header width-30">
                             <a
                             href="<%=baseSortUri%>&sort=name&sortDir=<%= sort.name.nextDirection %>"
-                            class="govuk-link <% if (sort.name.applied) { %>sorted dir-<%= (sort.name.nextDirection === 'asc') ? 'd' : 'a' %> <% } %>">
+                            class="govuk-link <% if (sort.name.applied) { %>sorted dir-<%= (sort.name.nextDirection === 'asc') ? 'a' : 'd' %> <% } %>">
                             Name
                             </a>
                         <th scope="col" class="govuk-table__header width-15">
                             <a
                             href="<%=baseSortUri%>&sort=type&sortDir=<%= sort.type.nextDirection %>"
-                            class="govuk-link <% if (sort.type.applied) { %>sorted dir-<%= (sort.type.nextDirection === 'asc') ? 'd' : 'a' %> <% } %>">
+                            class="govuk-link <% if (sort.type.applied) { %>sorted dir-<%= (sort.type.nextDirection === 'asc') ? 'a' : 'd' %> <% } %>">
                             Type
                             </a>
                         </th>
                         <th scope="col" class="govuk-table__header width-10">
                             <a
                             href="<%=baseSortUri%>&sort=urn&sortDir=<%= sort.urn.nextDirection %>"
-                            class="govuk-link <% if (sort.urn.applied) { %>sorted dir-<%= (sort.urn.nextDirection === 'asc') ? 'd' : 'a' %> <% } %>">
+                            class="govuk-link <% if (sort.urn.applied) { %>sorted dir-<%= (sort.urn.nextDirection === 'asc') ? 'a' : 'd' %> <% } %>">
                             URN
                             </a>
                         </th>
                         <th scope="col" class="govuk-table__header width-10">
                             <a
                             href="<%=baseSortUri%>&sort=uid&sortDir=<%= sort.uid.nextDirection %>"
-                            class="govuk-link <% if (sort.uid.applied) { %>sorted dir-<%= (sort.uid.nextDirection === 'asc') ? 'd' : 'a' %> <% } %>">
+                            class="govuk-link <% if (sort.uid.applied) { %>sorted dir-<%= (sort.uid.nextDirection === 'asc') ? 'a' : 'd' %> <% } %>">
                             UID
                             </a>
                         </th>
@@ -81,14 +83,14 @@
                         <th scope="col" class="govuk-table__header width-15">
                             <a
                             href="<%=baseSortUri%>&sort=ukprn&sortDir=<%= sort.ukprn.nextDirection %>"
-                            class="govuk-link <% if (sort.ukprn.applied) { %>sorted dir-<%= (sort.ukprn.nextDirection === 'asc') ? 'd' : 'a' %> <% } %>">
+                            class="govuk-link <% if (sort.ukprn.applied) { %>sorted dir-<%= (sort.ukprn.nextDirection === 'asc') ? 'a' : 'd' %> <% } %>">
                             UKPRN
                             </a>
                         </th>
                         <th scope="col" class="govuk-table__header width-20 govuk-table__header--numeric">
                             <a
                             href="<%=baseSortUri%>&sort=status&sortDir=<%= sort.status.nextDirection %>"
-                            class="govuk-link <% if (sort.status.applied) { %>sorted dir-<%= (sort.status.nextDirection === 'asc') ? 'd' : 'a' %> <% } %>">
+                            class="govuk-link <% if (sort.status.applied) { %>sorted dir-<%= (sort.status.nextDirection === 'asc') ? 'a' : 'd' %> <% } %>">
                             Status
                             </a>                            
                         </th>
