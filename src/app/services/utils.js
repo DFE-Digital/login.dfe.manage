@@ -113,6 +113,9 @@ const getFriendlyOrganisationCategory = async (categoryId) => {
     { id: '011', name: 'Government' },
     { id: '012', name: 'Other GIAS Stakeholder' },
     { id: '013', name: 'Single-Academy Trust' },
+    { id: '050', name: 'Software Suppliers' },
+    { id: '051', name: 'PIMS Training Providers' },
+    { id: '052', name: 'Billing Authority' },
   ];
 
   const category = categories.find(x => x.id === categoryId);
@@ -193,14 +196,17 @@ const getFriendlyOrganisationType = async (typeId) => {
     { id: '24', name: 'Secure Units' },
     { id: '25', name: 'Offshore Schools' },
     { id: '26', name: 'Service Childrens Education' },
+    { id: '27', name: 'Miscellaneous' },
     { id: '28', name: 'Academy Sponsor Led' },
     { id: '29', name: 'Higher education institution' },
     { id: '30', name: 'Welsh Establishment' },
+    { id: '31', name: 'Sixth Form Centres' },
     { id: '32', name: 'Special Post 16 Institution' },
     { id: '33', name: 'Academy Special Sponsor Led' },
     { id: '34', name: 'Academy Converter' },
     { id: '35', name: 'Free Schools' },
     { id: '36', name: 'Free Schools Special' },
+    { id: '37', name: 'British Overseas Schools' },
     { id: '38', name: 'Free Schools - Alternative Provision' },
     { id: '39', name: 'Free Schools - 16-19' },
     { id: '40', name: 'University Technical College' },
@@ -210,6 +216,9 @@ const getFriendlyOrganisationType = async (typeId) => {
     { id: '44', name: 'Academy Special Converter' },
     { id: '45', name: 'Academy 16-19 Converter' },
     { id: '46', name: 'Academy 16-19 Sponsor Led' },
+    { id: '47', name: 'Children\'s Centre' },
+    { id: '48', name: 'Children\'s Centre Linked Site' },
+    { id: '56', name: 'Institution funded by other government department' },
   ];
 
   const establishmentType = establishmentTypes.find(x => x.id === typeId);
