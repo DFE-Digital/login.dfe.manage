@@ -63,7 +63,7 @@ describe('when searching for organisations', () => {
       await action(req, res);
 
       expect(searchOrganisations).toHaveBeenCalledTimes(1);
-      expect(searchOrganisations).toHaveBeenCalledWith('org1', undefined, 2, req.id);
+      expect(searchOrganisations).toHaveBeenCalledWith('org1', undefined, 2, 'name', 'asc', req.id);
     });
 
     it(`then it should search orgs with no criteria if none specified (${method} / ${dataLocation})`, async () => {
@@ -83,7 +83,7 @@ describe('when searching for organisations', () => {
       await action(req, res);
 
       expect(searchOrganisations).toHaveBeenCalledTimes(1);
-      expect(searchOrganisations).toHaveBeenCalledWith('', undefined, 2, req.id);
+      expect(searchOrganisations).toHaveBeenCalledWith('', undefined, 2, 'name', 'asc', req.id);
     });
 
     it(`then it should request page 1 if no page specified (${method} / ${dataLocation})`, async () => {
@@ -103,7 +103,7 @@ describe('when searching for organisations', () => {
       await action(req, res);
 
       expect(searchOrganisations).toHaveBeenCalledTimes(1);
-      expect(searchOrganisations).toHaveBeenCalledWith('org1', undefined, 1, req.id);
+      expect(searchOrganisations).toHaveBeenCalledWith('org1', undefined, 1, 'name', 'asc', req.id);
     });
   });
 
