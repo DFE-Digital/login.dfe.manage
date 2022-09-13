@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-const { searchOrganisations } = require('../../infrastructure/organisations');
+const { searchOrganisations, searchOrgsAssociatedWithService } = require('../../infrastructure/organisations');
 const { getServiceById } = require('../../infrastructure/applications');
 const { getUserServiceRoles } = require('./utils');
 const logger = require('../../infrastructure/logger');
@@ -21,14 +21,27 @@ const search = async (req) => {
   }
   const sortBy = paramsSource.sort ? paramsSource.sort.toLowerCase() : 'name';
   const sortAsc = (paramsSource.sortDir ? paramsSource.sortDir : 'asc').toLowerCase() === 'asc';
-  const results = await searchOrganisations(
-    safeCriteria,
-    undefined,
-    pageNumber,
-    sortBy,
-    sortAsc ? 'asc' : 'desc',
-    req.id,
-  );
+  const showOrganisations = paramsSource.showOrganisations ? paramsSource.showOrganisations : 'all';
+  let results;
+  if (showOrganisations === 'all') {
+    results = await searchOrganisations(
+      safeCriteria,
+      undefined,
+      pageNumber,
+      sortBy,
+      sortAsc ? 'asc' : 'desc',
+      req.id,
+    );
+  } else {
+    results = await searchOrgsAssociatedWithService(
+      req.params.sid,
+      safeCriteria,
+      pageNumber,
+      sortBy,
+      sortAsc ? 'asc' : 'desc',
+      req.id,
+    );
+  }
 
   logger.audit(`${req.user.email} (id: ${req.user.sub}) searched for organisations in manage using criteria "${criteria}"`, {
     type: 'manage',
@@ -50,6 +63,7 @@ const search = async (req) => {
     totalNumberOfPages: results.totalNumberOfPages,
     totalNumberOfRecords: results.totalNumberOfRecords,
     organisations: results.organisations,
+    serviceOrganisations: showOrganisations,
     sort: {
       name: {
         nextDirection: sortBy === 'name' ? (sortAsc ? 'desc' : 'asc') : 'asc',
@@ -99,6 +113,7 @@ const buildModel = async (req) => {
     numberOfPages: pageOfOrganisations.totalNumberOfPages,
     totalNumberOfResults: pageOfOrganisations.totalNumberOfRecords,
     organisations: pageOfOrganisations.organisations,
+    serviceOrganisations: pageOfOrganisations.serviceOrganisations,
     serviceId: req.params.sid,
     service,
     userRoles: manageRolesForService,
@@ -112,7 +127,7 @@ const get = async (req, res) => {
 
 const post = async (req, res) => {
   const model = await buildModel(req);
-  return res.redirect(`?page=${model.page}&criteria=${model.criteria}&sort=${model.sortBy}&sortDir=${model.sortOrder}`);
+  return res.redirect(`?page=${model.page}&showOrganisations=${model.serviceOrganisations}&criteria=${model.criteria}&sort=${model.sortBy}&sortDir=${model.sortOrder}`);
 };
 
 module.exports = {
