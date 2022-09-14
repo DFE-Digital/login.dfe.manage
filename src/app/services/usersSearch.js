@@ -123,7 +123,7 @@ const get = async (req, res) => {
 
 const post = async (req, res) => {
   const model = await viewModel(req);
-  res.redirect(`?page=${model.page}&criteria=${model.criteria}&sort=${model.sortBy}&sortDir=${model.sortOrder}`);
+  return res.redirect(`?page=${model.page}&criteria=${model.criteria}&sort=${model.sortBy}&sortDir=${model.sortOrder}&showServices=${model.services}`);
 };
 
 module.exports = {
