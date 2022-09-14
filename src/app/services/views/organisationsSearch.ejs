@@ -29,8 +29,8 @@
                 <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
                 <input type="hidden" name="criteria" value="<%= locals.criteria %>" />
                 <input type="hidden" name="showOrganisations" value="<%= locals.serviceOrganisations === 'currentService' ? 'all' : 'currentService' %>" />
-                <div class ="govuk-form-group govuk-!-margin-bottom-6">
-                    <p class="govuk-body">
+                <div class ="govuk-form-group govuk-!-margin-bottom-7">
+                    <p class="govuk-body govuk-!-margin-bottom-2">
                         <%= locals.serviceOrganisations === 'currentService'
                         ? 'Currently viewing organisations with access to the ' + (locals.service.name) 
                         : 'Currently viewing all organisations' %>

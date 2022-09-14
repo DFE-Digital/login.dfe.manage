@@ -23,16 +23,7 @@ const search = async (req) => {
   const sortAsc = (paramsSource.sortDir ? paramsSource.sortDir : 'asc').toLowerCase() === 'asc';
   const showOrganisations = paramsSource.showOrganisations ? paramsSource.showOrganisations : 'all';
   let results;
-  if (showOrganisations === 'all') {
-    results = await searchOrganisations(
-      safeCriteria,
-      undefined,
-      pageNumber,
-      sortBy,
-      sortAsc ? 'asc' : 'desc',
-      req.id,
-    );
-  } else {
+  if (showOrganisations === 'currentService') {
     results = await searchOrgsAssociatedWithService(
       req.params.sid,
       safeCriteria,
@@ -41,19 +32,38 @@ const search = async (req) => {
       sortAsc ? 'asc' : 'desc',
       req.id,
     );
+    logger.audit(`${req.user.email} (id: ${req.user.sub}) searched for organisations associated with service (sid: ${req.params.sid}) in manage using criteria "${criteria}"`, {
+      type: 'manage',
+      subType: 'organisation-search',
+      userId: req.user.sub,
+      userEmail: req.user.email,
+      criteria,
+      pageNumber,
+      numberOfPages: results.numberOfPages,
+      sortedBy: sortBy,
+      sortDirection: sortAsc ? 'asc' : 'desc',
+    });
+  } else {
+    results = await searchOrganisations(
+      safeCriteria,
+      undefined,
+      pageNumber,
+      sortBy,
+      sortAsc ? 'asc' : 'desc',
+      req.id,
+    );
+    logger.audit(`${req.user.email} (id: ${req.user.sub}) searched for organisations in manage using criteria "${criteria}"`, {
+      type: 'manage',
+      subType: 'organisation-search',
+      userId: req.user.sub,
+      userEmail: req.user.email,
+      criteria,
+      pageNumber,
+      numberOfPages: results.numberOfPages,
+      sortedBy: sortBy,
+      sortDirection: sortAsc ? 'asc' : 'desc',
+    });
   }
-
-  logger.audit(`${req.user.email} (id: ${req.user.sub}) searched for organisations in manage using criteria "${criteria}"`, {
-    type: 'manage',
-    subType: 'organisation-search',
-    userId: req.user.sub,
-    userEmail: req.user.email,
-    criteria,
-    pageNumber,
-    numberOfPages: results.numberOfPages,
-    sortedBy: sortBy,
-    sortDirection: sortAsc ? 'asc' : 'desc',
-  });
 
   return {
     criteria: safeCriteria,
