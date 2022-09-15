@@ -119,6 +119,18 @@ const updateRequestById = async (requestId, status, actionedBy, actionedReason, 
   return callOrganisationsApi( `/organisations/requests/${requestId}`, 'PATCH', body, correlationId);
 };
 
+const searchOrgsAssociatedWithService = async (serviceId, criteria, pageNumber, sortBy, sortDirection, correlationId) => {
+  let uri = `organisations/associated-with-service/${serviceId}?search=${criteria}&page=${pageNumber}`;
+  if (sortBy) {
+    uri += `&sortBy=${mapOrgSortByToSearchApi(sortBy)}`;
+  }
+  if (sortDirection) {
+    uri += `&sortDirection=${sortDirection}`;
+  }
+
+  return callOrganisationsApi(uri, 'GET', undefined, correlationId);
+};
+
 module.exports = {
   getInvitationOrganisations,
   getAllUserOrganisations,
@@ -131,4 +143,5 @@ module.exports = {
   putUserInOrganisation,
   getPendingRequestsAssociatedWithUser,
   updateRequestById,
+  searchOrgsAssociatedWithService,
 };

@@ -108,6 +108,10 @@ const updateRequestById = async (requestId, status, actionedBy, actionedReason, 
   return Promise.resolve();
 };
 
+const searchOrgsAssociatedWithService = async (serviceId, criteria, pageNumber, sortBy, sortDirection, correlationId) => {
+  return getPageOfOrganisations(pageNumber, correlationId);
+};
+
 module.exports = {
   getOrganisationById,
   getUserOrganisations,
@@ -120,4 +124,5 @@ module.exports = {
   putUserInOrganisation,
   getPendingRequestsAssociatedWithUser,
   updateRequestById,
+  searchOrgsAssociatedWithService,
 };

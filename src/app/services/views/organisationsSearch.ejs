@@ -7,8 +7,9 @@
             </h1>
             <form method="post" id="form-organisation-search">
                 <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                <input type="hidden" name="showOrganisations" value=<%= locals.serviceOrganisations %> />
                 <fieldset class="govuk-fieldset">
-                    <div class="govuk-form-group">
+                    <div class="govuk-form-group govuk-!-margin-bottom-0">
                         <h2 class="govuk-label-wrapper">
                             <label for="criteria" class="govuk-label govuk-label--m">
                                 Search organisations
@@ -24,6 +25,25 @@
                     </div>
                 </fieldset>
             </form>
+            <form method="post" id="filter-service-organisations">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                <input type="hidden" name="criteria" value="<%= locals.criteria %>" />
+                <input type="hidden" name="showOrganisations" value="<%= locals.serviceOrganisations === 'currentService' ? 'all' : 'currentService' %>" />
+                <div class ="govuk-form-group govuk-!-margin-bottom-7">
+                    <p class="govuk-body govuk-!-margin-bottom-2">
+                        <%= locals.serviceOrganisations === 'currentService'
+                        ? 'Currently viewing organisations with access to ' + (locals.service.name) 
+                        : 'Currently viewing all organisations' %>
+                    </p>
+                    <div class="govuk-body">
+                        <button type="submit" class="button-link govuk-!-font-weight-bold">
+                        <%= locals.serviceOrganisations === 'currentService' 
+                            ? 'Show all organisations' 
+                            : 'Only show organisations with access to my service' %>
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
     
@@ -38,7 +58,8 @@
         data: [
             { key: 'criteria', value: locals.criteria },
             { key: 'sort', value: locals.sortBy },
-            { key: 'sortDir', value: locals.sortOrder }
+            { key: 'sortDir', value: locals.sortOrder },
+            { key: 'showOrganisations', value: locals.serviceOrganisations}
         ]
     }
     %>
@@ -48,7 +69,7 @@
             <%- include('../../layouts/pagination', paginationModel); %>
             <table class="govuk-table">
                 <thead class="govuk-table__head">
-                    <% let baseSortUri = `?page=${page}&criteria=${criteria}`; %>
+                    <% let baseSortUri = `?page=${page}&showOrganisations=${locals.serviceOrganisations}&criteria=${criteria}`; %>
                     <tr class="govuk-table__row sortable">
                         <th scope="col" class="govuk-table__header width-30">
                             <a
