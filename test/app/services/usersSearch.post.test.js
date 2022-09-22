@@ -65,52 +65,10 @@ describe('When posting users search ', () => {
     });
   });
 
-  it('then it should return the users search view', async () => {
+  it('then it should be the redirected to get view with query parameters', async () => {
     await post(req, res);
 
-    expect(res.render.mock.calls.length).toBe(1);
-    expect(res.render.mock.calls[0][0]).toBe('services/views/usersSearch');
-  });
-
-  it('then it should include csrf token', async () => {
-    await post(req, res);
-
-    expect(res.render.mock.calls[0][1]).toMatchObject({
-      csrfToken: 'token',
-    });
-  });
-
-  it('then it should include criteria', async () => {
-    await post(req, res);
-
-    expect(res.render.mock.calls[0][1]).toMatchObject({
-      criteria: 'test',
-    });
-  });
-
-  it('then it includes the sort order and sort value', async () => {
-    await post(req, res);
-
-    expect(res.render.mock.calls[0][1]).toMatchObject({
-      sortBy: 'name',
-      sortOrder: 'asc'
-    });
-  });
-
-  it('then it should include page details', async () => {
-    await post(req, res);
-
-    expect(res.render.mock.calls[0][1]).toMatchObject({
-      page: 1,
-      numberOfPages: 3,
-    });
-  });
-
-  it('then it should include users', async () => {
-    await post(req, res);
-
-    expect(res.render.mock.calls[0][1]).toMatchObject({
-      users: usersSearchResult,
-    });
+    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toBe('?page=1&criteria=test&sort=name&sortDir=asc&showServices=all');
   });
 });
