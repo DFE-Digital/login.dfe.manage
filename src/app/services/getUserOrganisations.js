@@ -87,7 +87,7 @@ const getUserOrganisations = async (req, res) => {
     user,
     organisations: visibleOrganisations,
     isInvitation: req.params.uid.startsWith('inv-'),
-    backLink: `/services/${req.params.sid}/users`,
+    backLink: true,
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
     currentNavigation: 'users',

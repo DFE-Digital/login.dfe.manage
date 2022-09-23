@@ -65,52 +65,38 @@ describe('When posting users search ', () => {
     });
   });
 
-  it('then it should return the users search view', async () => {
+  it('then it should be the redirected to get view with query parameter: page', async () => {
     await post(req, res);
 
-    expect(res.render.mock.calls.length).toBe(1);
-    expect(res.render.mock.calls[0][0]).toBe('services/views/usersSearch');
+    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toMatch(/(^\?|&)page=\d+(&|$)/);
   });
 
-  it('then it should include csrf token', async () => {
+  it('then it should be the redirected to get view with query parameter: criteria', async () => {
     await post(req, res);
 
-    expect(res.render.mock.calls[0][1]).toMatchObject({
-      csrfToken: 'token',
-    });
+    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toMatch(/(^\?|&)criteria=.*(&|$)/);
   });
 
-  it('then it should include criteria', async () => {
+  it('then it should be the redirected to get view with query parameter: sort', async () => {
     await post(req, res);
 
-    expect(res.render.mock.calls[0][1]).toMatchObject({
-      criteria: 'test',
-    });
+    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toMatch(/(^\?|&)sort=.+(&|$)/);
   });
 
-  it('then it includes the sort order and sort value', async () => {
+  it('then it should be the redirected to get view with query parameter: sortDir', async () => {
     await post(req, res);
 
-    expect(res.render.mock.calls[0][1]).toMatchObject({
-      sortBy: 'name',
-      sortOrder: 'asc'
-    });
+    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toMatch(/(^\?|&)sortDir=(asc|desc)(&|$)/);
   });
 
-  it('then it should include page details', async () => {
+  it('then it should be the redirected to get view with query parameter: showServices', async () => {
     await post(req, res);
 
-    expect(res.render.mock.calls[0][1]).toMatchObject({
-      page: 1,
-      numberOfPages: 3,
-    });
-  });
-
-  it('then it should include users', async () => {
-    await post(req, res);
-
-    expect(res.render.mock.calls[0][1]).toMatchObject({
-      users: usersSearchResult,
-    });
+    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toMatch(/(^\?|&)showServices=(all|current)(&|$)/);
   });
 });
