@@ -65,10 +65,38 @@ describe('When posting users search ', () => {
     });
   });
 
-  it('then it should be the redirected to get view with query parameters', async () => {
+  it('then it should be the redirected to get view with query parameter: page', async () => {
     await post(req, res);
 
     expect(res.redirect.mock.calls.length).toBe(1);
-    expect(res.redirect.mock.calls[0][0]).toBe('?page=1&criteria=test&sort=name&sortDir=asc&showServices=all');
+    expect(res.redirect.mock.calls[0][0]).toMatch(/(^\?|&)page=\d+(&|$)/);
+  });
+
+  it('then it should be the redirected to get view with query parameter: criteria', async () => {
+    await post(req, res);
+
+    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toMatch(/(^\?|&)criteria=.*(&|$)/);
+  });
+
+  it('then it should be the redirected to get view with query parameter: sort', async () => {
+    await post(req, res);
+
+    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toMatch(/(^\?|&)sort=.+(&|$)/);
+  });
+
+  it('then it should be the redirected to get view with query parameter: sortDir', async () => {
+    await post(req, res);
+
+    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toMatch(/(^\?|&)sortDir=(asc|desc)(&|$)/);
+  });
+
+  it('then it should be the redirected to get view with query parameter: showServices', async () => {
+    await post(req, res);
+
+    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toMatch(/(^\?|&)showServices=(all|current)(&|$)/);
   });
 });
