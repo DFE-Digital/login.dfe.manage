@@ -27,7 +27,9 @@ const search = async (req) => {
     page = 1;
   }
 
-  const sortBy = paramsSource.sort ? paramsSource.sort.toLowerCase() : 'name';
+  const availableSortCriteria = ['name', 'email', 'lastlogin', 'status'];
+
+  const sortBy = (paramsSource.sort && availableSortCriteria.includes(paramsSource.sort.toLowerCase())) ? paramsSource.sort.toLowerCase() : 'name';
   const sortAsc = (paramsSource.sortDir ? paramsSource.sortDir : 'asc').toLowerCase() === 'asc';
   const showServices = paramsSource.showServices || paramsSource.services || 'all';
 
@@ -69,10 +71,6 @@ const search = async (req) => {
       email: {
         nextDirection: sortBy === 'email' ? (sortAsc ? 'desc' : 'asc') : 'asc',
         applied: sortBy === 'email',
-      },
-      organisation: {
-        nextDirection: sortBy === 'organisation' ? (sortAsc ? 'desc' : 'asc') : 'asc',
-        applied: sortBy === 'organisation',
       },
       lastLogin: {
         nextDirection: sortBy === 'lastlogin' ? (sortAsc ? 'desc' : 'asc') : 'asc',
