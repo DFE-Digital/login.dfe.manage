@@ -98,6 +98,10 @@ const post = async (req, res) => {
       req.session.user.organisationName,
       req.session.user.service,
       roleDetails.map((i) => i.name),
+      {
+        id: req.session.user.permission,
+        name: req.session.user.permission === 10000 ? 'Approver' : 'End user',
+      },
     );
   }
 

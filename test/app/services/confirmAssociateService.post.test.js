@@ -11,39 +11,43 @@ jest.mock('./../../../src/infrastructure/access', () => ({
 jest.mock('./../../../src/infrastructure/applications', () => ({
   getServiceById: jest.fn(),
 }));
-jest.mock('./../../../src/infrastructure/organisations', () => ({
-  getOrganisationByIdV2: jest.fn(),
-}));
-
-const NotificationClient = require('login.dfe.notifications.client');
+jest.mock('./../../../src/infrastructure/organisations');
+const { getOrganisationByIdV2, getUserOrganisations, getInvitationOrganisations } = require('../../../src/infrastructure/organisations');
 
 const sendServiceAdded = jest.fn();
 const sendServiceRequestApproved = jest.fn();
-NotificationClient.mockImplementation(() => ({
-  sendServiceAdded,
-  sendServiceRequestApproved,
-}));
 
 const logger = require('../../../src/infrastructure/logger');
 const { getRequestMock, getResponseMock } = require('../../utils');
 const { addInvitationService, addUserService, listRolesOfService } = require('../../../src/infrastructure/access');
 
-const { getOrganisationByIdV2 } = require('../../../src/infrastructure/organisations');
 const { getUserDetails } = require('../../../src/app/services/utils');
 const { getServiceById } = require('../../../src/infrastructure/applications');
 
+jest.mock('login.dfe.notifications.client');
+const notificationClient = require('login.dfe.notifications.client');
 const res = getResponseMock();
 
 describe('when confirm associating a service to user', () => {
   let req;
-
   let postConfirmAssociateService;
+
+  const expectedEmailAddress = 'test@test.com';
+  const expectedFirstName = 'John';
+  const expectedLastName = 'Doe';
+  const expectedOrgName = 'Great Big School';
+  const expectedServiceName = 'service name';
+  const expectedRoles = ['role_name'];
+  const expectedPermission = {
+    id: 0,
+    name: 'End user',
+  };
 
   beforeEach(() => {
     req = getRequestMock({
       params: {
         uid: 'user1',
-        oid: 'org1',
+        oid: '88a1ed39-5a98-43da-b66e-78e564ea72b0',
         sid: 'service1',
       },
       session: {
@@ -56,7 +60,9 @@ describe('when confirm associating a service to user', () => {
     getUserDetails.mockReset();
     getUserDetails.mockReturnValue({
       id: 'user1',
-      name: 'John Doe',
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'test@test.com',
     });
 
     getServiceById.mockReset();
@@ -79,18 +85,69 @@ describe('when confirm associating a service to user', () => {
 
     getOrganisationByIdV2.mockReset();
     getOrganisationByIdV2.mockReturnValue({
-      id: 'org1',
-      name: 'org name',
+      id: '88a1ed39-5a98-43da-b66e-78e564ea72b0',
+      name: 'Great Big School',
     });
+
+    getUserOrganisations.mockReset();
+    getUserOrganisations.mockReturnValue([
+      {
+        organisation: {
+          id: '88a1ed39-5a98-43da-b66e-78e564ea72b0',
+          name: 'Great Big School'
+        },
+        role: {
+          id: 0,
+          name: 'End user'
+        },
+      },
+      {
+        organisation: {
+          id: 'fe68a9f4-a995-4d74-aa4b-e39e0e88c15d',
+          name: 'Little Tiny School'
+        },
+        role: {
+          id: 10000,
+          name: 'Approver'
+        },
+      },
+    ]);
+
+    getInvitationOrganisations.mockReset();
+    getInvitationOrganisations.mockReturnValue([
+      {
+        invitationId: 'E89DF8C6-BED4-480D-9F02-34D177E86DAD',
+        organisation: {
+          id: '88a1ed39-5a98-43da-b66e-78e564ea72b0',
+          name: 'Great Big School',
+        },
+        role: {
+          id: 0,
+          name: 'End user',
+        },
+      },
+      {
+        invitationId: 'E89DF8C6-BED4-480D-9F02-34D177E86DAD',
+        organisation: {
+          id: 'fe68a9f4-a995-4d74-aa4b-e39e0e88c15d',
+          name: 'Little Tiny School',
+        },
+        role: {
+          id: 10000,
+          name: 'Approver',
+        },
+      },
+    ]);
 
     addUserService.mockReset();
     addInvitationService.mockReset();
 
-    NotificationClient.mockReset();
+    sendServiceAddedStub = jest.fn();
+    sendServiceRequestApprovedStub = jest.fn();
 
-    NotificationClient.mockImplementation(() => ({
-      sendServiceAdded,
-      sendServiceRequestApproved,
+    notificationClient.mockReset().mockImplementation(() => ({
+      sendServiceRequestApproved: sendServiceRequestApprovedStub,
+      sendServiceAdded: sendServiceAddedStub,
     }));
 
     res.mockResetAll();
@@ -102,14 +159,13 @@ describe('when confirm associating a service to user', () => {
     getUserDetails.mockReset();
     getUserDetails.mockReturnValue({
       id: 'inv-invite1',
-      name: 'John Doe',
     });
     await postConfirmAssociateService(req, res);
 
     expect(addInvitationService.mock.calls).toHaveLength(1);
     expect(addInvitationService.mock.calls[0][0]).toBe('invite1');
     expect(addInvitationService.mock.calls[0][1]).toBe('service1');
-    expect(addInvitationService.mock.calls[0][2]).toBe('org1');
+    expect(addInvitationService.mock.calls[0][2]).toBe('88a1ed39-5a98-43da-b66e-78e564ea72b0');
     expect(addInvitationService.mock.calls[0][3]).toEqual(['role_id']);
     expect(addInvitationService.mock.calls[0][4]).toBe('correlationId');
   });
@@ -120,16 +176,33 @@ describe('when confirm associating a service to user', () => {
     expect(addUserService.mock.calls).toHaveLength(1);
     expect(addUserService.mock.calls[0][0]).toBe('user1');
     expect(addUserService.mock.calls[0][1]).toBe('service1');
-    expect(addUserService.mock.calls[0][2]).toBe('org1');
+    expect(addUserService.mock.calls[0][2]).toBe('88a1ed39-5a98-43da-b66e-78e564ea72b0');
     expect(addUserService.mock.calls[0][3]).toEqual(['role_id']);
     expect(addUserService.mock.calls[0][4]).toBe('correlationId');
+  });
+
+  it('then it should send an email notification to user', async () => {
+    await postConfirmAssociateService(req, res);
+
+    expect(listRolesOfService.mock.calls).toHaveLength(1);
+    expect(listRolesOfService.mock.calls[0][0]).toBe('service1');
+    expect(listRolesOfService.mock.calls[0][1]).toBe('correlationId');
+
+    expect(sendServiceRequestApprovedStub.mock.calls).toHaveLength(1);
+    expect(sendServiceRequestApprovedStub.mock.calls[0][0]).toBe(expectedEmailAddress);
+    expect(sendServiceRequestApprovedStub.mock.calls[0][1]).toBe(expectedFirstName);
+    expect(sendServiceRequestApprovedStub.mock.calls[0][2]).toBe(expectedLastName);
+    expect(sendServiceRequestApprovedStub.mock.calls[0][3]).toBe(expectedOrgName);
+    expect(sendServiceRequestApprovedStub.mock.calls[0][4]).toBe(expectedServiceName);
+    expect(sendServiceRequestApprovedStub.mock.calls[0][5]).toEqual(expectedRoles);
+    expect(sendServiceRequestApprovedStub.mock.calls[0][6]).toEqual(expectedPermission);
   });
 
   it('then it should should audit service being added', async () => {
     await postConfirmAssociateService(req, res);
 
     expect(logger.audit.mock.calls).toHaveLength(1);
-    expect(logger.audit.mock.calls[0][0]).toBe('user@unit.test (id: user1) added service service name for organisation org name (id: org1) for user undefined (id: user1)');
+    expect(logger.audit.mock.calls[0][0]).toBe('user@unit.test (id: user1) added service service name for organisation Great Big School (id: 88a1ed39-5a98-43da-b66e-78e564ea72b0) for user test@test.com (id: user1)');
     expect(logger.audit.mock.calls[0][1]).toMatchObject({
       type: 'manage',
       subType: 'user-service-added',
