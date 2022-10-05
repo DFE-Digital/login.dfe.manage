@@ -3,7 +3,8 @@
 const express = require('express');
 const { asyncWrapper } = require('login.dfe.express-error-handling');
 const logger = require('../../infrastructure/logger');
-const { isLoggedIn, isManageUserForService, hasRole, hasInvite 
+const {
+  isLoggedIn, isManageUserForService, hasRole, hasInvite,
 } = require('../../infrastructure/utils');
 
 const { getDashboard } = require('./getDashboard');
@@ -96,8 +97,8 @@ const services = (csrf) => {
   router.get('/:sid/users/:uid/organisations/:oid/confirm-associate-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getConfirmAssociateService));
   router.post('/:sid/users/:uid/organisations/:oid/confirm-associate-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postConfirmAssociateService));
 
-  router.get('/:sid/users/:uid/web-service-sync',csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getWebServiceSync));
-  router.post('/:sid/users/:uid/web-service-sync',csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postWebServiceSync));
+  router.get('/:sid/users/:uid/web-service-sync', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getWebServiceSync));
+  router.post('/:sid/users/:uid/web-service-sync', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postWebServiceSync));
 
   router.get('/:sid/users/:uid/audit', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getAudit));
   router.post('/:sid/users/:uid/audit', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postUpdateAuditLog));
@@ -111,13 +112,13 @@ const services = (csrf) => {
   router.get('/:sid/organisations/:oid/web-service-sync', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getWebServiceSyncOrg));
   router.post('/:sid/organisations/:oid/web-service-sync', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postWebServiceSyncOrg));
 
-  // service access management
-  router.get('/:sid/policies', csrf, isManageUserForService, hasRole('accessManage'), asyncWrapper(getListPolicies));
-  router.post('/:sid/policies', csrf, isManageUserForService, hasRole('accessManage'), asyncWrapper(postListPolicies));
+  // service config & service support
+  router.get('/:sid/policies', csrf, isManageUserForService, hasRole(['serviceconfig', 'serviceSup']), asyncWrapper(getListPolicies));
+  router.post('/:sid/policies', csrf, isManageUserForService, hasRole(['serviceconfig', 'serviceSup']), asyncWrapper(postListPolicies));
 
-  router.get('/:sid/policies/:pid/conditions', csrf, isManageUserForService, hasRole('accessManage'), asyncWrapper(getPolicyConditions));
+  router.get('/:sid/policies/:pid/conditions', csrf, isManageUserForService, hasRole(['serviceconfig', 'serviceSup']), asyncWrapper(getPolicyConditions));
 
-  router.get('/:sid/policies/:pid/roles', csrf, isManageUserForService, hasRole('accessManage'), asyncWrapper(getPolicyRoles));
+  router.get('/:sid/policies/:pid/roles', csrf, isManageUserForService, hasRole(['serviceconfig', 'serviceSup']), asyncWrapper(getPolicyRoles));
 
   return router;
 };

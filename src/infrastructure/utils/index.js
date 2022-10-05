@@ -32,14 +32,15 @@ const isManageUserForService = (req, res, next) => {
   return res.status(401).render('errors/views/notAuthorised');
 };
 
-const hasRole = (role) => (req, res, next) => {
+const hasRole = (roles) => (req, res, next) => {
   if (req.userServices && req.userServices.roles.length > 0) {
     const allUserRoles = req.userServices.roles.map((role) => ({
       serviceId: role.code.substr(0, role.code.indexOf('_')),
       role: role.code.substr(role.code.lastIndexOf('_') + 1),
     }));
     const userRolesForService = allUserRoles.filter((x) => x.serviceId === req.params.sid);
-    if (userRolesForService.find((x) => x.role === role)) {
+    const serviceRolesList = userRolesForService.map((x) => x.role);
+    if (serviceRolesList.some((x) => roles.includes(x))) {
       return next();
     }
   }
