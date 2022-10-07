@@ -89,6 +89,10 @@ const post = async (req, res) => {
     const allRolesForService = await listRolesOfService(req.params.sid, req.id);
     const selectedRoleIds = req.session.user.roles;
     const roleDetails = allRolesForService.filter((x) => selectedRoleIds.find((y) => y.toLowerCase() === x.id.toLowerCase()));
+    const userOrgPermission = {
+      id: req.session.user.permission,
+      name: req.session.user.permission === 10000 ? 'Approver' : 'End user',
+    };
 
     await addUserService(uid, req.params.sid, organisationId, req.session.user.roles, req.id);
     await notificationClient.sendServiceRequestApproved(
@@ -98,10 +102,7 @@ const post = async (req, res) => {
       req.session.user.organisationName,
       req.session.user.service,
       roleDetails.map((i) => i.name),
-      {
-        id: req.session.user.permission,
-        name: req.session.user.permission === 10000 ? 'Approver' : 'End user',
-      },
+      userOrgPermission,
     );
   }
 

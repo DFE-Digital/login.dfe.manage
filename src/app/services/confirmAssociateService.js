@@ -46,6 +46,10 @@ const post = async (req, res) => {
     ? await getInvitationOrganisations(invitationId, req.id)
     : await getUserOrganisations(user.id, req.id);
   const organisationDetails = userOrganisations.find(x => x.organisation.id === organisation.id);
+  const userOrgPermission = {
+    id: organisationDetails.role.id,
+    name: organisationDetails.role.name,
+  };
   const notificationClient = new NotificationClient({ connectionString: config.notifications.connectionString });
 
   if (invitationId) {
@@ -61,10 +65,7 @@ const post = async (req, res) => {
     organisation.name,
     service.name,
     roles.map((r) => r.name),
-    {
-      id: organisationDetails.role.id,
-      name: organisationDetails.role.name,
-    },
+    userOrgPermission,
   );
 
   logger.audit(`${req.user.email} (id: ${req.user.sub}) added service ${service.name} for organisation ${organisation.name} (id: ${model.organisation.id}) for user ${user.email} (id: ${user.id})`, {
