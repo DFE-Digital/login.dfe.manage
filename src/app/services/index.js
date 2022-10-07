@@ -9,6 +9,7 @@ const {
 
 const { getDashboard } = require('./getDashboard');
 const { getServiceConfig, postServiceConfig } = require('./serviceConfig');
+const { getServiceSecrets, postServiceSecrets } = require('./serviceSecrets');
 const { get: getSelectService, post: postSelectService } = require('./selectService');
 const { get: getServiceBanners, post: postServiceBanners } = require('./serviceBanners');
 const { get: getNewServiceBanners, post: postNewServiceBanners } = require('./newServiceBanner');
@@ -53,6 +54,10 @@ const services = (csrf) => {
   // service config
   router.get('/:sid/service-configuration', csrf, isManageUserForService, hasRole('serviceconfig'), asyncWrapper(getServiceConfig));
   router.post('/:sid/service-configuration', csrf, isManageUserForService, hasRole('serviceconfig'), asyncWrapper(postServiceConfig));
+
+  // Service Secrets Manager
+  router.get('/:sid/service-secrets', csrf, isManageUserForService, hasRole('secretsManage'), asyncWrapper(getServiceSecrets));
+  router.post('/:sid/service-secrets', csrf, isManageUserForService, hasRole('secretsManage'), asyncWrapper(postServiceSecrets));
 
   // service banners
   router.get('/:sid/service-banners', csrf, isManageUserForService, hasRole('serviceBanner'), asyncWrapper(getServiceBanners));
