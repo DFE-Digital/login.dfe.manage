@@ -75,10 +75,7 @@ const postServiceSecrets = async (req, res) => {
 
   const updatedService = {
     clientSecret: model.service.clientSecret,
-    grant_types: model.service.grantTypes,
-    response_types: model.service.responseTypes,
     apiSecret: model.service.apiSecret,
-    tokenEndpointAuthMethod: model.service.tokenEndpointAuthMethod === 'client_secret_post' ? 'client_secret_post' : null,
   };
 
   logger.audit(`${req.user.email} (id: ${req.user.sub}) updated service secret details for service ${model.service.name} (id: ${req.params.sid})`, {

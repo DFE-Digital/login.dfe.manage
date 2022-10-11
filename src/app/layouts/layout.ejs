@@ -114,7 +114,7 @@
                             </li>
                             <% } %>
 
-                            <% if (locals.userRoles && locals.userRoles.includes('accessManage' )) { %>
+                            <% if (locals.userRoles && (locals.userRoles.includes('serviceSup')|| locals.userRoles.includes('serviceconfig'))) { %>
                             <li class="govuk-header__navigation-item <%= locals.currentNavigation === 'policies' ? 'govuk-header__navigation-item--active' : '' %>">
                                 <a id="nav-manage-policies" class="govuk-header__link" href="/services/<%= locals.serviceId %>/policies">
                                     Policies
