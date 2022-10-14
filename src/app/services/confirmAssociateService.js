@@ -3,7 +3,7 @@ const config = require('../../infrastructure/config');
 const { getServiceById } = require('../../infrastructure/applications');
 const { listRolesOfService, addUserService, addInvitationService } = require('../../infrastructure/access');
 const { getUserDetails, getUserServiceRoles } = require('./utils');
-const { getOrganisationByIdV2 } = require('../../infrastructure/organisations');
+const { getOrganisationByIdV2, getUserOrganisations, getInvitationOrganisations } = require('../../infrastructure/organisations');
 const logger = require('../../infrastructure/logger');
 
 const getModel = async (req) => {
@@ -41,10 +41,18 @@ const post = async (req, res) => {
   } = model;
 
   const selectedRoles = req.session.service.roles;
+  const invitationId = user.id.startsWith('inv-') ? user.id.substr(4) : undefined;
+  const userOrganisations = invitationId
+    ? await getInvitationOrganisations(invitationId, req.id)
+    : await getUserOrganisations(user.id, req.id);
+  const organisationDetails = userOrganisations.find(x => x.organisation.id === organisation.id);
+  const userOrgPermission = {
+    id: organisationDetails.role.id,
+    name: organisationDetails.role.name,
+  };
   const notificationClient = new NotificationClient({ connectionString: config.notifications.connectionString });
 
-  if (user.id.startsWith('inv-')) {
-    const invitationId = user.id.substr(4);
+  if (invitationId) {
     await addInvitationService(invitationId, service.id, organisation.id, selectedRoles, req.id);
   } else {
     await addUserService(user.id, service.id, organisation.id, selectedRoles, req.id);
@@ -57,6 +65,7 @@ const post = async (req, res) => {
     organisation.name,
     service.name,
     roles.map((r) => r.name),
+    userOrgPermission,
   );
 
   logger.audit(`${req.user.email} (id: ${req.user.sub}) added service ${service.name} for organisation ${organisation.name} (id: ${model.organisation.id}) for user ${user.email} (id: ${user.id})`, {
