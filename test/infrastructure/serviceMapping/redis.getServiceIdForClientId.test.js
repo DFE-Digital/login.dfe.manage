@@ -12,15 +12,22 @@ describe('when getting a service id from a client id from redis', () => {
   let getServiceIdForClientId;
 
   beforeEach(() => {
-    jest.doMock('ioredis', () => jest.fn().mockImplementation(() => {
-      const RedisMock = require('ioredis-mock').default;
-      const redisMock = new RedisMock();
-      redisMock.set('SupportServiceMapping', JSON.stringify([
-        { serviceId: 'service-1', clientId: 'client-1' },
-        { serviceId: 'service-2', clientId: 'client-2' },
-      ]));
-      return redisMock;
-    }));
+    const mocks = { redis: null }
+    jest.mock('ioredis', () => {
+      const Redis = require('ioredis-mock')
+      if (typeof Redis === 'object') {
+        return {
+          Command: { _transformer: { argument: {}, reply: {} } }
+        }
+      }
+      // second mock for our code
+      return function(...args) {
+        const instance = new Redis(args);
+        instance.set('SupportServiceMapping', '[{"serviceId":"service-1","clientId":"client-1"},{"serviceId":"service-2","clientId":"client-2"}]');
+        mocks.redis = instance;
+        return instance;
+      };
+    });
     getServiceIdForClientId = require('./../../../src/infrastructure/serviceMapping/redis').getServiceIdForClientId;
   });
 
@@ -38,11 +45,21 @@ describe('when getting a service id from a client id from redis', () => {
 
   it('then it should return null if no mappings exist', async () => {
     jest.resetModules();
-    jest.doMock('ioredis', () => jest.fn().mockImplementation(() => {
-      const RedisMock = require('ioredis-mock').default;
-      const redisMock = new RedisMock();
-      return redisMock;
-    }));
+    const mocks = { redis: null }
+    jest.mock('ioredis', () => {
+      const Redis = require('ioredis-mock')
+      if (typeof Redis === 'object') {
+        return {
+          Command: { _transformer: { argument: {}, reply: {} } }
+        }
+      }
+      // second mock for our code
+      return function(...args) {
+        const instance = new Redis(args);
+        mocks.redis = instance;
+        return instance;
+      };
+    });
     getServiceIdForClientId = require('./../../../src/infrastructure/serviceMapping/redis').getServiceIdForClientId;
 
     const actual = await getServiceIdForClientId('client-1');
