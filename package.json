@@ -29,7 +29,7 @@
     "ejs": "^3.1.6",
     "express": "^4.17.3",
     "express-ejs-layouts": "^2.5.1",
-    "express-flash-2": "^1.0.1",
+    "login.dfe.express-flash-2": "git+https://github.com/DFE-Digital/login.dfe.express-flash-2.git#v1.0.1",
     "helmet": "^3.21.2",
     "ioredis": "^3.2.2",
     "lodash": "^4.17.21",
@@ -61,7 +61,7 @@
     "eslint": "^8.12.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.26.0",
-    "ioredis-mock": "^2.4.1",
+    "ioredis-mock": "^3.10.1",
     "jest": "^27.5.1",
     "jest-cli": "^27.5.1",
     "node-mocks-http": "^1.11.0"
