@@ -2,9 +2,10 @@
 const pages = locals.numberOfPages;
 const page = locals.page;
 const numberOfResultsOnPagePage = locals.numberOfResultsOnPage;
-const totalNumberOfResults = locals.totalNumberOfResults
-let lowerEndRecords = page === pages ? totalNumberOfResults - numberOfResultsOnPagePage + 1 : numberOfResultsOnPagePage * (page - 1) + 1
-const upperEndRecords = lowerEndRecords + numberOfResultsOnPagePage - 1
+const totalNumberOfResults = locals.totalNumberOfResults;
+const hideLastPage = locals.hideLastPage;
+let lowerEndRecords = page === pages ? totalNumberOfResults - numberOfResultsOnPagePage + 1 : numberOfResultsOnPagePage * (page - 1) + 1;
+const upperEndRecords = lowerEndRecords + numberOfResultsOnPagePage - 1;
 
 if (locals.totalNumberOfResults === 0) {
     lowerEndRecords = 0;
@@ -69,20 +70,23 @@ if (upperWindowBound < pages) {
                         </li>
                     <% } %>
 
-                    <% if (pageBracketRight.length > 0) { %>
-                        <li><span>...</span></li>
-                    <% } %>
+                    <% if (hideLastPage !== true) { %>
 
-                    <% for (let i = 0; i < pageBracketRight.length; i++) { %>
-                        <li>
-                            <% if (locals.currentPage === pageBracketRight[i]) { %>
-                                <span class="current"><%= pageBracketRight[i] %></span>
-                            <% } else if (locals.method === 'post') { %>
-                                <%- include('pageForm', {page: pageBracketRight[i], csrfToken: locals.csrfToken, data: locals.data}); %>
-                            <% } else { %>
-                                <%- include('pageLink', {page: pageBracketRight[i], csrfToken: locals.csrfToken, data: locals.data}); %>
-                            <% } %>
-                        </li>
+                        <% if (pageBracketRight.length > 0) { %>
+                            <li><span>...</span></li>
+                        <% } %>
+
+                        <% for (let i = 0; i < pageBracketRight.length; i++) { %>
+                            <li>
+                                <% if (locals.currentPage === pageBracketRight[i]) { %>
+                                    <span class="current"><%= pageBracketRight[i] %></span>
+                                <% } else if (locals.method === 'post') { %>
+                                    <%- include('pageForm', {page: pageBracketRight[i], csrfToken: locals.csrfToken, data: locals.data}); %>
+                                <% } else { %>
+                                    <%- include('pageLink', {page: pageBracketRight[i], csrfToken: locals.csrfToken, data: locals.data}); %>
+                                <% } %>
+                            </li>
+                        <% } %>
                     <% } %>
                 </ul>
             </div>
