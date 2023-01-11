@@ -4,8 +4,7 @@
             <div class="govuk-grid-column-two-thirds">
                 <h1 class="govuk-heading-xl govuk-!-margin-top-5 govuk-!-margin-bottom-5">DfE Manage</h1>
                 <h3 class="govuk-heading-m">
-                    Here you can manage and configure your service and its policies, as well as determine who has access
-                    to your service.
+                    Here you can manage and configure your service, as well as change roles and policies, and determine who has access to your service.
                 </h3>
             </div>
         </div>
@@ -30,10 +29,40 @@
             </aside>
         </div>
     </div>
-
+    <% if (locals.userRoles.includes('serviceSup')) { %>
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                <h1 class="govuk-heading-m govuk-!-margin-bottom-0">Support your service’s users</h1>
+                <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible govuk-!-margin-top-1" />
+            </div>
+        </div>
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                <div class="manage-cards">
+                    <div class="manage-card">
+                        <h3 class="govuk-heading-s">
+                            <a id="user-management" class="govuk-link-bold" href="<%=locals.serviceId %>/users"
+                                >User management</a
+                            >
+                        </h3>
+                        <p class="govuk-body">Manage those who use your service and invite new users.</p>
+                    </div>
+    
+                    <div class="manage-card">
+                        <h3 class="govuk-heading-s">
+                            <a id="organisation-search" class="govuk-link-bold" href="<%=locals.serviceId %>/organisations"
+                                >Organisation search</a
+                            >
+                        </h3>
+                        <p class="govuk-body">Search for an organisation</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% } %>
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
-            <h1 class="govuk-heading-m govuk-!-margin-bottom-0">Set up and configure your service</h1>
+            <h1 class="govuk-heading-m govuk-!-margin-bottom-0">View and configure your service</h1>
             <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible govuk-!-margin-top-1" />
         </div>
     </div>
@@ -41,7 +70,20 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
             <div class="manage-cards">
-                <% if (locals.userRoles.includes('serviceconfig')) { %>
+                <% if (locals.userRoles.includes('serviceconfig') || locals.userRoles.includes('serviceSup') || locals.userRoles.includes('accessManage') || locals.userRoles.includes('serviceBanner')) { %>
+                    <div class="manage-card">
+                        <h3 class="govuk-heading-s">
+                            <a
+                                id="service-configuration"
+                                class="govuk-link-bold"
+                                href="<%=locals.serviceId%>/service-information"
+                                >View service information</a
+                            >
+                        </h3>
+                        <p class="govuk-body">View the name and description of your service.</p>
+                    </div>
+
+               <% } %> <% if (locals.userRoles.includes('serviceconfig')) { %>
                 <div class="manage-card">
                     <h3 class="govuk-heading-s">
                         <a
@@ -92,50 +134,7 @@
                     </p>
                 </div>
                 <% } %>
-
-                <!-- TODO: update after Service Configuration functionality in place -->
-                <!--  <% if (locals.userRoles.includes('serviceconfig')) { %>
-                <div class="manage-card">
-                    <h3 class="govuk-heading-s">
-                        <a class="govuk-link-bold" href="<%=locals.serviceId%>/service-configuration"
-                            >Update service description</a
-                        >
-                    </h3>
-                    <p class="govuk-body">Create or modify your service's description.</p>
-                </div>
-                <% } %> -->
             </div>
         </div>
     </div>
-    <% if (locals.userRoles.includes('serviceSup')) { %>
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-            <h1 class="govuk-heading-m govuk-!-margin-bottom-0">Manage your service's users</h1>
-            <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible govuk-!-margin-top-1" />
-        </div>
-    </div>
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-            <div class="manage-cards">
-                <div class="manage-card">
-                    <h3 class="govuk-heading-s">
-                        <a id="user-management" class="govuk-link-bold" href="<%=locals.serviceId %>/users"
-                            >User management</a
-                        >
-                    </h3>
-                    <p class="govuk-body">Manage those who use your service and invite new users.</p>
-                </div>
-
-                <div class="manage-card">
-                    <h3 class="govuk-heading-s">
-                        <a id="organisation-search" class="govuk-link-bold" href="<%=locals.serviceId %>/organisations"
-                            >Organisation search</a
-                        >
-                    </h3>
-                    <p class="govuk-body">Search for an organisation</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <% } %>
 </div>
