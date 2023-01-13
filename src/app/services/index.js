@@ -7,6 +7,7 @@ const { isLoggedIn, isManageUserForService, hasRole, hasInvite
 } = require('../../infrastructure/utils');
 
 const { getDashboard } = require('./getDashboard');
+const getServiceInfo = require('./getServiceInfo');
 const { getServiceConfig, postServiceConfig } = require('./serviceConfig');
 const { get: getSelectService, post: postSelectService } = require('./selectService');
 const { get: getServiceBanners, post: postServiceBanners } = require('./serviceBanners');
@@ -48,6 +49,9 @@ const services = (csrf) => {
   router.post('/select-service', csrf, asyncWrapper(postSelectService));
 
   router.get('/:sid', csrf, isManageUserForService, asyncWrapper(getDashboard));
+
+  // service information
+  router.get('/:sid/service-information', csrf, isManageUserForService, asyncWrapper(getServiceInfo));
 
   // service config
   router.get('/:sid/service-configuration', csrf, isManageUserForService, hasRole('serviceconfig'), asyncWrapper(getServiceConfig));
