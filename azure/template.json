@@ -111,6 +111,13 @@
                 "description": "Audit HTTP trigger invoke URL"
             }
         },
+        "SNContact": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Service Now contact"
+            }
+        },
         "auditHttpTriggerFunctionKey": {
             "type": "string",
             "defaultValue": "",
@@ -217,7 +224,8 @@
                     "additionalAppSettings": {
                         "value": {
                             "AUDIT_HTTP_TRIGGER_URL": "[parameters('auditHttpTriggerInvokeUrl')]",
-                            "AUDIT_HTTP_TRIGGER_KEY": "[parameters('auditHttpTriggerFunctionKey')]"
+                            "AUDIT_HTTP_TRIGGER_KEY": "[parameters('auditHttpTriggerFunctionKey')]",
+                            "serviceNowContact":"[parameters('SNContact')]"
                         }
                     },
                     "subnetResourceId": {
