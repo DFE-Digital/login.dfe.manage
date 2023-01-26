@@ -1,12 +1,12 @@
-jest.mock('./../../../src/infrastructure/config', () => require('./../../utils').configMockFactory());
-jest.mock('./../../../src/infrastructure/logger', () => require('./../../utils').loggerMockFactory());
+jest.mock('./../../../src/infrastructure/config', () => require('../../utils').configMockFactory());
+jest.mock('./../../../src/infrastructure/logger', () => require('../../utils').loggerMockFactory());
 jest.mock('./../../../src/infrastructure/organisations');
 jest.mock('./../../../src/infrastructure/search');
 
-const { getOrganisationByIdV2 } = require('./../../../src/infrastructure/organisations');
-const { searchForUsers } = require('./../../../src/infrastructure/search');
-const { getRequestMock, getResponseMock } = require('./../../utils');
-const organisationUserList = require('./../../../src/app/services/organisationUserList');
+const { getOrganisationByIdV2 } = require('../../../src/infrastructure/organisations');
+const { searchForUsers } = require('../../../src/infrastructure/search');
+const { getRequestMock, getResponseMock } = require('../../utils');
+const organisationUserList = require('../../../src/app/services/organisationUserList');
 
 const res = getResponseMock();
 const orgResult = { id: 'org-1', name: 'organisation one' };
@@ -41,17 +41,17 @@ describe('when displaying organisation users', () => {
     { method: 'POST', dataLocation: 'body', action: organisationUserList.post },
     { method: 'GET', dataLocation: 'query', action: organisationUserList.get },
   ].forEach(({ method, dataLocation, action }) => {
-
     it(`then it should send page of organisation users (${method} / ${dataLocation})`, async () => {
       const req = getRequestMock({
         method,
         params: {
           id: orgResult.id,
+
         },
         userServices: {
           roles: [{
-            code: 'serviceid_serviceconfiguration'
-          }]
+            code: 'serviceid_serviceconfiguration',
+          }],
         },
       });
       req[dataLocation] = {
@@ -86,7 +86,7 @@ describe('when displaying organisation users', () => {
                 description: 'End user',
               },
             },
-          }
+          },
         ],
         numberOfPages: usersResult.numberOfPages,
         totalNumberOfResults: usersResult.totalNumberOfResults,
@@ -97,13 +97,13 @@ describe('when displaying organisation users', () => {
       const req = getRequestMock({
         method,
         params: {
-          id: orgResult.id,
+          oid: orgResult.id,
           sid: 'service-1',
         },
         userServices: {
           roles: [{
-            code: 'serviceid_serviceconfiguration'
-          }]
+            code: 'serviceid_serviceconfiguration',
+          }],
         },
       });
       req[dataLocation] = {
@@ -113,9 +113,8 @@ describe('when displaying organisation users', () => {
       await action(req, res);
 
       expect(searchForUsers).toHaveBeenCalledTimes(1);
-      expect(searchForUsers).toHaveBeenCalledWith('*', 2, undefined, undefined, {
+      expect(searchForUsers).toHaveBeenCalledWith('*', 2, 'name', 'asc', {
         organisations: ['org-1'],
-        services: ['service-1'],
       });
     });
 
@@ -123,13 +122,12 @@ describe('when displaying organisation users', () => {
       const req = getRequestMock({
         method,
         params: {
-          id: orgResult.id,
-          sid: 'service-1',
+          oid: orgResult.id,
         },
         userServices: {
           roles: [{
-            code: 'serviceid_serviceconfiguration'
-          }]
+            code: 'serviceid_serviceconfiguration',
+          }],
         },
       });
       req[dataLocation] = {
@@ -139,9 +137,240 @@ describe('when displaying organisation users', () => {
       await action(req, res);
 
       expect(searchForUsers).toHaveBeenCalledTimes(1);
-      expect(searchForUsers).toHaveBeenCalledWith('*', 1, undefined, undefined, {
+      expect(searchForUsers).toHaveBeenCalledWith('*', 1, 'name', 'asc', {
         organisations: ['org-1'],
-        services: ['service-1'],
+      });
+    });
+
+    it(`then it should request all users ordered by name and ascending order, if sorting by "Name - ascending" (${method} / ${dataLocation})`, async () => {
+      const req = getRequestMock({
+        method,
+        params: {
+          oid: orgResult.id,
+        },
+        userServices: {
+          roles: [{
+            code: 'serviceid_serviceconfiguration',
+          }],
+        },
+      });
+      req[dataLocation] = {
+        page: 3,
+        sort: 'name',
+        sortDir: 'asc',
+      };
+
+      await action(req, res);
+
+      expect(searchForUsers).toHaveBeenCalledTimes(1);
+      expect(searchForUsers).toHaveBeenCalledWith('*', 3, 'name', 'asc', {
+        organisations: ['org-1'],
+      });
+    });
+
+    it(`then it should request all users ordered by name and descending order, if sorting by "Name - descending" (${method} / ${dataLocation})`, async () => {
+      const req = getRequestMock({
+        method,
+        params: {
+          oid: orgResult.id,
+        },
+        userServices: {
+          roles: [{
+            code: 'serviceid_serviceconfiguration',
+          }],
+        },
+      });
+      req[dataLocation] = {
+        page: 3,
+        sort: 'name',
+        sortDir: 'desc',
+      };
+
+      await action(req, res);
+
+      expect(searchForUsers).toHaveBeenCalledTimes(1);
+      expect(searchForUsers).toHaveBeenCalledWith('*', 3, 'name', 'desc', {
+        organisations: ['org-1'],
+      });
+    });
+
+    it(`then it should request all users ordered by email and ascending order,if sorting by "Email - ascending" (${method} / ${dataLocation})`, async () => {
+      const req = getRequestMock({
+        method,
+        params: {
+          oid: orgResult.id,
+        },
+        userServices: {
+          roles: [{
+            code: 'serviceid_serviceconfiguration',
+          }],
+        },
+      });
+      req[dataLocation] = {
+        page: 3,
+        sort: 'email',
+        sortDir: 'asc',
+      };
+
+      await action(req, res);
+
+      expect(searchForUsers).toHaveBeenCalledTimes(1);
+      expect(searchForUsers).toHaveBeenCalledWith('*', 3, 'email', 'asc', {
+        organisations: ['org-1'],
+      });
+    });
+
+    it(`then it should request all users ordered by email and descending order, if sorting by "Email - descending" (${method} / ${dataLocation})`, async () => {
+      const req = getRequestMock({
+        method,
+        params: {
+          oid: orgResult.id,
+        },
+        userServices: {
+          roles: [{
+            code: 'serviceid_serviceconfiguration',
+          }],
+        },
+      });
+      req[dataLocation] = {
+        page: 3,
+        sort: 'email',
+        sortDir: 'desc',
+      };
+
+      await action(req, res);
+
+      expect(searchForUsers).toHaveBeenCalledTimes(1);
+      expect(searchForUsers).toHaveBeenCalledWith('*', 3, 'email', 'desc', {
+        organisations: ['org-1'],
+      });
+    });
+
+    it(`then it should request all users ordered by status and ascending order, if sorting by "Status - ascending" (${method} / ${dataLocation})`, async () => {
+      const req = getRequestMock({
+        method,
+        params: {
+          oid: orgResult.id,
+        },
+        userServices: {
+          roles: [{
+            code: 'serviceid_serviceconfiguration',
+          }],
+        },
+      });
+      req[dataLocation] = {
+        page: 3,
+        sort: 'status',
+        sortDir: 'asc',
+      };
+
+      await action(req, res);
+
+      expect(searchForUsers).toHaveBeenCalledTimes(1);
+      expect(searchForUsers).toHaveBeenCalledWith('*', 3, 'status', 'asc', {
+        organisations: ['org-1'],
+      });
+    });
+
+    it(`then it should request all users ordered by status and descending order, if sorting by "Status - descending" (${method} / ${dataLocation})`, async () => {
+      const req = getRequestMock({
+        method,
+        params: {
+          oid: orgResult.id,
+        },
+        userServices: {
+          roles: [{
+            code: 'serviceid_serviceconfiguration',
+          }],
+        },
+      });
+      req[dataLocation] = {
+        page: 3,
+        sort: 'status',
+        sortDir: 'desc',
+      };
+
+      await action(req, res);
+
+      expect(searchForUsers).toHaveBeenCalledTimes(1);
+      expect(searchForUsers).toHaveBeenCalledWith('*', 3, 'status', 'desc', {
+        organisations: ['org-1'],
+      });
+    });
+
+    it(`then it should request all users ordered by last login and ascending order, if sorting by "Last login - ascending" (${method} / ${dataLocation})`, async () => {
+      const req = getRequestMock({
+        method,
+        params: {
+          oid: orgResult.id,
+        },
+        userServices: {
+          roles: [{
+            code: 'serviceid_serviceconfiguration',
+          }],
+        },
+      });
+      req[dataLocation] = {
+        page: 3,
+        sort: 'lastlogin',
+        sortDir: 'asc',
+      };
+
+      await action(req, res);
+
+      expect(searchForUsers).toHaveBeenCalledTimes(1);
+      expect(searchForUsers).toHaveBeenCalledWith('*', 3, 'lastlogin', 'asc', {
+        organisations: ['org-1'],
+      });
+    });
+
+    it(`then it should request all users ordered by last login and descending order, if sorting by "Last Login - descending" (${method} / ${dataLocation})`, async () => {
+      const req = getRequestMock({
+        method,
+        params: {
+          oid: orgResult.id,
+        },
+        userServices: {
+          roles: [{
+            code: 'serviceid_serviceconfiguration',
+          }],
+        },
+      });
+      req[dataLocation] = {
+        page: 3,
+        sort: 'lastlogin',
+        sortDir: 'desc',
+      };
+
+      await action(req, res);
+
+      expect(searchForUsers).toHaveBeenCalledTimes(1);
+      expect(searchForUsers).toHaveBeenCalledWith('*', 3, 'lastlogin', 'desc', {
+        organisations: ['org-1'],
+      });
+    });
+
+    it(`then it should request sorting ascending by name if no sorting order and direction is specified (${method} / ${dataLocation})`, async () => {
+      const req = getRequestMock({
+        method,
+        params: {
+          oid: orgResult.id,
+        },
+        userServices: {
+          roles: [{
+            code: 'serviceid_serviceconfiguration',
+          }],
+        },
+      });
+      req[dataLocation] = {
+        page: 3,
+      };
+
+      await action(req, res);
+
+      expect(searchForUsers).toHaveBeenCalledTimes(1);
+      expect(searchForUsers).toHaveBeenCalledWith('*', 3, 'name', 'asc', {
+        organisations: ['org-1'],
       });
     });
 
@@ -154,8 +383,8 @@ describe('when displaying organisation users', () => {
         },
         userServices: {
           roles: [{
-            code: 'serviceid_serviceconfiguration'
-          }]
+            code: 'serviceid_serviceconfiguration',
+          }],
         },
       });
       req[dataLocation] = {

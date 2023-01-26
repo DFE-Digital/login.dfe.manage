@@ -35,7 +35,7 @@
     "lodash": "^4.17.21",
     "login.dfe.async-retry": "git+https://github.com/DFE-Digital/login.dfe.async-retry.git#v1.1",
     "login.dfe.audit.winston-sequelize-transport": "github:DFE-Digital/login.dfe.audit.winston-sequelize-transport#v2.12",
-    "login.dfe.config.schema.common": "git+https://github.com/DFE-Digital/login.dfe.config.schema.common.git#v1.9.4",
+    "login.dfe.config.schema.common": "git+https://github.com/DFE-Digital/login.dfe.config.schema.common.git#v1.9.5",
     "login.dfe.express-error-handling": "git+https://github.com/DFE-Digital/login.dfe.express-error-handling.git#v2.2.1",
     "login.dfe.healthcheck": "git+https://github.com/DFE-Digital/login.dfe.healthcheck.git#v2.2.1",
     "login.dfe.jwt-strategies": "git+https://github.com/DFE-Digital/login.dfe.jwt-strategies.git#v3.0.1",

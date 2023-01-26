@@ -13,41 +13,50 @@
     </div>
 </div>
 <% } %>
-<h1 class="govuk-heading-l text-break">
-    <span class="govuk-caption-l"><%= organisation.category.name %></span>
+<h1 class="govuk-heading-xl govuk-!-margin-top-0 text-break">
+    <span class="govuk-caption-xl"><%=locals.service.name%></span>
     <%= organisation.name %>
 </h1>
 <dl class="inline">
-<% if (organisation.urn) { %>
+    <% if (organisation.urn) { %>
     <dt class="govuk-label">URN:</dt>
     <dd class="govuk-label"><%= organisation.urn %></dd>
-<% } %>
-<% if (organisation.uid) { %>
-    <dt class="govuk-label">UID:</dt>
-    <dd class="govuk-label"><%= organisation.uid %></dd>
-<% } %>
-<% if (organisation.ukprn) { %>
-    <dt class="govuk-label">UKPRN:</dt>
-    <dd class="govuk-label"><%= organisation.ukprn %></dd>
-<% } %>
-<% if (organisation.establishmentNumber) { %>
+    <% } %>
+
+    <% if (organisation.establishmentNumber) { %>
     <dt class="govuk-label">Establishment number:</dt>
     <dd class="govuk-label"><%= organisation.establishmentNumber %></dd>
-<% } %>
-<% if (organisation.localAuthority) { %>
+    <% } %>
+
+    <% if (organisation.localAuthority) { %>
     <dt class="govuk-label">Local authority:</dt>
     <dd class="govuk-label">
     <% if (organisation.localAuthority.name && organisation.localAuthority.code && organisation.localAuthority.id) { %>
-            <a class="govuk-link" href="/services/<%= locals.serviceId %>/organisations/<%= organisation.localAuthority.id %>/users"><%= organisation.localAuthority.name %></a> (<%= organisation.localAuthority.code %>)
+            <dd class="govuk-label"><%= organisation.localAuthority.name %> (<%= organisation.localAuthority.code %>)</dd> 
     <% } else { %>
             Unknown
     <% } %>
     </dd>
-<% } %>
+    <% } %>
+
+    <% if (organisation.category.name) { %>
+    <dt class="govuk-label">Type:</dt>
+    <dd class="govuk-label"><%= organisation.category.name %></dd>
+    <% } %>
+
+    <% if (organisation.ukprn) { %>
+    <dt class="govuk-label">UKPRN:</dt>
+    <dd class="govuk-label"><%= organisation.ukprn %></dd>
+    <% } %>
+
     <dt class="govuk-label">Address:</dt>
     <dd class="govuk-label"><%= organisation.address || 'Not Recorded' %></dd>
-    <dt class="govuk-label">Legacy Id:</dt>
-    <dd class="govuk-label"><%= organisation.legacyId %></dd>
+
+    <% if (organisation.legacyId) { %>
+    <dt class="govuk-label">Legacy ID:</dt>
+    <dd class="govuk-label"><%= organisation.legacyId || 'Unknown' %></dd>
+    <% } %>
+
     <dt class="govuk-label">Status:</dt>
     <dd class="govuk-label"><%= organisation.status.name  || 'Unknown' %></dd>
 </dl>  
