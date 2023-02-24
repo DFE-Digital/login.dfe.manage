@@ -52,7 +52,7 @@
     "openid-client": "^4.0.0",
     "passport": "^0.5.2",
     "request": "^2.88.2",
-    "sequelize": "^6.18.0",
+    "sequelize": "^6.29.0",
     "simpl-schema": "^1.12.0",
     "tedious": "^14.4.0",
     "winston": "^2.4.0"
