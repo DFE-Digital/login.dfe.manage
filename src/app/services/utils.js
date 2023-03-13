@@ -219,6 +219,7 @@ const getFriendlyOrganisationType = async (typeId) => {
     { id: '47', name: 'Children\'s Centre' },
     { id: '48', name: 'Children\'s Centre Linked Site' },
     { id: '56', name: 'Institution funded by other government department' },
+    { id: '57', name: 'Academy secure 16 to 19' },
   ];
 
   const establishmentType = establishmentTypes.find(x => x.id === typeId);
