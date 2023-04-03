@@ -113,9 +113,11 @@ const getFriendlyOrganisationCategory = async (categoryId) => {
     { id: '011', name: 'Government' },
     { id: '012', name: 'Other GIAS Stakeholder' },
     { id: '013', name: 'Single-Academy Trust' },
+    { id: '014', name: 'Secure Single-Academy Trust'},
     { id: '050', name: 'Software Suppliers' },
     { id: '051', name: 'PIMS Training Providers' },
     { id: '052', name: 'Billing Authority' },
+    { id: '053', name: 'Youth Custody Service'},
   ];
 
   const category = categories.find(x => x.id === categoryId);
