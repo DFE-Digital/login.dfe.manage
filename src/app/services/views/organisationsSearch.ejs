@@ -99,7 +99,11 @@
                             </a>
                         </th>
                         <th scope="col" class="govuk-table__header width-10">
+                            <a
+                            href="<%=baseSortUri%>&sort=upin&sortDir=<%= sort.upin.nextDirection %>"
+                            class="govuk-link <% if (sort.upin.applied) { %>sorted dir-<%= (sort.upin.nextDirection === 'asc') ? 'a' : 'd' %> <% } %>">
                             UPIN
+                            </a>
                         </th>
                         <th scope="col" class="govuk-table__header width-15">
                             <a
