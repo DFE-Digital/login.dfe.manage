@@ -95,6 +95,7 @@ const getFriendlyOrganisation = async (organisationId, correlationId) => {
   const identifiers = [
     { label: 'URN', value: organisation.urn },
     { label: 'UID', value: organisation.uid },
+    { label: 'UPIN', value: organisation.upin },
     { label: 'UKPRN', value: organisation.ukprn },
     { label: 'type', value: organisation.category.name },
   ].filter(x => x.value).map(x => `${x.label}: ${x.value}`).join(', ');
