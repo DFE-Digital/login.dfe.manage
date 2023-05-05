@@ -36,7 +36,7 @@
 								</div>
 								<div class="meta js-hidden">
 									<div class="approvers">
-										<dl class="inline condensed small-dt">
+										<dl class="inline condensed small-dt govuk-summary-list govuk-summary-list--no-border">
 											<% if (org.status && org.status.name) { %>
 											<dt class="govuk-label"><abbr title="Status">Status:</abbr></dt>
 											<dd><%=org.status.name%></dd>
@@ -62,9 +62,9 @@
 											<% } %>
 	
 											<% if (org.approvers && org.approvers.length > 0) { %>
-												<dt>Approvers:</dt>
+												<dt class="govuk-label">Approvers:</dt>
 												<dd>
-													<ul>
+													<ul class="govuk-list">
 														<% for (let a = 0; a < org.approvers.length; a++) { %>
 														<li><%=org.approvers[a].name%> <a class="govuk-link" href="mailto:<%=org.approvers[a].email%>"><%=org.approvers[a].email%></a></li>
 														<% } %>
