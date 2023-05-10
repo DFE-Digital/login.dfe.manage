@@ -14,7 +14,19 @@
 			<div class="govuk-grid-row govuk-!-margin-top-6 govuk-!-margin-bottom-6">
 				<div class="govuk-grid-column-full">
 					<dl class="inline">
-						<dt class="govuk-label"><%=org.name%></dt>
+						<% if(org.urn && org.ukprn) {%>
+							<dt class="govuk-label"><%=org.name%> (URN:<%=org.urn%>,UKPRN:<%=org.ukprn%>)</dt>
+						<%} else {%>
+								<% if(org.urn && !org.ukprn){%>
+									<dt class="govuk-label"><%=org.name%> (URN:<%=org.urn%>)</dt>
+								<%}%>
+								<% if(!org.urn && org.ukprn){%>
+									<dt class="govuk-label"><%=org.name%> (UKPRN:<%=org.ukprn%>)</dt>
+								<%}%>
+								<% if(!org.urn && !org.ukprn){%>
+								<dt class="govuk-label"><%=org.name%></dt>
+								<%}%>
+							<%}%>
 						<% if (!locals.isInvitation) { %>
 						<dt class="govuk-label govuk-!-font-weight-regular">Legacy ID:</dt>
 						<dd class="govuk-label"><%= org.numericIdentifier %></dd>
