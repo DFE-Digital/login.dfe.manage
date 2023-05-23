@@ -30,6 +30,8 @@
 						<% if (!locals.isInvitation) { %>
 						<dt class="govuk-label govuk-!-font-weight-regular">Legacy ID:</dt>
 						<dd class="govuk-label"><%= org.numericIdentifier %></dd>
+						<dt class="govuk-label govuk-!-font-weight-regular">Legacy name:</dt>
+						<dd class="govuk-label"><%= org.textIdentifier %></dd>
 						<% } %>
 						<dt class="govuk-label govuk-!-font-weight-regular">Permission level:</dt>
 						<% if (org.role) { %>
