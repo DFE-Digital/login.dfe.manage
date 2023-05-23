@@ -4,15 +4,9 @@
         <div class="govuk-grid-column-full govuk-!-margin-top-4">
             <form method="post" id="form-audit-update">
                 <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-                <% if (!locals.updateInProgress) {%>
-                    <button class="govuk-button govuk-!-margin-bottom-6" type="submit" onclick="this.form.submit(); this.disabled=true; this.innerText='Processing Update';">
+                <button class="govuk-button govuk-!-margin-bottom-6" type="submit" onclick="this.form.submit(); this.disabled=true; this.innerText='Processing Update';">
                         Update and refresh
                     </button>
-                <%} else {%>
-                    <button class="govuk-button govuk-!-margin-bottom-6" type="submit" disabled>
-                        Processing Update
-                    </button>
-                <% } %>
             </form>
 
             <%

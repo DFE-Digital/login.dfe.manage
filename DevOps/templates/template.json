@@ -104,13 +104,6 @@
             "metadata": {
                 "description": "Audit HTTP trigger invoke URL"
             }
-        },
-        "auditHttpTriggerFunctionKey": {
-            "type": "string",
-            "defaultValue": "",
-            "metadata": {
-                "description": "Audit HTTP triger Function Key"
-            }
         }
     },
     "variables": {

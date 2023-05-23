@@ -38,15 +38,23 @@
     <% } %>
     </dd>
     <% } %>
-
-    <% if (organisation.category.name) { %>
+    
+    <% if (organisation.type || organisation.providerTypeName) { %>
     <dt class="govuk-label">Type:</dt>
-    <dd class="govuk-label"><%= organisation.category.name %></dd>
+    <dd class="govuk-label"><%=(organisation.type ? organisation.type.name : organisation.providerTypeName)%></dd>
+    <% } else if (organisation.category) { %>
+    <dt class="govuk-label">Category:</dt>
+    <dd class="govuk-label"><%=organisation.category.name%></dd>
     <% } %>
 
     <% if (organisation.ukprn) { %>
     <dt class="govuk-label">UKPRN:</dt>
     <dd class="govuk-label"><%= organisation.ukprn %></dd>
+    <% } %>
+   
+    <% if (organisation.upin) { %>
+    <dt class="govuk-label">UPIN:</dt>
+    <dd class="govuk-label"><%= organisation.upin || 'Not Recorded' %></dd>
     <% } %>
 
     <dt class="govuk-label">Address:</dt>
