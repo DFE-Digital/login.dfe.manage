@@ -226,6 +226,80 @@ describe('when editing the service configuration', () => {
     });
   });
 
+  it('then it should render view with validation if clientId is not alphanumeric & hyphens', async () => {
+    const testClientId = 't89-^&*2tIu-';
+    req.body.clientId = testClientId;
+
+    await postServiceConfig(req, res);
+    expect(res.render.mock.calls).toHaveLength(1);
+    expect(res.render.mock.calls[0][0]).toBe('services/views/serviceConfig');
+    expect(res.render.mock.calls[0][1]).toEqual({
+      backLink: '/services/service1',
+      csrfToken: 'token',
+      currentNavigation: 'configuration',
+      service: {
+        name: 'service two',
+        clientId: testClientId,
+        clientSecret: 'outshine-wringing-imparting-submitted',
+        description: 'service description',
+        grantTypes: [
+          'implicit',
+        ],
+        postLogoutRedirectUris: [
+          'https://www.logout2.com',
+        ],
+        postResetUrl: 'https://www.postreset2.com',
+        redirectUris: [
+          'https://www.redirect.com',
+          'https://www.redirect2.com',
+        ],
+        responseTypes: [
+          'code',
+        ],
+        serviceHome: 'https://www.servicehome2.com',
+      },
+      serviceId: 'service1',
+      userRoles: [],
+      validationMessages: {
+        clientId: 'Client Id must only contain letters, numbers, and hyphens',
+      },
+    });
+  });
+
+  it('then it should update the service if clientId is alphanumeric & hyphens', async () => {
+    const testClientId = 't89B-2tVuX-';
+    req.body.clientId = testClientId;
+
+    await postServiceConfig(req, res);
+
+    expect(updateService.mock.calls).toHaveLength(1);
+    expect(updateService.mock.calls[0][0]).toBe('service1');
+
+    expect(updateService.mock.calls[0][1]).toEqual({
+      name: 'service two',
+      description: 'service description',
+      clientId: testClientId,
+      clientSecret: 'outshine-wringing-imparting-submitted',
+      serviceHome: 'https://www.servicehome2.com',
+      postResetUrl: 'https://www.postreset2.com',
+      tokenEndpointAuthMethod: null,
+      redirect_uris: [
+        'https://www.redirect.com',
+        'https://www.redirect2.com',
+      ],
+      post_logout_redirect_uris: [
+        'https://www.logout2.com',
+      ],
+      grant_types: [
+        'implicit',
+      ],
+      response_types: [
+        'code',
+      ],
+    });
+    expect(updateService.mock.calls[0][2]).toBe('correlationId');
+  });
+
   it('then it should render view with validation if redirect urls are not unique', async () => {
     req.body.redirect_uris =  [
       'https://www.redirect.com',
