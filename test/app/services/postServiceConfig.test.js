@@ -186,6 +186,46 @@ describe('when editing the service configuration', () => {
     });
   });
 
+  it('then it should render view with validation if clientId is longer than 50 characters', async () => {
+    const testClientId = 'a'.repeat(100);
+    req.body.clientId = testClientId;
+
+    await postServiceConfig(req, res);
+    expect(res.render.mock.calls).toHaveLength(1);
+    expect(res.render.mock.calls[0][0]).toBe('services/views/serviceConfig');
+    expect(res.render.mock.calls[0][1]).toEqual({
+      backLink: '/services/service1',
+      csrfToken: 'token',
+      currentNavigation: 'configuration',
+      service: {
+        name: 'service two',
+        clientId: testClientId,
+        clientSecret: 'outshine-wringing-imparting-submitted',
+        description: 'service description',
+        grantTypes: [
+          'implicit',
+        ],
+        postLogoutRedirectUris: [
+          'https://www.logout2.com',
+        ],
+        postResetUrl: 'https://www.postreset2.com',
+        redirectUris: [
+          'https://www.redirect.com',
+          'https://www.redirect2.com',
+        ],
+        responseTypes: [
+          'code',
+        ],
+        serviceHome: 'https://www.servicehome2.com',
+      },
+      serviceId: 'service1',
+      userRoles: [],
+      validationMessages: {
+        clientId: 'Client Id must be 50 characters or less',
+      },
+    });
+  });
+
   it('then it should render view with validation if redirect urls are not unique', async () => {
     req.body.redirect_uris =  [
       'https://www.redirect.com',
