@@ -92,6 +92,8 @@ const validate = async (req) => {
 
   if (!model.service.clientId) {
     model.validationMessages.clientId = 'Client Id must be present';
+  } else if (model.service.clientId.length > 50) {
+    model.validationMessages.clientId = 'Client Id must be 50 characters or less';
   }
 
   if (!urlValidation.test(model.service.postResetUrl) && model.service.postResetUrl.trim() !== '') {
