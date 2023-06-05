@@ -96,7 +96,7 @@ const validate = async (req) => {
     model.validationMessages.clientId = 'Client Id must be 50 characters or less';
   } else if (!/^[A-Za-z0-9-]+$/.test(model.service.clientId)) {
     model.validationMessages.clientId = 'Client Id must only contain letters, numbers, and hyphens';
-  } else if (model.service.clientId !== service.relyingParty.client_id && getServiceById(model.service.clientId, req.id)) {
+  } else if (model.service.clientId !== service.relyingParty.client_id && await getServiceById(model.service.clientId, req.id)) {
     // If getServiceById returns truthy, then that clientId is already in use.
     model.validationMessages.clientId = 'Client Id is unavailable, try another';
   }
