@@ -52,6 +52,7 @@ const getOrganisations = async (userId, correlationId) => {
     return {
       id: invitation.organisation.id,
       name: invitation.organisation.name,
+      LegalName: invitation.organisation.LegalName,
       status: invitation.organisation.status,
       role: invitation.role,
       urn: invitation.organisation.urn,
