@@ -98,7 +98,7 @@ const validate = async (req) => {
     model.validationMessages.clientId = 'Client Id must only contain letters, numbers, and hyphens';
   } else if (model.service.clientId !== service.relyingParty.client_id && getServiceById(model.service.clientId, req.id)) {
     // If getServiceById returns truthy, then that clientId is already in use.
-    model.validationMessages.clientId = 'Client Id is unavailable, please try another';
+    model.validationMessages.clientId = 'Client Id is unavailable, try another';
   }
 
   if (!urlValidation.test(model.service.postResetUrl) && model.service.postResetUrl.trim() !== '') {

@@ -367,7 +367,7 @@ describe('when editing the service configuration', () => {
       serviceId: 'service1',
       userRoles: [],
       validationMessages: {
-        clientId: 'Client Id is unavailable, please try another',
+        clientId: 'Client Id is unavailable, try another',
       },
     });
   });
