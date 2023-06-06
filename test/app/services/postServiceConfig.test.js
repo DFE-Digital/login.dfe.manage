@@ -42,9 +42,9 @@ describe('when editing the service configuration', () => {
 
     updateService.mockReset();
     getServiceById.mockReset();
-    getServiceById.mockReturnValue({
+    getServiceById.mockReturnValueOnce({
       id: 'service1',
-      name:'service one',
+      name: 'service one',
       description: 'service description',
       relyingParty: {
         client_id: 'clientid',
@@ -65,8 +65,8 @@ describe('when editing the service configuration', () => {
         response_types: [
           'code',
         ],
-      }
-    });
+      },
+    }).mockReturnValueOnce(null);
     res.mockResetAll();
   });
 
@@ -184,6 +184,225 @@ describe('when editing the service configuration', () => {
         clientId: 'Client Id must be present',
       },
     });
+  });
+
+  it('then it should render view with validation if clientId is longer than 50 characters', async () => {
+    const testClientId = 'a'.repeat(100);
+    req.body.clientId = testClientId;
+
+    await postServiceConfig(req, res);
+    expect(res.render.mock.calls).toHaveLength(1);
+    expect(res.render.mock.calls[0][0]).toBe('services/views/serviceConfig');
+    expect(res.render.mock.calls[0][1]).toEqual({
+      backLink: '/services/service1',
+      csrfToken: 'token',
+      currentNavigation: 'configuration',
+      service: {
+        name: 'service two',
+        clientId: testClientId,
+        clientSecret: 'outshine-wringing-imparting-submitted',
+        description: 'service description',
+        grantTypes: [
+          'implicit',
+        ],
+        postLogoutRedirectUris: [
+          'https://www.logout2.com',
+        ],
+        postResetUrl: 'https://www.postreset2.com',
+        redirectUris: [
+          'https://www.redirect.com',
+          'https://www.redirect2.com',
+        ],
+        responseTypes: [
+          'code',
+        ],
+        serviceHome: 'https://www.servicehome2.com',
+      },
+      serviceId: 'service1',
+      userRoles: [],
+      validationMessages: {
+        clientId: 'Client Id must be 50 characters or less',
+      },
+    });
+  });
+
+  it('then it should render view with validation if clientId is not alphanumeric & hyphens', async () => {
+    const testClientId = 't89-^&*2tIu-';
+    req.body.clientId = testClientId;
+
+    await postServiceConfig(req, res);
+    expect(res.render.mock.calls).toHaveLength(1);
+    expect(res.render.mock.calls[0][0]).toBe('services/views/serviceConfig');
+    expect(res.render.mock.calls[0][1]).toEqual({
+      backLink: '/services/service1',
+      csrfToken: 'token',
+      currentNavigation: 'configuration',
+      service: {
+        name: 'service two',
+        clientId: testClientId,
+        clientSecret: 'outshine-wringing-imparting-submitted',
+        description: 'service description',
+        grantTypes: [
+          'implicit',
+        ],
+        postLogoutRedirectUris: [
+          'https://www.logout2.com',
+        ],
+        postResetUrl: 'https://www.postreset2.com',
+        redirectUris: [
+          'https://www.redirect.com',
+          'https://www.redirect2.com',
+        ],
+        responseTypes: [
+          'code',
+        ],
+        serviceHome: 'https://www.servicehome2.com',
+      },
+      serviceId: 'service1',
+      userRoles: [],
+      validationMessages: {
+        clientId: 'Client Id must only contain letters, numbers, and hyphens',
+      },
+    });
+  });
+
+  it('then it should update the service if clientId is alphanumeric & hyphens', async () => {
+    const testClientId = 't89B-2tVuX-';
+    req.body.clientId = testClientId;
+
+    await postServiceConfig(req, res);
+
+    expect(updateService.mock.calls).toHaveLength(1);
+    expect(updateService.mock.calls[0][0]).toBe('service1');
+
+    expect(updateService.mock.calls[0][1]).toEqual({
+      name: 'service two',
+      description: 'service description',
+      clientId: testClientId,
+      clientSecret: 'outshine-wringing-imparting-submitted',
+      serviceHome: 'https://www.servicehome2.com',
+      postResetUrl: 'https://www.postreset2.com',
+      tokenEndpointAuthMethod: null,
+      redirect_uris: [
+        'https://www.redirect.com',
+        'https://www.redirect2.com',
+      ],
+      post_logout_redirect_uris: [
+        'https://www.logout2.com',
+      ],
+      grant_types: [
+        'implicit',
+      ],
+      response_types: [
+        'code',
+      ],
+    });
+    expect(updateService.mock.calls[0][2]).toBe('correlationId');
+  });
+
+  it('then it should render view with validation if clientId is already in use by another service', async () => {
+    const testClientId = 'existing-id';
+    req.body.clientId = testClientId;
+
+    // Change mock to return truthy on second call to mimic a service existing with the clientId.
+    getServiceById.mockReset();
+    getServiceById.mockReturnValueOnce({
+      id: 'service1',
+      name: 'service one',
+      description: 'service description',
+      relyingParty: {
+        client_id: 'clientid',
+        client_secret: 'dewier-thrombi-confounder-mikado',
+        api_secret: 'dewier-thrombi-confounder-mikado',
+        service_home: 'https://www.servicehome.com',
+        postResetUrl: 'https://www.postreset.com',
+        redirect_uris: [
+          'https://www.redirect.com',
+        ],
+        post_logout_redirect_uris: [
+          'https://www.logout.com',
+        ],
+        grant_types: [
+          'implicit',
+          'authorization_code',
+        ],
+        response_types: [
+          'code',
+        ],
+      },
+    }).mockReturnValueOnce({
+      example: true,
+    });
+
+    await postServiceConfig(req, res);
+    // getServiceById should be called twice to get service info and check clientId uniqueness.
+    expect(getServiceById.mock.calls).toHaveLength(2);
+    expect(res.render.mock.calls).toHaveLength(1);
+    expect(res.render.mock.calls[0][0]).toBe('services/views/serviceConfig');
+    expect(res.render.mock.calls[0][1]).toEqual({
+      backLink: '/services/service1',
+      csrfToken: 'token',
+      currentNavigation: 'configuration',
+      service: {
+        name: 'service two',
+        clientId: testClientId,
+        clientSecret: 'outshine-wringing-imparting-submitted',
+        description: 'service description',
+        grantTypes: [
+          'implicit',
+        ],
+        postLogoutRedirectUris: [
+          'https://www.logout2.com',
+        ],
+        postResetUrl: 'https://www.postreset2.com',
+        redirectUris: [
+          'https://www.redirect.com',
+          'https://www.redirect2.com',
+        ],
+        responseTypes: [
+          'code',
+        ],
+        serviceHome: 'https://www.servicehome2.com',
+      },
+      serviceId: 'service1',
+      userRoles: [],
+      validationMessages: {
+        clientId: 'Client Id is unavailable, try another',
+      },
+    });
+  });
+
+  it('then it should still update the service if the clientId has not been edited', async () => {
+    req.body.clientId = 'clientid';
+
+    await postServiceConfig(req, res);
+    // getServiceById should only be called once as the uniqueness check won't be used.
+    expect(getServiceById.mock.calls).toHaveLength(1);
+    expect(updateService.mock.calls).toHaveLength(1);
+    expect(updateService.mock.calls[0][0]).toBe('service1');
+    expect(updateService.mock.calls[0][1]).toEqual({
+      name: 'service two',
+      description: 'service description',
+      clientId: 'clientid',
+      clientSecret: 'outshine-wringing-imparting-submitted',
+      serviceHome: 'https://www.servicehome2.com',
+      postResetUrl: 'https://www.postreset2.com',
+      tokenEndpointAuthMethod: null,
+      redirect_uris: [
+        'https://www.redirect.com',
+        'https://www.redirect2.com',
+      ],
+      post_logout_redirect_uris: [
+        'https://www.logout2.com',
+      ],
+      grant_types: [
+        'implicit',
+      ],
+      response_types: [
+        'code',
+      ],
+    });
+    expect(updateService.mock.calls[0][2]).toBe('correlationId');
   });
 
   it('then it should render view with validation if redirect urls are not unique', async () => {
