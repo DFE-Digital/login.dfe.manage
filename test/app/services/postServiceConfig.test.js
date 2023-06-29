@@ -99,6 +99,7 @@ describe('when editing the service configuration', () => {
           'code'
         ],
         serviceHome: 'https://www.servicehome2.com',
+        tokenEndpointAuthMethod: null,
       },
       serviceId: 'service1',
       userRoles: [],
@@ -137,7 +138,8 @@ describe('when editing the service configuration', () => {
         responseTypes: [
           'code'
         ],
-        serviceHome: 'not-a-url'
+        serviceHome: 'not-a-url',
+        tokenEndpointAuthMethod: null,
       },
       serviceId: 'service1',
       userRoles: [],
@@ -176,7 +178,8 @@ describe('when editing the service configuration', () => {
         responseTypes: [
           'code'
         ],
-        serviceHome: 'https://www.servicehome2.com'
+        serviceHome: 'https://www.servicehome2.com',
+        tokenEndpointAuthMethod: null,
       },
       serviceId: 'service1',
       userRoles: [],
@@ -217,6 +220,7 @@ describe('when editing the service configuration', () => {
           'code',
         ],
         serviceHome: 'https://www.servicehome2.com',
+        tokenEndpointAuthMethod: null,
       },
       serviceId: 'service1',
       userRoles: [],
@@ -257,6 +261,7 @@ describe('when editing the service configuration', () => {
           'code',
         ],
         serviceHome: 'https://www.servicehome2.com',
+        tokenEndpointAuthMethod: null,
       },
       serviceId: 'service1',
       userRoles: [],
@@ -363,6 +368,7 @@ describe('when editing the service configuration', () => {
           'code',
         ],
         serviceHome: 'https://www.servicehome2.com',
+        tokenEndpointAuthMethod: null,
       },
       serviceId: 'service1',
       userRoles: [],
@@ -437,7 +443,8 @@ describe('when editing the service configuration', () => {
         responseTypes: [
           'code'
         ],
-        serviceHome: 'https://www.servicehome2.com'
+        serviceHome: 'https://www.servicehome2.com',
+        tokenEndpointAuthMethod: null,
       },
       serviceId: 'service1',
       userRoles: [],
