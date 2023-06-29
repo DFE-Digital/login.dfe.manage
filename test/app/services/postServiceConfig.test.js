@@ -378,6 +378,39 @@ describe('when editing the service configuration', () => {
     });
   });
 
+  it('then it should still update the service if only the clientId capitalisation has changed', async () => {
+    req.body.clientId = 'cLiEnTiD';
+
+    await postServiceConfig(req, res);
+    // getServiceById should only be called once as the uniqueness check won't be used.
+    expect(getServiceById.mock.calls).toHaveLength(1);
+    expect(updateService.mock.calls).toHaveLength(1);
+    expect(updateService.mock.calls[0][0]).toBe('service1');
+    expect(updateService.mock.calls[0][1]).toEqual({
+      name: 'service two',
+      description: 'service description',
+      clientId: 'cLiEnTiD',
+      clientSecret: 'outshine-wringing-imparting-submitted',
+      serviceHome: 'https://www.servicehome2.com',
+      postResetUrl: 'https://www.postreset2.com',
+      tokenEndpointAuthMethod: null,
+      redirect_uris: [
+        'https://www.redirect.com',
+        'https://www.redirect2.com',
+      ],
+      post_logout_redirect_uris: [
+        'https://www.logout2.com',
+      ],
+      grant_types: [
+        'implicit',
+      ],
+      response_types: [
+        'code',
+      ],
+    });
+    expect(updateService.mock.calls[0][2]).toBe('correlationId');
+  });
+
   it('then it should still update the service if the clientId has not been edited', async () => {
     req.body.clientId = 'clientid';
 
