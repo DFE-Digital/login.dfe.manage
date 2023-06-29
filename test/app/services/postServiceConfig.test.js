@@ -447,6 +447,91 @@ describe('when editing the service configuration', () => {
     });
   });
 
+  it('then validation should set the token auth method to "client_secret_post" if that is what it was set to when there is a validation error', async () => {
+    req.body.tokenEndpointAuthMethod = 'client_secret_post';
+    const testClientId = 't89-^&*2tIu-';
+    req.body.clientId = testClientId;
+
+    await postServiceConfig(req, res);
+    expect(res.render.mock.calls).toHaveLength(1);
+    expect(res.render.mock.calls[0][0]).toBe('services/views/serviceConfig');
+    expect(res.render.mock.calls[0][1]).toEqual({
+      backLink: '/services/service1',
+      csrfToken: 'token',
+      currentNavigation: 'configuration',
+      service: {
+        name: 'service two',
+        clientId: testClientId,
+        clientSecret: 'outshine-wringing-imparting-submitted',
+        description: 'service description',
+        grantTypes: [
+          'implicit',
+        ],
+        postLogoutRedirectUris: [
+          'https://www.logout2.com',
+        ],
+        postResetUrl: 'https://www.postreset2.com',
+        redirectUris: [
+          'https://www.redirect.com',
+          'https://www.redirect2.com',
+        ],
+        responseTypes: [
+          'code',
+        ],
+        serviceHome: 'https://www.servicehome2.com',
+        tokenEndpointAuthMethod: 'client_secret_post',
+      },
+      serviceId: 'service1',
+      userRoles: [],
+      validationMessages: {
+        clientId: 'Client Id must only contain letters, numbers, and hyphens',
+      },
+    });
+  });
+
+  it('then validation should set the token auth method to null if it was set to "none" when there is a validation error', async () => {
+    // none is the value on the form input, which should be translated to null.
+    req.body.tokenEndpointAuthMethod = 'none';
+    const testClientId = 't89-^&*2tIu-';
+    req.body.clientId = testClientId;
+
+    await postServiceConfig(req, res);
+    expect(res.render.mock.calls).toHaveLength(1);
+    expect(res.render.mock.calls[0][0]).toBe('services/views/serviceConfig');
+    expect(res.render.mock.calls[0][1]).toEqual({
+      backLink: '/services/service1',
+      csrfToken: 'token',
+      currentNavigation: 'configuration',
+      service: {
+        name: 'service two',
+        clientId: testClientId,
+        clientSecret: 'outshine-wringing-imparting-submitted',
+        description: 'service description',
+        grantTypes: [
+          'implicit',
+        ],
+        postLogoutRedirectUris: [
+          'https://www.logout2.com',
+        ],
+        postResetUrl: 'https://www.postreset2.com',
+        redirectUris: [
+          'https://www.redirect.com',
+          'https://www.redirect2.com',
+        ],
+        responseTypes: [
+          'code',
+        ],
+        serviceHome: 'https://www.servicehome2.com',
+        tokenEndpointAuthMethod: null,
+      },
+      serviceId: 'service1',
+      userRoles: [],
+      validationMessages: {
+        clientId: 'Client Id must only contain letters, numbers, and hyphens',
+      },
+    });
+  });
+
   it('then it should update the service', async () => {
     await postServiceConfig(req, res);
 
