@@ -73,7 +73,7 @@ const validate = async (req) => {
       grantTypes,
       responseTypes,
       apiSecret: req.body.apiSecret,
-      tokenEndpointAuthMethod: req.body.tokenEndpointAuthMethod,
+      tokenEndpointAuthMethod: req.body.tokenEndpointAuthMethod === 'client_secret_post' ? 'client_secret_post' : null,
     },
     backLink: `/services/${req.params.sid}`,
     validationMessages: {},
