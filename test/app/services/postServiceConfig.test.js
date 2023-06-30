@@ -99,6 +99,7 @@ describe('when editing the service configuration', () => {
           'code'
         ],
         serviceHome: 'https://www.servicehome2.com',
+        tokenEndpointAuthMethod: null,
       },
       serviceId: 'service1',
       userRoles: [],
@@ -137,7 +138,8 @@ describe('when editing the service configuration', () => {
         responseTypes: [
           'code'
         ],
-        serviceHome: 'not-a-url'
+        serviceHome: 'not-a-url',
+        tokenEndpointAuthMethod: null,
       },
       serviceId: 'service1',
       userRoles: [],
@@ -176,7 +178,8 @@ describe('when editing the service configuration', () => {
         responseTypes: [
           'code'
         ],
-        serviceHome: 'https://www.servicehome2.com'
+        serviceHome: 'https://www.servicehome2.com',
+        tokenEndpointAuthMethod: null,
       },
       serviceId: 'service1',
       userRoles: [],
@@ -217,6 +220,7 @@ describe('when editing the service configuration', () => {
           'code',
         ],
         serviceHome: 'https://www.servicehome2.com',
+        tokenEndpointAuthMethod: null,
       },
       serviceId: 'service1',
       userRoles: [],
@@ -257,6 +261,7 @@ describe('when editing the service configuration', () => {
           'code',
         ],
         serviceHome: 'https://www.servicehome2.com',
+        tokenEndpointAuthMethod: null,
       },
       serviceId: 'service1',
       userRoles: [],
@@ -363,6 +368,7 @@ describe('when editing the service configuration', () => {
           'code',
         ],
         serviceHome: 'https://www.servicehome2.com',
+        tokenEndpointAuthMethod: null,
       },
       serviceId: 'service1',
       userRoles: [],
@@ -370,6 +376,39 @@ describe('when editing the service configuration', () => {
         clientId: 'Client Id is unavailable, try another',
       },
     });
+  });
+
+  it('then it should still update the service if only the clientId capitalisation has changed', async () => {
+    req.body.clientId = 'cLiEnTiD';
+
+    await postServiceConfig(req, res);
+    // getServiceById should only be called once as the uniqueness check won't be used.
+    expect(getServiceById.mock.calls).toHaveLength(1);
+    expect(updateService.mock.calls).toHaveLength(1);
+    expect(updateService.mock.calls[0][0]).toBe('service1');
+    expect(updateService.mock.calls[0][1]).toEqual({
+      name: 'service two',
+      description: 'service description',
+      clientId: 'cLiEnTiD',
+      clientSecret: 'outshine-wringing-imparting-submitted',
+      serviceHome: 'https://www.servicehome2.com',
+      postResetUrl: 'https://www.postreset2.com',
+      tokenEndpointAuthMethod: null,
+      redirect_uris: [
+        'https://www.redirect.com',
+        'https://www.redirect2.com',
+      ],
+      post_logout_redirect_uris: [
+        'https://www.logout2.com',
+      ],
+      grant_types: [
+        'implicit',
+      ],
+      response_types: [
+        'code',
+      ],
+    });
+    expect(updateService.mock.calls[0][2]).toBe('correlationId');
   });
 
   it('then it should still update the service if the clientId has not been edited', async () => {
@@ -437,12 +476,98 @@ describe('when editing the service configuration', () => {
         responseTypes: [
           'code'
         ],
-        serviceHome: 'https://www.servicehome2.com'
+        serviceHome: 'https://www.servicehome2.com',
+        tokenEndpointAuthMethod: null,
       },
       serviceId: 'service1',
       userRoles: [],
       validationMessages: {
         redirect_uris: 'Redirect Urls must be unique',
+      },
+    });
+  });
+
+  it('then validation should set the token auth method to "client_secret_post" if that is what it was set to when there is a validation error', async () => {
+    req.body.tokenEndpointAuthMethod = 'client_secret_post';
+    const testClientId = 't89-^&*2tIu-';
+    req.body.clientId = testClientId;
+
+    await postServiceConfig(req, res);
+    expect(res.render.mock.calls).toHaveLength(1);
+    expect(res.render.mock.calls[0][0]).toBe('services/views/serviceConfig');
+    expect(res.render.mock.calls[0][1]).toEqual({
+      backLink: '/services/service1',
+      csrfToken: 'token',
+      currentNavigation: 'configuration',
+      service: {
+        name: 'service two',
+        clientId: testClientId,
+        clientSecret: 'outshine-wringing-imparting-submitted',
+        description: 'service description',
+        grantTypes: [
+          'implicit',
+        ],
+        postLogoutRedirectUris: [
+          'https://www.logout2.com',
+        ],
+        postResetUrl: 'https://www.postreset2.com',
+        redirectUris: [
+          'https://www.redirect.com',
+          'https://www.redirect2.com',
+        ],
+        responseTypes: [
+          'code',
+        ],
+        serviceHome: 'https://www.servicehome2.com',
+        tokenEndpointAuthMethod: 'client_secret_post',
+      },
+      serviceId: 'service1',
+      userRoles: [],
+      validationMessages: {
+        clientId: 'Client Id must only contain letters, numbers, and hyphens',
+      },
+    });
+  });
+
+  it('then validation should set the token auth method to null if it was set to "none" when there is a validation error', async () => {
+    // none is the value on the form input, which should be translated to null.
+    req.body.tokenEndpointAuthMethod = 'none';
+    const testClientId = 't89-^&*2tIu-';
+    req.body.clientId = testClientId;
+
+    await postServiceConfig(req, res);
+    expect(res.render.mock.calls).toHaveLength(1);
+    expect(res.render.mock.calls[0][0]).toBe('services/views/serviceConfig');
+    expect(res.render.mock.calls[0][1]).toEqual({
+      backLink: '/services/service1',
+      csrfToken: 'token',
+      currentNavigation: 'configuration',
+      service: {
+        name: 'service two',
+        clientId: testClientId,
+        clientSecret: 'outshine-wringing-imparting-submitted',
+        description: 'service description',
+        grantTypes: [
+          'implicit',
+        ],
+        postLogoutRedirectUris: [
+          'https://www.logout2.com',
+        ],
+        postResetUrl: 'https://www.postreset2.com',
+        redirectUris: [
+          'https://www.redirect.com',
+          'https://www.redirect2.com',
+        ],
+        responseTypes: [
+          'code',
+        ],
+        serviceHome: 'https://www.servicehome2.com',
+        tokenEndpointAuthMethod: null,
+      },
+      serviceId: 'service1',
+      userRoles: [],
+      validationMessages: {
+        clientId: 'Client Id must only contain letters, numbers, and hyphens',
       },
     });
   });
