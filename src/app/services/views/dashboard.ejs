@@ -134,6 +134,18 @@
                     </p>
                 </div>
                 <% } %>
+
+                <% if (locals.userRoles.includes('onboarding')) { %>
+                <div class="manage-card">
+                    <h3 class="govuk-heading-s">
+                        <a id="service-onboard" class="govuk-link-bold" href="<%= locals.serviceId %>/onboarding">Onboard a service</a>
+                    </h3>
+                    <p class="govuk-body">
+                        Onboard a new service to DfE Sign-in. (Currently under construction)
+                    </p>
+                </div>
+                <% } %>
+
             </div>
         </div>
     </div>

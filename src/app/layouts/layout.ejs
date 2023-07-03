@@ -136,6 +136,15 @@
                                 </a>
                             </li>
                             <% } %>
+
+                            <% if (locals.userRoles && locals.userRoles.includes('onboarding')) { %>
+                            <li class="govuk-header__navigation-item <%= locals.currentNavigation === 'onboarding' ? 'govuk-header__navigation-item--active' : '' %>">
+                                <a id="nav-service-onboarding" class="govuk-header__link" href="/services/<%= locals.serviceId %>/onboarding">
+                                    Service Onboarding
+                                </a>
+                            </li>
+                            <% } %>
+
                         <% } %>
 
                             <li class="govuk-header__navigation-item">
