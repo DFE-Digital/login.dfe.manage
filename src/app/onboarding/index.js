@@ -5,7 +5,7 @@ const { asyncWrapper } = require('login.dfe.express-error-handling');
 const logger = require('../../infrastructure/logger');
 const { isLoggedIn, isManageUserForService, hasRole } = require('../../infrastructure/utils');
 
-const { getServiceStartPage } = require('./service/getStartPage');
+const getServiceStartPage = require('./service/getStartPage');
 
 const router = express.Router({ mergeParams: true });
 
