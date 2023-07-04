@@ -139,7 +139,7 @@
 
                             <% if (locals.userRoles && locals.userRoles.includes('onboardSvc')) { %>
                             <li class="govuk-header__navigation-item <%= locals.currentNavigation === 'onboarding' ? 'govuk-header__navigation-item--active' : '' %>">
-                                <a id="nav-onboard-service" class="govuk-header__link" href="/onboarding/service">
+                                <a id="nav-onboard-service" class="govuk-header__link" href="/onboarding/<%= locals.serviceId %>/service">
                                     Service Onboarding
                                 </a>
                             </li>
