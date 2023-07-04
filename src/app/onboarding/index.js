@@ -3,7 +3,7 @@
 const express = require('express');
 const { asyncWrapper } = require('login.dfe.express-error-handling');
 const logger = require('../../infrastructure/logger');
-const { isLoggedIn, hasRole } = require('../../infrastructure/utils');
+const { isLoggedIn, isManageUserForService, hasRole } = require('../../infrastructure/utils');
 
 const { getServiceStartPage } = require('./service/getStartPage');
 
@@ -13,7 +13,7 @@ const onboarding = (csrf) => {
   logger.info('Mounting onboarding routes');
   router.use(isLoggedIn);
 
-  router.get('/service', csrf, hasRole('onboardSvc'), asyncWrapper(getServiceStartPage));
+  router.get('/:sid/service', csrf, isManageUserForService, hasRole('onboardSvc'), asyncWrapper(getServiceStartPage));
 
   return router;
 };
