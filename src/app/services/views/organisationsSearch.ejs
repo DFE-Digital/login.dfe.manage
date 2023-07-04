@@ -143,11 +143,11 @@
                         <th class="govuk-table__cell govuk-table__header govuk-!-padding-bottom-4 govuk-!-padding-top-4">
                             <a class="govuk-link" href="organisations/<%= organisations[i].id %>/users"><%= organisations[i].name %></a>
                         </th>
-                        <td class="govuk-table__cell govuk-!-font-size-16"><%= organisations[i].LegalName ? organisations[i].LegalName : '' %></td>
+                        <td class="govuk-table__cell govuk-!-font-size-16"><%= organisations[i].LegalName %></td>
                         <td class="govuk-table__cell govuk-!-font-size-16"><%= organisations[i].category.name %></td>
                         <td class="govuk-table__cell govuk-!-font-size-16"><%= organisations[i].urn %></td>
                         <td class="govuk-table__cell govuk-!-font-size-16"><%= organisations[i].uid %></td>
-                        <td class="govuk-table__cell govuk-!-font-size-16"><%= organisations[i].upin ? organisations[i].upin : '' %></td>
+                        <td class="govuk-table__cell govuk-!-font-size-16"><%= organisations[i].upin %></td>
                         <td class="govuk-table__cell govuk-!-font-size-16"><%= organisations[i].ukprn %></td>
                         <td class="govuk-table__cell govuk-!-font-size-16 govuk-table__cell--numeric"><%= organisations[i].status!==undefined ? organisations[i].status.name : '' %></td>
                     </tr>
