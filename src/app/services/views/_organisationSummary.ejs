@@ -19,10 +19,10 @@
 </h1>
 <dl class="inline">
     <% if (organisation.LegalName) { %>
-    <dt class="govuk-label">Legal name:</dt>
-    <dd class="govuk-label"><%= organisation.LegalName %></dd>
+    <dt class="govuk-label">LegalName:</dt>
+    <dd class="govuk-label"><%= organisation.LegalName || 'Not Recorded' %></dd>
     <% } %>
-    
+
     <dt class="govuk-label">Address:</dt>
     <dd class="govuk-label"><%= organisation.address || 'Not Recorded' %></dd>
     
