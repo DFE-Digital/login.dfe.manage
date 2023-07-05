@@ -79,6 +79,10 @@ const search = async (req) => {
         nextDirection: sortBy === 'name' ? (sortAsc ? 'desc' : 'asc') : 'asc',
         applied: sortBy === 'name',
       },
+      legalname: {
+        nextDirection: sortBy === 'LegalName' ? (sortAsc ? 'desc' : 'asc') : 'asc',
+        applied: sortBy === 'LegalName',
+      },
       type: {
         nextDirection: sortBy === 'type' ? (sortAsc ? 'desc' : 'asc') : 'asc',
         applied: sortBy === 'type',

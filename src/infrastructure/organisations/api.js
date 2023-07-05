@@ -6,6 +6,8 @@ const mapOrgSortByToSearchApi = (supportSortBy) => {
   switch (supportSortBy.toLowerCase()) {
     case 'name':
       return 'name';
+    case 'legalname':
+      return 'legalname';
     case 'type':
       return 'category';
     case 'urn':
