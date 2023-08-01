@@ -31,15 +31,11 @@ describe('When going to the select-service page', () => {
     });
 
     getServiceById.mockReset();
-    getServiceById.mockReturnValue([{
+    getServiceById.mockReturnValue({
       id: 'serviceid',
       name: 'service one',
       description: 'service one description',
-    }], [{
-      id: 'serviceid1',
-      name: 'service two',
-      description: 'service two description',
-    }]);
+    });
     res.mockResetAll();
   });
 
