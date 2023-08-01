@@ -63,7 +63,7 @@ const getServiceSummaries = async (ids, fields, correlationId) => {
   const foundApps = applications.filter((a) => lowercaseIds.includes(a.id.toLowerCase())
     || (a.relyingParty && lowercaseIds.includes(a.relyingParty.clientId.toLowerCase())));
   const requiredAttributes = mapServiceFieldsToAttributes(fields);
-  return foundApps.map((app) => {
+  return [...new Set(foundApps.map((app) => {
     const appWithAttributes = {};
     requiredAttributes.forEach((field) => {
       const splitField = field.split('.');
@@ -77,7 +77,7 @@ const getServiceSummaries = async (ids, fields, correlationId) => {
       }
     });
     return appWithAttributes;
-  });
+  }))];
 };
 
 const updateService = async (id, body, correlationId) => Promise.resolve(null);
