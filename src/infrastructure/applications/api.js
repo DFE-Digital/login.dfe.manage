@@ -91,7 +91,7 @@ const listAllBannersForService = async (id, correlationId) => {
   let pageNumber = 1;
   let isMorePages = true;
   while (isMorePages) {
-    const page = await listBannersForService(id, 25, pageNumber ,correlationId);
+    const page = await listBannersForService(id, 25, pageNumber, correlationId);
     page.banners.forEach((banner) => {
       allBanners.push(banner);
     });

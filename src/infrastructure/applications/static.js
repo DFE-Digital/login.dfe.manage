@@ -53,9 +53,10 @@ const mapServiceFieldsToAttributes = (fields) => fields.map((field) => {
   return mappedField;
 });
 
-const getServiceById = async (idOrClientId, correlationId) => {
-  return applications.find(a => a.id.toLowerCase() === idOrClientId.toLowerCase() || (a.relyingParty && a.relyingParty.clientId.toLowerCase() === idOrClientId.toLowerCase()));
-};
+const getServiceById = async (idOrClientId, correlationId) => applications.find(
+  (a) => a.id.toLowerCase() === idOrClientId.toLowerCase()
+  || (a.relyingParty && a.relyingParty.clientId.toLowerCase() === idOrClientId.toLowerCase()),
+);
 
 const getServiceSummaries = async (ids, fields, correlationId) => {
   const lowercaseIds = ids.map((id) => id.toLowerCase());
@@ -79,44 +80,32 @@ const getServiceSummaries = async (ids, fields, correlationId) => {
   });
 };
 
-const updateService = async (id, body, correlationId) => {
-  return Promise.resolve(null);
-};
+const updateService = async (id, body, correlationId) => Promise.resolve(null);
 
-const listAllServices = async (correlationId) => {
-  return Promise.resolve(null);
-};
+const listAllServices = async (correlationId) => Promise.resolve(null);
 
-const listBannersForService = async (id, pageSize, page, correlationId) => {
-  return Promise.resolve({
-    banners: {
-      id: 'bannerId',
-      serviceId: 'serviceId',
-      name: 'banner name',
-      title: 'banner title',
-      message: 'banner message',
-    },
-    page: page,
-    totalNumberOfPages: 1,
-    totalNumberOfRecords: 1,
-  });
-};
+const listBannersForService = async (id, pageSize, page, correlationId) => Promise.resolve({
+  banners: {
+    id: 'bannerId',
+    serviceId: 'serviceId',
+    name: 'banner name',
+    title: 'banner title',
+    message: 'banner message',
+  },
+  page,
+  totalNumberOfPages: 1,
+  totalNumberOfRecords: 1,
+});
 
-const getBannerById = async (id, bid, correlationId) => {
-  return Promise.resolve(null);
-};
+const getBannerById = async (id, bid, correlationId) => Promise.resolve(null);
 
-const upsertBanner = async (sid, banner, correlationId) => {
-  return Promise.resolve(null);
-};
+const upsertBanner = async (sid, banner, correlationId) => Promise.resolve(null);
 
-const removeBanner = async (sid, bid, correlationId) => {
-  return Promise.resolve(null);
-};
+const removeBanner = async (sid, bid, correlationId) => Promise.resolve(null);
 
-const listAllBannersForService = async (id, correlationId) => {
-  return (await listBannersForService(id, 25, 1, correlationId).banners.find(x => x.id === id))
-};
+const listAllBannersForService = async (id, correlationId) => listBannersForService(id, 25, 1, correlationId)
+  .banners
+  .find((x) => x.id === id);
 
 module.exports = {
   getServiceById,
