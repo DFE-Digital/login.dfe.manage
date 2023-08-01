@@ -4,7 +4,6 @@ const rp = require('login.dfe.request-promise-retry');
 
 const jwtStrategy = require('login.dfe.jwt-strategies');
 
-
 const callApi = async (endpoint, method, body, correlationId) => {
   const token = await jwtStrategy(config.applications.service).getBearerToken();
 
@@ -35,6 +34,13 @@ const callApi = async (endpoint, method, body, correlationId) => {
 const getServiceById = async (id, correlationId) => {
   return await callApi(`services/${id}`, 'GET', undefined, correlationId);
 };
+
+const getServiceSummaries = async (ids, fields, correlationId) => callApi(
+  `service-summaries/${ids.join()}?fields=${fields.join()}`,
+  'GET',
+  undefined,
+  correlationId,
+);
 
 const listAllServices = async (correlationId) => {
   return await callApi(`services`, 'GET', undefined, correlationId);
@@ -113,6 +119,7 @@ const removeBanner = async (sid, bid, correlationId) => {
 
 module.exports = {
   getServiceById,
+  getServiceSummaries,
   updateService,
   listAllServices,
   listBannersForService,
