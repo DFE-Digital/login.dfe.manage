@@ -1,10 +1,16 @@
-jest.mock('./../../../src/infrastructure/config', () => require('./../../utils').configMockFactory());
-jest.mock('./../../../src/infrastructure/logger', () => require('./../../utils').loggerMockFactory());
+const mockUtils = require('../../utils');
+
+const mockConfig = mockUtils.configMockFactory();
+const mockLogger = mockUtils.loggerMockFactory();
+
+jest.mock('./../../../src/infrastructure/config', () => mockConfig);
+jest.mock('./../../../src/infrastructure/logger', () => mockLogger);
 jest.mock('./../../../src/infrastructure/applications');
 
-const { getRequestMock, getResponseMock } = require('./../../utils');
-const postSelectService = require('./../../../src/app/services/selectService').post;
-const { getServiceById } = require('./../../../src/infrastructure/applications');
+const { getRequestMock, getResponseMock } = require('../../utils');
+const postSelectService = require('../../../src/app/services/selectService').post;
+const { getServiceById } = require('../../../src/infrastructure/applications');
+
 const res = getResponseMock();
 
 describe('when selecting a service', () => {
@@ -13,12 +19,12 @@ describe('when selecting a service', () => {
   beforeEach(() => {
     req = getRequestMock({
       params: {
-        sid: 'service1'
+        sid: 'service1',
       },
       userServices: {
         roles: [{
-          code: 'serviceid_serviceconfiguration'
-        }]
+          code: 'serviceid_serviceconfiguration',
+        }],
       },
     });
 
@@ -27,26 +33,6 @@ describe('when selecting a service', () => {
       id: 'serviceid',
       name: 'service one',
       description: 'service description',
-      relyingParty: {
-        client_id: 'clientid',
-        client_secret: 'dewier-thrombi-confounder-mikado',
-        api_secret: 'dewier-thrombi-confounder-mikado',
-        service_home: 'https://www.servicehome.com',
-        postResetUrl: 'https://www.postreset.com',
-        redirect_uris: [
-          'https://www.redirect.com',
-        ],
-        post_logout_redirect_uris: [
-          'https://www.logout.com',
-        ],
-        grant_types: [
-          'implicit',
-          'authorization_code'
-        ],
-        response_types: [
-          'code',
-        ],
-      }
     });
     res.mockResetAll();
   });
@@ -56,7 +42,7 @@ describe('when selecting a service', () => {
 
     await postSelectService(req, res);
     expect(res.render.mock.calls).toHaveLength(1);
-    expect(res.render.mock.calls[0][0]).toBe(`services/views/selectService`);
+    expect(res.render.mock.calls[0][0]).toBe('services/views/selectService');
     expect(res.render.mock.calls[0][1]).toEqual({
       csrfToken: 'token',
       selectedService: undefined,
