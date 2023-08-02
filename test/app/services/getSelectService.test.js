@@ -74,10 +74,10 @@ describe('When going to the select-service page', () => {
     expect(getServiceSummaries.mock.calls[1][2]).toBe('correlationId');
   });
 
-  it('then it should redirect to the service if only one service', async () => {
+  it('Then it should redirect to the service dashboard if the user only has one active service', async () => {
     req.userServices = {
       roles: [{
-        code: 'serviceid_serviceconfiguration',
+        code: 'serviceid_serviceconfig',
       }],
     };
     getServiceSummaries.mockReturnValue({
@@ -91,14 +91,14 @@ describe('When going to the select-service page', () => {
     expect(res.redirect.mock.calls[0][0]).toBe('serviceid');
   });
 
-  it('then it should return the multiple services view', async () => {
+  it('Then it should return the selectService view if the user has more than one active service', async () => {
     await getSelectService(req, res);
 
     expect(res.render.mock.calls.length).toBe(1);
     expect(res.render.mock.calls[0][0]).toBe('services/views/selectService');
   });
 
-  it('then it should include csrf token in model', async () => {
+  it('Then it should include csrf token in model', async () => {
     await getSelectService(req, res);
 
     expect(res.render.mock.calls[0][1]).toMatchObject({
@@ -106,7 +106,7 @@ describe('When going to the select-service page', () => {
     });
   });
 
-  it('then it should include the service details in the model', async () => {
+  it('Then it should include the service details in the model', async () => {
     await getSelectService(req, res);
 
     expect(res.render.mock.calls[0][1]).toMatchObject({
