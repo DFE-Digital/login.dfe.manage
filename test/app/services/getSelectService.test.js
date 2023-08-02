@@ -48,13 +48,30 @@ describe('When going to the select-service page', () => {
     res.mockResetAll();
   });
 
-  it('Then it should get the necessary service information with one request if the user has <=33 services', async () => {
+  it('Then it should get the necessary service information with one request if the user has <=33 unique services', async () => {
     await getSelectService(req, res);
 
     expect(getServiceSummaries.mock.calls).toHaveLength(1);
     expect(getServiceSummaries.mock.calls[0][0]).toStrictEqual(['serviceid', 'serviceid1']);
     expect(getServiceSummaries.mock.calls[0][1]).toStrictEqual(['id', 'name', 'description']);
     expect(getServiceSummaries.mock.calls[0][2]).toBe('correlationId');
+  });
+
+  it('Then it should get the necessary service information with multiple requests if the user has > 33 unique services', async () => {
+    const requestedIds = new Array(45).fill(null).map((_, index) => `serviceId${index}`);
+
+    req.userServices = {
+      roles: requestedIds.map((id) => ({ code: `${id}_serviceconfig` })),
+    };
+    await getSelectService(req, res);
+
+    expect(getServiceSummaries.mock.calls).toHaveLength(2);
+    expect(getServiceSummaries.mock.calls[0][0]).toStrictEqual(requestedIds.slice(0, 33));
+    expect(getServiceSummaries.mock.calls[1][0]).toStrictEqual(requestedIds.slice(33));
+    expect(getServiceSummaries.mock.calls[0][1]).toStrictEqual(['id', 'name', 'description']);
+    expect(getServiceSummaries.mock.calls[1][1]).toStrictEqual(['id', 'name', 'description']);
+    expect(getServiceSummaries.mock.calls[0][2]).toBe('correlationId');
+    expect(getServiceSummaries.mock.calls[1][2]).toBe('correlationId');
   });
 
   it('then it should redirect to the service if only one service', async () => {
