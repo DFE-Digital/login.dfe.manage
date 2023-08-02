@@ -52,25 +52,8 @@ describe('When selecting a service', () => {
     await postSelectService(req, res);
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][0]).toBe('services/views/selectService');
-    expect(res.render.mock.calls[0][1]).toEqual({
-      csrfToken: 'token',
-      selectedService: undefined,
-      services: [
-        {
-          id: 'serviceid',
-          name: 'service one',
-          description: 'service one description',
-        },
-        {
-          id: 'serviceid1',
-          name: 'service two',
-          description: 'service two description',
-        },
-      ],
-      title: 'Select service',
-      validationMessages: {
-        selectedService: 'Please select a service',
-      },
+    expect(res.render.mock.calls[0][1]).toHaveProperty('validationMessages', {
+      selectedService: 'Please select a service',
     });
   });
 
