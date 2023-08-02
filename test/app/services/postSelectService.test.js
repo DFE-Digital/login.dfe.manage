@@ -13,7 +13,7 @@ const { getServiceSummaries } = require('../../../src/infrastructure/application
 
 const res = getResponseMock();
 
-describe('when selecting a service', () => {
+describe('When selecting a service', () => {
   let req;
 
   beforeEach(() => {
@@ -46,7 +46,7 @@ describe('when selecting a service', () => {
     res.mockResetAll();
   });
 
-  it('then it should render validation message if no selected service', async () => {
+  it('Then it should render a validation message if no service is selected', async () => {
     req.body.selectedService = undefined;
 
     await postSelectService(req, res);
@@ -74,7 +74,7 @@ describe('when selecting a service', () => {
     });
   });
 
-  it('then it should redirect to the selected organisation if not undefined', async () => {
+  it('Then it should redirect to the selected service dashboard if selectedService is defined', async () => {
     req.body.selectedService = 'service1';
     await postSelectService(req, res);
     expect(res.redirect.mock.calls).toHaveLength(1);
