@@ -74,6 +74,18 @@ describe('When going to the select-service page', () => {
     expect(getServiceSummaries.mock.calls[1][2]).toBe('correlationId');
   });
 
+  it('Then it should log and throw an error if no active services could be found for the user', async () => {
+    const userServicesIds = new Set(req.userServices.roles.map((role) => role.code.substr(0, role.code.indexOf('_'))));
+    const expectedMessage = `No manage services found with IDs [${[...userServicesIds].join()}]`;
+
+    getServiceSummaries.mockReturnValue(null);
+
+    await expect(async () => getSelectService(req, res)).rejects.toThrow(`${expectedMessage}, correlation ID ${req.id}`);
+    expect(mockLogger.error).toHaveBeenCalledTimes(1);
+    expect(mockLogger.error.mock.calls[0][0]).toBe(expectedMessage);
+    expect(mockLogger.error.mock.calls[0][1]).toStrictEqual({ correlationId: req.id });
+  });
+
   it('Then it should redirect to the service dashboard if the user only has one active service', async () => {
     req.userServices = {
       roles: [{
