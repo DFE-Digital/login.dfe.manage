@@ -9,7 +9,7 @@ jest.mock('./../../../src/infrastructure/applications');
 
 const { getRequestMock, getResponseMock } = require('../../utils');
 const postSelectService = require('../../../src/app/services/selectService').post;
-const { getServiceById } = require('../../../src/infrastructure/applications');
+const { getServiceSummaries } = require('../../../src/infrastructure/applications');
 
 const res = getResponseMock();
 
@@ -28,11 +28,20 @@ describe('when selecting a service', () => {
       },
     });
 
-    getServiceById.mockReset();
-    getServiceById.mockReturnValue({
-      id: 'serviceid',
-      name: 'service one',
-      description: 'service description',
+    getServiceSummaries.mockReset();
+    getServiceSummaries.mockReturnValue({
+      services: [
+        {
+          id: 'serviceid',
+          name: 'service one',
+          description: 'service one description',
+        },
+        {
+          id: 'serviceid1',
+          name: 'service two',
+          description: 'service two description',
+        },
+      ],
     });
     res.mockResetAll();
   });
@@ -46,11 +55,18 @@ describe('when selecting a service', () => {
     expect(res.render.mock.calls[0][1]).toEqual({
       csrfToken: 'token',
       selectedService: undefined,
-      services: [{
-        id: 'serviceid',
-        name: 'service one',
-        description: 'service description',
-      }],
+      services: [
+        {
+          id: 'serviceid',
+          name: 'service one',
+          description: 'service one description',
+        },
+        {
+          id: 'serviceid1',
+          name: 'service two',
+          description: 'service two description',
+        },
+      ],
       title: 'Select service',
       validationMessages: {
         selectedService: 'Please select a service',

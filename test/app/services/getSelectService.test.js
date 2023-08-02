@@ -9,7 +9,7 @@ jest.mock('./../../../src/infrastructure/applications');
 
 const { getRequestMock, getResponseMock } = require('../../utils');
 const getSelectService = require('../../../src/app/services/selectService').get;
-const { getServiceById } = require('../../../src/infrastructure/applications');
+const { getServiceSummaries } = require('../../../src/infrastructure/applications');
 
 const res = getResponseMock();
 
@@ -30,11 +30,20 @@ describe('When going to the select-service page', () => {
       },
     });
 
-    getServiceById.mockReset();
-    getServiceById.mockReturnValue({
-      id: 'serviceid',
-      name: 'service one',
-      description: 'service one description',
+    getServiceSummaries.mockReset();
+    getServiceSummaries.mockReturnValue({
+      services: [
+        {
+          id: 'serviceid',
+          name: 'service one',
+          description: 'service one description',
+        },
+        {
+          id: 'serviceid1',
+          name: 'service two',
+          description: 'service two description',
+        },
+      ],
     });
     res.mockResetAll();
   });
@@ -42,9 +51,9 @@ describe('When going to the select-service page', () => {
   it('then it should get the services by id', async () => {
     await getSelectService(req, res);
 
-    expect(getServiceById.mock.calls).toHaveLength(2);
-    expect(getServiceById.mock.calls[0][0]).toBe('serviceid');
-    expect(getServiceById.mock.calls[0][1]).toBe('correlationId');
+    expect(getServiceSummaries.mock.calls).toHaveLength(2);
+    expect(getServiceSummaries.mock.calls[0][0]).toBe('serviceid');
+    expect(getServiceSummaries.mock.calls[0][1]).toBe('correlationId');
   });
 
   it('then it should redirect to the service if only one service', async () => {
@@ -82,10 +91,12 @@ describe('When going to the select-service page', () => {
         {
           id: 'serviceid',
           name: 'service one',
+          description: 'service one description',
         },
         {
           id: 'serviceid1',
-          name: 'service one',
+          name: 'service two',
+          description: 'service two description',
         },
       ],
     });
