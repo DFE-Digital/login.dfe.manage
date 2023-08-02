@@ -74,8 +74,8 @@ describe('When selecting a service', () => {
     });
   });
 
-  it('Then it should redirect to the selected service dashboard if selectedService is defined', async () => {
-    req.body.selectedService = 'service1';
+  it('Then it should redirect to the selected service dashboard if selectedService is defined and is in the services list', async () => {
+    req.body.selectedService = 'serviceid';
     await postSelectService(req, res);
     expect(res.redirect.mock.calls).toHaveLength(1);
     expect(res.redirect.mock.calls[0][0]).toBe(`/services/${req.body.selectedService}`);
