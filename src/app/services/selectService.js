@@ -57,7 +57,11 @@ const validate = async (req) => {
     selectedService,
     validationMessages: {},
   };
-  if (model.selectedService === undefined || model.selectedService === null) {
+  if (
+    model.selectedService === undefined
+    || model.selectedService === null
+    || typeof userServices.find((service) => service.id === model.selectedService) === 'undefined'
+  ) {
     model.validationMessages.selectedService = 'Please select a service';
   }
   return model;

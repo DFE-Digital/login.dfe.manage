@@ -57,6 +57,17 @@ describe('When selecting a service', () => {
     });
   });
 
+  it('Then it should render a validation message if selectedService is defined but is not in the services list', async () => {
+    req.body.selectedService = 'non-existant-id';
+
+    await postSelectService(req, res);
+    expect(res.render.mock.calls).toHaveLength(1);
+    expect(res.render.mock.calls[0][0]).toBe('services/views/selectService');
+    expect(res.render.mock.calls[0][1]).toHaveProperty('validationMessages', {
+      selectedService: 'Please select a service',
+    });
+  });
+
   it('Then it should redirect to the selected service dashboard if selectedService is defined and is in the services list', async () => {
     req.body.selectedService = 'serviceid';
     await postSelectService(req, res);
