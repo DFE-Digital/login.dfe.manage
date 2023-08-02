@@ -48,12 +48,13 @@ describe('When going to the select-service page', () => {
     res.mockResetAll();
   });
 
-  it('then it should get the services by id', async () => {
+  it('Then it should get the necessary service information with one request if the user has <=33 services', async () => {
     await getSelectService(req, res);
 
-    expect(getServiceSummaries.mock.calls).toHaveLength(2);
-    expect(getServiceSummaries.mock.calls[0][0]).toBe('serviceid');
-    expect(getServiceSummaries.mock.calls[0][1]).toBe('correlationId');
+    expect(getServiceSummaries.mock.calls).toHaveLength(1);
+    expect(getServiceSummaries.mock.calls[0][0]).toStrictEqual(['serviceid', 'serviceid1']);
+    expect(getServiceSummaries.mock.calls[0][1]).toStrictEqual(['id', 'name', 'description']);
+    expect(getServiceSummaries.mock.calls[0][2]).toBe('correlationId');
   });
 
   it('then it should redirect to the service if only one service', async () => {
@@ -62,6 +63,11 @@ describe('When going to the select-service page', () => {
         code: 'serviceid_serviceconfiguration',
       }],
     };
+    getServiceSummaries.mockReturnValue({
+      id: 'serviceid',
+      name: 'service one',
+      description: 'service one description',
+    });
     await getSelectService(req, res);
 
     expect(res.redirect.mock.calls).toHaveLength(1);
