@@ -5,26 +5,30 @@ const { getServiceById, updateService } = require('../../infrastructure/applicat
 const logger = require('../../infrastructure/logger');
 const { getUserServiceRoles } = require('./utils');
 
-const getServiceConfig = async (req, res) => {
+const buildCurrentServiceModel = async (req) => {
   const service = await getServiceById(req.params.sid, req.id);
+  return {
+    name: service.name || '',
+    description: service.description || '',
+    serviceHome: service.relyingParty.service_home || '',
+    postResetUrl: service.relyingParty.postResetUrl || '',
+    clientId: service.relyingParty.client_id || '',
+    clientSecret: service.relyingParty.client_secret || '',
+    redirectUris: service.relyingParty.redirect_uris || [],
+    postLogoutRedirectUris: service.relyingParty.post_logout_redirect_uris || [],
+    responseTypes: service.relyingParty.response_types || [],
+    grantTypes: service.relyingParty.grant_types || [],
+    apiSecret: service.relyingParty.api_secret || '',
+    tokenEndpointAuthMethod: service.relyingParty.token_endpoint_auth_method,
+  };
+};
+
+const getServiceConfig = async (req, res) => {
   const manageRolesForService = await getUserServiceRoles(req);
 
   return res.render('services/views/serviceConfig', {
     csrfToken: req.csrfToken(),
-    service: {
-      name: service.name || '',
-      description: service.description || '',
-      serviceHome: service.relyingParty.service_home || '',
-      postResetUrl: service.relyingParty.postResetUrl || '',
-      clientId: service.relyingParty.client_id || '',
-      clientSecret: service.relyingParty.client_secret || '',
-      redirectUris: service.relyingParty.redirect_uris,
-      postLogoutRedirectUris: service.relyingParty.post_logout_redirect_uris,
-      responseTypes: service.relyingParty.response_types || [],
-      grantTypes: service.relyingParty.grant_types || [],
-      apiSecret: service.relyingParty.api_secret || '',
-      tokenEndpointAuthMethod: service.relyingParty.token_endpoint_auth_method,
-    },
+    service: await buildCurrentServiceModel(req),
     backLink: `/services/${req.params.sid}`,
     validationMessages: {},
     serviceId: req.params.sid,
@@ -33,8 +37,7 @@ const getServiceConfig = async (req, res) => {
   });
 };
 
-const validate = async (req) => {
-  const service = await getServiceById(req.params.sid, req.id);
+const validate = async (req, currentService) => {
   const urlValidation = new RegExp('^https?:\\/\\/(.*)');
   const manageRolesForService = await getUserServiceRoles(req);
 
@@ -63,7 +66,7 @@ const validate = async (req) => {
   const model = {
     service: {
       name: req.body.name,
-      description: service.description || '', // field disabled in form so we don't pick it up from it but use current value
+      description: currentService.description || '', // field disabled in form so we don't pick it up from it but use current value
       clientId: req.body.clientId,
       clientSecret: req.body.clientSecret || '',
       serviceHome: req.body.serviceHome || '',
@@ -97,7 +100,7 @@ const validate = async (req) => {
   } else if (!/^[A-Za-z0-9-]+$/.test(model.service.clientId)) {
     model.validationMessages.clientId = 'Client Id must only contain letters, numbers, and hyphens';
   } else if (
-    model.service.clientId.toLowerCase() !== service.relyingParty.client_id.toLowerCase()
+    model.service.clientId.toLowerCase() !== currentService.clientId.toLowerCase()
     && await getServiceById(model.service.clientId, req.id)
   ) {
     // If getServiceById returns truthy, then that clientId is already in use.
@@ -123,7 +126,7 @@ const validate = async (req) => {
   } else if (model.service.postLogoutRedirectUris.some((value, i) => model.service.postLogoutRedirectUris.indexOf(value) !== i)) {
     model.validationMessages.post_logout_redirect_uris = 'Logout redirect Urls must be unique';
   }
-  if (model.service.clientSecret !== service.relyingParty.client_secret) {
+  if (model.service.clientSecret !== currentService.clientSecret) {
     try {
       const validateClientSecret = niceware.passphraseToBytes(model.service.clientSecret.split('-'));
       if (validateClientSecret.length < 8) {
@@ -134,7 +137,7 @@ const validate = async (req) => {
     }
   }
 
-  if (model.service.apiSecret && model.service.apiSecret !== service.relyingParty.api_secret) {
+  if (model.service.apiSecret && model.service.apiSecret !== currentService.apiSecret) {
     try {
       const validateApiSecret = niceware.passphraseToBytes(model.service.apiSecret.split('-'));
       if (validateApiSecret.length !== 8) {
@@ -148,7 +151,8 @@ const validate = async (req) => {
 };
 
 const postServiceConfig = async (req, res) => {
-  const model = await validate(req);
+  const currentService = await buildCurrentServiceModel(req);
+  const model = await validate(req, currentService);
 
   if (Object.keys(model.validationMessages).length > 0) {
     model.csrfToken = req.csrfToken();
