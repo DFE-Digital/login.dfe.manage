@@ -38,7 +38,7 @@ const getServiceConfig = async (req, res) => {
 };
 
 const validate = async (req, currentService) => {
-  const urlValidation = new RegExp('^https?:\\/\\/(.*)');
+  const urlValidation = /^https?:\/\/(.*)/;
   const manageRolesForService = await getUserServiceRoles(req);
 
   let grantTypes = req.body.grant_types ? req.body.grant_types : [];
