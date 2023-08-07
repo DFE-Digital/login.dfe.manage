@@ -35,36 +35,37 @@ const mockCurrentServiceInfo = {
     ],
   },
 };
+const mockUpdatedServiceInfo = {
+  name: 'service two',
+  description: 'service description',
+  clientId: 'clientid2',
+  clientSecret: 'outshine-wringing-imparting-submitted',
+  serviceHome: 'https://www.servicehome2.com',
+  postResetUrl: 'https://www.postreset2.com',
+  redirect_uris: [
+    'https://www.redirect.com',
+    'https://www.redirect2.com',
+  ],
+  post_logout_redirect_uris: [
+    'https://www.logout2.com',
+  ],
+  grant_types: [
+    'implicit',
+  ],
+  response_types: [
+    'code',
+  ],
+};
 
 describe('when editing the service configuration', () => {
   let req;
 
   beforeEach(() => {
     req = getRequestMock({
-      body: {
-        name: 'service two',
-        description: 'service description',
-        clientId: 'clientid2',
-        clientSecret: 'outshine-wringing-imparting-submitted',
-        serviceHome: 'https://www.servicehome2.com',
-        postResetUrl: 'https://www.postreset2.com',
-        redirect_uris: [
-          'https://www.redirect.com',
-          'https://www.redirect2.com',
-        ],
-        post_logout_redirect_uris: [
-          'https://www.logout2.com',
-        ],
-        grant_types: [
-          'implicit',
-        ],
-        response_types: [
-          'code',
-        ],
-      },
+      body: { ...mockUpdatedServiceInfo },
       params: {
         sid: 'service1',
-      }
+      },
     });
 
     updateService.mockReset();
