@@ -1,11 +1,13 @@
-jest.mock('./../../../src/infrastructure/config', () => require('./../../utils').configMockFactory());
-jest.mock('./../../../src/infrastructure/logger', () => require('./../../utils').loggerMockFactory());
+const mockUtils = require('../../utils');
+
+jest.mock('./../../../src/infrastructure/config', () => mockUtils.configMockFactory());
+jest.mock('./../../../src/infrastructure/logger', () => mockUtils.loggerMockFactory());
 jest.mock('./../../../src/infrastructure/applications');
 
-const { getRequestMock, getResponseMock } = require('./../../utils');
-const postServiceConfig = require('./../../../src/app/services/serviceConfig').postServiceConfig;
-const { getServiceById, updateService } = require('./../../../src/infrastructure/applications');
-const logger = require('./../../../src/infrastructure/logger');
+const { getRequestMock, getResponseMock } = require('../../utils');
+const { postServiceConfig } = require('../../../src/app/services/serviceConfig');
+const { getServiceById, updateService } = require('../../../src/infrastructure/applications');
+const logger = require('../../../src/infrastructure/logger');
 
 const res = getResponseMock();
 
@@ -89,18 +91,18 @@ describe('when editing the service configuration', () => {
         clientSecret: 'outshine-wringing-imparting-submitted',
         description: 'service description',
         grantTypes: [
-          'implicit'
+          'implicit',
         ],
         postLogoutRedirectUris: [
-          'https://www.logout2.com'
+          'https://www.logout2.com',
         ],
         postResetUrl: 'https://www.postreset2.com',
         redirectUris: [
           'https://www.redirect.com',
-          'https://www.redirect2.com'
+          'https://www.redirect2.com',
         ],
         responseTypes: [
-          'code'
+          'code',
         ],
         serviceHome: 'https://www.servicehome2.com',
         tokenEndpointAuthMethod: null,
@@ -129,18 +131,18 @@ describe('when editing the service configuration', () => {
         clientSecret: 'outshine-wringing-imparting-submitted',
         description: 'service description',
         grantTypes: [
-          'implicit'
+          'implicit',
         ],
         postLogoutRedirectUris: [
-          'https://www.logout2.com'
+          'https://www.logout2.com',
         ],
         postResetUrl: 'https://www.postreset2.com',
         redirectUris: [
           'https://www.redirect.com',
-          'https://www.redirect2.com'
+          'https://www.redirect2.com',
         ],
         responseTypes: [
-          'code'
+          'code',
         ],
         serviceHome: 'not-a-url',
         tokenEndpointAuthMethod: null,
@@ -169,18 +171,18 @@ describe('when editing the service configuration', () => {
         clientSecret: 'outshine-wringing-imparting-submitted',
         description: 'service description',
         grantTypes: [
-          'implicit'
+          'implicit',
         ],
         postLogoutRedirectUris: [
-          'https://www.logout2.com'
+          'https://www.logout2.com',
         ],
         postResetUrl: 'https://www.postreset2.com',
         redirectUris: [
           'https://www.redirect.com',
-          'https://www.redirect2.com'
+          'https://www.redirect2.com',
         ],
         responseTypes: [
-          'code'
+          'code',
         ],
         serviceHome: 'https://www.servicehome2.com',
         tokenEndpointAuthMethod: null,
@@ -425,7 +427,7 @@ describe('when editing the service configuration', () => {
   });
 
   it('then it should render view with validation if redirect urls are not unique', async () => {
-    req.body.redirect_uris =  [
+    req.body.redirect_uris = [
       'https://www.redirect.com',
       'https://www.redirect.com',
     ];
@@ -443,18 +445,18 @@ describe('when editing the service configuration', () => {
         clientSecret: 'outshine-wringing-imparting-submitted',
         description: 'service description',
         grantTypes: [
-          'implicit'
+          'implicit',
         ],
         postLogoutRedirectUris: [
-          'https://www.logout2.com'
+          'https://www.logout2.com',
         ],
         postResetUrl: 'https://www.postreset2.com',
         redirectUris: [
           'https://www.redirect.com',
-          'https://www.redirect.com'
+          'https://www.redirect.com',
         ],
         responseTypes: [
-          'code'
+          'code',
         ],
         serviceHome: 'https://www.servicehome2.com',
         tokenEndpointAuthMethod: null,
@@ -596,5 +598,4 @@ describe('when editing the service configuration', () => {
       editedService: 'service1',
     });
   });
-
 });
