@@ -69,7 +69,7 @@ describe('when editing the service configuration', () => {
 
     updateService.mockReset();
     getServiceById.mockReset();
-    getServiceById.mockReturnValueOnce(mockCurrentServiceInfo).mockReturnValueOnce(null);
+    getServiceById.mockReturnValueOnce({ ...mockCurrentServiceInfo }).mockReturnValueOnce(null);
     res.mockResetAll();
   });
 
