@@ -9,6 +9,33 @@ const logger = require('./../../../src/infrastructure/logger');
 
 const res = getResponseMock();
 
+const mockCurrentServiceInfo = {
+  id: 'service1',
+  name: 'service one',
+  description: 'service description',
+  relyingParty: {
+    client_id: 'clientid',
+    client_secret: 'dewier-thrombi-confounder-mikado',
+    api_secret: 'dewier-thrombi-confounder-mikado',
+    service_home: 'https://www.servicehome.com',
+    postResetUrl: 'https://www.postreset.com',
+    token_endpoint_auth_method: null,
+    redirect_uris: [
+      'https://www.redirect.com',
+    ],
+    post_logout_redirect_uris: [
+      'https://www.logout.com',
+    ],
+    grant_types: [
+      'implicit',
+      'authorization_code',
+    ],
+    response_types: [
+      'code',
+    ],
+  },
+};
+
 describe('when editing the service configuration', () => {
   let req;
 
@@ -42,31 +69,7 @@ describe('when editing the service configuration', () => {
 
     updateService.mockReset();
     getServiceById.mockReset();
-    getServiceById.mockReturnValueOnce({
-      id: 'service1',
-      name: 'service one',
-      description: 'service description',
-      relyingParty: {
-        client_id: 'clientid',
-        client_secret: 'dewier-thrombi-confounder-mikado',
-        api_secret: 'dewier-thrombi-confounder-mikado',
-        service_home: 'https://www.servicehome.com',
-        postResetUrl: 'https://www.postreset.com',
-        redirect_uris: [
-          'https://www.redirect.com',
-        ],
-        post_logout_redirect_uris: [
-          'https://www.logout.com',
-        ],
-        grant_types: [
-          'implicit',
-          'authorization_code'
-        ],
-        response_types: [
-          'code',
-        ],
-      },
-    }).mockReturnValueOnce(null);
+    getServiceById.mockReturnValueOnce(mockCurrentServiceInfo).mockReturnValueOnce(null);
     res.mockResetAll();
   });
 
@@ -311,31 +314,7 @@ describe('when editing the service configuration', () => {
 
     // Change mock to return truthy on second call to mimic a service existing with the clientId.
     getServiceById.mockReset();
-    getServiceById.mockReturnValueOnce({
-      id: 'service1',
-      name: 'service one',
-      description: 'service description',
-      relyingParty: {
-        client_id: 'clientid',
-        client_secret: 'dewier-thrombi-confounder-mikado',
-        api_secret: 'dewier-thrombi-confounder-mikado',
-        service_home: 'https://www.servicehome.com',
-        postResetUrl: 'https://www.postreset.com',
-        redirect_uris: [
-          'https://www.redirect.com',
-        ],
-        post_logout_redirect_uris: [
-          'https://www.logout.com',
-        ],
-        grant_types: [
-          'implicit',
-          'authorization_code',
-        ],
-        response_types: [
-          'code',
-        ],
-      },
-    }).mockReturnValueOnce({
+    getServiceById.mockReturnValueOnce(mockCurrentServiceInfo).mockReturnValueOnce({
       example: true,
     });
 
