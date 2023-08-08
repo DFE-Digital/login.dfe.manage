@@ -65,7 +65,7 @@ const mockRequestServiceInfo = {
 };
 
 // Represents the model used for validation and the view.
-const mockModelServiceInfo = {
+const mockUpdatedServiceModel = {
   name: mockRequestServiceInfo.name,
   description: mockCurrentServiceInfo.description,
   clientId: mockRequestServiceInfo.clientId,
@@ -108,7 +108,7 @@ describe('when editing the service configuration', () => {
       csrfToken: 'token',
       currentNavigation: 'configuration',
       service: {
-        ...mockModelServiceInfo,
+        ...mockUpdatedServiceModel,
         name: req.body.name,
       },
       serviceId: 'service1',
@@ -130,7 +130,7 @@ describe('when editing the service configuration', () => {
       csrfToken: 'token',
       currentNavigation: 'configuration',
       service: {
-        ...mockModelServiceInfo,
+        ...mockUpdatedServiceModel,
         serviceHome: req.body.serviceHome,
       },
       serviceId: 'service1',
@@ -152,7 +152,7 @@ describe('when editing the service configuration', () => {
       csrfToken: 'token',
       currentNavigation: 'configuration',
       service: {
-        ...mockModelServiceInfo,
+        ...mockUpdatedServiceModel,
         clientId: req.body.clientId,
       },
       serviceId: 'service1',
@@ -175,7 +175,7 @@ describe('when editing the service configuration', () => {
       csrfToken: 'token',
       currentNavigation: 'configuration',
       service: {
-        ...mockModelServiceInfo,
+        ...mockUpdatedServiceModel,
         clientId: req.body.clientId,
       },
       serviceId: 'service1',
@@ -198,7 +198,7 @@ describe('when editing the service configuration', () => {
       csrfToken: 'token',
       currentNavigation: 'configuration',
       service: {
-        ...mockModelServiceInfo,
+        ...mockUpdatedServiceModel,
         clientId: req.body.clientId,
       },
       serviceId: 'service1',
@@ -245,7 +245,7 @@ describe('when editing the service configuration', () => {
       csrfToken: 'token',
       currentNavigation: 'configuration',
       service: {
-        ...mockModelServiceInfo,
+        ...mockUpdatedServiceModel,
         clientId: req.body.clientId,
       },
       serviceId: 'service1',
@@ -300,7 +300,7 @@ describe('when editing the service configuration', () => {
       csrfToken: 'token',
       currentNavigation: 'configuration',
       service: {
-        ...mockModelServiceInfo,
+        ...mockUpdatedServiceModel,
         redirectUris: req.body.redirect_uris,
       },
       serviceId: 'service1',
@@ -324,7 +324,7 @@ describe('when editing the service configuration', () => {
       csrfToken: 'token',
       currentNavigation: 'configuration',
       service: {
-        ...mockModelServiceInfo,
+        ...mockUpdatedServiceModel,
         clientId: req.body.clientId,
         tokenEndpointAuthMethod: req.body.tokenEndpointAuthMethod,
       },
@@ -350,7 +350,7 @@ describe('when editing the service configuration', () => {
       csrfToken: 'token',
       currentNavigation: 'configuration',
       service: {
-        ...mockModelServiceInfo,
+        ...mockUpdatedServiceModel,
         clientId: req.body.clientId,
         tokenEndpointAuthMethod: null,
       },
