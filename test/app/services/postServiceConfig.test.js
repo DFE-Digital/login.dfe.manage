@@ -11,6 +11,7 @@ const logger = require('../../../src/infrastructure/logger');
 
 const res = getResponseMock();
 
+// Represents the getServiceById response.
 const mockCurrentServiceInfo = {
   id: 'service1',
   name: 'service one',
@@ -37,13 +38,17 @@ const mockCurrentServiceInfo = {
     ],
   },
 };
-const mockUpdatedServiceInfo = {
+
+// Represents the request body and the updateService info.
+const mockRequestServiceInfo = {
   name: 'service two',
   description: 'service description',
   clientId: 'clientid2',
   clientSecret: 'outshine-wringing-imparting-submitted',
+  apiSecret: 'outshine-wringing-imparting-submitted',
   serviceHome: 'https://www.servicehome2.com',
   postResetUrl: 'https://www.postreset2.com',
+  tokenEndpointAuthMethod: 'client_secret_post',
   redirect_uris: [
     'https://www.redirect.com',
     'https://www.redirect2.com',
@@ -59,12 +64,28 @@ const mockUpdatedServiceInfo = {
   ],
 };
 
+// Represents the model used for validation and the view.
+const mockModelServiceInfo = {
+  name: mockRequestServiceInfo.name,
+  description: mockCurrentServiceInfo.description,
+  clientId: mockRequestServiceInfo.clientId,
+  clientSecret: mockRequestServiceInfo.clientSecret,
+  serviceHome: mockRequestServiceInfo.serviceHome,
+  postResetUrl: mockRequestServiceInfo.postResetUrl,
+  redirectUris: mockRequestServiceInfo.redirect_uris,
+  postLogoutRedirectUris: mockRequestServiceInfo.post_logout_redirect_uris,
+  grantTypes: mockRequestServiceInfo.grant_types,
+  responseTypes: mockRequestServiceInfo.response_types,
+  apiSecret: mockRequestServiceInfo.apiSecret,
+  tokenEndpointAuthMethod: mockRequestServiceInfo.tokenEndpointAuthMethod,
+};
+
 describe('when editing the service configuration', () => {
   let req;
 
   beforeEach(() => {
     req = getRequestMock({
-      body: { ...mockUpdatedServiceInfo },
+      body: { ...mockRequestServiceInfo },
       params: {
         sid: 'service1',
       },
@@ -87,25 +108,8 @@ describe('when editing the service configuration', () => {
       csrfToken: 'token',
       currentNavigation: 'configuration',
       service: {
-        clientId: 'clientid2',
-        clientSecret: 'outshine-wringing-imparting-submitted',
-        description: 'service description',
-        grantTypes: [
-          'implicit',
-        ],
-        postLogoutRedirectUris: [
-          'https://www.logout2.com',
-        ],
-        postResetUrl: 'https://www.postreset2.com',
-        redirectUris: [
-          'https://www.redirect.com',
-          'https://www.redirect2.com',
-        ],
-        responseTypes: [
-          'code',
-        ],
-        serviceHome: 'https://www.servicehome2.com',
-        tokenEndpointAuthMethod: null,
+        ...mockModelServiceInfo,
+        name: req.body.name,
       },
       serviceId: 'service1',
       userRoles: [],
@@ -126,26 +130,8 @@ describe('when editing the service configuration', () => {
       csrfToken: 'token',
       currentNavigation: 'configuration',
       service: {
-        name: 'service two',
-        clientId: 'clientid2',
-        clientSecret: 'outshine-wringing-imparting-submitted',
-        description: 'service description',
-        grantTypes: [
-          'implicit',
-        ],
-        postLogoutRedirectUris: [
-          'https://www.logout2.com',
-        ],
-        postResetUrl: 'https://www.postreset2.com',
-        redirectUris: [
-          'https://www.redirect.com',
-          'https://www.redirect2.com',
-        ],
-        responseTypes: [
-          'code',
-        ],
-        serviceHome: 'not-a-url',
-        tokenEndpointAuthMethod: null,
+        ...mockModelServiceInfo,
+        serviceHome: req.body.serviceHome,
       },
       serviceId: 'service1',
       userRoles: [],
@@ -166,26 +152,8 @@ describe('when editing the service configuration', () => {
       csrfToken: 'token',
       currentNavigation: 'configuration',
       service: {
-        name: 'service two',
-        clientId: undefined,
-        clientSecret: 'outshine-wringing-imparting-submitted',
-        description: 'service description',
-        grantTypes: [
-          'implicit',
-        ],
-        postLogoutRedirectUris: [
-          'https://www.logout2.com',
-        ],
-        postResetUrl: 'https://www.postreset2.com',
-        redirectUris: [
-          'https://www.redirect.com',
-          'https://www.redirect2.com',
-        ],
-        responseTypes: [
-          'code',
-        ],
-        serviceHome: 'https://www.servicehome2.com',
-        tokenEndpointAuthMethod: null,
+        ...mockModelServiceInfo,
+        clientId: req.body.clientId,
       },
       serviceId: 'service1',
       userRoles: [],
@@ -207,26 +175,8 @@ describe('when editing the service configuration', () => {
       csrfToken: 'token',
       currentNavigation: 'configuration',
       service: {
-        name: 'service two',
-        clientId: testClientId,
-        clientSecret: 'outshine-wringing-imparting-submitted',
-        description: 'service description',
-        grantTypes: [
-          'implicit',
-        ],
-        postLogoutRedirectUris: [
-          'https://www.logout2.com',
-        ],
-        postResetUrl: 'https://www.postreset2.com',
-        redirectUris: [
-          'https://www.redirect.com',
-          'https://www.redirect2.com',
-        ],
-        responseTypes: [
-          'code',
-        ],
-        serviceHome: 'https://www.servicehome2.com',
-        tokenEndpointAuthMethod: null,
+        ...mockModelServiceInfo,
+        clientId: req.body.clientId,
       },
       serviceId: 'service1',
       userRoles: [],
@@ -248,26 +198,8 @@ describe('when editing the service configuration', () => {
       csrfToken: 'token',
       currentNavigation: 'configuration',
       service: {
-        name: 'service two',
-        clientId: testClientId,
-        clientSecret: 'outshine-wringing-imparting-submitted',
-        description: 'service description',
-        grantTypes: [
-          'implicit',
-        ],
-        postLogoutRedirectUris: [
-          'https://www.logout2.com',
-        ],
-        postResetUrl: 'https://www.postreset2.com',
-        redirectUris: [
-          'https://www.redirect.com',
-          'https://www.redirect2.com',
-        ],
-        responseTypes: [
-          'code',
-        ],
-        serviceHome: 'https://www.servicehome2.com',
-        tokenEndpointAuthMethod: null,
+        ...mockModelServiceInfo,
+        clientId: req.body.clientId,
       },
       serviceId: 'service1',
       userRoles: [],
@@ -287,26 +219,8 @@ describe('when editing the service configuration', () => {
     expect(updateService.mock.calls[0][0]).toBe('service1');
 
     expect(updateService.mock.calls[0][1]).toEqual({
-      name: 'service two',
-      description: 'service description',
-      clientId: testClientId,
-      clientSecret: 'outshine-wringing-imparting-submitted',
-      serviceHome: 'https://www.servicehome2.com',
-      postResetUrl: 'https://www.postreset2.com',
-      tokenEndpointAuthMethod: null,
-      redirect_uris: [
-        'https://www.redirect.com',
-        'https://www.redirect2.com',
-      ],
-      post_logout_redirect_uris: [
-        'https://www.logout2.com',
-      ],
-      grant_types: [
-        'implicit',
-      ],
-      response_types: [
-        'code',
-      ],
+      ...mockRequestServiceInfo,
+      clientId: req.body.clientId,
     });
     expect(updateService.mock.calls[0][2]).toBe('correlationId');
   });
@@ -331,26 +245,8 @@ describe('when editing the service configuration', () => {
       csrfToken: 'token',
       currentNavigation: 'configuration',
       service: {
-        name: 'service two',
-        clientId: testClientId,
-        clientSecret: 'outshine-wringing-imparting-submitted',
-        description: 'service description',
-        grantTypes: [
-          'implicit',
-        ],
-        postLogoutRedirectUris: [
-          'https://www.logout2.com',
-        ],
-        postResetUrl: 'https://www.postreset2.com',
-        redirectUris: [
-          'https://www.redirect.com',
-          'https://www.redirect2.com',
-        ],
-        responseTypes: [
-          'code',
-        ],
-        serviceHome: 'https://www.servicehome2.com',
-        tokenEndpointAuthMethod: null,
+        ...mockModelServiceInfo,
+        clientId: req.body.clientId,
       },
       serviceId: 'service1',
       userRoles: [],
@@ -369,26 +265,8 @@ describe('when editing the service configuration', () => {
     expect(updateService.mock.calls).toHaveLength(1);
     expect(updateService.mock.calls[0][0]).toBe('service1');
     expect(updateService.mock.calls[0][1]).toEqual({
-      name: 'service two',
-      description: 'service description',
-      clientId: 'cLiEnTiD',
-      clientSecret: 'outshine-wringing-imparting-submitted',
-      serviceHome: 'https://www.servicehome2.com',
-      postResetUrl: 'https://www.postreset2.com',
-      tokenEndpointAuthMethod: null,
-      redirect_uris: [
-        'https://www.redirect.com',
-        'https://www.redirect2.com',
-      ],
-      post_logout_redirect_uris: [
-        'https://www.logout2.com',
-      ],
-      grant_types: [
-        'implicit',
-      ],
-      response_types: [
-        'code',
-      ],
+      ...mockRequestServiceInfo,
+      clientId: req.body.clientId,
     });
     expect(updateService.mock.calls[0][2]).toBe('correlationId');
   });
@@ -402,26 +280,8 @@ describe('when editing the service configuration', () => {
     expect(updateService.mock.calls).toHaveLength(1);
     expect(updateService.mock.calls[0][0]).toBe('service1');
     expect(updateService.mock.calls[0][1]).toEqual({
-      name: 'service two',
-      description: 'service description',
-      clientId: 'clientid',
-      clientSecret: 'outshine-wringing-imparting-submitted',
-      serviceHome: 'https://www.servicehome2.com',
-      postResetUrl: 'https://www.postreset2.com',
-      tokenEndpointAuthMethod: null,
-      redirect_uris: [
-        'https://www.redirect.com',
-        'https://www.redirect2.com',
-      ],
-      post_logout_redirect_uris: [
-        'https://www.logout2.com',
-      ],
-      grant_types: [
-        'implicit',
-      ],
-      response_types: [
-        'code',
-      ],
+      ...mockRequestServiceInfo,
+      clientId: req.body.clientId,
     });
     expect(updateService.mock.calls[0][2]).toBe('correlationId');
   });
@@ -440,26 +300,8 @@ describe('when editing the service configuration', () => {
       csrfToken: 'token',
       currentNavigation: 'configuration',
       service: {
-        name: 'service two',
-        clientId: 'clientid2',
-        clientSecret: 'outshine-wringing-imparting-submitted',
-        description: 'service description',
-        grantTypes: [
-          'implicit',
-        ],
-        postLogoutRedirectUris: [
-          'https://www.logout2.com',
-        ],
-        postResetUrl: 'https://www.postreset2.com',
-        redirectUris: [
-          'https://www.redirect.com',
-          'https://www.redirect.com',
-        ],
-        responseTypes: [
-          'code',
-        ],
-        serviceHome: 'https://www.servicehome2.com',
-        tokenEndpointAuthMethod: null,
+        ...mockModelServiceInfo,
+        redirectUris: req.body.redirect_uris,
       },
       serviceId: 'service1',
       userRoles: [],
@@ -482,26 +324,9 @@ describe('when editing the service configuration', () => {
       csrfToken: 'token',
       currentNavigation: 'configuration',
       service: {
-        name: 'service two',
-        clientId: testClientId,
-        clientSecret: 'outshine-wringing-imparting-submitted',
-        description: 'service description',
-        grantTypes: [
-          'implicit',
-        ],
-        postLogoutRedirectUris: [
-          'https://www.logout2.com',
-        ],
-        postResetUrl: 'https://www.postreset2.com',
-        redirectUris: [
-          'https://www.redirect.com',
-          'https://www.redirect2.com',
-        ],
-        responseTypes: [
-          'code',
-        ],
-        serviceHome: 'https://www.servicehome2.com',
-        tokenEndpointAuthMethod: 'client_secret_post',
+        ...mockModelServiceInfo,
+        clientId: req.body.clientId,
+        tokenEndpointAuthMethod: req.body.tokenEndpointAuthMethod,
       },
       serviceId: 'service1',
       userRoles: [],
@@ -525,25 +350,8 @@ describe('when editing the service configuration', () => {
       csrfToken: 'token',
       currentNavigation: 'configuration',
       service: {
-        name: 'service two',
-        clientId: testClientId,
-        clientSecret: 'outshine-wringing-imparting-submitted',
-        description: 'service description',
-        grantTypes: [
-          'implicit',
-        ],
-        postLogoutRedirectUris: [
-          'https://www.logout2.com',
-        ],
-        postResetUrl: 'https://www.postreset2.com',
-        redirectUris: [
-          'https://www.redirect.com',
-          'https://www.redirect2.com',
-        ],
-        responseTypes: [
-          'code',
-        ],
-        serviceHome: 'https://www.servicehome2.com',
+        ...mockModelServiceInfo,
+        clientId: req.body.clientId,
         tokenEndpointAuthMethod: null,
       },
       serviceId: 'service1',
@@ -560,28 +368,7 @@ describe('when editing the service configuration', () => {
     expect(updateService.mock.calls).toHaveLength(1);
     expect(updateService.mock.calls[0][0]).toBe('service1');
 
-    expect(updateService.mock.calls[0][1]).toEqual({
-      name: 'service two',
-      description: 'service description',
-      clientId: 'clientid2',
-      clientSecret: 'outshine-wringing-imparting-submitted',
-      serviceHome: 'https://www.servicehome2.com',
-      postResetUrl: 'https://www.postreset2.com',
-      tokenEndpointAuthMethod: null,
-      redirect_uris: [
-        'https://www.redirect.com',
-        'https://www.redirect2.com',
-      ],
-      post_logout_redirect_uris: [
-        'https://www.logout2.com',
-      ],
-      grant_types: [
-        'implicit',
-      ],
-      response_types: [
-        'code',
-      ],
-    });
+    expect(updateService.mock.calls[0][1]).toEqual(mockRequestServiceInfo);
     expect(updateService.mock.calls[0][2]).toBe('correlationId');
   });
 
