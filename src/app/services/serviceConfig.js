@@ -10,14 +10,14 @@ const buildCurrentServiceModel = async (req) => {
   return {
     name: service.name || '',
     description: service.description || '',
-    serviceHome: service.relyingParty.service_home || '',
-    postResetUrl: service.relyingParty.postResetUrl || '',
     clientId: service.relyingParty.client_id || '',
     clientSecret: service.relyingParty.client_secret || '',
+    serviceHome: service.relyingParty.service_home || '',
+    postResetUrl: service.relyingParty.postResetUrl || '',
     redirectUris: service.relyingParty.redirect_uris || [],
     postLogoutRedirectUris: service.relyingParty.post_logout_redirect_uris || [],
-    responseTypes: service.relyingParty.response_types || [],
     grantTypes: service.relyingParty.grant_types || [],
+    responseTypes: service.relyingParty.response_types || [],
     apiSecret: service.relyingParty.api_secret || '',
     tokenEndpointAuthMethod: service.relyingParty.token_endpoint_auth_method,
   };

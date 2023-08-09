@@ -19,10 +19,8 @@ const mockCurrentServiceInfo = {
   relyingParty: {
     client_id: 'clientid',
     client_secret: 'dewier-thrombi-confounder-mikado',
-    api_secret: 'dewier-thrombi-confounder-mikado',
     service_home: 'https://www.servicehome.com',
     postResetUrl: 'https://www.postreset.com',
-    token_endpoint_auth_method: null,
     redirect_uris: [
       'https://www.redirect.com',
     ],
@@ -36,6 +34,8 @@ const mockCurrentServiceInfo = {
     response_types: [
       'code',
     ],
+    api_secret: 'dewier-thrombi-confounder-mikado',
+    token_endpoint_auth_method: null,
   },
 };
 
@@ -43,14 +43,14 @@ const mockCurrentServiceInfo = {
 const mockCurrentServiceModel = {
   name: mockCurrentServiceInfo.name || '',
   description: mockCurrentServiceInfo.description || '',
-  serviceHome: mockCurrentServiceInfo.relyingParty.service_home || '',
-  postResetUrl: mockCurrentServiceInfo.relyingParty.postResetUrl || '',
   clientId: mockCurrentServiceInfo.relyingParty.client_id || '',
   clientSecret: mockCurrentServiceInfo.relyingParty.client_secret || '',
+  serviceHome: mockCurrentServiceInfo.relyingParty.service_home || '',
+  postResetUrl: mockCurrentServiceInfo.relyingParty.postResetUrl || '',
   redirectUris: mockCurrentServiceInfo.relyingParty.redirect_uris || [],
   postLogoutRedirectUris: mockCurrentServiceInfo.relyingParty.post_logout_redirect_uris || [],
-  responseTypes: mockCurrentServiceInfo.relyingParty.response_types || [],
   grantTypes: mockCurrentServiceInfo.relyingParty.grant_types || [],
+  responseTypes: mockCurrentServiceInfo.relyingParty.response_types || [],
   apiSecret: mockCurrentServiceInfo.relyingParty.api_secret || '',
   tokenEndpointAuthMethod: mockCurrentServiceInfo.relyingParty.token_endpoint_auth_method,
 };
@@ -61,10 +61,8 @@ const mockRequestServiceInfo = {
   description: 'service description',
   clientId: 'clientid2',
   clientSecret: 'outshine-wringing-imparting-submitted',
-  apiSecret: 'outshine-wringing-imparting-submitted',
   serviceHome: 'https://www.servicehome2.com',
   postResetUrl: 'https://www.postreset2.com',
-  tokenEndpointAuthMethod: 'client_secret_post',
   redirect_uris: [
     'https://www.redirect.com',
     'https://www.redirect2.com',
@@ -79,6 +77,8 @@ const mockRequestServiceInfo = {
     'code',
     'token',
   ],
+  apiSecret: 'outshine-wringing-imparting-submitted',
+  tokenEndpointAuthMethod: 'client_secret_post',
 };
 
 // Represents the model used for validation and the view.
@@ -533,7 +533,7 @@ describe('when editing the service configuration', () => {
   });
 
   it('then it should return a mix of explicit/expunged elements in the audit editedFields array, if a mix of secret/non-secret fields have been updated', async () => {
-    req.body = getModifiedRequestBody(['name', 'clientSecret', 'clientId', 'apiSecret', 'response_types']);
+    req.body = getModifiedRequestBody(['name', 'clientId', 'clientSecret', 'response_types', 'apiSecret']);
 
     await postServiceConfig(req, res);
     expect(logger.audit.mock.calls).toHaveLength(1);
