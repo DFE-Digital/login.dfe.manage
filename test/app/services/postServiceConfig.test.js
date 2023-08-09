@@ -12,7 +12,7 @@ const logger = require('../../../src/infrastructure/logger');
 const res = getResponseMock();
 
 // Represents the getServiceById response.
-const mockCurrentServiceInfo = {
+const currentServiceInfo = {
   id: 'service1',
   name: 'service one',
   description: 'service description',
@@ -40,23 +40,23 @@ const mockCurrentServiceInfo = {
 };
 
 // Represents the current service in the "model" form for validation and comparison.
-const mockCurrentServiceModel = {
-  name: mockCurrentServiceInfo.name || '',
-  description: mockCurrentServiceInfo.description || '',
-  clientId: mockCurrentServiceInfo.relyingParty.client_id || '',
-  clientSecret: mockCurrentServiceInfo.relyingParty.client_secret || '',
-  serviceHome: mockCurrentServiceInfo.relyingParty.service_home || '',
-  postResetUrl: mockCurrentServiceInfo.relyingParty.postResetUrl || '',
-  redirectUris: mockCurrentServiceInfo.relyingParty.redirect_uris || [],
-  postLogoutRedirectUris: mockCurrentServiceInfo.relyingParty.post_logout_redirect_uris || [],
-  grantTypes: mockCurrentServiceInfo.relyingParty.grant_types || [],
-  responseTypes: mockCurrentServiceInfo.relyingParty.response_types || [],
-  apiSecret: mockCurrentServiceInfo.relyingParty.api_secret || '',
-  tokenEndpointAuthMethod: mockCurrentServiceInfo.relyingParty.token_endpoint_auth_method,
+const currentServiceModel = {
+  name: currentServiceInfo.name || '',
+  description: currentServiceInfo.description || '',
+  clientId: currentServiceInfo.relyingParty.client_id || '',
+  clientSecret: currentServiceInfo.relyingParty.client_secret || '',
+  serviceHome: currentServiceInfo.relyingParty.service_home || '',
+  postResetUrl: currentServiceInfo.relyingParty.postResetUrl || '',
+  redirectUris: currentServiceInfo.relyingParty.redirect_uris || [],
+  postLogoutRedirectUris: currentServiceInfo.relyingParty.post_logout_redirect_uris || [],
+  grantTypes: currentServiceInfo.relyingParty.grant_types || [],
+  responseTypes: currentServiceInfo.relyingParty.response_types || [],
+  apiSecret: currentServiceInfo.relyingParty.api_secret || '',
+  tokenEndpointAuthMethod: currentServiceInfo.relyingParty.token_endpoint_auth_method,
 };
 
 // Represents the request body and the updateService info.
-const mockRequestServiceInfo = {
+const requestServiceInfo = {
   name: 'service two',
   description: 'service description',
   clientId: 'clientid2',
@@ -82,31 +82,31 @@ const mockRequestServiceInfo = {
 };
 
 // Represents the model used for validation and the view.
-const mockUpdatedServiceModel = {
-  name: mockRequestServiceInfo.name,
-  description: mockCurrentServiceInfo.description,
-  clientId: mockRequestServiceInfo.clientId,
-  clientSecret: mockRequestServiceInfo.clientSecret,
-  serviceHome: mockRequestServiceInfo.serviceHome,
-  postResetUrl: mockRequestServiceInfo.postResetUrl,
-  redirectUris: mockRequestServiceInfo.redirect_uris,
-  postLogoutRedirectUris: mockRequestServiceInfo.post_logout_redirect_uris,
-  grantTypes: mockRequestServiceInfo.grant_types,
-  responseTypes: mockRequestServiceInfo.response_types,
-  apiSecret: mockRequestServiceInfo.apiSecret,
-  tokenEndpointAuthMethod: mockRequestServiceInfo.tokenEndpointAuthMethod,
+const updatedServiceModel = {
+  name: requestServiceInfo.name,
+  description: currentServiceInfo.description,
+  clientId: requestServiceInfo.clientId,
+  clientSecret: requestServiceInfo.clientSecret,
+  serviceHome: requestServiceInfo.serviceHome,
+  postResetUrl: requestServiceInfo.postResetUrl,
+  redirectUris: requestServiceInfo.redirect_uris,
+  postLogoutRedirectUris: requestServiceInfo.post_logout_redirect_uris,
+  grantTypes: requestServiceInfo.grant_types,
+  responseTypes: requestServiceInfo.response_types,
+  apiSecret: requestServiceInfo.apiSecret,
+  tokenEndpointAuthMethod: requestServiceInfo.tokenEndpointAuthMethod,
 };
 
 /**
- * Creates a version of mockRequestServiceInfo which only modifies the requested fields, the rest remain
- * the same as mockCurrentServiceInfo.
+ * Creates a version of requestServiceInfo which only modifies the requested fields, the rest remain
+ * the same as currentServiceInfo.
  *
- * @param {string[]} fields The fields (matching mockRequestServiceInfo) that need to be modified.
- * @returns A version of mockRequestServiceInfo where only the requested fields are being modified.
+ * @param {string[]} fields The fields (matching requestServiceInfo) that need to be modified.
+ * @returns A version of requestServiceInfo where only the requested fields are being modified.
  */
 const getModifiedRequestBody = (fields = []) => {
   // Throw an error if an invalid/unknown field is requested.
-  const allowedFields = Object.keys(mockRequestServiceInfo);
+  const allowedFields = Object.keys(requestServiceInfo);
   if (fields.length > 1 && !fields.every((field) => allowedFields.includes(field))) {
     throw new Error(`One of the following fields entered are not in mock data: ${fields}`);
   }
@@ -117,10 +117,10 @@ const getModifiedRequestBody = (fields = []) => {
     grant_types: 'grantTypes',
     response_types: 'responseTypes',
   };
-  // Create a version of mockRequestServiceInfo which only alters the requested fields.
+  // Create a version of requestServiceInfo which only alters the requested fields.
   return allowedFields.reduce((request, field) => {
     const modelField = Object.prototype.hasOwnProperty.call(translations, field) ? translations[field] : field;
-    request[field] = fields.includes(field) ? mockUpdatedServiceModel[modelField] : mockCurrentServiceModel[modelField];
+    request[field] = fields.includes(field) ? updatedServiceModel[modelField] : currentServiceModel[modelField];
     return request;
   }, {});
 };
@@ -130,7 +130,7 @@ describe('when editing the service configuration', () => {
 
   beforeEach(() => {
     req = getRequestMock({
-      body: { ...mockRequestServiceInfo },
+      body: { ...requestServiceInfo },
       params: {
         sid: 'service1',
       },
@@ -138,7 +138,7 @@ describe('when editing the service configuration', () => {
 
     updateService.mockReset();
     getServiceById.mockReset();
-    getServiceById.mockReturnValueOnce({ ...mockCurrentServiceInfo }).mockReturnValueOnce(null);
+    getServiceById.mockReturnValueOnce({ ...currentServiceInfo }).mockReturnValueOnce(null);
     res.mockResetAll();
   });
 
@@ -153,7 +153,7 @@ describe('when editing the service configuration', () => {
       csrfToken: 'token',
       currentNavigation: 'configuration',
       service: {
-        ...mockUpdatedServiceModel,
+        ...updatedServiceModel,
         name: req.body.name,
       },
       serviceId: 'service1',
@@ -175,7 +175,7 @@ describe('when editing the service configuration', () => {
       csrfToken: 'token',
       currentNavigation: 'configuration',
       service: {
-        ...mockUpdatedServiceModel,
+        ...updatedServiceModel,
         serviceHome: req.body.serviceHome,
       },
       serviceId: 'service1',
@@ -197,7 +197,7 @@ describe('when editing the service configuration', () => {
       csrfToken: 'token',
       currentNavigation: 'configuration',
       service: {
-        ...mockUpdatedServiceModel,
+        ...updatedServiceModel,
         clientId: req.body.clientId,
       },
       serviceId: 'service1',
@@ -220,7 +220,7 @@ describe('when editing the service configuration', () => {
       csrfToken: 'token',
       currentNavigation: 'configuration',
       service: {
-        ...mockUpdatedServiceModel,
+        ...updatedServiceModel,
         clientId: req.body.clientId,
       },
       serviceId: 'service1',
@@ -243,7 +243,7 @@ describe('when editing the service configuration', () => {
       csrfToken: 'token',
       currentNavigation: 'configuration',
       service: {
-        ...mockUpdatedServiceModel,
+        ...updatedServiceModel,
         clientId: req.body.clientId,
       },
       serviceId: 'service1',
@@ -264,7 +264,7 @@ describe('when editing the service configuration', () => {
     expect(updateService.mock.calls[0][0]).toBe('service1');
 
     expect(updateService.mock.calls[0][1]).toEqual({
-      ...mockRequestServiceInfo,
+      ...requestServiceInfo,
       clientId: req.body.clientId,
     });
     expect(updateService.mock.calls[0][2]).toBe('correlationId');
@@ -276,7 +276,7 @@ describe('when editing the service configuration', () => {
 
     // Change mock to return truthy on second call to mimic a service existing with the clientId.
     getServiceById.mockReset();
-    getServiceById.mockReturnValueOnce(mockCurrentServiceInfo).mockReturnValueOnce({
+    getServiceById.mockReturnValueOnce(currentServiceInfo).mockReturnValueOnce({
       example: true,
     });
 
@@ -290,7 +290,7 @@ describe('when editing the service configuration', () => {
       csrfToken: 'token',
       currentNavigation: 'configuration',
       service: {
-        ...mockUpdatedServiceModel,
+        ...updatedServiceModel,
         clientId: req.body.clientId,
       },
       serviceId: 'service1',
@@ -310,7 +310,7 @@ describe('when editing the service configuration', () => {
     expect(updateService.mock.calls).toHaveLength(1);
     expect(updateService.mock.calls[0][0]).toBe('service1');
     expect(updateService.mock.calls[0][1]).toEqual({
-      ...mockRequestServiceInfo,
+      ...requestServiceInfo,
       clientId: req.body.clientId,
     });
     expect(updateService.mock.calls[0][2]).toBe('correlationId');
@@ -325,7 +325,7 @@ describe('when editing the service configuration', () => {
     expect(updateService.mock.calls).toHaveLength(1);
     expect(updateService.mock.calls[0][0]).toBe('service1');
     expect(updateService.mock.calls[0][1]).toEqual({
-      ...mockRequestServiceInfo,
+      ...requestServiceInfo,
       clientId: req.body.clientId,
     });
     expect(updateService.mock.calls[0][2]).toBe('correlationId');
@@ -345,7 +345,7 @@ describe('when editing the service configuration', () => {
       csrfToken: 'token',
       currentNavigation: 'configuration',
       service: {
-        ...mockUpdatedServiceModel,
+        ...updatedServiceModel,
         redirectUris: req.body.redirect_uris,
       },
       serviceId: 'service1',
@@ -369,7 +369,7 @@ describe('when editing the service configuration', () => {
       csrfToken: 'token',
       currentNavigation: 'configuration',
       service: {
-        ...mockUpdatedServiceModel,
+        ...updatedServiceModel,
         clientId: req.body.clientId,
         tokenEndpointAuthMethod: req.body.tokenEndpointAuthMethod,
       },
@@ -395,7 +395,7 @@ describe('when editing the service configuration', () => {
       csrfToken: 'token',
       currentNavigation: 'configuration',
       service: {
-        ...mockUpdatedServiceModel,
+        ...updatedServiceModel,
         clientId: req.body.clientId,
         tokenEndpointAuthMethod: null,
       },
@@ -413,7 +413,7 @@ describe('when editing the service configuration', () => {
     expect(updateService.mock.calls).toHaveLength(1);
     expect(updateService.mock.calls[0][0]).toBe('service1');
 
-    expect(updateService.mock.calls[0][1]).toEqual(mockRequestServiceInfo);
+    expect(updateService.mock.calls[0][1]).toEqual(requestServiceInfo);
     expect(updateService.mock.calls[0][2]).toBe('correlationId');
   });
 
@@ -428,12 +428,12 @@ describe('when editing the service configuration', () => {
       userId: 'user1',
       userEmail: 'user@unit.test',
       editedService: 'service1',
-      editedFields: Object.keys(mockCurrentServiceModel).filter((key) => key !== 'description').map((key) => {
+      editedFields: Object.keys(currentServiceModel).filter((key) => key !== 'description').map((key) => {
         const isSecret = key.toLowerCase().includes('secret');
         return {
           name: key,
-          oldValue: isSecret ? 'EXPUNGED' : mockCurrentServiceModel[key],
-          newValue: isSecret ? 'EXPUNGED' : mockUpdatedServiceModel[key],
+          oldValue: isSecret ? 'EXPUNGED' : currentServiceModel[key],
+          newValue: isSecret ? 'EXPUNGED' : updatedServiceModel[key],
         };
       }),
     });
@@ -455,7 +455,7 @@ describe('when editing the service configuration', () => {
     expect(logger.audit.mock.calls[0][1]).toHaveProperty('editedFields', [
       {
         name: 'name',
-        oldValue: mockCurrentServiceModel.name,
+        oldValue: currentServiceModel.name,
         newValue: req.body.name,
       },
     ]);
@@ -469,7 +469,7 @@ describe('when editing the service configuration', () => {
     expect(logger.audit.mock.calls[0][1]).toHaveProperty('editedFields', [
       {
         name: 'grantTypes',
-        oldValue: mockCurrentServiceModel.grantTypes,
+        oldValue: currentServiceModel.grantTypes,
         newValue: req.body.grant_types,
       },
     ]);
@@ -497,17 +497,17 @@ describe('when editing the service configuration', () => {
     expect(logger.audit.mock.calls[0][1]).toHaveProperty('editedFields', [
       {
         name: 'name',
-        oldValue: mockCurrentServiceModel.name,
+        oldValue: currentServiceModel.name,
         newValue: req.body.name,
       },
       {
         name: 'clientId',
-        oldValue: mockCurrentServiceModel.clientId,
+        oldValue: currentServiceModel.clientId,
         newValue: req.body.clientId,
       },
       {
         name: 'responseTypes',
-        oldValue: mockCurrentServiceModel.responseTypes,
+        oldValue: currentServiceModel.responseTypes,
         newValue: req.body.response_types,
       },
     ]);
@@ -540,12 +540,12 @@ describe('when editing the service configuration', () => {
     expect(logger.audit.mock.calls[0][1]).toHaveProperty('editedFields', [
       {
         name: 'name',
-        oldValue: mockCurrentServiceModel.name,
+        oldValue: currentServiceModel.name,
         newValue: req.body.name,
       },
       {
         name: 'clientId',
-        oldValue: mockCurrentServiceModel.clientId,
+        oldValue: currentServiceModel.clientId,
         newValue: req.body.clientId,
       },
       {
@@ -555,7 +555,7 @@ describe('when editing the service configuration', () => {
       },
       {
         name: 'responseTypes',
-        oldValue: mockCurrentServiceModel.responseTypes,
+        oldValue: currentServiceModel.responseTypes,
         newValue: req.body.response_types,
       },
       {
