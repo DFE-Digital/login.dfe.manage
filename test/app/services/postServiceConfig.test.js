@@ -35,7 +35,7 @@ const currentServiceInfo = {
       'code',
     ],
     api_secret: 'dewier-thrombi-confounder-mikado',
-    token_endpoint_auth_method: null,
+    token_endpoint_auth_method: undefined,
   },
 };
 
@@ -52,7 +52,8 @@ const currentServiceModel = {
   grantTypes: currentServiceInfo.relyingParty.grant_types || [],
   responseTypes: currentServiceInfo.relyingParty.response_types || [],
   apiSecret: currentServiceInfo.relyingParty.api_secret || '',
-  tokenEndpointAuthMethod: currentServiceInfo.relyingParty.token_endpoint_auth_method,
+  tokenEndpointAuthMethod: currentServiceInfo.relyingParty.token_endpoint_auth_method === 'client_secret_post'
+    ? 'client_secret_post' : null,
 };
 
 // Represents the request body and the updateService info.

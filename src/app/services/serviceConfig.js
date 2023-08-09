@@ -19,7 +19,8 @@ const buildCurrentServiceModel = async (req) => {
     grantTypes: service.relyingParty.grant_types || [],
     responseTypes: service.relyingParty.response_types || [],
     apiSecret: service.relyingParty.api_secret || '',
-    tokenEndpointAuthMethod: service.relyingParty.token_endpoint_auth_method,
+    tokenEndpointAuthMethod: service.relyingParty.token_endpoint_auth_method === 'client_secret_post'
+      ? 'client_secret_post' : null,
   };
 };
 
