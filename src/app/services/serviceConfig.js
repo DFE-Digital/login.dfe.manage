@@ -159,6 +159,22 @@ const postServiceConfig = async (req, res) => {
     return res.render('services/views/serviceConfig', model);
   }
 
+  const editedFields = Object.entries(currentService).filter(([field, oldValue]) => {
+    const newValue = model.service[field];
+    return Array.isArray(oldValue) ? !(
+      Array.isArray(newValue)
+      && oldValue.length === newValue.length
+      && oldValue.every((value, index) => value === newValue[index])
+    ) : oldValue !== newValue;
+  }).map(([field, oldValue]) => {
+    const isSecret = field.toLowerCase().includes('secret');
+    return {
+      name: field,
+      oldValue: isSecret ? 'EXPUNGED' : oldValue,
+      newValue: isSecret ? 'EXPUNGED' : model.service[field],
+    };
+  });
+
   const updatedService = {
     name: model.service.name,
     description: model.service.description,
@@ -180,6 +196,7 @@ const postServiceConfig = async (req, res) => {
     userId: req.user.sub,
     userEmail: req.user.email,
     editedService: req.params.sid,
+    editedFields,
   });
 
   await updateService(req.params.sid, updatedService, req.id);
