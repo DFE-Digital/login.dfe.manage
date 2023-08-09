@@ -39,6 +39,22 @@ const mockCurrentServiceInfo = {
   },
 };
 
+// Represents the current service in the "model" form for validation and comparison.
+const mockCurrentServiceModel = {
+  name: mockCurrentServiceInfo.name || '',
+  description: mockCurrentServiceInfo.description || '',
+  serviceHome: mockCurrentServiceInfo.relyingParty.service_home || '',
+  postResetUrl: mockCurrentServiceInfo.relyingParty.postResetUrl || '',
+  clientId: mockCurrentServiceInfo.relyingParty.client_id || '',
+  clientSecret: mockCurrentServiceInfo.relyingParty.client_secret || '',
+  redirectUris: mockCurrentServiceInfo.relyingParty.redirect_uris || [],
+  postLogoutRedirectUris: mockCurrentServiceInfo.relyingParty.post_logout_redirect_uris || [],
+  responseTypes: mockCurrentServiceInfo.relyingParty.response_types || [],
+  grantTypes: mockCurrentServiceInfo.relyingParty.grant_types || [],
+  apiSecret: mockCurrentServiceInfo.relyingParty.api_secret || '',
+  tokenEndpointAuthMethod: mockCurrentServiceInfo.relyingParty.token_endpoint_auth_method,
+};
+
 // Represents the request body and the updateService info.
 const mockRequestServiceInfo = {
   name: 'service two',
@@ -61,6 +77,7 @@ const mockRequestServiceInfo = {
   ],
   response_types: [
     'code',
+    'token',
   ],
 };
 
@@ -78,6 +95,34 @@ const mockUpdatedServiceModel = {
   responseTypes: mockRequestServiceInfo.response_types,
   apiSecret: mockRequestServiceInfo.apiSecret,
   tokenEndpointAuthMethod: mockRequestServiceInfo.tokenEndpointAuthMethod,
+};
+
+/**
+ * Creates a version of mockRequestServiceInfo which only modifies the requested fields, the rest remain
+ * the same as mockCurrentServiceInfo.
+ *
+ * @param {string[]} fields The fields (matching mockRequestServiceInfo) that need to be modified.
+ * @returns A version of mockRequestServiceInfo where only the requested fields are being modified.
+ */
+const getModifiedRequestBody = (fields = []) => {
+  // Throw an error if an invalid/unknown field is requested.
+  const allowedFields = Object.keys(mockRequestServiceInfo);
+  if (fields.length > 1 && !fields.every((field) => allowedFields.includes(field))) {
+    throw new Error(`One of the following fields entered are not in mock data: ${fields}`);
+  }
+  // Mappings for fields that do not follow the naming scheme of the "model" service data.
+  const translations = {
+    redirect_uris: 'redirectUris',
+    post_logout_redirect_uris: 'postLogoutRedirectUris',
+    grant_types: 'grantTypes',
+    response_types: 'responseTypes',
+  };
+  // Create a version of mockRequestServiceInfo which only alters the requested fields.
+  return allowedFields.reduce((request, field) => {
+    const modelField = Object.prototype.hasOwnProperty.call(translations, field) ? translations[field] : field;
+    request[field] = fields.includes(field) ? mockUpdatedServiceModel[modelField] : mockCurrentServiceModel[modelField];
+    return request;
+  }, {});
 };
 
 describe('when editing the service configuration', () => {
@@ -372,7 +417,7 @@ describe('when editing the service configuration', () => {
     expect(updateService.mock.calls[0][2]).toBe('correlationId');
   });
 
-  it('then it should should audit service being edited', async () => {
+  it('then it should audit the service being edited', async () => {
     await postServiceConfig(req, res);
 
     expect(logger.audit.mock.calls).toHaveLength(1);
@@ -383,6 +428,141 @@ describe('when editing the service configuration', () => {
       userId: 'user1',
       userEmail: 'user@unit.test',
       editedService: 'service1',
+      editedFields: Object.keys(mockCurrentServiceModel).filter((key) => key !== 'description').map((key) => {
+        const isSecret = key.toLowerCase().includes('secret');
+        return {
+          name: key,
+          oldValue: isSecret ? 'EXPUNGED' : mockCurrentServiceModel[key],
+          newValue: isSecret ? 'EXPUNGED' : mockUpdatedServiceModel[key],
+        };
+      }),
     });
+  });
+
+  it('then it should return an empty array for the audit editedFields property, if no fields have been updated', async () => {
+    req.body = getModifiedRequestBody();
+
+    await postServiceConfig(req, res);
+    expect(logger.audit.mock.calls).toHaveLength(1);
+    expect(logger.audit.mock.calls[0][1]).toHaveProperty('editedFields', []);
+  });
+
+  it('then it should return a single element in the audit editedFields array, if only one non-secret primitive field has been updated', async () => {
+    req.body = getModifiedRequestBody(['name']);
+
+    await postServiceConfig(req, res);
+    expect(logger.audit.mock.calls).toHaveLength(1);
+    expect(logger.audit.mock.calls[0][1]).toHaveProperty('editedFields', [
+      {
+        name: 'name',
+        oldValue: mockCurrentServiceModel.name,
+        newValue: req.body.name,
+      },
+    ]);
+  });
+
+  it('then it should return a single element in the audit editedFields array, if only one non-secret array field has been updated', async () => {
+    req.body = getModifiedRequestBody(['grant_types']);
+
+    await postServiceConfig(req, res);
+    expect(logger.audit.mock.calls).toHaveLength(1);
+    expect(logger.audit.mock.calls[0][1]).toHaveProperty('editedFields', [
+      {
+        name: 'grantTypes',
+        oldValue: mockCurrentServiceModel.grantTypes,
+        newValue: req.body.grant_types,
+      },
+    ]);
+  });
+
+  it('then it should return a single expunged element in the audit editedFields array, if only one secret field has been updated', async () => {
+    req.body = getModifiedRequestBody(['clientSecret']);
+
+    await postServiceConfig(req, res);
+    expect(logger.audit.mock.calls).toHaveLength(1);
+    expect(logger.audit.mock.calls[0][1]).toHaveProperty('editedFields', [
+      {
+        name: 'clientSecret',
+        oldValue: 'EXPUNGED',
+        newValue: 'EXPUNGED',
+      },
+    ]);
+  });
+
+  it('then it should return multiple elements in the audit editedFields array, if multiple non-secret fields have been updated', async () => {
+    req.body = getModifiedRequestBody(['name', 'clientId', 'response_types']);
+
+    await postServiceConfig(req, res);
+    expect(logger.audit.mock.calls).toHaveLength(1);
+    expect(logger.audit.mock.calls[0][1]).toHaveProperty('editedFields', [
+      {
+        name: 'name',
+        oldValue: mockCurrentServiceModel.name,
+        newValue: req.body.name,
+      },
+      {
+        name: 'clientId',
+        oldValue: mockCurrentServiceModel.clientId,
+        newValue: req.body.clientId,
+      },
+      {
+        name: 'responseTypes',
+        oldValue: mockCurrentServiceModel.responseTypes,
+        newValue: req.body.response_types,
+      },
+    ]);
+  });
+
+  it('then it should return multiple expunged elements in the audit editedFields array, if multiple secret fields have been updated', async () => {
+    req.body = getModifiedRequestBody(['clientSecret', 'apiSecret']);
+
+    await postServiceConfig(req, res);
+    expect(logger.audit.mock.calls).toHaveLength(1);
+    expect(logger.audit.mock.calls[0][1]).toHaveProperty('editedFields', [
+      {
+        name: 'clientSecret',
+        oldValue: 'EXPUNGED',
+        newValue: 'EXPUNGED',
+      },
+      {
+        name: 'apiSecret',
+        oldValue: 'EXPUNGED',
+        newValue: 'EXPUNGED',
+      },
+    ]);
+  });
+
+  it('then it should return a mix of explicit/expunged elements in the audit editedFields array, if a mix of secret/non-secret fields have been updated', async () => {
+    req.body = getModifiedRequestBody(['name', 'clientSecret', 'clientId', 'apiSecret', 'response_types']);
+
+    await postServiceConfig(req, res);
+    expect(logger.audit.mock.calls).toHaveLength(1);
+    expect(logger.audit.mock.calls[0][1]).toHaveProperty('editedFields', [
+      {
+        name: 'name',
+        oldValue: mockCurrentServiceModel.name,
+        newValue: req.body.name,
+      },
+      {
+        name: 'clientId',
+        oldValue: mockCurrentServiceModel.clientId,
+        newValue: req.body.clientId,
+      },
+      {
+        name: 'clientSecret',
+        oldValue: 'EXPUNGED',
+        newValue: 'EXPUNGED',
+      },
+      {
+        name: 'responseTypes',
+        oldValue: mockCurrentServiceModel.responseTypes,
+        newValue: req.body.response_types,
+      },
+      {
+        name: 'apiSecret',
+        oldValue: 'EXPUNGED',
+        newValue: 'EXPUNGED',
+      },
+    ]);
   });
 });
