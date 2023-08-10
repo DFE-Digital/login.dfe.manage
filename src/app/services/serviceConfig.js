@@ -161,11 +161,11 @@ const postServiceConfig = async (req, res) => {
   }
 
   const editedFields = Object.entries(currentService).filter(([field, oldValue]) => {
-    const newValue = model.service[field];
+    const newValue = Array.isArray(model.service[field]) ? model.service[field].sort() : model.service[field];
     return Array.isArray(oldValue) ? !(
       Array.isArray(newValue)
       && oldValue.length === newValue.length
-      && oldValue.every((value, index) => value === newValue[index])
+      && oldValue.sort().every((value, index) => value === newValue[index])
     ) : oldValue !== newValue;
   }).map(([field, oldValue]) => {
     const isSecret = field.toLowerCase().includes('secret');

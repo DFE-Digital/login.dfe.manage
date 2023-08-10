@@ -448,6 +448,30 @@ describe('when editing the service configuration', () => {
     expect(logger.audit.mock.calls[0][1]).toHaveProperty('editedFields', []);
   });
 
+  it('then it should treat array fields containing the same values as equal, even if the ordering is different', async () => {
+    const exampleGrantTypes = [
+      'authorization_code',
+      'client_credentials',
+      'implicit',
+      'refresh_token',
+    ];
+
+    // Get a copy of the currentServiceInfo mock data.
+    const databaseServiceInfo = JSON.parse(JSON.stringify(currentServiceInfo));
+    const updatedServiceInfo = getModifiedRequestBody();
+
+    databaseServiceInfo.relyingParty.grant_types = exampleGrantTypes.sort();
+    updatedServiceInfo.grant_types = [...exampleGrantTypes].reverse();
+
+    getServiceById.mockReset();
+    getServiceById.mockReturnValueOnce(databaseServiceInfo);
+    req.body = updatedServiceInfo;
+
+    await postServiceConfig(req, res);
+    expect(logger.audit.mock.calls).toHaveLength(1);
+    expect(logger.audit.mock.calls[0][1]).toHaveProperty('editedFields', []);
+  });
+
   it('then it should return a single element in the audit editedFields array, if only one non-secret primitive field has been updated', async () => {
     req.body = getModifiedRequestBody(['name']);
 
