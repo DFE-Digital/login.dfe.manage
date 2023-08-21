@@ -1,8 +1,55 @@
 /* eslint-disable no-nested-ternary */
-const { searchOrganisations, searchOrgsAssociatedWithService } = require('../../infrastructure/organisations');
+const {
+  searchOrganisations, searchOrgsAssociatedWithService, getOrganisationCategories,
+  listOrganisationStatus,
+} = require('../../infrastructure/organisations');
 const { getServiceById } = require('../../infrastructure/applications');
-const { getUserServiceRoles } = require('./utils');
+const { getUserServiceRoles, unpackMultiSelect, isSelected } = require('./utils');
 const logger = require('../../infrastructure/logger');
+
+const getFiltersModel = async (req, organisationCategories) => {
+  const {
+    method, body, query, id,
+  } = req;
+  const paramsSource = method === 'POST' ? body : query;
+
+  const showFilters = paramsSource && paramsSource.showFilters
+    ? paramsSource.showFilters.toLowerCase() === 'true'
+    : false;
+
+  let organisationTypes = [];
+  let organisationStatuses = [];
+
+  if (showFilters) {
+    const selectedOrganisationTypes = unpackMultiSelect(paramsSource.organisationType);
+    const selectedOrganisationStatus = unpackMultiSelect(paramsSource.organisationStatus);
+    if (paramsSource && paramsSource.showOrganisations === 'currentService' && organisationCategories) {
+      organisationTypes = organisationCategories.map((category) => ({
+        id: category.id,
+        name: category.name,
+        isSelected: isSelected(selectedOrganisationTypes, category.id),
+      }));
+    } else {
+      organisationTypes = (await getOrganisationCategories(id)).map((category) => ({
+        id: category.id,
+        name: category.name,
+        isSelected: isSelected(selectedOrganisationTypes, category.id),
+      }));
+    }
+
+    organisationStatuses = (await listOrganisationStatus(id)).map((status) => ({
+      id: status.id,
+      name: status.name,
+      isSelected: selectedOrganisationStatus.includes(status.id.toString()),
+    }));
+  }
+
+  return {
+    showFilters,
+    organisationTypes,
+    organisationStatuses,
+  };
+};
 
 const search = async (req) => {
   const paramsSource = req.method.toUpperCase() === 'POST' ? req.body : req.query;
@@ -72,6 +119,7 @@ const search = async (req) => {
     sortOrder: sortAsc ? 'asc' : 'desc',
     totalNumberOfPages: results.totalNumberOfPages,
     totalNumberOfRecords: results.totalNumberOfRecords,
+    organisationCategories: results.organisationCategories,
     organisations: results.organisations,
     serviceOrganisations: showOrganisations,
     sort: {
@@ -112,9 +160,13 @@ const search = async (req) => {
 };
 
 const buildModel = async (req) => {
-  const service = await getServiceById(req.params.sid, req.id);
-  const manageRolesForService = await getUserServiceRoles(req);
-  const pageOfOrganisations = await search(req);
+  const [service, manageRolesForService, pageOfOrganisations] = await Promise.all([
+    getServiceById(req.params.sid, req.id),
+    getUserServiceRoles(req),
+    search(req),
+  ]);
+
+  const filtersModel = await getFiltersModel(req, pageOfOrganisations.organisationCategories);
 
   return {
     csrfToken: req.csrfToken(),
@@ -132,6 +184,7 @@ const buildModel = async (req) => {
     service,
     userRoles: manageRolesForService,
     currentNavigation: 'organisations',
+    ...filtersModel,
   };
 };
 const get = async (req, res) => {
@@ -141,7 +194,7 @@ const get = async (req, res) => {
 
 const post = async (req, res) => {
   const model = await buildModel(req);
-  return res.redirect(`?page=${model.page}&showOrganisations=${model.serviceOrganisations}&criteria=${model.criteria}&sort=${model.sortBy}&sortDir=${model.sortOrder}`);
+  return res.redirect(`?page=${model.page}&showOrganisations=${model.serviceOrganisations}&criteria=${model.criteria}&sort=${model.sortBy}&sortDir=${model.sortOrder}&showFilters=${model.showFilters}`);
 };
 
 module.exports = {

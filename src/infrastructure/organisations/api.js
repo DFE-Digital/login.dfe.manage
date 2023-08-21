@@ -133,6 +133,10 @@ const searchOrgsAssociatedWithService = async (serviceId, criteria, pageNumber, 
   return callOrganisationsApi(uri, 'GET', undefined, correlationId);
 };
 
+const getOrganisationCategories = async (correlationId) => callOrganisationsApi('organisations/categories', 'GET', undefined, correlationId);
+
+const listOrganisationStatus = async (correlationId) => callOrganisationsApi('organisations/states', 'GET', undefined, correlationId);
+
 module.exports = {
   getInvitationOrganisations,
   getAllUserOrganisations,
@@ -146,4 +150,6 @@ module.exports = {
   getPendingRequestsAssociatedWithUser,
   updateRequestById,
   searchOrgsAssociatedWithService,
+  getOrganisationCategories,
+  listOrganisationStatus,
 };

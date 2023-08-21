@@ -302,6 +302,18 @@ const getUserServiceRoles = async (req) => {
   return userRolesForService.map((x) => x.role);
 };
 
+const unpackMultiSelect = (parameter) => {
+  if (!parameter) {
+    return [];
+  }
+  if (!(parameter instanceof Array)) {
+    return parameter.split(',');
+  }
+  return parameter;
+};
+
+const isSelected = (source, target) => source.some((x) => x.toLowerCase() === target.toLowerCase());
+
 module.exports = {
   mapUserToSupportModel,
   getUserDetails,
@@ -310,4 +322,6 @@ module.exports = {
   getFriendlyValues,
   waitForIndexToUpdate,
   getUserServiceRoles,
+  unpackMultiSelect,
+  isSelected,
 };
