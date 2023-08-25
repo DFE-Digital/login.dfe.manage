@@ -314,6 +314,71 @@ const unpackMultiSelect = (parameter) => {
 
 const isSelected = (source, target) => source.some((x) => x.toLowerCase() === target.toLowerCase());
 
+const getParamsSource = (reqMethod, reqBody, reqQuery) => (reqMethod.toUpperCase() === 'POST' ? reqBody : reqQuery);
+
+const getSafeCriteria = (paramsSource) => {
+  const criteria = paramsSource.criteria || '';
+  return criteria.includes('-') ? `"${criteria}"` : criteria;
+};
+
+const getSortInfo = (paramsSource, sortKeys) => {
+  let sortBy = 'name';
+  if (paramsSource.sort) {
+    sortBy = paramsSource.sort.toLowerCase();
+  }
+
+  let sortAsc = true;
+  if (paramsSource.sortDir) {
+    sortAsc = paramsSource.sortDir.toLowerCase() === 'asc';
+  }
+
+  const sort = sortKeys.reduce((acc, key) => {
+    const lowerCaseKey = key.toLowerCase();
+    let nextDirection = 'asc';
+    let applied = false;
+
+    if (sortBy === lowerCaseKey) {
+      applied = true;
+      if (sortAsc) {
+        nextDirection = 'desc';
+      } else {
+        nextDirection = 'asc';
+      }
+    }
+
+    acc[lowerCaseKey] = {
+      nextDirection,
+      applied,
+    };
+
+    return acc;
+  }, {});
+
+  return {
+    sortBy,
+    sortAsc,
+    sort,
+  };
+};
+
+const getValidPageNumber = (pageSource) => {
+  const pageNumber = parseInt(pageSource, 10) || 1;
+  return Number.isNaN(pageNumber) ? 1 : pageNumber;
+};
+
+const objectToQueryString = (obj) => Object.entries(obj)
+  .flatMap(([key, value]) => {
+    if (Array.isArray(value)) {
+      return value
+        .filter((v) => v !== undefined && v !== null && v !== '')
+        .map((v) => `${key}=${v}`);
+    } if (value !== undefined && value !== null && value !== '') {
+      return `${key}=${value}`;
+    }
+    return [];
+  })
+  .join('&');
+
 module.exports = {
   mapUserToSupportModel,
   getUserDetails,
@@ -324,4 +389,9 @@ module.exports = {
   getUserServiceRoles,
   unpackMultiSelect,
   isSelected,
+  getParamsSource,
+  getSortInfo,
+  getSafeCriteria,
+  getValidPageNumber,
+  objectToQueryString,
 };

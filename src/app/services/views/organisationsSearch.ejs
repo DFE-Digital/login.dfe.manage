@@ -8,6 +8,18 @@
             <form method="post" id="form-organisation-search">
                 <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
                 <input type="hidden" name="showOrganisations" value=<%= locals.serviceOrganisations %> />
+                <input type="hidden" name="showFilters" value="<%= locals.showFilters %>"/>
+                <% function generateHiddenInputs(array, inputName) { %>
+                    <% if (array && array.length > 0) { %>
+                        <% array.forEach(option => { %>
+                            <input type="hidden" name="<%= inputName %>" value="<%= option %>">
+                        <% }) %>
+                    <% } %>
+                <% } %>
+                
+                <% generateHiddenInputs(locals.selectedOrgStatuses, 'organisationStatus'); %>
+                <% generateHiddenInputs(locals.selectedOrgTypes, 'organisationType'); %>
+
                 <fieldset class="govuk-fieldset">
                     <div class="govuk-form-group govuk-!-margin-bottom-0">
                         <h2 class="govuk-label-wrapper">
@@ -44,11 +56,23 @@
                     </div>
                 </div>
             </form>
+            <form method="post" class="show-filters">
+                <% generateHiddenInputs(locals.selectedOrgStatuses, 'organisationStatus'); %>
+                <% generateHiddenInputs(locals.selectedOrgTypes, 'organisationType'); %>
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
+                <input type="hidden" name="criteria" value="<%= locals.criteria %>"/>
+                <input type="hidden" name="sort" value="<%= locals.sortBy %>"/>
+                <input type="hidden" name="sortDir" value="<%= locals.sortOrder %>"/>
+                <input type="hidden" name="showOrganisations" value="<%= locals.serviceOrganisations %>"/>
+                <input type="hidden" name="page" value="<%= locals.page %>"/>
+                <input type="hidden" name="showFilters" value="<%= !showFilters %>"/>
+                <input type="hidden" name="isFilterToggle" value="true"/>
+                <button type="submit" class="govuk-button govuk-button--secondary"><%= (showFilters ? 'Hide' : 'Show') %> filters</button>
+            </form>
         </div>
     </div>
     
-    <%
-    const paginationModel = {
+    <% const paginationModel = {
         method: 'post',
         csrfToken,
         currentPage: locals.page,
@@ -59,67 +83,124 @@
             { key: 'criteria', value: locals.criteria },
             { key: 'sort', value: locals.sortBy },
             { key: 'sortDir', value: locals.sortOrder },
-            { key: 'showOrganisations', value: locals.serviceOrganisations}
+            { key: 'showOrganisations', value: locals.serviceOrganisations},
+            { key: 'showFilters', value: locals.showFilters}
         ]
-    }
+        }
+        const addToPaginationData = (array, key, paginationData) => {
+            if (array && array.length > 0) {
+                array.forEach(item => {
+                    paginationData.push({ key, value: `${item}` });
+                });
+            }
+        };
+
+        addToPaginationData(locals.selectedOrgStatuses, 'organisationStatus', paginationModel.data);
+        addToPaginationData(locals.selectedOrgTypes, 'organisationType', paginationModel.data);
     %>
 
+    
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
+        <% if (showFilters) { %>
+            <div class="govuk-grid-column-one-third">
+                <% 
+                const filterCategories = [
+                    { name: 'Status', inputName:'organisationStatus', options: organisationStatuses },
+                    { name: 'Organisation type', inputName:'organisationType', options: organisationTypes }
+                ];
+                %>
+
+                <% const clearFiltersUri = `?page=${locals.page}&showOrganisations=${locals.serviceOrganisations}&criteria=${locals.criteria}&sort=${locals.sortBy}&sortDir${locals.sortOrder}&showFilters=${locals.showFilters}` %>
+                <form method="POST">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
+                    <input type="hidden" name="criteria" value="<%= locals.criteria %>"/>
+                    <input type="hidden" name="sort" value="<%= locals.sortBy %>"/>
+                    <input type="hidden" name="sortDir" value="<%= locals.sortOrder %>"/>
+                    <input type="hidden" name="showOrganisations" value="<%= locals.serviceOrganisations %>"/>
+                    <input type="hidden" name="page" value="1"/>
+                    <input type="hidden" name="showFilters" value="<%= locals.showFilters %>"/>
+                
+                    <%- include('../../layouts/filters.ejs', { filterCategories: filterCategories, clearFiltersUri:clearFiltersUri }); %>
+                </form>
+            </div>
+        <% } %>
+
+        <div class="<%= showFilters ? 'govuk-grid-column-two-thirds govuk-!-padding-left-0 govuk-!-padding-right-0' : 'govuk-grid-column-full' %>">
             <%- include('../../layouts/pagination', paginationModel); %>
             <table class="govuk-table">
                 <thead class="govuk-table__head">
-                    <% let baseSortUri = `?page=${page}&showOrganisations=${locals.serviceOrganisations}&criteria=${criteria}`; %>
+                    <% 
+                        let orgStatusParam = "";
+                        let orgTypeParam = "";
+    
+                        if (locals.selectedOrgStatuses && locals.selectedOrgStatuses.length > 0) {
+                            orgStatusParam = locals.selectedOrgStatuses.map(status => `organisationStatus=${status}`).join('&');
+                        }
+
+                        if (locals.selectedOrgTypes && locals.selectedOrgTypes.length > 0) {
+                            orgTypeParam = locals.selectedOrgTypes.map(type => `organisationType=${type}`).join('&');
+                        }
+                        
+                        let baseSortUri = `?page=${page}&showOrganisations=${locals.serviceOrganisations}&criteria=${criteria}&showFilters=${showFilters}`;
+
+                        if (orgStatusParam) {
+                            baseSortUri += `&${orgStatusParam}`;
+                        }
+
+                        if (orgTypeParam) {
+                            baseSortUri += `&${orgTypeParam}`;
+                        }
+                    %>
                     <tr class="govuk-table__row sortable">
-                        <th scope="col" class="govuk-table__header width-30">
+                        <th scope="col" class="govuk-table__header width-17<%= showFilters ? ' govuk-!-font-size-14 govuk-!-padding-right-2' : '' %>">
                             <a
                             href="<%=baseSortUri%>&sort=name&sortDir=<%= sort.name.nextDirection %>"
                             class="govuk-link <% if (sort.name.applied) { %>sorted dir-<%= (sort.name.nextDirection === 'asc') ? 'a' : 'd' %> <% } %>">
                             Organisation
                             </a>
-                        <th scope="col" class="govuk-table__header width-30">
+                        <th scope="col" class="govuk-table__header width-15<%= showFilters ? ' govuk-!-font-size-14 govuk-!-padding-right-2' : '' %>">
                             <a
                             href="<%=baseSortUri%>&sort=legalname&sortDir=<%= sort.legalname.nextDirection %>"
                             class="govuk-link <% if (sort.legalname.applied) { %>sorted dir-<%= (sort.legalname.nextDirection === 'asc') ? 'a' : 'd' %> <% } %>">
                             Legal name
                             </a>
                         </th>
-                        <th scope="col" class="govuk-table__header width-15">
+                        <th scope="col" class="govuk-table__header width-15<%= showFilters ? ' govuk-!-font-size-14 govuk-!-padding-right-2' : '' %>">
                             <a
                             href="<%=baseSortUri%>&sort=type&sortDir=<%= sort.type.nextDirection %>"
                             class="govuk-link <% if (sort.type.applied) { %>sorted dir-<%= (sort.type.nextDirection === 'asc') ? 'a' : 'd' %> <% } %>">
                             Type
                             </a>
                         </th>
-                        <th scope="col" class="govuk-table__header width-10">
+                        <th scope="col" class="govuk-table__header width-10<%= showFilters ? ' govuk-!-font-size-14 govuk-!-padding-right-2' : '' %>">
                             <a
                             href="<%=baseSortUri%>&sort=urn&sortDir=<%= sort.urn.nextDirection %>"
                             class="govuk-link <% if (sort.urn.applied) { %>sorted dir-<%= (sort.urn.nextDirection === 'asc') ? 'a' : 'd' %> <% } %>">
                             URN
                             </a>
                         </th>
-                        <th scope="col" class="govuk-table__header width-10">
+                        <th scope="col" class="govuk-table__header width-10<%= showFilters ? ' govuk-!-font-size-14 govuk-!-padding-right-2' : '' %>">
                             <a
                             href="<%=baseSortUri%>&sort=uid&sortDir=<%= sort.uid.nextDirection %>"
                             class="govuk-link <% if (sort.uid.applied) { %>sorted dir-<%= (sort.uid.nextDirection === 'asc') ? 'a' : 'd' %> <% } %>">
                             UID
                             </a>
                         </th>
-                        <th scope="col" class="govuk-table__header width-10">
+                        <th scope="col" class="govuk-table__header width-10<%= showFilters ? ' govuk-!-font-size-14 govuk-!-padding-right-2' : '' %>">
                             <a
                             href="<%=baseSortUri%>&sort=upin&sortDir=<%= sort.upin.nextDirection %>"
                             class="govuk-link <% if (sort.upin.applied) { %>sorted dir-<%= (sort.upin.nextDirection === 'asc') ? 'a' : 'd' %> <% } %>">
                             UPIN
                             </a>
                         </th>
-                        <th scope="col" class="govuk-table__header width-15">
+                        <th scope="col" class="govuk-table__header width-15<%= showFilters ? ' govuk-!-font-size-14 govuk-!-padding-right-2' : '' %>">
                             <a
                             href="<%=baseSortUri%>&sort=ukprn&sortDir=<%= sort.ukprn.nextDirection %>"
                             class="govuk-link <% if (sort.ukprn.applied) { %>sorted dir-<%= (sort.ukprn.nextDirection === 'asc') ? 'a' : 'd' %> <% } %>">
                             UKPRN
                             </a>
                         </th>
-                        <th scope="col" class="govuk-table__header width-20 govuk-table__header--numeric">
+                        <th scope="col" class="govuk-table__header width-15 govuk-table__header--numeric<%= showFilters ? ' govuk-!-font-size-14 govuk-!-padding-right-0' : '' %>">
                             <a
                             href="<%=baseSortUri%>&sort=status&sortDir=<%= sort.status.nextDirection %>"
                             class="govuk-link <% if (sort.status.applied) { %>sorted dir-<%= (sort.status.nextDirection === 'asc') ? 'a' : 'd' %> <% } %>">
@@ -131,7 +212,7 @@
                 <tbody class="govuk-table__body">
                     <% if(locals.organisations.length === 0 && locals.criteria) { %>
                     <tr class="govuk-table__row">
-                        <td class="govuk-table__cell" colspan="7">
+                        <td class="govuk-table__cell" colspan="8">
                             <div class="empty-state">
                                 <p class="govuk-body">No organisations found</p>
                             </div>
@@ -140,16 +221,16 @@
                 <% } %>
                 <% for (let i = 0; i < locals.organisations.length; i++) { %>
                     <tr class="govuk-table__row">
-                        <th class="govuk-table__cell govuk-table__header govuk-!-padding-bottom-4 govuk-!-padding-top-4">
+                        <th class="govuk-table__cell govuk-table__header govuk-!-padding-bottom-4 govuk-!-padding-top-4<%= showFilters ? ' govuk-!-font-size-14 govuk-!-padding-right-2' : '' %>">
                             <a class="govuk-link" href="organisations/<%= organisations[i].id %>/users"><%= organisations[i].name %></a>
                         </th>
-                        <td class="govuk-table__cell govuk-!-font-size-16"><%= organisations[i].LegalName %></td>
-                        <td class="govuk-table__cell govuk-!-font-size-16"><%= organisations[i].category.name %></td>
-                        <td class="govuk-table__cell govuk-!-font-size-16"><%= organisations[i].urn %></td>
-                        <td class="govuk-table__cell govuk-!-font-size-16"><%= organisations[i].uid %></td>
-                        <td class="govuk-table__cell govuk-!-font-size-16"><%= organisations[i].upin %></td>
-                        <td class="govuk-table__cell govuk-!-font-size-16"><%= organisations[i].ukprn %></td>
-                        <td class="govuk-table__cell govuk-!-font-size-16 govuk-table__cell--numeric"><%= organisations[i].status!==undefined ? organisations[i].status.name : '' %></td>
+                        <td class="govuk-table__cell govuk-!-font-size-<%= showFilters ? '14 govuk-!-padding-right-2'  : '16' %>"><%= organisations[i].LegalName %></td>
+                        <td class="govuk-table__cell govuk-!-font-size-<%= showFilters ? '14 govuk-!-padding-right-2' : '16' %>"><%= organisations[i].category.name %></td>
+                        <td class="govuk-table__cell govuk-!-font-size-<%= showFilters ? '14 govuk-!-padding-right-2' : '16' %>"><%= organisations[i].urn %></td>
+                        <td class="govuk-table__cell govuk-!-font-size-<%= showFilters ? '14 govuk-!-padding-right-2' : '16' %>"><%= organisations[i].uid %></td>
+                        <td class="govuk-table__cell govuk-!-font-size-<%= showFilters ? '14 govuk-!-padding-right-2' : '16' %>"><%= organisations[i].upin %></td>
+                        <td class="govuk-table__cell govuk-!-font-size-<%= showFilters ? '14 govuk-!-padding-right-2' : '16' %>"><%= organisations[i].ukprn %></td>
+                        <td class="govuk-table__cell govuk-!-font-size-<%= showFilters ? '14 govuk-!-padding-right-0' : '16' %> govuk-table__cell--numeric"><%= organisations[i].status!==undefined ? organisations[i].status.name : '' %></td>
                     </tr>
                 <% } %>
                 </tbody>
