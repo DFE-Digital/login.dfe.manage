@@ -8,7 +8,7 @@ const {
 } = require('./utils');
 const logger = require('../../infrastructure/logger');
 
-const getFiltersModel = async (req, organisationCategories) => {
+const getFiltersModel = async (req, organisationCategories, orgStatuses) => {
   const {
     method, body, query, id,
   } = req;
@@ -37,12 +37,19 @@ const getFiltersModel = async (req, organisationCategories) => {
         isSelected: isSelected(selectedOrganisationTypes, category.id),
       }));
     }
-
-    organisationStatuses = (await listOrganisationStatus(id)).map((status) => ({
-      id: status.id,
-      name: status.name,
-      isSelected: selectedOrganisationStatus.includes(status.id.toString()),
-    }));
+    if (paramsSource && paramsSource.showOrganisations === 'currentService' && orgStatuses) {
+      organisationStatuses = orgStatuses.map((status) => ({
+        id: status.id,
+        name: status.name,
+        isSelected: isSelected(selectedOrganisationStatus, status.id.toString()),
+      }));
+    } else {
+      organisationStatuses = (await listOrganisationStatus(id)).map((status) => ({
+        id: status.id,
+        name: status.name,
+        isSelected: selectedOrganisationStatus.includes(status.id.toString()),
+      }));
+    }
   }
 
   return {
@@ -86,7 +93,7 @@ const search = async (req) => {
       userEmail: req.user.email,
       criteria,
       pageNumber,
-      numberOfPages: results.numberOfPages,
+      numberOfPages: results.totalNumberOfPages,
       sortedBy: sortBy,
       sortDirection: sortAsc ? 'asc' : 'desc',
     });
@@ -107,7 +114,7 @@ const search = async (req) => {
       userEmail: req.user.email,
       criteria,
       pageNumber,
-      numberOfPages: results.numberOfPages,
+      numberOfPages: results.totalNumberOfPages,
       sortedBy: sortBy,
       sortDirection: sortAsc ? 'asc' : 'desc',
     });
@@ -121,6 +128,7 @@ const search = async (req) => {
     totalNumberOfPages: results.totalNumberOfPages,
     totalNumberOfRecords: results.totalNumberOfRecords,
     organisationCategories: results.organisationCategories,
+    organisationStatuses: results.organisationStatuses,
     organisations: results.organisations,
     serviceOrganisations: showOrganisations,
     selectedOrgStatuses: orgStatuses,
@@ -136,7 +144,7 @@ const buildModel = async (req) => {
     search(req),
   ]);
 
-  const filtersModel = await getFiltersModel(req, pageOfOrganisations.organisationCategories);
+  const filtersModel = await getFiltersModel(req, pageOfOrganisations.organisationCategories, pageOfOrganisations.organisationStatuses);
 
   return {
     csrfToken: req.csrfToken(),
