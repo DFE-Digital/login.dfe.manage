@@ -1,6 +1,6 @@
 <div class="govuk-width-container govuk-main-wrapper">
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-three-quarters">
+        <div class="govuk-grid-column-two-thirds">
         <% if (locals.flash.info) { %>
             <div id="notification-wrapper" class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
                 <div class="govuk-notification-banner__header">
@@ -18,8 +18,20 @@
         <% } %>
             <h1 class="govuk-heading-xl govuk-!-margin-top-0 text-break">
                 <span class="govuk-caption-xl"><%=locals.service.name%></span>
-                Service configuration
+                Edit service configuration
             </h1>
+            <p class="govuk-body-l">View and edit your service configuration.</p>
+        </div>
+        <!-- TODO: add help link -->
+        <div class="govuk-grid-column-one-third">
+            <aside id="related-actions" class="govuk-!-margin-top-0">
+                <h2 class="govuk-heading-m">Related actions</h2>
+                <ul class="govuk-list">
+                    <li>
+                        <a class="govuk-link-bold" href="">Help with service configuration</a>
+                    </li>
+                </ul>
+            </aside>
         </div>
     </div>
 
@@ -28,152 +40,180 @@
             <form method="post" class="prevent-form-double-submission" id="form-service-config">
                 <input type="hidden" name="_csrf" value="<%=csrfToken%>" />
                 <fieldset  class="govuk-fieldset govuk-!-margin-top-3">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
                         Service details
                     </legend>
-                    <dl class="govuk-summary-list">
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">
-                                <label for="name" class="govuk-label govuk-label--s">
-                                    Service name
-                                </label>
-                            </dt>
-                            <dd class="govuk-summary-list__value">
-                                <div
-                                    class="govuk-form-group <%= (locals.validationMessages.name !== undefined) ? 'govuk-form-group--error' : ''%>">
-                                    <% if (locals.validationMessages.name !== undefined) { %>
-                                    <p id="validation-name" class="govuk-error-message">
-                                        <span class="govuk-visually-hidden">Error:</span>
-                                        <%=locals.validationMessages.name %>
-                                    </p>
-                                    <% } %>
-                                    <input
-                                        class="form-control inputConfig govuk-input"
-                                        id="name"
-                                        name="name"
-                                        type="text"
-                                        value="<%=locals.service.name%>" />
-                                </div>
-                            </dd>
+                    <!-- TODO: update the address to help page -->
+                    <p class="govuk-body">Read the <a href="">service configuration help page</a> to find out more about service details:</p>
+                    <ul class="govuk-list govuk-list--bullet">
+                        <li>home URL</li>
+                        <li>post password-reset URL</li>
+                      </ul>
+
+
+                    <div class="govuk-form-group<%= (locals.validationMessages.serviceHome !== undefined) ? ' govuk-form-group--error' : ''%>">
+                        <h1 class="govuk-label-wrapper">
+                            <label class="govuk-label govuk-label--m" for="serviceHome">
+                                Home URL
+                            </label>
+                        </h1>
+                        <div id="home-url-hint" class="govuk-hint">
+                            The home page of the service you want to configure. It is usually the service landing page from DfE Sign-in.
                         </div>
-    
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">
-                                <label for="description" class="govuk-label govuk-label--s">
-                                    Description
-                                </label>
-                                <div class="govuk-hint">
-                                    (<a class="govuk-link" href="<%= locals.urls.serviceNow %>">Contact us</a> to request a change)
-                                </div>
-                            </dt>
-                            <dd class="govuk-summary-list__value">
-                                <div
-                                    class="govuk-form-group <%= (locals.validationMessages.description !== undefined) ? 'govuk-form-group--error' : ''%>">
-                                    <% if (locals.validationMessages.description !== undefined){ %>
-                                    <p id="validation-description" class="govuk-error-message">
-                                        <span class="govuk-visually-hidden">Error:</span>
-                                        <%=locals.validationMessages.description %>
-                                    </p>
-                                    <% } %>
-    
-                                    <textarea
-                                        disabled
-                                        class="govuk-textarea form-control inputConfig"
-                                        id="description"
-                                        name="description"
-                                        rows="5"
-                                        style="resize: none">
-                                        <%=locals.service.description%>
-                                    </textarea>
-                                </div>
-                            </dd>
+
+                        <% if (locals.validationMessages.serviceHome !== undefined){ %>
+                        <p id="validation-homeUrl" class="govuk-error-message">
+                        <span class="govuk-visually-hidden">Error:</span>
+                        <%=locals.validationMessages.serviceHome %>
+                        </p>
+                        <% } %>
+
+                        <input class="form-control  govuk-input" id="serviceHome" name="serviceHome" type="text"
+                            value="<%=locals.service.serviceHome%>">
+                    </div>
+
+                    <div class="govuk-form-group<%= (locals.validationMessages.postResetUrl !== undefined) ? ' govuk-form-group--error' : ''%>">
+                        <h1 class="govuk-label-wrapper">
+                            <label class="govuk-label govuk-label--m" for="postResetUrl">
+                                Post password-reset URL
+                            </label>
+                        </h1>
+                        <div id="post-reset-url-hint" class="govuk-hint">
+                            Where you want to redirect users after they have reset their password. It is usually the DfE Sign-in home page.
                         </div>
-    
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">
-                                <label for="serviceHome" class="govuk-label govuk-label--s">
-                                    Home Url
-                                </label>
-                            </dt>
-                            <dd class="govuk-summary-list__value">
-                                <div
-                                    class="govuk-form-group <%= (locals.validationMessages.serviceHome !== undefined) ? 'govuk-form-group--error' : ''%>">
-                                    <% if (locals.validationMessages.serviceHome !== undefined){ %>
-                                    <p id="validation-homeUrl" class="govuk-error-message">
-                                        <span class="govuk-visually-hidden">Error:</span>
-                                        <%=locals.validationMessages.serviceHome %>
-                                    </p>
-                                    <% } %>
-                                    <input
-                                        class="form-control inputConfig govuk-input"
-                                        id="serviceHome"
-                                        name="serviceHome"
-                                        type="text"
-                                        value="<%=locals.service.serviceHome%>" />
-                                </div>
-                            </dd>
-                        </div>
-    
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">
-                                <label for="postResetUrl" class="govuk-label govuk-label--s">
-                                    Post-reset Url
-                                </label>
-                            </dt>
-                            <dd class="govuk-summary-list__value">
-                                <div
-                                    class="govuk-form-group <%= (locals.validationMessages.postResetUrl !== undefined) ? 'govuk-form-group--error' : ''%>">
-                                    <% if (locals.validationMessages.postResetUrl !== undefined){ %>
-                                    <p id="validation-postResetUrl" class="govuk-error-message">
-                                        <span class="govuk-visually-hidden">Error:</span>
-                                        <%=locals.validationMessages.postResetUrl %>
-                                    </p>
-                                    <% } %>
-    
-                                    <input
-                                        class="form-control inputConfig govuk-input"
-                                        id="postResetUrl"
-                                        name="postResetUrl"
-                                        type="text"
-                                        value="<%=locals.service.postResetUrl%>" />
-                                </div>
-                            </dd>
-                        </div>
-                    </dl>
+
+                        <% if (locals.validationMessages.postResetUrl !== undefined){ %>
+                        <p id="validation-postResetUrl" class="govuk-error-message">
+                          <span class="govuk-visually-hidden">Error:</span>
+                          <%=locals.validationMessages.postResetUrl %>
+                        </p>
+                        <% } %>
+
+                        <input class="form-control govuk-input" id="postResetUrl" name="postResetUrl" type="text"
+                            value="<%=locals.service.postResetUrl%>" />
+                    </div>
                 </fieldset>
 
+                <hr class="govuk-section-break govuk-section-break--visible">
+
                 <fieldset  class="govuk-fieldset govuk-!-margin-top-3">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
                         OpenID Connect
                     </legend>
-                    <dl class="govuk-summary-list">
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">
-                                <label for="clientId" class="govuk-label govuk-label--s">
-                                    Client Id
-                                    <span class="govuk-hint">(Up to 50 characters including letters, numbers, and hyphens)</span>
-                                </label>
-                            </dt>
-                            <dd class="govuk-summary-list__value">
-                                <div
-                                    class="govuk-form-group <%= (locals.validationMessages.clientId !== undefined) ? 'govuk-form-group--error' : ''%>">
-                                    <% if (locals.validationMessages.clientId !== undefined){ %>
-                                    <p id="validation-clientId" class="govuk-error-message">
-                                        <span class="govuk-visually-hidden">Error:</span>
-                                        <%=locals.validationMessages.clientId %>
-                                    </p>
-                                    <% } %>
+                    <!-- TODO: update the address to help page -->
+                    <p class="govuk-body">Read the <a href="">service configuration help page</a> to find out more about OpenID Connect:</p>
+                    <ul class="govuk-list govuk-list--bullet">
+                        <li>client ID</li>
+                        <li>redirect URL</li>
+                        <li>logout redirect URL</li>
+                        <li>response types</li>
+                        <li>refresh_token</li>
+                        <li>client secret</li>
+                        <li>token endpoint authentication method</li>
+                    </ul>
 
-                                    <input
-                                        class="form-control inputConfig govuk-input"
-                                        id="clientId"
-                                        name="clientId"
-                                        type="text"
-                                        value="<%=locals.service.clientId%>" />
-                                </div>
-                            </dd>
+                    <div class="govuk-form-group">
+                        <h1 class="govuk-label-wrapper">
+                            <label class="govuk-label govuk-label--m" for="clientId">
+                                Client ID
+                            </label>
+                        </h1>
+                        <div id="client-id-hint" class="govuk-hint">
+                            A unique identifier of the service that is created manually by the DfE Sign-in team. You cannot change this value.
                         </div>
 
+                        <input class="form-control govuk-input read-only-input govuk-!-width-one-half" id="clientId"
+                            name="clientId"
+                            type="text" 
+                            readonly="readonly"
+                            value="<%=locals.service.clientId%>"/>
+                    </div>
+
+                    <% function generateRedirectUrlsSection(sectionId, heading, hint, urlsData, validationMessages) { %>
+                        <div id="<%= sectionId %>-form-group" data-<%= sectionId %>-counter="<%= (urlsData.length > 0) ? (urlsData.length + 1) : 2 %>" class="govuk-form-group <%= (validationMessages !== undefined) ? 'govuk-form-group--error' : '' %>">
+                            <h1 class="govuk-heading-m govuk-!-margin-bottom-2" id="<%= sectionId %>-heading"> <%= heading %> </h1>
+                            <div id="<%= sectionId %>-hint" class="govuk-hint">
+                                <%= hint %>
+                            </div>
+                    
+                            <% if (urlsData.length > 0) { %>
+                                <% if (validationMessages !== undefined) { %>
+                                <p id="<%= sectionId %>-validation" class="govuk-error-message">
+                                    <span class="govuk-visually-hidden">Error:</span>
+                                    <%= validationMessages %>
+                                </p>
+                                <% } %>
+                                <% for (let i = 0; i < urlsData.length; i++) { 
+                                    const url = urlsData[i];
+                                %>
+                                    <p class="govuk-body input-config-container" id="<%= sectionId %>-input-group-<%= i+1 %>">
+                                        <label for="<%= sectionId %>-input-<%= i+1 %>" class="govuk-label govuk-label--s govuk-visually-hidden">
+                                           <%= heading %>
+                                        </label>
+                                        <input
+                                            class="form-control input-config govuk-input"
+                                            id="<%= sectionId %>-input-<%= i+1 %>"
+                                            name="<%= sectionId %>"
+                                            value="<%= url %>" />
+                                        <a href="#" class="govuk-link govuk-link--no-visited-state remove-redirect" id="<%= sectionId %>-remove-<%= i+1 %>" data-group-id="<%= i+1 %>">Remove</a>
+                                    </p>
+                                <% } %>
+                            <% } else { %>
+                                <% if (validationMessages !== undefined) { %>
+                                <p id="<%= sectionId %>-validation" class="govuk-error-message">
+                                    <span class="govuk-visually-hidden">Error:</span>
+                                    <%= validationMessages %>
+                                </p>
+                                <% } %>
+                                <p class="govuk-body input-config-container" id="<%= sectionId %>-input-group-1">
+                                    <label for="<%= sectionId %>-1" class="govuk-label govuk-label--s govuk-visually-hidden">
+                                       <%= heading %>
+                                    </label>
+                                    <input
+                                        class="form-control input-config govuk-input"
+                                        id="<%= sectionId %>-1"
+                                        name="<%= sectionId %>"
+                                    />
+                                    <a href="#" class="govuk-link govuk-link--no-visited-state remove-redirect" id="<%= sectionId %>-remove-1" data-group-id="1">Remove</a>
+                                </p>
+                            <% } %>
+                        </div>
+                        <a href="" class="govuk-button" id="<%= sectionId %>-add">Add Url</a>
+                    <% } %>
+
+                    <%
+
+                    const sectionsData = [
+                        {
+                            sectionId: 'redirect_uris', 
+                            heading: 'Redirect URL', 
+                            hint: 'Where you want to redirect users after they have authenticated. Add at least 1 URL.', 
+                            urlsData: locals.service.redirectUris, 
+                            validationMessages: locals.validationMessages.redirect_uris 
+                        },
+                        {
+                            sectionId: 'post_logout_redirect_uris', 
+                            heading: 'Logout redirect URL', 
+                            hint: 'Where you want to redirect users after they log out of a service. Add at least 1 URL.', 
+                            urlsData: locals.service.postLogoutRedirectUris, 
+                            validationMessages: locals.validationMessages.post_logout_redirect_uris 
+                        }
+                    ];
+
+                        for (const section of sectionsData) {
+                            generateRedirectUrlsSection(
+                                section.sectionId,
+                                section.heading,
+                                section.hint,
+                                section.urlsData,
+                                section.validationMessages
+                            );
+                        }
+                    %>
+                    
+                </fieldset>
+
+                     <!-- Client secredt OLD section  -->
                         <div class="govuk-summary-list__row">
                             <dt class="govuk-summary-list__key">
                                 <label for="clientSecret" class="govuk-label govuk-label--s">
@@ -204,7 +244,10 @@
                             </dd>
                         </div>
 
-                        <div class="govuk-summary-list__row">
+
+
+                        <!-- Redirect URLS -->
+<!--                         <div class="govuk-summary-list__row">
                             <dt class="govuk-summary-list__key">
                                 <span class="govuk-label govuk-label--s">Redirect Urls</span>
                             </dt>
@@ -256,8 +299,9 @@
                                     </fieldset>
                                 </div>
                             </dd>
-                        </div>
+                        </div> -->
 
+                        <!-- Logout redirect URLS Old section -->
                         <div class="govuk-summary-list__row">
                             <dt class="govuk-summary-list__key">
                                 <span class="govuk-label govuk-label--s">Logout redirect Urls</span>
@@ -311,7 +355,7 @@
                                 </div>
                             </dd>
                         </div>
-
+                        <!-- Grant types old section -->
                         <div class="govuk-summary-list__row">
                             <dt class="govuk-summary-list__key">
                                 <span class="govuk-label govuk-label--s">Grant types</span>
@@ -453,7 +497,7 @@
                             </dd>
                         </div>
                     </dl>
-                </fieldset>
+                </fieldset> 
 
                 <div class="govuk-button-group auto-scroll-dest">
                     <button type="submit" class="govuk-button" data-module="govuk-button">Save</button>
