@@ -284,9 +284,10 @@
                             </div>
                         </fieldset>
                     </div>
-
+                      <%#  TODO: control the dynamic display of this section NSA-7332 %>
                       <%# Client secret new section %>
-                      <div id="clientSecret-wrapper" style="display:none;">
+                      
+                      <!-- <div id="clientSecret-wrapper" style="display:none;">
                         <% 
                             renderSecretInputSection({
                             sectionId: 'clientSecret',
@@ -296,7 +297,7 @@
                             validationMessage: locals.validationMessages.clientSecret
                             }) 
                         %>
-                    </div>
+                    </div> -->
                 </fieldset>
 
                 <hr class="govuk-section-break govuk-section-break--visible">
@@ -613,10 +614,33 @@
                 <!-- </fieldset>   -->
 
                 <div class="govuk-button-group auto-scroll-dest govuk-!-margin-top-3">
-                    <button type="submit" class="govuk-button" data-module="govuk-button">Save</button>
+                    <button type="submit" class="govuk-button" data-module="govuk-button" id="continue-button" disabled>Continue</button>
                     <a href="<%= locals.backLink %>" class="govuk-button govuk-button--secondary">Cancel</a>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+<script>
+    $(document).ready(function() {
+  const $form = $('#form-service-config');
+  const $continueButton = $('#continue-button');
+
+  const initialFormState = $form.serialize();
+
+  // Function to enable or disable the "Continue" button
+  const toggleContinueButton = function() {
+    const currentFormState = $form.serialize();
+    if (currentFormState === initialFormState) {
+      $continueButton.prop('disabled', true);
+    } else {
+      $continueButton.prop('disabled', false);
+    }
+  };
+
+  // Attach event handlers to form elements
+  $form.on('input change', toggleContinueButton);
+});
+
+</script>
