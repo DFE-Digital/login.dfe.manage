@@ -4,8 +4,8 @@ const { getServiceById } = require('../../infrastructure/applications');
 const { getUserServiceRoles } = require('./utils');
 
 const getDashboard = async (req, res) => {
-  if (req.session.serviceConfiguration) {
-    req.session.serviceConfiguration = {};
+  if (req.session.serviceConfigurationChanges) {
+    req.session.serviceConfigurationChanges = {};
   }
   const serviceDetails = await getServiceById(req.params.sid, req.id);
   const manageRolesForService = await getUserServiceRoles(req);

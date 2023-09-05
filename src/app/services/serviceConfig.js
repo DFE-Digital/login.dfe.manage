@@ -1,35 +1,45 @@
 'use strict';
 
 const niceware = require('niceware');
-const { getServiceById, updateService } = require('../../infrastructure/applications');
-const logger = require('../../infrastructure/logger');
+const { getServiceById } = require('../../infrastructure/applications');
 const { getUserServiceRoles } = require('./utils');
 
 const buildCurrentServiceModel = async (req) => {
+  const sessionService = req.query.action === 'amendChanges' ? req.session.serviceConfigurationChanges : {};
   const service = await getServiceById(req.params.sid, req.id);
+
+  let tokenEndpointAuthMethod = null;
+  if (sessionService?.token_endpoint_auth_method?.newValue === 'client_secret_post'
+      || service.relyingParty.token_endpoint_auth_method === 'client_secret_post') {
+    tokenEndpointAuthMethod = 'client_secret_post';
+  }
+
   return {
     name: service.name || '',
     description: service.description || '',
     clientId: service.relyingParty.client_id || '',
-    clientSecret: service.relyingParty.client_secret || '',
-    serviceHome: service.relyingParty.service_home || '',
-    postResetUrl: service.relyingParty.postResetUrl || '',
-    redirectUris: service.relyingParty.redirect_uris || [],
-    postLogoutRedirectUris: service.relyingParty.post_logout_redirect_uris || [],
-    grantTypes: service.relyingParty.grant_types || [],
-    responseTypes: service.relyingParty.response_types || [],
-    apiSecret: service.relyingParty.api_secret || '',
-    tokenEndpointAuthMethod: service.relyingParty.token_endpoint_auth_method === 'client_secret_post'
-      ? 'client_secret_post' : null,
+    clientSecret: (sessionService?.clientSecret?.secretNewValue || service.relyingParty.client_secret) || '',
+    serviceHome: (sessionService?.serviceHome?.newValue || service.relyingParty.service_home) || '',
+    postResetUrl: (sessionService?.postResetUrl?.newValue || service.relyingParty.postResetUrl) || '',
+    redirectUris: (sessionService?.redirectUris?.newValue || service.relyingParty.redirect_uris) || [],
+    postLogoutRedirectUris: (sessionService?.postLogoutRedirectUris?.newValue || service.relyingParty.post_logout_redirect_uris) || [],
+    grantTypes: (sessionService?.grantTypes?.newValue || service.relyingParty.grant_types) || [],
+    responseTypes: (sessionService?.responseTypes?.newValue || service.relyingParty.response_types) || [],
+    apiSecret: (sessionService?.apiSecret?.secretNewValue || service.relyingParty.api_secret) || '',
+    tokenEndpointAuthMethod,
   };
 };
 
 const getServiceConfig = async (req, res) => {
+  if (req.session.serviceConfigurationChanges && req.query.action !== 'amendChanges' ) {
+    req.session.serviceConfigurationChanges = {};
+  }
   const manageRolesForService = await getUserServiceRoles(req);
+  const currentServiceModel = await buildCurrentServiceModel(req);
 
   return res.render('services/views/serviceConfig', {
     csrfToken: req.csrfToken(),
-    service: await buildCurrentServiceModel(req),
+    service: currentServiceModel,
     backLink: `/services/${req.params.sid}`,
     validationMessages: {},
     serviceId: req.params.sid,
@@ -41,8 +51,8 @@ const getServiceConfig = async (req, res) => {
 const validate = async (req, currentService) => {
   const urlValidation = /^https?:\/\/(.*)/;
   const manageRolesForService = await getUserServiceRoles(req);
-
-  let grantTypes = req.body.grant_types ? req.body.grant_types : [];
+  // TODO: revert when adding grantTypes NSA-7334
+  let grantTypes = req.body.grant_types ? req.body.grant_types : currentService.grantTypes;
   if (!(grantTypes instanceof Array)) {
     grantTypes = [req.body.grant_types];
   }
@@ -64,17 +74,18 @@ const validate = async (req, currentService) => {
   }
   selectedLogout = selectedLogout.filter((x) => x.trim() !== '');
 
+  // TODO: remove || currentService.clientSecret, currentService.grantTypes for validation NSA-7334
   const model = {
     service: {
-      name: req.body.name,
-      description: currentService.description || '', // field disabled in form so we don't pick it up from it but use current value
-      clientId: req.body.clientId,
-      clientSecret: req.body.clientSecret || '',
+      name: currentService.name,
+      description: currentService.description,
+      clientId: currentService.clientId,
+      clientSecret: req.body.clientSecret || currentService.clientSecret,
       serviceHome: req.body.serviceHome || '',
       postResetUrl: req.body.postResetUrl || '',
       redirectUris: selectedRedirects,
       postLogoutRedirectUris: selectedLogout,
-      grantTypes,
+      grantTypes: grantTypes || [],
       responseTypes,
       apiSecret: req.body.apiSecret,
       tokenEndpointAuthMethod: req.body.tokenEndpointAuthMethod === 'client_secret_post' ? 'client_secret_post' : null,
@@ -86,9 +97,9 @@ const validate = async (req, currentService) => {
     currentNavigation: 'configuration',
   };
 
-  if (!model.service.name) {
-    model.validationMessages.name = 'Service name must be present';
-  }
+  // if (!model.service.name) {
+  //   model.validationMessages.name = 'Service name must be present';
+  // }
 
   if (model.service.serviceHome && !urlValidation.test(model.service.serviceHome)) {
     model.validationMessages.serviceHome = 'Please enter a valid home Url';
@@ -160,50 +171,48 @@ const postServiceConfig = async (req, res) => {
     return res.render('services/views/serviceConfig', model);
   }
 
-  const editedFields = Object.entries(currentService).filter(([field, oldValue]) => {
-    const newValue = Array.isArray(model.service[field]) ? model.service[field].sort() : model.service[field];
-    return Array.isArray(oldValue) ? !(
-      Array.isArray(newValue)
-      && oldValue.length === newValue.length
-      && oldValue.sort().every((value, index) => value === newValue[index])
-    ) : oldValue !== newValue;
-  }).map(([field, oldValue]) => {
-    const isSecret = field.toLowerCase().includes('secret');
-    return {
-      name: field,
-      oldValue: isSecret ? 'EXPUNGED' : oldValue,
-      newValue: isSecret ? 'EXPUNGED' : model.service[field],
-    };
+  const editedFields = Object.entries(currentService)
+    .filter(([field, oldValue]) => {
+      const newValue = Array.isArray(model.service[field]) ? model.service[field].sort() : model.service[field];
+      return Array.isArray(oldValue) ? !(
+        Array.isArray(newValue)
+    && oldValue.length === newValue.length
+    && oldValue.sort().every((value, index) => value === newValue[index])
+      ) : oldValue !== newValue;
+    })
+    .map(([field, oldValue]) => {
+      const isSecret = field.toLowerCase().includes('secret');
+      const editedField = {
+        name: field,
+        oldValue: isSecret ? 'EXPUNGED' : oldValue,
+        newValue: isSecret ? 'EXPUNGED' : model.service[field],
+        isSecret,
+      };
+      if (isSecret) {
+        editedField.secretNewValue = model.service[field];
+      }
+      return editedField;
+    });
+
+  if (!req.session.serviceConfigurationChanges) {
+    req.session.serviceConfigurationChanges = {};
+  }
+
+  editedFields.forEach(({
+    name, oldValue, newValue, isSecret, secretNewValue,
+  }) => {
+    if (!req.session.serviceConfigurationChanges[name]) {
+      req.session.serviceConfigurationChanges[name] = {};
+    }
+    req.session.serviceConfigurationChanges[name].oldValue = oldValue;
+    req.session.serviceConfigurationChanges[name].newValue = newValue;
+
+    if (isSecret) {
+      req.session.serviceConfigurationChanges[name].secretNewValue = secretNewValue;
+    }
   });
 
-  const updatedService = {
-    name: model.service.name,
-    description: model.service.description,
-    clientId: model.service.clientId,
-    clientSecret: model.service.clientSecret,
-    serviceHome: model.service.serviceHome,
-    postResetUrl: model.service.postResetUrl,
-    redirect_uris: model.service.redirectUris,
-    post_logout_redirect_uris: model.service.postLogoutRedirectUris,
-    grant_types: model.service.grantTypes,
-    response_types: model.service.responseTypes,
-    apiSecret: model.service.apiSecret,
-    tokenEndpointAuthMethod: model.service.tokenEndpointAuthMethod === 'client_secret_post' ? 'client_secret_post' : null,
-  };
-
-  logger.audit(`${req.user.email} (id: ${req.user.sub}) updated service configuration for service ${model.service.name} (id: ${req.params.sid})`, {
-    type: 'manage',
-    subType: 'service-config-updated',
-    userId: req.user.sub,
-    userEmail: req.user.email,
-    editedService: req.params.sid,
-    editedFields,
-  });
-
-  await updateService(req.params.sid, updatedService, req.id);
-
-  res.flash('info', 'Service configuration updated successfully');
-  return res.redirect('service-configuration');
+  return res.redirect('review-service-configuration');
 };
 
 module.exports = {

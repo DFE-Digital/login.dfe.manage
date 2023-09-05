@@ -1,7 +1,7 @@
 <%# Reusable functions to generate elements  %>
 
 <% function renderSecretInputSection({ sectionId, headingText, hintText, dataValues, validationMessages }) { %>
-    <div class="govuk-form-group <%= (validationMessages !== undefined) ? 'govuk-form-group--error' : '' %>">
+    <div class="govuk-form-group <%= (validationMessages !== undefined) ? 'govuk-form-group--error' : '' %>" id="<%=sectionId%>-form-group">
       <h1 class="govuk-label-wrapper" id="<%=sectionId%>-heading">
         <label class="govuk-label govuk-label--m" id="<%=sectionId%>-label" for="<%=sectionId%>">
           <%=headingText%>
@@ -140,7 +140,7 @@
                         </ul>
                     </div>
 
-                    <div class="govuk-form-group<%= (locals.validationMessages.serviceHome !== undefined) ? ' govuk-form-group--error' : ''%>">
+                    <div class="govuk-form-group<%= (locals.validationMessages.serviceHome !== undefined) ? ' govuk-form-group--error' : ''%>" id="serviceHome-form-group">
                         <h1 class="govuk-label-wrapper">
                             <label class="govuk-label govuk-label--m" for="serviceHome">
                                 Home URL
@@ -161,7 +161,7 @@
                             value="<%=locals.service.serviceHome%>">
                     </div>
 
-                    <div class="govuk-form-group<%= (locals.validationMessages.postResetUrl !== undefined) ? ' govuk-form-group--error' : ''%>">
+                    <div class="govuk-form-group<%= (locals.validationMessages.postResetUrl !== undefined) ? ' govuk-form-group--error' : ''%>" id="postResetUrl-form-group">
                         <h1 class="govuk-label-wrapper">
                             <label class="govuk-label govuk-label--m" for="postResetUrl">
                                 Post password-reset URL
@@ -202,7 +202,7 @@
                             <li>token endpoint authentication method</li>
                         </ul>
                     </div>
-                    <div class="govuk-form-group">
+                    <div class="govuk-form-group" id="clientId-form-group">
                         <h1 class="govuk-label-wrapper">
                             <label class="govuk-label govuk-label--m" for="clientId">
                                 Client ID
@@ -251,7 +251,7 @@
                 
 
                     <%# Response types section %>
-                    <div class="govuk-form-group">
+                    <div class="govuk-form-group" id="response_types-form-group">
                         <fieldset class="govuk-fieldset" id="response_types-fieldset" aria-describedby="response_types-hint">
                             <legend class="govuk-fieldset__legend" id="response_types-legend">
                                 <h1 class="govuk-heading-m govuk-!-margin-bottom-2" id="response_types-heading"> Response types </h1>

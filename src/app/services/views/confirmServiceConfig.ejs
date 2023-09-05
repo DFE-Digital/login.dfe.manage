@@ -1,0 +1,86 @@
+
+<div class="govuk-width-container govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds govuk-!-margin-bottom-3">
+            <h1 class="govuk-heading-xl govuk-!-margin-top-0 text-break govuk-!-margin-bottom-4">
+                <span class="govuk-caption-xl"><%=locals.service.name%></span>
+                Review service configuration changes
+            </h1>
+            <p class="govuk-body-l">Review these details before changing service configuration for <%=locals.service.name%>.</p>
+        </div>
+       <%# TODO: add help link   %> 
+        <div class="govuk-grid-column-one-third">
+            <aside id="related-actions" class="govuk-!-margin-top-0">
+                <h2 class="govuk-heading-m">Related actions</h2>
+                <ul class="govuk-list">
+                    <li>
+                        <a class="govuk-link-bold" href="">Help with service configuration</a>
+                    </li>
+                </ul>
+            </aside>
+        </div>
+    </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+          <form method="post" class="prevent-form-double-submission" id="service-config-changes-form">
+          <input type="hidden" name="_csrf" value="<%=csrfToken%>" />
+          <dl class="govuk-summary-list">
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">
+                Review summary
+              </dt>
+              <dd class="app-check-your-answers__answer">
+              </dd>
+            </div>
+            <% if (locals.serviceChanges && locals.serviceChanges.length > 0) { %>
+              <% locals.serviceChanges.forEach((e) => { %>
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">
+                    <%= e.title || 'N/A' %>
+                    <div class="govuk-hint">
+                      <%= e.description || '' %>
+                    </div>
+                  </dt>
+                  <dd class="govuk-summary-list__value">
+                    <% if (e.newValue) { %>
+                      <% if (Array.isArray(e.newValue) && e.newValue.length > 0) { %>
+                        <% e.newValue.forEach((value) => { %>
+                          <p class="govuk-body"><%= value %></p>
+                        <% }); %>
+                      <% } else if (typeof e.newValue === 'string' || typeof e.newValue === 'number') { %>
+                        <p class="govuk-body"><%= e.newValue %></p>
+                      <% } %>
+                    <% } else { %>
+                      N/A
+                    <% } %>
+                  </dd>
+                  <dd class="govuk-summary-list__actions">
+                    <% if (e.changeLink) { %>
+                      <a class="govuk-link" href="<%= e.changeLink %>">
+                        Change<span class="govuk-visually-hidden"> <%= (e.title || '').toLowerCase() %></span>
+                      </a>
+                    <% } else { %>
+                      N/A
+                    <% } %>
+                  </dd>
+                </div>
+              <% }); %>
+            <% } %>
+          </dl>
+        </div>
+      </div>
+      <div class="govuk-warning-text" id="service-config-changes-warning-text">
+        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+        <strong class="govuk-warning-text__text">
+          <span class="govuk-warning-text__assistive">Warning</span>
+          If you make an error in your service configuration changes, <%=locals.service.name%> might become unavailable to users.
+        </strong>
+      </div>
+      <div class="govuk-button-group govuk-!-margin-top-3">
+        <button type="submit" class="govuk-button" data-module="govuk-button" id="service-config-changes-save-button" >Save</button>
+        <a href="<%= locals.backLink %>" class="govuk-button govuk-button--secondary" id="service-config-changes-cancel-button">Cancel</a>
+    </div>
+  </form>
+</div>
+
