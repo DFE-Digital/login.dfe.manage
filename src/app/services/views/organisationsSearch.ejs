@@ -18,7 +18,7 @@
                 <% } %>
                 
                 <% generateHiddenInputs(locals.selectedOrgStatuses, 'organisationStatus'); %>
-                <% generateHiddenInputs(locals.selectedOrgTypes, 'organisationType'); %>
+                <% generateHiddenInputs(locals.selectedOrgTypes, 'organisationCategory'); %>
 
                 <fieldset class="govuk-fieldset">
                     <div class="govuk-form-group govuk-!-margin-bottom-0">
@@ -106,7 +106,7 @@
                 <% 
                 const filterCategories = [
                     { name: 'Status', inputName:'organisationStatus', options: organisationStatuses },
-                    { name: 'Organisation type', inputName:'organisationType', options: organisationTypes }
+                    { name: 'Organisation category', inputName:'organisationType', options: organisationTypes }
                 ];
                 %>
 
@@ -152,55 +152,55 @@
                         }
                     %>
                     <tr class="govuk-table__row sortable">
-                        <th scope="col" class="govuk-table__header width-17<%= showFilters ? ' govuk-!-font-size-14 govuk-!-padding-right-2' : '' %>">
+                        <th scope="col" class="govuk-table__header width-17<%= showFilters ? ' govuk-!-font-size-14 govuk-!-padding-right-2 dfe-white-space-no-wrap' : '' %>">
                             <a
                             href="<%=baseSortUri%>&sort=name&sortDir=<%= sort.name.nextDirection %>"
                             class="govuk-link <% if (sort.name.applied) { %>sorted dir-<%= (sort.name.nextDirection === 'asc') ? 'a' : 'd' %> <% } %>">
                             Organisation
                             </a>
-                        <th scope="col" class="govuk-table__header width-15<%= showFilters ? ' govuk-!-font-size-14 govuk-!-padding-right-2' : '' %>">
+                        <th scope="col" class="govuk-table__header width-15<%= showFilters ? ' govuk-!-font-size-14 govuk-!-padding-right-2 dfe-white-space-no-wrap' : '' %>">
                             <a
                             href="<%=baseSortUri%>&sort=legalname&sortDir=<%= sort.legalname.nextDirection %>"
                             class="govuk-link <% if (sort.legalname.applied) { %>sorted dir-<%= (sort.legalname.nextDirection === 'asc') ? 'a' : 'd' %> <% } %>">
                             Legal name
                             </a>
                         </th>
-                        <th scope="col" class="govuk-table__header width-15<%= showFilters ? ' govuk-!-font-size-14 govuk-!-padding-right-2' : '' %>">
+                        <th scope="col" class="govuk-table__header width-15<%= showFilters ? ' govuk-!-font-size-14 govuk-!-padding-right-2 dfe-white-space-no-wrap' : '' %>">
                             <a
                             href="<%=baseSortUri%>&sort=type&sortDir=<%= sort.type.nextDirection %>"
                             class="govuk-link <% if (sort.type.applied) { %>sorted dir-<%= (sort.type.nextDirection === 'asc') ? 'a' : 'd' %> <% } %>">
-                            Type
+                            Category
                             </a>
                         </th>
-                        <th scope="col" class="govuk-table__header width-10<%= showFilters ? ' govuk-!-font-size-14 govuk-!-padding-right-2' : '' %>">
+                        <th scope="col" class="govuk-table__header width-10<%= showFilters ? ' govuk-!-font-size-14 govuk-!-padding-right-2 dfe-white-space-no-wrap' : '' %>">
                             <a
                             href="<%=baseSortUri%>&sort=urn&sortDir=<%= sort.urn.nextDirection %>"
                             class="govuk-link <% if (sort.urn.applied) { %>sorted dir-<%= (sort.urn.nextDirection === 'asc') ? 'a' : 'd' %> <% } %>">
                             URN
                             </a>
                         </th>
-                        <th scope="col" class="govuk-table__header width-10<%= showFilters ? ' govuk-!-font-size-14 govuk-!-padding-right-2' : '' %>">
+                        <th scope="col" class="govuk-table__header width-10<%= showFilters ? ' govuk-!-font-size-14 govuk-!-padding-right-2 dfe-white-space-no-wrap' : '' %>">
                             <a
                             href="<%=baseSortUri%>&sort=uid&sortDir=<%= sort.uid.nextDirection %>"
                             class="govuk-link <% if (sort.uid.applied) { %>sorted dir-<%= (sort.uid.nextDirection === 'asc') ? 'a' : 'd' %> <% } %>">
                             UID
                             </a>
                         </th>
-                        <th scope="col" class="govuk-table__header width-10<%= showFilters ? ' govuk-!-font-size-14 govuk-!-padding-right-2' : '' %>">
+                        <th scope="col" class="govuk-table__header width-10<%= showFilters ? ' govuk-!-font-size-14 govuk-!-padding-right-2 dfe-white-space-no-wrap' : '' %>">
                             <a
                             href="<%=baseSortUri%>&sort=upin&sortDir=<%= sort.upin.nextDirection %>"
                             class="govuk-link <% if (sort.upin.applied) { %>sorted dir-<%= (sort.upin.nextDirection === 'asc') ? 'a' : 'd' %> <% } %>">
                             UPIN
                             </a>
                         </th>
-                        <th scope="col" class="govuk-table__header width-15<%= showFilters ? ' govuk-!-font-size-14 govuk-!-padding-right-2' : '' %>">
+                        <th scope="col" class="govuk-table__header width-15<%= showFilters ? ' govuk-!-font-size-14 govuk-!-padding-right-2 dfe-white-space-no-wrap' : '' %>">
                             <a
                             href="<%=baseSortUri%>&sort=ukprn&sortDir=<%= sort.ukprn.nextDirection %>"
                             class="govuk-link <% if (sort.ukprn.applied) { %>sorted dir-<%= (sort.ukprn.nextDirection === 'asc') ? 'a' : 'd' %> <% } %>">
                             UKPRN
                             </a>
                         </th>
-                        <th scope="col" class="govuk-table__header width-15 govuk-table__header--numeric<%= showFilters ? ' govuk-!-font-size-14 govuk-!-padding-right-0' : '' %>">
+                        <th scope="col" class="govuk-table__header width-15 govuk-table__header--numeric<%= showFilters ? ' govuk-!-font-size-14 govuk-!-padding-right-0 dfe-white-space-no-wrap' : '' %>">
                             <a
                             href="<%=baseSortUri%>&sort=status&sortDir=<%= sort.status.nextDirection %>"
                             class="govuk-link <% if (sort.status.applied) { %>sorted dir-<%= (sort.status.nextDirection === 'asc') ? 'a' : 'd' %> <% } %>">
