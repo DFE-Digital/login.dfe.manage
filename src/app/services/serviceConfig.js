@@ -31,7 +31,7 @@ const buildCurrentServiceModel = async (req) => {
 };
 
 const getServiceConfig = async (req, res) => {
-  if (req.session.serviceConfigurationChanges && req.query.action !== 'amendChanges' ) {
+  if (req.session.serviceConfigurationChanges && req.query.action !== 'amendChanges') {
     req.session.serviceConfigurationChanges = {};
   }
   const manageRolesForService = await getUserServiceRoles(req);
@@ -212,7 +212,7 @@ const postServiceConfig = async (req, res) => {
     }
   });
 
-  return res.redirect('review-service-configuration');
+  return res.redirect('review-service-configuration#');
 };
 
 module.exports = {

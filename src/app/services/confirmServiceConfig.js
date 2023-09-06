@@ -79,33 +79,33 @@ const validate = async (req, currentService) => {
 
   const { serviceConfigurationChanges } = req.session;
 
-  let grantTypes = serviceConfigurationChanges.grantTypes?.newValue ? serviceConfigurationChanges.grantTypes.newValue : [];
-  if (!(grantTypes instanceof Array)) {
+  let grantTypes = serviceConfigurationChanges.grantTypes?.newValue;
+  if (grantTypes && !(grantTypes instanceof Array)) {
     grantTypes = [serviceConfigurationChanges.grantTypes.newValue];
   }
 
-  let responseTypes = serviceConfigurationChanges.responseTypes?.newValue ? serviceConfigurationChanges.responseTypes.newValue : [];
-  if (!(responseTypes instanceof Array)) {
+  let responseTypes = serviceConfigurationChanges.responseTypes?.newValue;
+  if (responseTypes && !(responseTypes instanceof Array)) {
     responseTypes = [serviceConfigurationChanges.responseTypes?.newValue];
   }
 
-  let selectedRedirects = serviceConfigurationChanges.redirectUris?.newValue ? serviceConfigurationChanges.redirectUris.newValue : [];
-  if (!(selectedRedirects instanceof Array)) {
-    selectedRedirects = [serviceConfigurationChanges.redirectUris.newValue];
+  let selectedRedirects = serviceConfigurationChanges.redirectUris?.newValue;
+  if (selectedRedirects) {
+    selectedRedirects = Array.isArray(selectedRedirects) ? selectedRedirects : [selectedRedirects];
+    selectedRedirects = selectedRedirects.filter((x) => x.trim() !== '');
   }
-  selectedRedirects = selectedRedirects.filter((x) => x.trim() !== '');
 
-  let selectedLogout = serviceConfigurationChanges.postLogoutRedirectUris?.newValue ? serviceConfigurationChanges.postLogoutRedirectUris.newValue : [];
-  if (!(selectedLogout instanceof Array)) {
-    selectedLogout = [serviceConfigurationChanges.postLogoutRedirectUris.newValue];
+  let selectedLogout = serviceConfigurationChanges.postLogoutRedirectUris?.newValue;
+  if (selectedLogout) {
+    selectedLogout = Array.isArray(selectedLogout) ? selectedLogout : [selectedLogout];
+    selectedLogout = selectedLogout.filter((x) => x.trim() !== '');
   }
-  selectedLogout = selectedLogout.filter((x) => x.trim() !== '');
 
   const model = {
     service: {
       name: currentService.name,
-      serviceHome: serviceConfigurationChanges?.serviceHome?.newValue || '',
-      postResetUrl: serviceConfigurationChanges?.postResetUrl?.newValue || '',
+      serviceHome: serviceConfigurationChanges?.serviceHome?.newValue,
+      postResetUrl: serviceConfigurationChanges?.postResetUrl?.newValue,
       redirectUris: selectedRedirects,
       postLogoutRedirectUris: selectedLogout,
       grantTypes,
@@ -126,7 +126,7 @@ const validate = async (req, currentService) => {
     model.validationMessages.serviceHome = 'Please enter a valid home Url';
   }
 
-  if (!urlValidation.test(model.service.postResetUrl) && model.service.postResetUrl.trim() !== '') {
+  if (model.service.postResetUrl && !urlValidation.test(model.service.postResetUrl) && model.service?.postResetUrl.trim() !== '') {
     model.validationMessages.postResetUrl = 'Please enter a valid Post-reset Url';
   }
 
@@ -167,7 +167,7 @@ const validate = async (req, currentService) => {
 
 const getConfirmServiceConfig = async (req, res) => {
   if (!req.session.serviceConfigurationChanges) {
-    return res.redirect(`/services/${req.params.sid}`);
+    return res.redirect(`/services/${req.params.sid}/service-configuration`);
   }
 
   try {
@@ -211,7 +211,6 @@ const postConfirmServiceConfig = async (req, res) => {
     model.csrfToken = req.csrfToken();
     return res.render('services/views/confirmServiceConfig', model);
   }
-  console.log(req.session.serviceConfigurationChanges);
   const editedFields = Object.entries(req.session.serviceConfigurationChanges)
     .filter(([field, oldValue]) => {
       const newValue = Array.isArray(model.service[field])
@@ -231,7 +230,7 @@ const postConfirmServiceConfig = async (req, res) => {
         newValue: isSecret ? 'EXPUNGED' : newValue,
       };
     });
-console.log(editedFields,'EDITED FIELDS')
+
   const updatedService = {
     clientSecret: model.service.clientSecret,
     serviceHome: model.service.serviceHome,
@@ -244,6 +243,8 @@ console.log(editedFields,'EDITED FIELDS')
     tokenEndpointAuthMethod: model.service.tokenEndpointAuthMethod === 'client_secret_post' ? 'client_secret_post' : null,
   };
 
+  console.log(updatedService);
+
   logger.audit(`${req.user.email} (id: ${req.user.sub}) updated service configuration for service ${model.service.name} (id: ${req.params.sid})`, {
     type: 'manage',
     subType: 'service-config-updated',
@@ -253,10 +254,13 @@ console.log(editedFields,'EDITED FIELDS')
     editedFields,
   });
 
-  // await updateService(req.params.sid, updatedService, req.id);
+  await updateService(req.params.sid, updatedService, req.id);
 
-  // res.flash('info', 'Service configuration updated successfully');
-  // return res.redirect('service-configuration');
+  res.flash('title', 'Success');
+  res.flash('heading', 'Service configuration changed');
+  res.flash('message', `Your changes to service configuration for ${model.service.name} have been saved.`);
+
+  return res.redirect(`/services/${req.params.sid}`);
 };
 
 module.exports = {
