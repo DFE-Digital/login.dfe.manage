@@ -3,66 +3,91 @@ const { getServiceById, updateService } = require('../../infrastructure/applicat
 const logger = require('../../infrastructure/logger');
 const { getUserServiceRoles } = require('./utils');
 
-const createFlattenedMappedServiceConfigChanges = (serviceConfigurationChanges, sid) => {
-  const serviceConfigChangesMapping = {
-    serviceHome: {
-      title: 'Home URL',
-      description: 'The home page of the service you want to configure. It is usually the service landing page from DfE Sign-in.',
-      changeLink: `/services/${sid}/service-configuration?action=amendChanges#serviceHome-form-group`,
-      displayOldValue: false,
-      displayOrder: 1,
-    },
-    postResetUrl: {
-      title: 'Post password-reset URL',
-      description: 'Where you want to redirect users after they have reset their password.',
-      changeLink: `/services/${sid}/service-configuration?action=amendChanges#postResetUrl-form-group`,
-      displayOldValue: false,
-      displayOrder: 2,
-    },
-    redirectUris: {
-      title: 'Redirect URL',
-      description: 'Where you want to redirect users after they have authenticated.',
-      changeLink: `/services/${sid}/service-configuration?action=amendChanges#redirect_uris-form-group`,
-      displayOldValue: false,
-      displayOrder: 3,
-    },
-    postLogoutRedirectUris: {
-      title: 'Logout redirect URL',
-      description: 'Where you want to redirect users after they log out of a service.',
-      changeLink: `/services/${sid}/service-configuration?action=amendChanges#post_logout_redirect_uris-form-group`,
-      displayOldValue: false,
-      displayOrder: 4,
-    },
-    responseTypes: {
-      title: 'Response types',
-      description: 'A value that determines the authentication flow.',
-      changeLink: `/services/${sid}/service-configuration?action=amendChanges#response_types-form-group`,
-      displayOldValue: false,
-      displayOrder: 5,
-    },
-    grantTypes: {
-      title: 'Grant types',
-      description: 'Grant types place holder.',
-      changeLink: `/services/${sid}/service-configuration?action=amendChanges#clientSecret-form-group`,
-      displayOldValue: false,
-      displayOrder: 6,
-    },
-    apiSecret: {
-      title: 'API Secret',
-      description: 'API Secret description place holder.',
-      changeLink: `/services/${sid}/service-configuration?action=amendChanges#apiSecret-form-group`,
-      displayOldValue: false,
-      displayOrder: 7,
-    },
-  };
-
-  return Object.entries(serviceConfigurationChanges).map(([key, value]) => {
-    if (serviceConfigChangesMapping[key]) {
-      return { ...value, ...serviceConfigChangesMapping[key] };
-    }
-    return value;
-  });
+const serviceConfigChangesSummaryDetails = {
+  serviceHome: {
+    title: 'Home URL',
+    description: 'The home page of the service you want to configure. It is usually the service landing page from DfE Sign-in.',
+    changeLink: 'service-configuration?action=amendChanges#serviceHome-form-group',
+    displayOrder: 1,
+  },
+  postResetUrl: {
+    title: 'Post password-reset URL',
+    description: 'Where you want to redirect users after they have reset their password. It is usually the DfE Sign-in home page.',
+    changeLink: 'service-configuration?action=amendChanges#postResetUrl-form-group',
+    displayOrder: 2,
+  },
+  redirectUris: {
+    title: 'Redirect URL',
+    description: 'Where you want to redirect users after they have authenticated. Add at least 1 URL.',
+    changeLink: 'service-configuration?action=amendChanges#redirect_uris-form-group',
+    displayOrder: 3,
+  },
+  postLogoutRedirectUris: {
+    title: 'Logout redirect URL',
+    description: 'Where you want to redirect users after they log out of a service. Add at least 1 URL.',
+    changeLink: 'service-configuration?action=amendChanges#post_logout_redirect_uris-form-group',
+    displayOrder: 4,
+  },
+  responseTypes: {
+    title: 'Response types',
+    description: 'A value that determines the authentication flow. Select all that apply.',
+    changeLink: 'service-configuration?action=amendChanges#response_types-form-group',
+    displayOrder: 5,
+  },
+  grantTypes: {
+    title: 'Grant types',
+    description: 'Grant types placeholder description.',
+    changeLink: 'service-configuration?action=amendChanges#clientSecret-form-group',
+    displayOrder: 6,
+  },
+  apiSecret: {
+    title: 'API Secret',
+    description: 'A value that is created automatically by the system and acts as a password for the DfE Sign-in public API. You can regenerate this value.',
+    changeLink: 'service-configuration?action=amendChanges#apiSecret-form-group',
+    displayOrder: 7,
+  },
 };
+
+const getServiceConfigMapping = (key, sid) => {
+  const mapping = { ...serviceConfigChangesSummaryDetails[key] };
+  if (mapping) {
+    mapping.changeLink = `/services/${sid}/${mapping.changeLink}`;
+  }
+  return mapping;
+};
+
+const getAddedAndRemovedValues = (oldValue, newValue) => {
+  let addedValues = [];
+  let removedValues = [];
+
+  if (Array.isArray(oldValue) && Array.isArray(newValue)) {
+    addedValues = newValue.filter((v) => !oldValue.includes(v));
+    removedValues = oldValue.filter((v) => !newValue.includes(v));
+  } else if (typeof oldValue === 'string' && typeof newValue === 'string') {
+    if (oldValue !== newValue) {
+      addedValues = [newValue];
+      removedValues = [oldValue];
+    }
+  }
+
+  return { addedValues, removedValues };
+};
+
+const createFlattenedMappedServiceConfigChanges = (serviceConfigurationChanges, sid) => Object.entries(serviceConfigurationChanges).map(([key, value]) => {
+  const mapping = getServiceConfigMapping(key, sid);
+  if (mapping) {
+    const { oldValue, newValue } = value;
+    const { addedValues, removedValues } = getAddedAndRemovedValues(oldValue, newValue);
+
+    return {
+      ...value,
+      ...mapping,
+      addedValues,
+      removedValues,
+    };
+  }
+  return value;
+});
 
 const buildCurrentServiceModel = async (req) => {
   const service = await getServiceById(req.params.sid, req.id);
@@ -186,7 +211,7 @@ const getConfirmServiceConfig = async (req, res) => {
     return res.render('services/views/confirmServiceConfig', {
       csrfToken: req.csrfToken(),
       service: currentService,
-      backLink: `/services/${req.params.sid}/service-configuration?action=amendChanges`,
+      backLink: `/services/${req.params.sid}/service-configuration`,
       cancelLink: `/services/${req.params.sid}`,
       validationMessages: {},
       serviceId: req.params.sid,
@@ -242,8 +267,6 @@ const postConfirmServiceConfig = async (req, res) => {
     apiSecret: model.service.apiSecret,
     tokenEndpointAuthMethod: model.service.tokenEndpointAuthMethod === 'client_secret_post' ? 'client_secret_post' : null,
   };
-
-  console.log(updatedService);
 
   logger.audit(`${req.user.email} (id: ${req.user.sub}) updated service configuration for service ${model.service.name} (id: ${req.params.sid})`, {
     type: 'manage',

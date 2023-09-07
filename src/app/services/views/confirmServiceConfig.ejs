@@ -37,22 +37,23 @@
               <% locals.serviceChanges.forEach((e) => { %>
                 <div class="govuk-summary-list__row">
                   <dt class="govuk-summary-list__key">
-                    <%= e.title || 'N/A' %>
+                    <%= e.title || '' %>
                     <div class="govuk-hint">
                       <%= e.description || '' %>
                     </div>
                   </dt>
                   <dd class="govuk-summary-list__value">
-                    <% if (e.newValue) { %>
-                      <% if (Array.isArray(e.newValue) && e.newValue.length > 0) { %>
-                        <% e.newValue.forEach((value) => { %>
-                          <p class="govuk-body"><%= value %></p>
-                        <% }); %>
-                      <% } else if (typeof e.newValue === 'string' || typeof e.newValue === 'number') { %>
-                        <p class="govuk-body"><%= e.newValue %></p>
-                      <% } %>
-                    <% } else { %>
-                      N/A
+                    <% if (e.removedValues && e.removedValues.length > 0) { %>
+                      <p class="govuk-body govuk-!-font-weight-bold">Removed:</p>
+                      <% e.removedValues.forEach((value) => { %>
+                        <p class="govuk-body"><%= value %></p>
+                      <% }); %>
+                    <% } %>
+                    <% if (e.addedValues && e.addedValues.length > 0) { %>
+                      <p class="govuk-body govuk-!-font-weight-bold">Added:</p>
+                      <% e.addedValues.forEach((value) => { %>
+                        <p class="govuk-body"><%= value %></p>
+                      <% }); %>
                     <% } %>
                   </dd>
                   <dd class="govuk-summary-list__actions">
@@ -60,8 +61,6 @@
                       <a class="govuk-link" href="<%= e.changeLink %>">
                         Change<span class="govuk-visually-hidden"> <%= (e.title || '').toLowerCase() %></span>
                       </a>
-                    <% } else { %>
-                      N/A
                     <% } %>
                   </dd>
                 </div>

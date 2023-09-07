@@ -1,13 +1,8 @@
-'use strict';
-
 const niceware = require('niceware');
 const { getServiceById } = require('../../infrastructure/applications');
 const { getUserServiceRoles } = require('./utils');
 
-const buildCurrentServiceModel = async (req) => {
-  const sessionService = req.query.action === 'amendChanges' ? req.session.serviceConfigurationChanges : {};
-  const service = await getServiceById(req.params.sid, req.id);
-
+const buildServiceModelFromObject = (service, sessionService = {}) => {
   let tokenEndpointAuthMethod = null;
   if (sessionService?.token_endpoint_auth_method?.newValue === 'client_secret_post'
       || service.relyingParty.token_endpoint_auth_method === 'client_secret_post') {
@@ -30,22 +25,43 @@ const buildCurrentServiceModel = async (req) => {
   };
 };
 
-const getServiceConfig = async (req, res) => {
-  if (req.session.serviceConfigurationChanges && req.query.action !== 'amendChanges') {
-    req.session.serviceConfigurationChanges = {};
-  }
-  const manageRolesForService = await getUserServiceRoles(req);
-  const currentServiceModel = await buildCurrentServiceModel(req);
+const buildCurrentServiceModel = async (req) => {
+  try {
+    const sessionService = req.query.action === 'amendChanges' ? req.session.serviceConfigurationChanges : {};
+    const service = await getServiceById(req.params.sid, req.id);
 
-  return res.render('services/views/serviceConfig', {
-    csrfToken: req.csrfToken(),
-    service: currentServiceModel,
-    backLink: `/services/${req.params.sid}`,
-    validationMessages: {},
-    serviceId: req.params.sid,
-    userRoles: manageRolesForService,
-    currentNavigation: 'configuration',
-  });
+    const currentServiceModel = buildServiceModelFromObject(service, sessionService);
+    const oldServiceConfigModel = buildServiceModelFromObject(service);
+
+    return {
+      currentServiceModel,
+      oldServiceConfigModel,
+    };
+  } catch (error) {
+    throw new Error(`Could not build service model - ${error}`);
+  }
+};
+
+const getServiceConfig = async (req, res) => {
+  try {
+    if (req.session.serviceConfigurationChanges && req.query.action !== 'amendChanges') {
+      req.session.serviceConfigurationChanges = {};
+    }
+    const manageRolesForService = await getUserServiceRoles(req);
+    const serviceModel = await buildCurrentServiceModel(req);
+
+    return res.render('services/views/serviceConfig', {
+      csrfToken: req.csrfToken(),
+      service: serviceModel.currentServiceModel,
+      backLink: `/services/${req.params.sid}`,
+      validationMessages: {},
+      serviceId: req.params.sid,
+      userRoles: manageRolesForService,
+      currentNavigation: 'configuration',
+    });
+  } catch (error) {
+    return res.status(500).send(`An error occurred while getting service configuration. - ${error}`);
+  }
 };
 
 const validate = async (req, currentService) => {
@@ -96,10 +112,6 @@ const validate = async (req, currentService) => {
     userRoles: manageRolesForService,
     currentNavigation: 'configuration',
   };
-
-  // if (!model.service.name) {
-  //   model.validationMessages.name = 'Service name must be present';
-  // }
 
   if (model.service.serviceHome && !urlValidation.test(model.service.serviceHome)) {
     model.validationMessages.serviceHome = 'Please enter a valid home Url';
@@ -163,29 +175,18 @@ const validate = async (req, currentService) => {
 };
 
 const postServiceConfig = async (req, res) => {
-  const currentService = await buildCurrentServiceModel(req);
+  const serviceModels = await buildCurrentServiceModel(req);
+
+  const currentService = serviceModels.currentServiceModel;
+  const { oldServiceConfigModel } = serviceModels;
   const model = await validate(req, currentService);
 
   if (Object.keys(model.validationMessages).length > 0) {
     model.csrfToken = req.csrfToken();
     return res.render('services/views/serviceConfig', model);
   }
-  const oldService = await getServiceById(req.params.sid, req.id);
-  const oldServiceModel = {
-    name: oldService.name || '',
-    description: oldService.description || '',
-    clientId: oldService.relyingParty.client_id || '',
-    clientSecret: oldService.relyingParty.client_secret || '',
-    serviceHome: oldService.relyingParty.service_home || '',
-    postResetUrl: oldService.relyingParty.postResetUrl || '',
-    redirectUris: oldService.relyingParty.redirect_uris || [],
-    postLogoutRedirectUris: oldService.relyingParty.post_logout_redirect_uris || [],
-    grantTypes: oldService.relyingParty.grant_types || [],
-    responseTypes: oldService.relyingParty.response_types || [],
-    apiSecret: oldService.relyingParty.api_secret || '',
-  };
 
-  const editedFields = Object.entries(oldServiceModel)
+  const editedFields = Object.entries(oldServiceConfigModel)
     .filter(([field, oldValue]) => {
       const newValue = Array.isArray(model.service[field]) ? model.service[field].sort() : model.service[field];
       return Array.isArray(oldValue) ? !(
@@ -208,9 +209,7 @@ const postServiceConfig = async (req, res) => {
       return editedField;
     });
 
-  if (!req.session.serviceConfigurationChanges) {
-    req.session.serviceConfigurationChanges = {};
-  }
+  req.session.serviceConfigurationChanges = {};
 
   editedFields.forEach(({
     name, oldValue, newValue, isSecret, secretNewValue,
