@@ -170,8 +170,22 @@ const postServiceConfig = async (req, res) => {
     model.csrfToken = req.csrfToken();
     return res.render('services/views/serviceConfig', model);
   }
+  const oldService = await getServiceById(req.params.sid, req.id);
+  const oldServiceModel = {
+    name: oldService.name || '',
+    description: oldService.description || '',
+    clientId: oldService.relyingParty.client_id || '',
+    clientSecret: oldService.relyingParty.client_secret || '',
+    serviceHome: oldService.relyingParty.service_home || '',
+    postResetUrl: oldService.relyingParty.postResetUrl || '',
+    redirectUris: oldService.relyingParty.redirect_uris || [],
+    postLogoutRedirectUris: oldService.relyingParty.post_logout_redirect_uris || [],
+    grantTypes: oldService.relyingParty.grant_types || [],
+    responseTypes: oldService.relyingParty.response_types || [],
+    apiSecret: oldService.relyingParty.api_secret || '',
+  };
 
-  const editedFields = Object.entries(currentService)
+  const editedFields = Object.entries(oldServiceModel)
     .filter(([field, oldValue]) => {
       const newValue = Array.isArray(model.service[field]) ? model.service[field].sort() : model.service[field];
       return Array.isArray(oldValue) ? !(
@@ -206,7 +220,6 @@ const postServiceConfig = async (req, res) => {
     }
     req.session.serviceConfigurationChanges[name].oldValue = oldValue;
     req.session.serviceConfigurationChanges[name].newValue = newValue;
-
     if (isSecret) {
       req.session.serviceConfigurationChanges[name].secretNewValue = secretNewValue;
     }
