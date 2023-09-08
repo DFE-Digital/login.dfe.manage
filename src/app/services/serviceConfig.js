@@ -58,6 +58,7 @@ const getServiceConfig = async (req, res) => {
       serviceId: req.params.sid,
       userRoles: manageRolesForService,
       currentNavigation: 'configuration',
+      enableContinueButton: req.query.action === 'amendChanges',
     });
   } catch (error) {
     return res.status(500).send(`An error occurred while getting service configuration. - ${error}`);
@@ -111,6 +112,7 @@ const validate = async (req, currentService) => {
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
     currentNavigation: 'configuration',
+    enableContinueButton: req.query.action === 'amendChanges',
   };
 
   if (model.service.serviceHome && !urlValidation.test(model.service.serviceHome)) {

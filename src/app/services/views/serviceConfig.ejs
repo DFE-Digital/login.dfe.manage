@@ -614,33 +614,69 @@
                 <!-- </fieldset>   -->
 
                 <div class="govuk-button-group auto-scroll-dest govuk-!-margin-top-3">
-                    <button type="submit" class="govuk-button" data-module="govuk-button" id="continue-button" disabled>Continue</button>
+                    <button type="submit" class="govuk-button" data-module="govuk-button" id="continue-button" <%= locals.enableContinueButton ? '' : 'disabled' %>>Continue</button>
                     <a href="<%= locals.backLink %>" class="govuk-button govuk-button--secondary">Cancel</a>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
+<!-- 
 <script>
-    $(document).ready(function() {
-  const $form = $('#form-service-config');
-  const $continueButton = $('#continue-button');
+$(document).ready(function () {
+  // Store initial form values
+  const initialFormValues = {};
 
-  const initialFormState = $form.serialize();
+  const updateButtonState = () => {
+    let isChanged = false;
+    $('#form-service-config :input[id]').each(function () {
+      const id = $(this).attr('id');
+      const type = $(this).attr('type');
+      let currentValue;
 
-  // Function to enable or disable the "Continue" button
-  const toggleContinueButton = function() {
-    const currentFormState = $form.serialize();
-    if (currentFormState === initialFormState) {
-      $continueButton.prop('disabled', true);
-    } else {
-      $continueButton.prop('disabled', false);
-    }
+      // Handle checkboxes separately
+      if (type === 'checkbox') {
+        currentValue = $(this).prop('checked');
+      } else {
+        currentValue = $(this).val();
+      }
+
+      if (initialFormValues[id] !== currentValue) {
+        isChanged = true;
+        return false;  // Exit loop
+      }
+    });
+    $('#continue-button').prop('disabled', !isChanged);
   };
 
-  // Attach event handlers to form elements
-  $form.on('input change', toggleContinueButton);
+  const updateInitialValues = () => {
+    $('#form-service-config :input[id]').each(function () {
+      const id = $(this).attr('id');
+      const type = $(this).attr('type');
+      let initialValue;
+
+      // Handle checkboxes separately
+      if (type === 'checkbox') {
+        initialValue = $(this).prop('checked');
+      } else {
+        initialValue = $(this).val();
+      }
+
+      if (!initialFormValues.hasOwnProperty(id)) {
+        initialFormValues[id] = initialValue;
+      }
+    });
+  };
+
+  // Initially populate initialFormValues and set button state
+  updateInitialValues();
+  updateButtonState();
+
+  // Event handler for dynamically added or existing inputs
+  $('#form-service-config').on('input change', ':input[id]', function () {
+    updateButtonState();
+  });
 });
 
-</script>
+
+</script> -->
