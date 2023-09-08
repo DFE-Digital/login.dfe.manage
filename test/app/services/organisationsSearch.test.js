@@ -43,7 +43,7 @@ describe('when searching for all organisations', () => {
       await action(req, res);
       if (method === 'POST') {
         expect(res.redirect.mock.calls.length).toBe(1);
-        expect(res.redirect.mock.calls[0][0]).toBe('?page=2&showOrganisations=all&criteria=org1&sort=name&sortDir=asc');
+        expect(res.redirect.mock.calls[0][0]).toBe('?page=2&showOrganisations=all&criteria=org1&sort=name&sortDir=asc&showFilters=false');
       } else if (method === 'GET') {
         expect(res.render.mock.calls.length).toBe(1);
         expect(res.render.mock.calls[0][0]).toBe('services/views/organisationsSearch');
@@ -67,7 +67,7 @@ describe('when searching for all organisations', () => {
       await action(req, res);
 
       expect(searchOrganisations).toHaveBeenCalledTimes(1);
-      expect(searchOrganisations).toHaveBeenCalledWith('org1', undefined, 2, 'name', 'asc', req.id);
+      expect(searchOrganisations).toHaveBeenCalledWith('org1', [], 2, 'name', 'asc', req.id, []);
     });
 
     it(`then it should search for all orgs with no criteria if none specified (${method} / ${dataLocation})`, async () => {
@@ -87,7 +87,7 @@ describe('when searching for all organisations', () => {
       await action(req, res);
 
       expect(searchOrganisations).toHaveBeenCalledTimes(1);
-      expect(searchOrganisations).toHaveBeenCalledWith('', undefined, 2, 'name', 'asc', req.id);
+      expect(searchOrganisations).toHaveBeenCalledWith('', [], 2, 'name', 'asc', req.id, []);
     });
 
     it(`then it should request page 1 if no page specified (${method} / ${dataLocation})`, async () => {
@@ -107,7 +107,7 @@ describe('when searching for all organisations', () => {
       await action(req, res);
 
       expect(searchOrganisations).toHaveBeenCalledTimes(1);
-      expect(searchOrganisations).toHaveBeenCalledWith('org1', undefined, 1, 'name', 'asc', req.id);
+      expect(searchOrganisations).toHaveBeenCalledWith('org1', [], 1, 'name', 'asc', req.id, []);
     });
   });
 });
@@ -139,7 +139,7 @@ describe('when searching for organisations associated to current service', () =>
       await action(req, res);
       if (method === 'POST') {
         expect(res.redirect.mock.calls.length).toBe(1);
-        expect(res.redirect.mock.calls[0][0]).toBe('?page=2&showOrganisations=currentService&criteria=org1&sort=name&sortDir=asc');
+        expect(res.redirect.mock.calls[0][0]).toBe('?page=2&showOrganisations=currentService&criteria=org1&sort=name&sortDir=asc&showFilters=false');
       } else if (method === 'GET') {
         expect(res.render.mock.calls.length).toBe(1);
         expect(res.render.mock.calls[0][0]).toBe('services/views/organisationsSearch');
@@ -167,7 +167,7 @@ describe('when searching for organisations associated to current service', () =>
       await action(req, res);
 
       expect(searchOrgsAssociatedWithService).toHaveBeenCalledTimes(1);
-      expect(searchOrgsAssociatedWithService).toHaveBeenCalledWith('serviceId', 'org1', 2, 'name', 'asc', 'correlationId');
+      expect(searchOrgsAssociatedWithService).toHaveBeenCalledWith('serviceId', 'org1', 2, 'name', 'asc', 'correlationId', [], []);
     });
 
     it(`then it should search for orgs associated to current service and with no criteria if none specified (${method} / ${dataLocation})`, async () => {
@@ -191,7 +191,7 @@ describe('when searching for organisations associated to current service', () =>
       await action(req, res);
 
       expect(searchOrgsAssociatedWithService).toHaveBeenCalledTimes(1);
-      expect(searchOrgsAssociatedWithService).toHaveBeenCalledWith('serviceId', '', 2, 'name', 'asc', 'correlationId');
+      expect(searchOrgsAssociatedWithService).toHaveBeenCalledWith('serviceId', '', 2, 'name', 'asc', 'correlationId', [], []);
     });
 
     it(`then it should request page 1 if no page specified (${method} / ${dataLocation})`, async () => {
@@ -215,7 +215,7 @@ describe('when searching for organisations associated to current service', () =>
       await action(req, res);
 
       expect(searchOrgsAssociatedWithService).toHaveBeenCalledTimes(1);
-      expect(searchOrgsAssociatedWithService).toHaveBeenCalledWith('serviceId', 'org1', 1, 'name', 'asc', req.id);
+      expect(searchOrgsAssociatedWithService).toHaveBeenCalledWith('serviceId', 'org1', 1, 'name', 'asc', req.id, [], []);
     });
   });
 });

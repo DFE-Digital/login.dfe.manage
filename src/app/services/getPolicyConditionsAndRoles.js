@@ -16,7 +16,7 @@ const getPolicyConditions = async (req, res) => {
   const manageRolesForService = await getUserServiceRoles(req);
   await mapPolicyConstraints(policy, req.id);
 
-  return res.render('services/views/policyConditions', {
+  return res.render('services/views/policyConditionsAndRoles', {
     csrfToken: req.csrfToken(),
     policy,
     service,
