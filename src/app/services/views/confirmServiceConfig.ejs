@@ -65,7 +65,17 @@
                   </dd>
                 </div>
               <% }); %>
-            <% } %>
+            <% } else {%>
+              <div class="govuk-summary-list__row empty-state">
+                <dt class="govuk-summary-list__value govuk-visually-hidden empty-state">
+                </dt>
+                <dd class="govuk-summary-list__value empty-state">
+                  No changes have been made
+                </dd>
+                <dd class="govuk-summary-list__value govuk-visually-hidden empty-state">
+                </dd>
+              </div>
+              <% }%>
           </dl>
         </div>
       </div>
@@ -77,7 +87,7 @@
         </strong>
       </div>
       <div class="govuk-button-group govuk-!-margin-top-3">
-        <button type="submit" class="govuk-button" data-module="govuk-button" id="service-config-changes-save-button" >Save</button>
+        <button type="submit" class="govuk-button" data-module="govuk-button" id="service-config-changes-save-button" <%= (locals.serviceChanges && locals.serviceChanges.length === 0) ? 'disabled' : '' %> >Save</button>
         <a href="<%= locals.backLink %>" class="govuk-button govuk-button--secondary" id="service-config-changes-cancel-button">Cancel</a>
     </div>
   </form>
