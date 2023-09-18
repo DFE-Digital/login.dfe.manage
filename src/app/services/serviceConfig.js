@@ -27,9 +27,8 @@ const buildServiceModelFromObject = (service, sessionService = {}) => {
 
 const buildCurrentServiceModel = async (req) => {
   try {
-    const sessionService = req.query.action === 'amendChanges' ? req.session.serviceConfigurationChanges : {};
+    const sessionService = req.query?.action === 'amendChanges' ? req.session.serviceConfigurationChanges : {};
     const service = await getServiceById(req.params.sid, req.id);
-
     const currentServiceModel = buildServiceModelFromObject(service, sessionService);
     const oldServiceConfigModel = buildServiceModelFromObject(service);
 
@@ -49,7 +48,6 @@ const getServiceConfig = async (req, res) => {
     }
     const manageRolesForService = await getUserServiceRoles(req);
     const serviceModel = await buildCurrentServiceModel(req);
-
     return res.render('services/views/serviceConfig', {
       csrfToken: req.csrfToken(),
       service: serviceModel.currentServiceModel,
@@ -58,10 +56,9 @@ const getServiceConfig = async (req, res) => {
       serviceId: req.params.sid,
       userRoles: manageRolesForService,
       currentNavigation: 'configuration',
-      enableContinueButton: req.query.action === 'amendChanges',
     });
   } catch (error) {
-    return res.status(500).send(`An error occurred while getting service configuration. - ${error}`);
+    throw new Error(error);
   }
 };
 
@@ -112,7 +109,6 @@ const validate = async (req, currentService) => {
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
     currentNavigation: 'configuration',
-    enableContinueButton: req.query.action === 'amendChanges',
   };
 
   if (model.service.serviceHome && !urlValidation.test(model.service.serviceHome)) {
@@ -177,56 +173,60 @@ const validate = async (req, currentService) => {
 };
 
 const postServiceConfig = async (req, res) => {
-  const serviceModels = await buildCurrentServiceModel(req);
+  try {
+    const serviceModels = await buildCurrentServiceModel(req);
 
-  const currentService = serviceModels.currentServiceModel;
-  const { oldServiceConfigModel } = serviceModels;
-  const model = await validate(req, currentService);
+    const currentService = serviceModels.currentServiceModel;
+    const { oldServiceConfigModel } = serviceModels;
+    const model = await validate(req, currentService);
 
-  if (Object.keys(model.validationMessages).length > 0) {
-    model.csrfToken = req.csrfToken();
-    return res.render('services/views/serviceConfig', model);
-  }
+    if (Object.keys(model.validationMessages).length > 0) {
+      model.csrfToken = req.csrfToken();
+      return res.render('services/views/serviceConfig', model);
+    }
 
-  const editedFields = Object.entries(oldServiceConfigModel)
-    .filter(([field, oldValue]) => {
-      const newValue = Array.isArray(model.service[field]) ? model.service[field].sort() : model.service[field];
-      return Array.isArray(oldValue) ? !(
-        Array.isArray(newValue)
+    const editedFields = Object.entries(oldServiceConfigModel)
+      .filter(([field, oldValue]) => {
+        const newValue = Array.isArray(model.service[field]) ? model.service[field].sort() : model.service[field];
+        return Array.isArray(oldValue) ? !(
+          Array.isArray(newValue)
     && oldValue.length === newValue.length
     && oldValue.sort().every((value, index) => value === newValue[index])
-      ) : oldValue !== newValue;
-    })
-    .map(([field, oldValue]) => {
-      const isSecret = field.toLowerCase().includes('secret');
-      const editedField = {
-        name: field,
-        oldValue: isSecret ? 'EXPUNGED' : oldValue,
-        newValue: isSecret ? 'EXPUNGED' : model.service[field],
-        isSecret,
-      };
-      if (isSecret) {
-        editedField.secretNewValue = model.service[field];
+        ) : oldValue !== newValue;
+      })
+      .map(([field, oldValue]) => {
+        const isSecret = field.toLowerCase().includes('secret');
+        const editedField = {
+          name: field,
+          oldValue: isSecret ? 'EXPUNGED' : oldValue,
+          newValue: isSecret ? 'EXPUNGED' : model.service[field],
+          isSecret,
+        };
+        if (isSecret) {
+          editedField.secretNewValue = model.service[field];
+        }
+        return editedField;
+      });
+
+    req.session.serviceConfigurationChanges = {};
+
+    editedFields.forEach(({
+      name, oldValue, newValue, isSecret, secretNewValue,
+    }) => {
+      if (!req.session.serviceConfigurationChanges[name]) {
+        req.session.serviceConfigurationChanges[name] = {};
       }
-      return editedField;
+      req.session.serviceConfigurationChanges[name].oldValue = oldValue;
+      req.session.serviceConfigurationChanges[name].newValue = newValue;
+      if (isSecret) {
+        req.session.serviceConfigurationChanges[name].secretNewValue = secretNewValue;
+      }
     });
 
-  req.session.serviceConfigurationChanges = {};
-
-  editedFields.forEach(({
-    name, oldValue, newValue, isSecret, secretNewValue,
-  }) => {
-    if (!req.session.serviceConfigurationChanges[name]) {
-      req.session.serviceConfigurationChanges[name] = {};
-    }
-    req.session.serviceConfigurationChanges[name].oldValue = oldValue;
-    req.session.serviceConfigurationChanges[name].newValue = newValue;
-    if (isSecret) {
-      req.session.serviceConfigurationChanges[name].secretNewValue = secretNewValue;
-    }
-  });
-
-  return res.redirect('review-service-configuration#');
+    return res.redirect('review-service-configuration#');
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
 module.exports = {
