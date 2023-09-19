@@ -6,31 +6,31 @@ const { getUserServiceRoles } = require('./utils');
 const serviceConfigChangesSummaryDetails = {
   serviceHome: {
     title: 'Home URL',
-    description: 'The home page of the service you want to configure. It is usually the service landing page from DfE Sign-in.',
+    description: 'The home page of the service you want to configure.',
     changeLink: 'service-configuration?action=amendChanges#serviceHome-form-group',
     displayOrder: 1,
   },
   postResetUrl: {
     title: 'Post password-reset URL',
-    description: 'Where you want to redirect users after they have reset their password. It is usually the DfE Sign-in home page.',
+    description: 'Where you want to redirect users after they have reset their password.',
     changeLink: 'service-configuration?action=amendChanges#postResetUrl-form-group',
     displayOrder: 2,
   },
   redirectUris: {
     title: 'Redirect URL',
-    description: 'Where you want to redirect users after they have authenticated. Add at least 1 URL.',
+    description: 'Where you want to redirect users after they have authenticated.',
     changeLink: 'service-configuration?action=amendChanges#redirect_uris-form-group',
     displayOrder: 3,
   },
   postLogoutRedirectUris: {
     title: 'Logout redirect URL',
-    description: 'Where you want to redirect users after they log out of a service. Add at least 1 URL.',
+    description: 'Where you want to redirect users after they log out of a service.',
     changeLink: 'service-configuration?action=amendChanges#post_logout_redirect_uris-form-group',
     displayOrder: 4,
   },
   responseTypes: {
     title: 'Response types',
-    description: 'A value that determines the authentication flow. Select all that apply.',
+    description: 'A value that determines the authentication flow.',
     changeLink: 'service-configuration?action=amendChanges#response_types-form-group',
     displayOrder: 5,
   },
@@ -42,7 +42,7 @@ const serviceConfigChangesSummaryDetails = {
   },
   apiSecret: {
     title: 'API Secret',
-    description: 'A value that is created automatically by the system and acts as a password for the DfE Sign-in public API. You can regenerate this value.',
+    description: 'A value that is created automatically by the system and acts as a password for the DfE Sign-in public API.',
     changeLink: 'service-configuration?action=amendChanges#apiSecret-form-group',
     displayOrder: 7,
   },
@@ -194,7 +194,6 @@ const getConfirmServiceConfig = async (req, res) => {
   if (!req.session.serviceConfigurationChanges) {
     return res.redirect(`/services/${req.params.sid}/service-configuration`);
   }
-
   try {
     const manageRolesForService = await getUserServiceRoles(req);
     const currentService = await buildCurrentServiceModel(req);
@@ -226,7 +225,7 @@ const getConfirmServiceConfig = async (req, res) => {
 
 const postConfirmServiceConfig = async (req, res) => {
   if (!req.session.serviceConfigurationChanges) {
-    return res.redirect(`/services/${req.params.sid}`);
+    return res.redirect(`/services/${req.params.sid}/service-configuration`);
   }
 
   const currentService = await buildCurrentServiceModel(req);
