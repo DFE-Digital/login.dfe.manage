@@ -180,7 +180,7 @@ describe('when getting the Review service config changes page', () => {
     expect(serviceChanges).toMatchObject([
       {
         title: 'Home URL',
-        description: 'The home page of the service you want to configure.',
+        description: 'The home page of the service you want to configure. It is usually the service landing page from DfE Sign-in.',
         changeLink: '/services/service1/service-configuration?action=amendChanges#serviceHome-form-group',
         displayOrder: 1,
         oldValue: 'http://old-service-home.com',
@@ -190,7 +190,7 @@ describe('when getting the Review service config changes page', () => {
       },
       {
         title: 'Post password-reset URL',
-        description: 'Where you want to redirect users after they have reset their password.',
+        description: 'Where you want to redirect users after they have reset their password. It is usually the DfE Sign-in home page.',
         changeLink: '/services/service1/service-configuration?action=amendChanges#postResetUrl-form-group',
         displayOrder: 2,
         oldValue: 'https://www.postreset.com',

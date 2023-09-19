@@ -6,13 +6,13 @@ const { getUserServiceRoles } = require('./utils');
 const serviceConfigChangesSummaryDetails = {
   serviceHome: {
     title: 'Home URL',
-    description: 'The home page of the service you want to configure.',
+    description: 'The home page of the service you want to configure. It is usually the service landing page from DfE Sign-in.',
     changeLink: 'service-configuration?action=amendChanges#serviceHome-form-group',
     displayOrder: 1,
   },
   postResetUrl: {
     title: 'Post password-reset URL',
-    description: 'Where you want to redirect users after they have reset their password.',
+    description: 'Where you want to redirect users after they have reset their password. It is usually the DfE Sign-in home page.',
     changeLink: 'service-configuration?action=amendChanges#postResetUrl-form-group',
     displayOrder: 2,
   },
@@ -146,6 +146,10 @@ const validate = async (req, currentService) => {
     userRoles: manageRolesForService,
     currentNavigation: 'configuration',
   };
+
+  if (!serviceConfigurationChanges || Object.keys(serviceConfigurationChanges).length === 0) {
+    model.validationMessages.noChangesMade = 'No changes have been made';
+  }
 
   if (model.service.serviceHome && !urlValidation.test(model.service.serviceHome)) {
     model.validationMessages.serviceHome = 'Please enter a valid home Url';
