@@ -26,8 +26,8 @@ const { get: getRemoveService, post: postRemoveService } = require('./removeServ
 const { get: getAssociateService, post: postAssociateService } = require('./associateService');
 const { get: getConfirmAssociateService, post: postConfirmAssociateService } = require('./confirmAssociateService');
 const { get: getListPolicies, post: postListPolicies } = require('./listPolicies');
-const getPolicyConditions = require('./getPolicyConditions');
-const getPolicyRoles = require('./getPolicyRoles');
+const getPolicyConditions = require('./getPolicyConditionsAndRoles');
+
 const { get: getAssociateRoles, post: postAssociateRoles } = require('./associateRoles');
 const { get: getConfirmInvitation, post: postConfirmInvitation } = require('./confirmInvitation');
 const getAudit = require('./getAudit');
@@ -124,9 +124,8 @@ const services = (csrf) => {
   router.get('/:sid/policies', csrf, isManageUserForService, hasRole('accessManage'), asyncWrapper(getListPolicies));
   router.post('/:sid/policies', csrf, isManageUserForService, hasRole('accessManage'), asyncWrapper(postListPolicies));
 
-  router.get('/:sid/policies/:pid/conditions', csrf, isManageUserForService, hasRole('accessManage'), asyncWrapper(getPolicyConditions));
+  router.get('/:sid/policies/:pid/conditionsAndRoles', csrf, isManageUserForService, hasRole('accessManage'), asyncWrapper(getPolicyConditions));
 
-  router.get('/:sid/policies/:pid/roles', csrf, isManageUserForService, hasRole('accessManage'), asyncWrapper(getPolicyRoles));
 
   return router;
 };

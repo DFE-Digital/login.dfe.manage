@@ -1,18 +1,16 @@
-jest.mock('./../../../src/infrastructure/config', () => require('./../../utils').configMockFactory());
-jest.mock('./../../../src/infrastructure/logger', () => require('./../../utils').loggerMockFactory());
+jest.mock('./../../../src/infrastructure/config', () => require('../../utils').configMockFactory());
+jest.mock('./../../../src/infrastructure/logger', () => require('../../utils').loggerMockFactory());
 jest.mock('./../../../src/infrastructure/applications');
 jest.mock('./../../../src/infrastructure/access');
 
-
-const { getRequestMock, getResponseMock } = require('./../../utils');
-const getPolicyConditions = require('./../../../src/app/services/getPolicyConditions');
-const { getServiceById } = require('./../../../src/infrastructure/applications');
-const { getPolicyById } = require('./../../../src/infrastructure/access');
+const { getRequestMock, getResponseMock } = require('../../utils');
+const getPolicyConditions = require('../../../src/app/services/getPolicyConditionsAndRoles');
+const { getServiceById } = require('../../../src/infrastructure/applications');
+const { getPolicyById } = require('../../../src/infrastructure/access');
 
 const res = getResponseMock();
 
 describe('when displaying the confirm edit service view', () => {
-
   let req;
 
   beforeEach(() => {
@@ -23,8 +21,8 @@ describe('when displaying the confirm edit service view', () => {
       },
       userServices: {
         roles: [{
-          code: 'serviceid_serviceconfiguration'
-        }]
+          code: 'serviceid_serviceconfiguration',
+        }],
       },
     });
 
@@ -44,20 +42,20 @@ describe('when displaying the confirm edit service view', () => {
           field: 'organisation.type.id',
           operator: 'is',
           value: [
-            '46'
+            '46',
           ],
-        }
+        },
       ],
       id: 'conditionId',
-      name: 'condition name'
-    })
+      name: 'condition name',
+    });
   });
 
   it('then it should return the policy conditions view', async () => {
     await getPolicyConditions(req, res);
 
     expect(res.render.mock.calls.length).toBe(1);
-    expect(res.render.mock.calls[0][0]).toBe('services/views/policyConditions');
+    expect(res.render.mock.calls[0][0]).toBe('services/views/policyConditionsAndRoles');
   });
 
   it('then it should include csrf token', async () => {
@@ -90,19 +88,18 @@ describe('when displaying the confirm edit service view', () => {
 
     expect(res.render.mock.calls[0][1]).toMatchObject({
       policy: {
-        'applicationId': 'service1',
-        'conditions': [
+        applicationId: 'service1',
+        conditions: [
           {
-            'field': 'type',
-            'operator': 'is',
-            'value': [
-              'Academy 16-19 Sponsor Led'
-            ]
-          }
-        ]
+            field: 'type',
+            operator: 'is',
+            value: [
+              'Academy 16-19 Sponsor Led',
+            ],
+          },
+        ],
 
-      }
+      },
     });
   });
-
 });

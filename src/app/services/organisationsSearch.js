@@ -1,26 +1,78 @@
-/* eslint-disable no-nested-ternary */
-const { searchOrganisations, searchOrgsAssociatedWithService } = require('../../infrastructure/organisations');
+const {
+  searchOrganisations, searchOrgsAssociatedWithService, getOrganisationCategories,
+  listOrganisationStatus,
+} = require('../../infrastructure/organisations');
 const { getServiceById } = require('../../infrastructure/applications');
-const { getUserServiceRoles } = require('./utils');
+const {
+  getUserServiceRoles, unpackMultiSelect, isSelected, getSortInfo, getParamsSource, getSafeCriteria, getValidPageNumber, objectToQueryString,
+} = require('./utils');
 const logger = require('../../infrastructure/logger');
 
+const getFiltersModel = async (req, organisationCategories, orgStatuses) => {
+  const {
+    method, body, query, id,
+  } = req;
+  const paramsSource = getParamsSource(method, body, query);
+
+  const showFilters = paramsSource && paramsSource.showFilters
+    ? paramsSource.showFilters.toLowerCase() === 'true'
+    : false;
+
+  let organisationTypes = [];
+  let organisationStatuses = [];
+
+  if (showFilters) {
+    const selectedOrganisationTypes = unpackMultiSelect(paramsSource.organisationType);
+    const selectedOrganisationStatus = unpackMultiSelect(paramsSource.organisationStatus);
+    if (paramsSource && paramsSource.showOrganisations === 'currentService' && organisationCategories) {
+      organisationTypes = organisationCategories.map((category) => ({
+        id: category.id,
+        name: category.name,
+        isSelected: isSelected(selectedOrganisationTypes, category.id),
+      }));
+    } else {
+      organisationTypes = (await getOrganisationCategories(id)).map((category) => ({
+        id: category.id,
+        name: category.name,
+        isSelected: isSelected(selectedOrganisationTypes, category.id),
+      }));
+    }
+    if (paramsSource && paramsSource.showOrganisations === 'currentService' && orgStatuses) {
+      organisationStatuses = orgStatuses.map((status) => ({
+        id: status.id,
+        name: status.name,
+        isSelected: isSelected(selectedOrganisationStatus, status.id.toString()),
+      }));
+    } else {
+      organisationStatuses = (await listOrganisationStatus(id)).map((status) => ({
+        id: status.id,
+        name: status.name,
+        isSelected: selectedOrganisationStatus.includes(status.id.toString()),
+      }));
+    }
+  }
+
+  return {
+    showFilters,
+    organisationTypes,
+    organisationStatuses,
+  };
+};
+
 const search = async (req) => {
-  const paramsSource = req.method.toUpperCase() === 'POST' ? req.body : req.query;
-  let { criteria } = paramsSource;
-  if (!criteria) {
-    criteria = '';
-  }
-  const safeCriteria = criteria;
-  if (criteria.indexOf('-') !== -1) {
-    criteria = `"${criteria}"`;
-  }
-  let pageNumber = parseInt(paramsSource.page, 10) || 1;
-  // eslint-disable-next-line no-restricted-globals
-  if (isNaN(pageNumber)) {
-    pageNumber = 1;
-  }
-  const sortBy = paramsSource.sort ? paramsSource.sort.toLowerCase() : 'name';
-  const sortAsc = (paramsSource.sortDir ? paramsSource.sortDir : 'asc').toLowerCase() === 'asc';
+  const { method, body, query } = req;
+  const paramsSource = getParamsSource(method, body, query);
+  const criteria = paramsSource.criteria || '';
+  const safeCriteria = getSafeCriteria(paramsSource);
+
+  const pageNumber = getValidPageNumber(paramsSource.page);
+
+  const orgTypes = unpackMultiSelect(paramsSource.organisationType);
+  const orgStatuses = unpackMultiSelect(paramsSource.organisationStatus);
+
+  const sortKeys = ['name', 'LegalName', 'type', 'urn', 'uid', 'upin', 'ukprn', 'status'];
+
+  const { sortBy, sortAsc, sort } = getSortInfo(paramsSource, sortKeys);
   const showOrganisations = paramsSource.showOrganisations ? paramsSource.showOrganisations : 'all';
   let results;
   if (showOrganisations === 'currentService') {
@@ -31,6 +83,8 @@ const search = async (req) => {
       sortBy,
       sortAsc ? 'asc' : 'desc',
       req.id,
+      orgTypes,
+      orgStatuses,
     );
     logger.audit(`${req.user.email} (id: ${req.user.sub}) searched for organisations associated with service (sid: ${req.params.sid}) in manage using criteria "${criteria}"`, {
       type: 'manage',
@@ -39,18 +93,19 @@ const search = async (req) => {
       userEmail: req.user.email,
       criteria,
       pageNumber,
-      numberOfPages: results.numberOfPages,
+      numberOfPages: results.totalNumberOfPages,
       sortedBy: sortBy,
       sortDirection: sortAsc ? 'asc' : 'desc',
     });
   } else {
     results = await searchOrganisations(
       safeCriteria,
-      undefined,
+      orgTypes,
       pageNumber,
       sortBy,
       sortAsc ? 'asc' : 'desc',
       req.id,
+      orgStatuses,
     );
     logger.audit(`${req.user.email} (id: ${req.user.sub}) searched for organisations in manage using criteria "${criteria}"`, {
       type: 'manage',
@@ -59,7 +114,7 @@ const search = async (req) => {
       userEmail: req.user.email,
       criteria,
       pageNumber,
-      numberOfPages: results.numberOfPages,
+      numberOfPages: results.totalNumberOfPages,
       sortedBy: sortBy,
       sortDirection: sortAsc ? 'asc' : 'desc',
     });
@@ -72,49 +127,24 @@ const search = async (req) => {
     sortOrder: sortAsc ? 'asc' : 'desc',
     totalNumberOfPages: results.totalNumberOfPages,
     totalNumberOfRecords: results.totalNumberOfRecords,
+    organisationCategories: results.organisationCategories,
+    organisationStatuses: results.organisationStatuses,
     organisations: results.organisations,
     serviceOrganisations: showOrganisations,
-    sort: {
-      name: {
-        nextDirection: sortBy === 'name' ? (sortAsc ? 'desc' : 'asc') : 'asc',
-        applied: sortBy === 'name',
-      },
-      legalname: {
-        nextDirection: sortBy === 'LegalName' ? (sortAsc ? 'desc' : 'asc') : 'asc',
-        applied: sortBy === 'LegalName',
-      },
-      type: {
-        nextDirection: sortBy === 'type' ? (sortAsc ? 'desc' : 'asc') : 'asc',
-        applied: sortBy === 'type',
-      },
-      urn: {
-        nextDirection: sortBy === 'urn' ? (sortAsc ? 'desc' : 'asc') : 'asc',
-        applied: sortBy === 'urn',
-      },
-      uid: {
-        nextDirection: sortBy === 'uid' ? (sortAsc ? 'desc' : 'asc') : 'asc',
-        applied: sortBy === 'uid',
-      },
-      upin: {
-        nextDirection: sortBy === 'upin' ? (sortAsc ? 'desc' : 'asc') : 'asc',
-        applied: sortBy === 'upin',
-      },
-      ukprn: {
-        nextDirection: sortBy === 'ukprn' ? (sortAsc ? 'desc' : 'asc') : 'asc',
-        applied: sortBy === 'ukprn',
-      },
-      status: {
-        nextDirection: sortBy === 'status' ? (sortAsc ? 'desc' : 'asc') : 'asc',
-        applied: sortBy === 'status',
-      },
-    },
+    selectedOrgStatuses: orgStatuses,
+    selectedOrgTypes: orgTypes,
+    sort,
   };
 };
 
 const buildModel = async (req) => {
-  const service = await getServiceById(req.params.sid, req.id);
-  const manageRolesForService = await getUserServiceRoles(req);
-  const pageOfOrganisations = await search(req);
+  const [service, manageRolesForService, pageOfOrganisations] = await Promise.all([
+    getServiceById(req.params.sid, req.id),
+    getUserServiceRoles(req),
+    search(req),
+  ]);
+
+  const filtersModel = await getFiltersModel(req, pageOfOrganisations.organisationCategories, pageOfOrganisations.organisationStatuses);
 
   return {
     csrfToken: req.csrfToken(),
@@ -128,10 +158,14 @@ const buildModel = async (req) => {
     totalNumberOfResults: pageOfOrganisations.totalNumberOfRecords,
     organisations: pageOfOrganisations.organisations,
     serviceOrganisations: pageOfOrganisations.serviceOrganisations,
+    selectedOrgStatuses: pageOfOrganisations.selectedOrgStatuses,
+    selectedOrgTypes: pageOfOrganisations.selectedOrgTypes,
+
     serviceId: req.params.sid,
     service,
     userRoles: manageRolesForService,
     currentNavigation: 'organisations',
+    ...filtersModel,
   };
 };
 const get = async (req, res) => {
@@ -141,7 +175,19 @@ const get = async (req, res) => {
 
 const post = async (req, res) => {
   const model = await buildModel(req);
-  return res.redirect(`?page=${model.page}&showOrganisations=${model.serviceOrganisations}&criteria=${model.criteria}&sort=${model.sortBy}&sortDir=${model.sortOrder}`);
+  const queryParameters = {
+    page: model.page,
+    showOrganisations: model.serviceOrganisations,
+    criteria: model.criteria,
+    sort: model.sortBy,
+    sortDir: model.sortOrder,
+    showFilters: model.showFilters,
+    organisationStatus: model.selectedOrgStatuses,
+    organisationType: model.selectedOrgTypes,
+  };
+
+  const query = objectToQueryString(queryParameters);
+  return res.redirect(`?${query}`);
 };
 
 module.exports = {
