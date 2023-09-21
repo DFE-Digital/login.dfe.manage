@@ -284,10 +284,9 @@
                             </div>
                         </fieldset>
                     </div>
-                      <%#  TODO: control the dynamic display of this section NSA-7332 %>
+
                       <%# Client secret new section %>
-                      
-                      <!-- <div id="clientSecret-wrapper" style="display:none;">
+                     <div id="clientSecret-wrapper" tabindex="-1" style="display: none">
                         <% 
                             renderSecretInputSection({
                             sectionId: 'clientSecret',
@@ -297,7 +296,31 @@
                             validationMessage: locals.validationMessages.clientSecret
                             }) 
                         %>
-                    </div> -->
+                    </div> 
+
+                    <%# Token endpoint authntication method section %>
+                    <div id="tokenEndpointAuthMethod-wrapper">
+                        <h1 class="govuk-label-wrapper">
+                            <label class="govuk-label govuk-label--m" for="tokenEndpointAuthMethod">
+                                Token endpoint authentication method
+                            </label>
+                        </h1>
+                        <div id="tokenEndpointAuthMethod-hint" class="govuk-hint">
+                            The way your service authenticates to the DfE Sign-in token endpoint. Select the method that applies.
+                        </div>
+                        <div class="govuk-form-group" id="tokenEndpointAuthMethod-form-group">
+                            <select
+                                class="govuk-select"
+                                id="tokenEndpointAuthMethod"
+                                name="tokenEndpointAuthMethod"
+                                disabled>
+                                <option disabled value>Select token endpoint authentication method</option>
+                                <option <%=((locals.service.tokenEndpointAuthMethod && locals.service.tokenEndpointAuthMethod) === 'client_secret_post') ? 'selected="selected"' : ''%> value="client_secret_post">client_secret_post</option>
+                                <option <%=!locals.service.tokenEndpointAuthMethod ? 'selected="selected"' : ''%>value="">none</option>
+                            </select>
+                        </div>
+                    </div>
+
                 </fieldset>
 
                 <hr class="govuk-section-break govuk-section-break--visible">
@@ -612,7 +635,6 @@
                         </div>
                     </dl> -->
                 <!-- </fieldset>   -->
-
                 <div class="govuk-button-group auto-scroll-dest govuk-!-margin-top-3">
                     <button type="submit" class="govuk-button" data-module="govuk-button" id="continue-button">Continue</button>
                     <a href="<%= locals.backLink %>" class="govuk-button govuk-button--secondary">Cancel</a>
@@ -622,3 +644,82 @@
     </div>
 </div>
 <script src="/assets/javascript/niceware.js"></script>
+
+<script>
+  $(document).ready(function() {
+  // Initialize: Check the checkboxes and display the appropriate message and sections
+  updateSections();
+
+  // Event listener for the checkboxes
+  $('#response_types-id_token, #response_types-token, #response_types-code').change(function() {
+    updateSections();
+  });
+
+  // Function to add or update the warning div and secret input section
+  function updateSections() {
+    // Save the current scroll position
+//    var savedScrollPosition = $(window).scrollTop();
+
+    let selectedTypes = [];
+
+    if ($('#response_types-id_token').is(':checked')) {
+      selectedTypes.push('ID token');
+    }
+
+    if ($('#response_types-token').is(':checked')) {
+      selectedTypes.push('Token');
+    }
+
+    if ($('#response_types-code').is(':checked')) {
+      selectedTypes.push('Code');
+    }
+
+    let warningMessage = "";
+    if (selectedTypes.length > 0) {
+      let flowType = 'implicit flow';
+
+      if (selectedTypes.length === 1 && selectedTypes.includes('Code')) {
+        flowType = 'Authorisation flow';
+      } else if ((selectedTypes.includes('Code') && selectedTypes.includes('Token')) || 
+                (selectedTypes.includes('Code') && selectedTypes.includes('ID token'))) {
+        flowType = 'hybrid flow';
+      }
+
+      warningMessage = `
+        <div class="govuk-warning-text govuk-!-margin-top-5 govuk-!-margin-bottom-0">
+          <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+          <strong class="govuk-warning-text__text">
+            <span class="govuk-warning-text__assistive">Warning</span>
+            You have selected ${selectedTypes.join(' and ')} as your response type. This means ${flowType} is your flow.
+          </strong>
+        </div>
+      `;
+    }
+
+    // Remove existing warning, if any
+    $('.govuk-warning-text').remove();
+
+    // Add the new warning
+    if (warningMessage) {
+      $('#response_types-fieldset').append(warningMessage);
+    }
+
+    if ($('#response_types-code').is(':checked')) {
+      $('#clientSecret-wrapper').show();  // Show the element
+      $('#clientSecret-wrapper :input').prop('disabled', false);  
+      $('#tokenEndpointAuthMethod-wrapper').show();
+      $('#tokenEndpointAuthMethod-wrapper select').prop('disabled', false)
+    } else {
+      $('#clientSecret-wrapper').hide();  // Hide the element
+      $('#clientSecret-wrapper :input').prop('disabled', true); 
+      $('#tokenEndpointAuthMethod-wrapper').hide();
+      $('#tokenEndpointAuthMethod-wrapper select').prop('disabled', true) 
+    }
+
+//     $('html, body').animate({
+//   scrollTop: savedScrollPosition
+//     }, 400, 'swing');  
+}
+});
+
+</script>

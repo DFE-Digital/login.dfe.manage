@@ -34,17 +34,29 @@ const serviceConfigChangesSummaryDetails = {
     changeLink: 'service-configuration?action=amendChanges#response_types-form-group',
     displayOrder: 5,
   },
-  grantTypes: {
-    title: 'Grant types',
-    description: 'Grant types placeholder description.',
+  clientSecret: {
+    title: 'Client secret',
+    description: 'A value that is created automatically by the system and acts as a password for the service.',
     changeLink: 'service-configuration?action=amendChanges#clientSecret-form-group',
-    displayOrder: 6,
+    displayOrder: 9,
   },
+  tokenEndpointAuthMethod: {
+    title: 'Token endpoint authentication method',
+    description: 'The way your service authenticates to the DfE Sign-in token endpoint. Select the method that applies.',
+    changeLink: 'service-configuration?action=amendChanges#tokenEndpointAuthMethod-form-group',
+    displayOrder: 7,
+  },
+  // grantTypes: {
+  //   title: 'Grant types',
+  //   description: 'Grant types placeholder description.',
+  //   changeLink: 'service-configuration?action=amendChanges#clientSecret-form-group',
+  //   displayOrder: 8,
+  // },
   apiSecret: {
     title: 'API Secret',
     description: 'A value that is created automatically by the system and acts as a password for the DfE Sign-in public API.',
     changeLink: 'service-configuration?action=amendChanges#apiSecret-form-group',
-    displayOrder: 7,
+    displayOrder: 8,
   },
 };
 
@@ -68,6 +80,9 @@ const getAddedAndRemovedValues = (oldValue, newValue) => {
       addedValues = newValue === '' ? [] : [newValue];
       removedValues = oldValue === '' ? [] : [oldValue];
     }
+  } else if ((oldValue === null && typeof newValue === 'string') || (typeof oldValue === 'string' && newValue === null)) {
+    addedValues = newValue === null ? [] : [newValue];
+    removedValues = oldValue === null ? [] : [oldValue];
   }
 
   return { addedValues, removedValues };
@@ -93,8 +108,8 @@ const buildCurrentServiceModel = async (req) => {
   const service = await getServiceById(req.params.sid, req.id);
   return {
     name: service.name || '',
-    clientSecret: service.relyingParty.client_secret || '',
-    apiSecret: service.relyingParty.api_secret || '',
+    // clientSecret: service.relyingParty.client_secret || '',
+    // apiSecret: service.relyingParty.api_secret || '',
   };
 };
 
@@ -137,7 +152,7 @@ const validate = async (req, currentService) => {
       responseTypes,
       apiSecret: serviceConfigurationChanges?.apiSecret?.secretNewValue,
       clientSecret: serviceConfigurationChanges?.clientSecret?.secretNewValue,
-      tokenEndpointAuthMethod: req.body.tokenEndpointAuthMethod === 'client_secret_post' ? 'client_secret_post' : null,
+      tokenEndpointAuthMethod: serviceConfigurationChanges?.tokenEndpointAuthMethod?.newValue === 'client_secret_post' ? 'client_secret_post' : null,
     },
     backLink: `/services/${req.params.sid}/service-configuration`,
     cancelLink: `/services/${req.params.sid}`,
@@ -228,65 +243,69 @@ const getConfirmServiceConfig = async (req, res) => {
 };
 
 const postConfirmServiceConfig = async (req, res) => {
-  if (!req.session.serviceConfigurationChanges) {
-    return res.redirect(`/services/${req.params.sid}/service-configuration`);
-  }
+  try {
+    if (!req.session.serviceConfigurationChanges) {
+      return res.redirect(`/services/${req.params.sid}/service-configuration`);
+    }
 
-  const currentService = await buildCurrentServiceModel(req);
-  const model = await validate(req, currentService);
+    const currentService = await buildCurrentServiceModel(req);
+    const model = await validate(req, currentService);
 
-  if (Object.keys(model.validationMessages).length > 0) {
-    model.csrfToken = req.csrfToken();
-    return res.render('services/views/confirmServiceConfig', model);
-  }
-  const editedFields = Object.entries(req.session.serviceConfigurationChanges)
-    .filter(([field, oldValue]) => {
-      const newValue = Array.isArray(model.service[field])
-        ? model.service[field].sort()
-        : model.service[field];
+    if (Object.keys(model.validationMessages).length > 0) {
+      model.csrfToken = req.csrfToken();
+      return res.render('services/views/confirmServiceConfig', model);
+    }
+    const editedFields = Object.entries(req.session.serviceConfigurationChanges)
+      .filter(([field, oldValue]) => {
+        const newValue = Array.isArray(model.service[field])
+          ? model.service[field].sort()
+          : model.service[field];
 
-      return Array.isArray(oldValue)
-        ? !(Array.isArray(newValue) && oldValue.length === newValue.length && oldValue.sort().every((value, index) => value === newValue[index]))
-        : oldValue !== newValue;
-    })
-    .map(([field, change]) => {
-      const isSecret = field.toLowerCase().includes('secret');
-      const { oldValue, newValue } = change;
-      return {
-        name: field,
-        oldValue: isSecret ? 'EXPUNGED' : oldValue,
-        newValue: isSecret ? 'EXPUNGED' : newValue,
-      };
+        return Array.isArray(oldValue)
+          ? !(Array.isArray(newValue) && oldValue.length === newValue.length && oldValue.sort().every((value, index) => value === newValue[index]))
+          : oldValue !== newValue;
+      })
+      .map(([field, change]) => {
+        const isSecret = field.toLowerCase().includes('secret');
+        const { oldValue, newValue } = change;
+        return {
+          name: field,
+          oldValue: isSecret ? 'EXPUNGED' : oldValue,
+          newValue: isSecret ? 'EXPUNGED' : newValue,
+        };
+      });
+
+    const updatedService = {
+      clientSecret: model.service.clientSecret,
+      serviceHome: model.service.serviceHome,
+      postResetUrl: model.service.postResetUrl,
+      redirect_uris: model.service.redirectUris,
+      post_logout_redirect_uris: model.service.postLogoutRedirectUris,
+      grant_types: model.service.grantTypes,
+      response_types: model.service.responseTypes,
+      apiSecret: model.service.apiSecret,
+      tokenEndpointAuthMethod: model.service.tokenEndpointAuthMethod === 'client_secret_post' ? 'client_secret_post' : null,
+    };
+
+    logger.audit(`${req.user.email} (id: ${req.user.sub}) updated service configuration for service ${model.service.name} (id: ${req.params.sid})`, {
+      type: 'manage',
+      subType: 'service-config-updated',
+      userId: req.user.sub,
+      userEmail: req.user.email,
+      editedService: req.params.sid,
+      editedFields,
     });
 
-  const updatedService = {
-    clientSecret: model.service.clientSecret,
-    serviceHome: model.service.serviceHome,
-    postResetUrl: model.service.postResetUrl,
-    redirect_uris: model.service.redirectUris,
-    post_logout_redirect_uris: model.service.postLogoutRedirectUris,
-    grant_types: model.service.grantTypes,
-    response_types: model.service.responseTypes,
-    apiSecret: model.service.apiSecret,
-    tokenEndpointAuthMethod: model.service.tokenEndpointAuthMethod === 'client_secret_post' ? 'client_secret_post' : null,
-  };
+    await updateService(req.params.sid, updatedService, req.id);
 
-  logger.audit(`${req.user.email} (id: ${req.user.sub}) updated service configuration for service ${model.service.name} (id: ${req.params.sid})`, {
-    type: 'manage',
-    subType: 'service-config-updated',
-    userId: req.user.sub,
-    userEmail: req.user.email,
-    editedService: req.params.sid,
-    editedFields,
-  });
+    res.flash('title', 'Success');
+    res.flash('heading', 'Service configuration changed');
+    res.flash('message', `Your changes to service configuration for ${model.service.name} have been saved.`);
 
-  await updateService(req.params.sid, updatedService, req.id);
-
-  res.flash('title', 'Success');
-  res.flash('heading', 'Service configuration changed');
-  res.flash('message', `Your changes to service configuration for ${model.service.name} have been saved.`);
-
-  return res.redirect(`/services/${req.params.sid}`);
+    return res.redirect(`/services/${req.params.sid}`);
+  } catch (error) {
+    throw new Error();
+  }
 };
 
 module.exports = {

@@ -4,10 +4,11 @@ const { getUserServiceRoles } = require('./utils');
 
 const buildServiceModelFromObject = (service, sessionService = {}) => {
   let tokenEndpointAuthMethod = null;
-  if (sessionService?.token_endpoint_auth_method?.newValue === 'client_secret_post'
-      || service.relyingParty.token_endpoint_auth_method === 'client_secret_post') {
-    tokenEndpointAuthMethod = 'client_secret_post';
-  }
+
+  const sessionValue = sessionService?.tokenEndpointAuthMethod?.newValue;
+  const fallbackValue = service.relyingParty.token_endpoint_auth_method === 'client_secret_post' ? 'client_secret_post' : null;
+
+  tokenEndpointAuthMethod = sessionValue !== undefined ? sessionValue : fallbackValue;
 
   return {
     name: service.name || '',
@@ -62,7 +63,7 @@ const getServiceConfig = async (req, res) => {
   }
 };
 
-const validate = async (req, currentService) => {
+const validate = async (req, currentService, oldService) => {
   const urlValidation = /^https?:\/\/(.*)/;
   const manageRolesForService = await getUserServiceRoles(req);
   // TODO: revert when adding grantTypes NSA-7334
@@ -88,13 +89,14 @@ const validate = async (req, currentService) => {
   }
   selectedLogout = selectedLogout.filter((x) => x.trim() !== '');
 
-  // TODO: remove || currentService.clientSecret, currentService.grantTypes for validation NSA-7334
+  const isAuthorisedOrHybridFlow = (responseTypes && responseTypes.length > 0 && responseTypes.includes('code'));
+
   const model = {
     service: {
       name: currentService.name,
       description: currentService.description,
       clientId: currentService.clientId,
-      clientSecret: req.body.clientSecret || currentService.clientSecret,
+      clientSecret: isAuthorisedOrHybridFlow ? req.body.clientSecret : oldService.clientSecret,
       serviceHome: req.body.serviceHome || '',
       postResetUrl: req.body.postResetUrl || '',
       redirectUris: selectedRedirects,
@@ -148,7 +150,7 @@ const validate = async (req, currentService) => {
   } else if (model.service.postLogoutRedirectUris.some((value, i) => model.service.postLogoutRedirectUris.indexOf(value) !== i)) {
     model.validationMessages.post_logout_redirect_uris = 'Logout redirect Urls must be unique';
   }
-  if (model.service.clientSecret !== currentService.clientSecret) {
+  if (isAuthorisedOrHybridFlow && model.service.clientSecret !== currentService.clientSecret) {
     try {
       const validateClientSecret = niceware.passphraseToBytes(model.service.clientSecret.split('-'));
       if (validateClientSecret.length < 8) {
@@ -178,7 +180,7 @@ const postServiceConfig = async (req, res) => {
 
     const currentService = serviceModels.currentServiceModel;
     const { oldServiceConfigModel } = serviceModels;
-    const model = await validate(req, currentService);
+    const model = await validate(req, currentService, oldServiceConfigModel);
 
     if (Object.keys(model.validationMessages).length > 0) {
       model.csrfToken = req.csrfToken();
