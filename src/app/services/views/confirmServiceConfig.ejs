@@ -35,6 +35,8 @@
             </div>
             <% if (locals.serviceChanges && locals.serviceChanges.length > 0) { %>
               <% locals.serviceChanges.forEach((e) => { %>
+                <%  if(e.title){%>
+
                 <div class="govuk-summary-list__row">
                   <dt class="govuk-summary-list__key">
                     <%= e.title || '' %>
@@ -64,6 +66,7 @@
                     <% } %>
                   </dd>
                 </div>
+                <% } %>
               <% }); %>
             <% } else {%>
               <div class="govuk-summary-list__row empty-state">

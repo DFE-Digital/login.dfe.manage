@@ -1,0 +1,39 @@
+// Authentication Flows
+const AUTHENTICATION_FLOWS = {
+  AUTHORISATION_CODE_FLOW: 'authorisationCodeFlow',
+  IMPLICIT_FLOW: 'implicitFlow',
+  HYBRID_FLOW: 'hybridFlow',
+  UNKNOWN_FLOW: 'unknownFlow',
+};
+
+// Response Types
+const RESPONSE_TYPES = {
+  CODE: 'code',
+  ID_TOKEN: 'id_token',
+  TOKEN: 'token',
+};
+
+// Grant Types
+const GRANT_TYPES = {
+  AUTHORIZATION_CODE: 'authorization_code',
+  IMPLICIT: 'implicit',
+  CLIENT_CREDENTIALS: 'client_credentials',
+  REFRESH_TOKEN: 'refresh_token',
+};
+
+// Patterns for determining authentication flows based on response types
+const AUTHENTICATION_FLOWS_PATTERNS = [
+  { types: [RESPONSE_TYPES.CODE], flow: AUTHENTICATION_FLOWS.AUTHORISATION_CODE_FLOW },
+  { types: [RESPONSE_TYPES.ID_TOKEN], flow: AUTHENTICATION_FLOWS.IMPLICIT_FLOW },
+  { types: [RESPONSE_TYPES.ID_TOKEN, RESPONSE_TYPES.TOKEN], flow: AUTHENTICATION_FLOWS.IMPLICIT_FLOW },
+  { types: [RESPONSE_TYPES.CODE, RESPONSE_TYPES.ID_TOKEN], flow: AUTHENTICATION_FLOWS.HYBRID_FLOW },
+  { types: [RESPONSE_TYPES.CODE, RESPONSE_TYPES.TOKEN], flow: AUTHENTICATION_FLOWS.HYBRID_FLOW },
+  { types: [RESPONSE_TYPES.CODE, RESPONSE_TYPES.ID_TOKEN, RESPONSE_TYPES.TOKEN], flow: AUTHENTICATION_FLOWS.HYBRID_FLOW },
+];
+
+module.exports = {
+  AUTHENTICATION_FLOWS,
+  RESPONSE_TYPES,
+  GRANT_TYPES,
+  AUTHENTICATION_FLOWS_PATTERNS,
+};

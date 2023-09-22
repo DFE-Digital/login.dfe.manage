@@ -1,3 +1,8 @@
+const {
+  AUTHENTICATION_FLOWS,
+  RESPONSE_TYPES,
+  AUTHENTICATION_FLOWS_PATTERNS
+} = require('../../constants/serviceConfigConstants')
 const { getSearchDetailsForUserById } = require('./../../infrastructure/search');
 const { getInvitation, getUserById } = require('./../../infrastructure/directories');
 const { getServicesForUser } = require('../../infrastructure/access');
@@ -379,6 +384,36 @@ const objectToQueryString = (obj) => Object.entries(obj)
   })
   .join('&');
 
+const arraysEqual = (a, b) => {
+  if (a.length !== b.length) return false;
+  return a.every((element, index) => element === b[index]);
+};
+
+const determineAuthFlowByRespType = (responseTypes) => {
+  if (!responseTypes) return AUTHENTICATION_FLOWS.UNKNOWN_FLOW;
+
+  const foundPattern = AUTHENTICATION_FLOWS_PATTERNS.find((pattern) => arraysEqual(pattern.types, responseTypes));
+
+  return foundPattern ? foundPattern.flow : AUTHENTICATION_FLOWS.UNKNOWN_FLOW;
+};
+
+function processConfigurationTypes(configurationTypes) {
+  let processedTypes = configurationTypes;
+  if (processedTypes) {
+    processedTypes = Array.isArray(processedTypes) ? processedTypes : [processedTypes];
+  }
+  return processedTypes;
+}
+
+function processRedirectUris(uris) {
+  let processedUris = uris;
+  if (processedUris) {
+    processedUris = Array.isArray(processedUris) ? processedUris : [processedUris];
+    processedUris = processedUris.map((x) => x.trim()).filter((x) => x !== '');
+  }
+  return processedUris;
+}
+
 module.exports = {
   mapUserToSupportModel,
   getUserDetails,
@@ -394,4 +429,7 @@ module.exports = {
   getSafeCriteria,
   getValidPageNumber,
   objectToQueryString,
+  determineAuthFlowByRespType,
+  processRedirectUris,
+  processConfigurationTypes,
 };

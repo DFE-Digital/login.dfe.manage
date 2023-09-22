@@ -1,14 +1,30 @@
 const niceware = require('niceware');
+const {
+  AUTHENTICATION_FLOWS,
+  GRANT_TYPES,
+} = require('../../constants/serviceConfigConstants');
 const { getServiceById } = require('../../infrastructure/applications');
-const { getUserServiceRoles } = require('./utils');
+const {
+  getUserServiceRoles,
+  determineAuthFlowByRespType,
+  processRedirectUris,
+  processConfigurationTypes,
+} = require('./utils');
 
 const buildServiceModelFromObject = (service, sessionService = {}) => {
+  const responseTypes = (sessionService?.responseTypes?.newValue || service.relyingParty.response_types) || [];
+  const authFlowType = determineAuthFlowByRespType(responseTypes);
+
   let tokenEndpointAuthMethod = null;
 
   const sessionValue = sessionService?.tokenEndpointAuthMethod?.newValue;
   const fallbackValue = service.relyingParty.token_endpoint_auth_method === 'client_secret_post' ? 'client_secret_post' : null;
 
   tokenEndpointAuthMethod = sessionValue !== undefined ? sessionValue : fallbackValue;
+
+  const grantTypes = sessionService?.grantTypes?.newValue || service.relyingParty.grant_types || [];
+
+  const refreshToken = service.relyingParty.grant_types.includes(GRANT_TYPES.REFRESH_TOKEN) ? GRANT_TYPES.REFRESH_TOKEN : null;
 
   return {
     name: service.name || '',
@@ -19,9 +35,10 @@ const buildServiceModelFromObject = (service, sessionService = {}) => {
     postResetUrl: (sessionService?.postResetUrl?.newValue || service.relyingParty.postResetUrl) || '',
     redirectUris: (sessionService?.redirectUris?.newValue || service.relyingParty.redirect_uris) || [],
     postLogoutRedirectUris: (sessionService?.postLogoutRedirectUris?.newValue || service.relyingParty.post_logout_redirect_uris) || [],
-    grantTypes: (sessionService?.grantTypes?.newValue || service.relyingParty.grant_types) || [],
-    responseTypes: (sessionService?.responseTypes?.newValue || service.relyingParty.response_types) || [],
+    grantTypes,
+    responseTypes,
     apiSecret: (sessionService?.apiSecret?.secretNewValue || service.relyingParty.api_secret) || '',
+    refreshToken,
     tokenEndpointAuthMethod,
   };
 };
@@ -66,46 +83,47 @@ const getServiceConfig = async (req, res) => {
 const validate = async (req, currentService, oldService) => {
   const urlValidation = /^https?:\/\/(.*)/;
   const manageRolesForService = await getUserServiceRoles(req);
-  // TODO: revert when adding grantTypes NSA-7334
-  let grantTypes = req.body.grant_types ? req.body.grant_types : currentService.grantTypes;
-  if (!(grantTypes instanceof Array)) {
-    grantTypes = [req.body.grant_types];
-  }
 
-  let responseTypes = req.body.response_types ? req.body.response_types : [];
-  if (!(responseTypes instanceof Array)) {
-    responseTypes = [req.body.response_types];
-  }
+  const responseTypes = processConfigurationTypes(req.body.response_types);
+  const selectedRedirects = processRedirectUris(req.body.redirect_uris);
+  const selectedLogout = processRedirectUris(req.body.post_logout_redirect_uris);
 
-  let selectedRedirects = req.body.redirect_uris ? req.body.redirect_uris : [];
-  if (!(selectedRedirects instanceof Array)) {
-    selectedRedirects = [req.body.redirect_uris];
-  }
-  selectedRedirects = selectedRedirects.filter((x) => x.trim() !== '');
+  const authFlowType = determineAuthFlowByRespType(responseTypes);
+  console.log(authFlowType);
 
-  let selectedLogout = req.body.post_logout_redirect_uris ? req.body.post_logout_redirect_uris : [];
-  if (!(selectedLogout instanceof Array)) {
-    selectedLogout = [req.body.post_logout_redirect_uris];
-  }
-  selectedLogout = selectedLogout.filter((x) => x.trim() !== '');
+  const isImplicitFlow = authFlowType === AUTHENTICATION_FLOWS.IMPLICIT_FLOW;
+  const isAuthorisationCodeFlow = authFlowType === AUTHENTICATION_FLOWS.AUTHORISATION_CODE_FLOW;
+  const isHybridFlow = authFlowType === AUTHENTICATION_FLOWS.HYBRID_FLOW;
 
-  const isAuthorisedOrHybridFlow = (responseTypes && responseTypes.length > 0 && responseTypes.includes('code'));
+  const refreshToken = (req.body.refresh_token && !isImplicitFlow) ? req.body.refresh_token : null;
+  let grantTypes = [];
+
+  if (isHybridFlow || isAuthorisationCodeFlow) {
+    grantTypes = [GRANT_TYPES.AUTHORIZATION_CODE];
+    if (refreshToken) {
+      grantTypes.push(refreshToken);
+    }
+  } else if (isImplicitFlow) {
+    grantTypes = [GRANT_TYPES.IMPLICIT];
+  }
 
   const model = {
     service: {
       name: currentService.name,
       description: currentService.description,
       clientId: currentService.clientId,
-      clientSecret: isAuthorisedOrHybridFlow ? req.body.clientSecret : oldService.clientSecret,
-      serviceHome: req.body.serviceHome || '',
-      postResetUrl: req.body.postResetUrl || '',
+      clientSecret: !isImplicitFlow ? req.body.clientSecret : oldService.clientSecret,
+      serviceHome: (req.body.serviceHome || '').trim(),
+      postResetUrl: (req.body.postResetUrl || '').trim(),
       redirectUris: selectedRedirects,
       postLogoutRedirectUris: selectedLogout,
       grantTypes: grantTypes || [],
       responseTypes,
       apiSecret: req.body.apiSecret,
       tokenEndpointAuthMethod: req.body.tokenEndpointAuthMethod === 'client_secret_post' ? 'client_secret_post' : null,
+      refreshToken,
     },
+    authFlowType,
     backLink: `/services/${req.params.sid}`,
     validationMessages: {},
     serviceId: req.params.sid,
@@ -150,7 +168,7 @@ const validate = async (req, currentService, oldService) => {
   } else if (model.service.postLogoutRedirectUris.some((value, i) => model.service.postLogoutRedirectUris.indexOf(value) !== i)) {
     model.validationMessages.post_logout_redirect_uris = 'Logout redirect Urls must be unique';
   }
-  if (isAuthorisedOrHybridFlow && model.service.clientSecret !== currentService.clientSecret) {
+  if (!isImplicitFlow && model.service.clientSecret !== currentService.clientSecret) {
     try {
       const validateClientSecret = niceware.passphraseToBytes(model.service.clientSecret.split('-'));
       if (validateClientSecret.length < 8) {
@@ -224,6 +242,7 @@ const postServiceConfig = async (req, res) => {
         req.session.serviceConfigurationChanges[name].secretNewValue = secretNewValue;
       }
     });
+    req.session.serviceConfigurationChanges.authFlowType = model.authFlowType;
 
     return res.redirect('review-service-configuration#');
   } catch (error) {

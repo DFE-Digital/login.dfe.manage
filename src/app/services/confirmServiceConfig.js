@@ -1,7 +1,12 @@
 const niceware = require('niceware');
 const { getServiceById, updateService } = require('../../infrastructure/applications');
 const logger = require('../../infrastructure/logger');
-const { getUserServiceRoles } = require('./utils');
+const {
+  getUserServiceRoles, processRedirectUris, processConfigurationTypes,
+} = require('./utils');
+const {
+  AUTHENTICATION_FLOWS,
+} = require('../../constants/serviceConfigConstants');
 
 const serviceConfigChangesSummaryDetails = {
   serviceHome: {
@@ -34,29 +39,30 @@ const serviceConfigChangesSummaryDetails = {
     changeLink: 'service-configuration?action=amendChanges#response_types-form-group',
     displayOrder: 5,
   },
+  refreshToken: {
+    title: 'Refresh token',
+    description: 'Select this field if you want to get new access tokens when they have expired without interaction with the user.',
+    changeLink: 'service-configuration?action=amendChanges#refresh_token-form-group',
+    displayOrder: 6,
+  },
   clientSecret: {
     title: 'Client secret',
     description: 'A value that is created automatically by the system and acts as a password for the service.',
     changeLink: 'service-configuration?action=amendChanges#clientSecret-form-group',
-    displayOrder: 9,
+    displayOrder: 7,
   },
   tokenEndpointAuthMethod: {
     title: 'Token endpoint authentication method',
     description: 'The way your service authenticates to the DfE Sign-in token endpoint. Select the method that applies.',
     changeLink: 'service-configuration?action=amendChanges#tokenEndpointAuthMethod-form-group',
-    displayOrder: 7,
+    displayOrder: 8,
   },
-  // grantTypes: {
-  //   title: 'Grant types',
-  //   description: 'Grant types placeholder description.',
-  //   changeLink: 'service-configuration?action=amendChanges#clientSecret-form-group',
-  //   displayOrder: 8,
-  // },
+
   apiSecret: {
     title: 'API Secret',
     description: 'A value that is created automatically by the system and acts as a password for the DfE Sign-in public API.',
     changeLink: 'service-configuration?action=amendChanges#apiSecret-form-group',
-    displayOrder: 8,
+    displayOrder: 9,
   },
 };
 
@@ -88,28 +94,35 @@ const getAddedAndRemovedValues = (oldValue, newValue) => {
   return { addedValues, removedValues };
 };
 
-const createFlattenedMappedServiceConfigChanges = (serviceConfigurationChanges, sid) => Object.entries(serviceConfigurationChanges).map(([key, value]) => {
-  const mapping = getServiceConfigMapping(key, sid);
-  if (mapping) {
-    const { oldValue, newValue } = value;
-    const { addedValues, removedValues } = getAddedAndRemovedValues(oldValue, newValue);
+const createFlattenedMappedServiceConfigChanges = (serviceConfigurationChanges, sid, authFlowType) => Object.entries(serviceConfigurationChanges)
+  .map(([key, value]) => {
+    // if flow changed to implicit flow,then the refresh token and tokenEndpointAuthMethod removed in the background and not displayed in the UI
+    if (authFlowType === AUTHENTICATION_FLOWS.IMPLICIT_FLOW && (key === 'refreshToken' || key === 'tokenEndpointAuthMethod')) {
+      return null;
+    }
 
-    return {
-      ...value,
-      ...mapping,
-      addedValues,
-      removedValues,
-    };
-  }
-  return value;
-});
+    const mapping = getServiceConfigMapping(key, sid);
+
+    if (mapping) {
+      const { oldValue, newValue } = value;
+      const { addedValues, removedValues } = getAddedAndRemovedValues(oldValue, newValue);
+
+      return {
+        ...value,
+        ...mapping,
+        addedValues,
+        removedValues,
+      };
+    }
+
+    return value;
+  })
+  .filter((mappedValue) => mappedValue !== null); // Filter out null entries
 
 const buildCurrentServiceModel = async (req) => {
   const service = await getServiceById(req.params.sid, req.id);
   return {
     name: service.name || '',
-    // clientSecret: service.relyingParty.client_secret || '',
-    // apiSecret: service.relyingParty.api_secret || '',
   };
 };
 
@@ -119,27 +132,10 @@ const validate = async (req, currentService) => {
 
   const { serviceConfigurationChanges } = req.session;
 
-  let grantTypes = serviceConfigurationChanges.grantTypes?.newValue;
-  if (grantTypes && !(grantTypes instanceof Array)) {
-    grantTypes = [serviceConfigurationChanges.grantTypes.newValue];
-  }
-
-  let responseTypes = serviceConfigurationChanges.responseTypes?.newValue;
-  if (responseTypes && !(responseTypes instanceof Array)) {
-    responseTypes = [serviceConfigurationChanges.responseTypes?.newValue];
-  }
-
-  let selectedRedirects = serviceConfigurationChanges.redirectUris?.newValue;
-  if (selectedRedirects) {
-    selectedRedirects = Array.isArray(selectedRedirects) ? selectedRedirects : [selectedRedirects];
-    selectedRedirects = selectedRedirects.filter((x) => x.trim() !== '');
-  }
-
-  let selectedLogout = serviceConfigurationChanges.postLogoutRedirectUris?.newValue;
-  if (selectedLogout) {
-    selectedLogout = Array.isArray(selectedLogout) ? selectedLogout : [selectedLogout];
-    selectedLogout = selectedLogout.filter((x) => x.trim() !== '');
-  }
+  const grantTypes = processConfigurationTypes(serviceConfigurationChanges.grantTypes?.newValue);
+  const responseTypes = processConfigurationTypes(serviceConfigurationChanges.responseTypes?.newValue);
+  const selectedRedirects = processRedirectUris(serviceConfigurationChanges.redirectUris?.newValue);
+  const selectedLogout = processRedirectUris(serviceConfigurationChanges.postLogoutRedirectUris?.newValue);
 
   const model = {
     service: {
@@ -210,16 +206,22 @@ const validate = async (req, currentService) => {
 };
 
 const getConfirmServiceConfig = async (req, res) => {
+  const { sid } = req.params;
   if (!req.session.serviceConfigurationChanges) {
-    return res.redirect(`/services/${req.params.sid}/service-configuration`);
+    return res.redirect(`/services/${sid}/service-configuration`);
   }
   try {
     const manageRolesForService = await getUserServiceRoles(req);
     const currentService = await buildCurrentServiceModel(req);
 
+    const authFlowTypeValue = req.session.serviceConfigurationChanges?.authFlowType;
+    const serviceConfigChanges = req.session.serviceConfigurationChanges;
+    const { authFlowType, ...changedServiceParams } = serviceConfigChanges;
+
     const serviceChanges = createFlattenedMappedServiceConfigChanges(
-      req.session.serviceConfigurationChanges,
-      req.params.sid,
+      changedServiceParams,
+      sid,
+      authFlowTypeValue,
     );
 
     const sortedServiceChanges = serviceChanges.sort(
