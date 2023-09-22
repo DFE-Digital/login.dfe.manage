@@ -300,7 +300,7 @@
                                     <div class="multiple-choice govuk-checkboxes__item">
                                         <input id="refresh_token" class = "govuk-checkboxes__input" type="checkbox"
                                         name="refresh_token" value="refresh_token" <%=
-                                        (locals.service.refreshToken.indexOf('refreshToken') !== -1) ? 'checked' : ''%> disabled>
+                                        (locals.service.grantTypes.indexOf('refresh_token') !== -1) ? 'checked' : ''%> disabled>
                                         <label class="govuk-label govuk-checkboxes__label" for="refresh_token">
                                             refresh_token
                                         </label>

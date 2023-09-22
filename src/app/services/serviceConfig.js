@@ -12,19 +12,15 @@ const {
 } = require('./utils');
 
 const buildServiceModelFromObject = (service, sessionService = {}) => {
-  const responseTypes = (sessionService?.responseTypes?.newValue || service.relyingParty.response_types) || [];
-  const authFlowType = determineAuthFlowByRespType(responseTypes);
-
   let tokenEndpointAuthMethod = null;
 
   const sessionValue = sessionService?.tokenEndpointAuthMethod?.newValue;
   const fallbackValue = service.relyingParty.token_endpoint_auth_method === 'client_secret_post' ? 'client_secret_post' : null;
-
+  // TODO: doublecheck functionality 
   tokenEndpointAuthMethod = sessionValue !== undefined ? sessionValue : fallbackValue;
 
   const grantTypes = sessionService?.grantTypes?.newValue || service.relyingParty.grant_types || [];
-
-  const refreshToken = service.relyingParty.grant_types.includes(GRANT_TYPES.REFRESH_TOKEN) ? GRANT_TYPES.REFRESH_TOKEN : null;
+  const refreshToken = grantTypes.includes(GRANT_TYPES.REFRESH_TOKEN) ? GRANT_TYPES.REFRESH_TOKEN : null;
 
   return {
     name: service.name || '',
@@ -36,7 +32,7 @@ const buildServiceModelFromObject = (service, sessionService = {}) => {
     redirectUris: (sessionService?.redirectUris?.newValue || service.relyingParty.redirect_uris) || [],
     postLogoutRedirectUris: (sessionService?.postLogoutRedirectUris?.newValue || service.relyingParty.post_logout_redirect_uris) || [],
     grantTypes,
-    responseTypes,
+    responseTypes: (sessionService?.responseTypes?.newValue || service.relyingParty.response_types) || [],
     apiSecret: (sessionService?.apiSecret?.secretNewValue || service.relyingParty.api_secret) || '',
     refreshToken,
     tokenEndpointAuthMethod,
