@@ -9,6 +9,7 @@ const {
   determineAuthFlowByRespType,
   processRedirectUris,
   processConfigurationTypes,
+  isValidUrl,
 } = require('./utils');
 
 const buildServiceModelFromObject = (service, sessionService = {}) => {
@@ -16,10 +17,19 @@ const buildServiceModelFromObject = (service, sessionService = {}) => {
 
   const sessionValue = sessionService?.tokenEndpointAuthMethod?.newValue;
   const fallbackValue = service.relyingParty.token_endpoint_auth_method === 'client_secret_post' ? 'client_secret_post' : null;
-  // TODO: doublecheck functionality 
-  tokenEndpointAuthMethod = sessionValue !== undefined ? sessionValue : fallbackValue;
 
-  const grantTypes = sessionService?.grantTypes?.newValue || service.relyingParty.grant_types || [];
+  const responseTypes = (sessionService?.responseTypes?.newValue || service.relyingParty.response_types) || [];
+  const authFlowType = determineAuthFlowByRespType(responseTypes);
+
+  tokenEndpointAuthMethod = (sessionValue !== undefined && authFlowType !== 'implicitFlow') ? sessionValue : fallbackValue;
+
+  let grantTypes = [];
+  if (sessionService?.grantTypes?.newValue && authFlowType !== 'implicitFlow') {
+    grantTypes = sessionService?.grantTypes?.newValue;
+  } else {
+    grantTypes = service.relyingParty?.grant_types || [];
+  }
+
   const refreshToken = grantTypes.includes(GRANT_TYPES.REFRESH_TOKEN) ? GRANT_TYPES.REFRESH_TOKEN : null;
 
   return {
@@ -32,7 +42,7 @@ const buildServiceModelFromObject = (service, sessionService = {}) => {
     redirectUris: (sessionService?.redirectUris?.newValue || service.relyingParty.redirect_uris) || [],
     postLogoutRedirectUris: (sessionService?.postLogoutRedirectUris?.newValue || service.relyingParty.post_logout_redirect_uris) || [],
     grantTypes,
-    responseTypes: (sessionService?.responseTypes?.newValue || service.relyingParty.response_types) || [],
+    responseTypes,
     apiSecret: (sessionService?.apiSecret?.secretNewValue || service.relyingParty.api_secret) || '',
     refreshToken,
     tokenEndpointAuthMethod,
@@ -85,7 +95,6 @@ const validate = async (req, currentService, oldService) => {
   const selectedLogout = processRedirectUris(req.body.post_logout_redirect_uris);
 
   const authFlowType = determineAuthFlowByRespType(responseTypes);
-  console.log(authFlowType);
 
   const isImplicitFlow = authFlowType === AUTHENTICATION_FLOWS.IMPLICIT_FLOW;
   const isAuthorisationCodeFlow = authFlowType === AUTHENTICATION_FLOWS.AUTHORISATION_CODE_FLOW;
@@ -127,31 +136,37 @@ const validate = async (req, currentService, oldService) => {
     currentNavigation: 'configuration',
   };
 
-  if (model.service.serviceHome && !urlValidation.test(model.service.serviceHome)) {
+  if (model.service.serviceHome && !isValidUrl(model.service.serviceHome)) {
     model.validationMessages.serviceHome = 'Please enter a valid home Url';
   }
 
-  if (!model.service.clientId) {
-    model.validationMessages.clientId = 'Client Id must be present';
-  } else if (model.service.clientId.length > 50) {
-    model.validationMessages.clientId = 'Client Id must be 50 characters or less';
-  } else if (!/^[A-Za-z0-9-]+$/.test(model.service.clientId)) {
-    model.validationMessages.clientId = 'Client Id must only contain letters, numbers, and hyphens';
-  } else if (
-    model.service.clientId.toLowerCase() !== currentService.clientId.toLowerCase()
-    && await getServiceById(model.service.clientId, req.id)
-  ) {
-    // If getServiceById returns truthy, then that clientId is already in use.
-    model.validationMessages.clientId = 'Client Id is unavailable, try another';
+  if (model.service.responseTypes.length === 0) {
+    model.validationMessages.respnseTypes = 'Select at least 1 response type';
+  } else if (model.service.responseTypes.length === 1 && model.service.responseTypes.includes('token')) {
+    model.validationMessages.respnseTypes = 'You must select more than 1 response type when selecting  \'token\' as a response type';
   }
 
-  if (!urlValidation.test(model.service.postResetUrl) && model.service.postResetUrl.trim() !== '') {
+  // if (!model.service.clientId) {
+  //   model.validationMessages.clientId = 'Client Id must be present';
+  // } else if (model.service.clientId.length > 50) {
+  //   model.validationMessages.clientId = 'Client Id must be 50 characters or less';
+  // } else if (!/^[A-Za-z0-9-]+$/.test(model.service.clientId)) {
+  //   model.validationMessages.clientId = 'Client Id must only contain letters, numbers, and hyphens';
+  // } else if (
+  //   model.service.clientId.toLowerCase() !== currentService.clientId.toLowerCase()
+  //   && await getServiceById(model.service.clientId, req.id)
+  // ) {
+  //   // If getServiceById returns truthy, then that clientId is already in use.
+  //   model.validationMessages.clientId = 'Client Id is unavailable, try another';
+  // }
+
+  if (!isValidUrl(model.service.postResetUrl) && model.service.postResetUrl.trim() !== '') {
     model.validationMessages.postResetUrl = 'Please enter a valid Post-reset Url';
   }
 
   if (!model.service.redirectUris || !model.service.redirectUris.length > 0) {
     model.validationMessages.redirect_uris = 'At least one redirect Url must be specified';
-  } else if (model.service.redirectUris.some((x) => !urlValidation.test(x))) {
+  } else if (model.service.redirectUris.some((x) => !isValidUrl(x))) {
     model.validationMessages.redirect_uris = 'Invalid redirect Url';
   } else if (model.service.redirectUris.some((value, i) => model.service.redirectUris.indexOf(value) !== i)) {
     model.validationMessages.redirect_uris = 'Redirect Urls must be unique';
@@ -159,12 +174,12 @@ const validate = async (req, currentService, oldService) => {
 
   if (!model.service.postLogoutRedirectUris || !model.service.postLogoutRedirectUris.length > 0) {
     model.validationMessages.post_logout_redirect_uris = 'At least one logout redirect Url must be specified';
-  } else if (model.service.postLogoutRedirectUris.some((x) => !urlValidation.test(x))) {
+  } else if (model.service.postLogoutRedirectUris.some((x) => !isValidUrl(x))) {
     model.validationMessages.post_logout_redirect_uris = 'Invalid logout redirect Url';
   } else if (model.service.postLogoutRedirectUris.some((value, i) => model.service.postLogoutRedirectUris.indexOf(value) !== i)) {
     model.validationMessages.post_logout_redirect_uris = 'Logout redirect Urls must be unique';
   }
-  if (!isImplicitFlow && model.service.clientSecret !== currentService.clientSecret) {
+  if (model.service.clientSecret && (!isImplicitFlow && model.service.clientSecret !== currentService.clientSecret)) {
     try {
       const validateClientSecret = niceware.passphraseToBytes(model.service.clientSecret.split('-'));
       if (validateClientSecret.length < 8) {

@@ -252,7 +252,7 @@
                 
 
                     <%# Response types section %>
-                    <div class="govuk-form-group" id="response_types-form-group">
+                    <div class="govuk-form-group<%= (locals.validationMessages.respnseTypes !== undefined) ? ' govuk-form-group--error' : ''%>" id="response_types-form-group">
                         <fieldset class="govuk-fieldset" id="response_types-fieldset" aria-describedby="response_types-hint">
                             <legend class="govuk-fieldset__legend" id="response_types-legend">
                                 <h1 class="govuk-heading-m govuk-!-margin-bottom-2" id="response_types-heading"> Response types </h1>
@@ -260,6 +260,12 @@
                             <div id="response_types-hint" class="govuk-hint">
                                 A value that determines the authentication flow. Select all that apply.
                             </div>
+                            <% if (locals.validationMessages.respnseTypes !== undefined){ %>
+                                <p id="respnseTypes" class="govuk-error-message">
+                                <span class="govuk-visually-hidden">Error:</span>
+                                <%=locals.validationMessages.respnseTypes %>
+                                </p>
+                                <% } %>
                             <div class="govuk-checkboxes" id="response_types-checkboxes">
                                 <div class="multiple-choice govuk-checkboxes__item">
                                     <input id="response_types-code" class ="govuk-checkboxes__input" type="checkbox"
@@ -414,26 +420,47 @@
     }
 
     let warningMessage = "";
-    if (selectedTypes.length > 0) {
-      let flowType = 'implicit flow';
 
-      if (selectedTypes.length === 1 && selectedTypes.includes('Code')) {
-        flowType = 'Authorisation flow';
-      } else if ((selectedTypes.includes('Code') && selectedTypes.includes('Token')) || 
-                (selectedTypes.includes('Code') && selectedTypes.includes('ID token'))) {
-        flowType = 'hybrid flow';
-      }
+if (selectedTypes.length > 0) {
 
-      warningMessage = `
-        <div class="govuk-warning-text govuk-!-margin-top-5 govuk-!-margin-bottom-0">
-          <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-          <strong class="govuk-warning-text__text">
-            <span class="govuk-warning-text__assistive">Warning</span>
-            You have selected ${selectedTypes.join(' and ')} as your response type. This means ${flowType} is your flow.
-          </strong>
-        </div>
-      `;
+    selectedTypes.sort((a, b) => {
+        const order = ['Code', 'ID token', 'Token'];
+        return order.indexOf(a) - order.indexOf(b);
+    });
+    
+    let flowType = 'Implicit';
+
+    if (selectedTypes.length === 1 && selectedTypes.includes('Code')) {
+        flowType = 'Authorisation';
+    } else if ((selectedTypes.includes('Code') && selectedTypes.includes('Token')) || 
+            (selectedTypes.includes('Code') && selectedTypes.includes('ID token'))) {
+        flowType = 'Hybrid';
     }
+
+    if (selectedTypes.length === 1 && selectedTypes.includes('Token')) {
+        warningMessage = '';
+    } else {
+        let selectedTypesDisplay;
+        
+        if (selectedTypes.length > 1) {
+            let allButLast = selectedTypes.slice(0, -1).join(', ');
+            let last = selectedTypes[selectedTypes.length - 1];
+            selectedTypesDisplay = `${allButLast} and ${last}`;
+        } else {
+            selectedTypesDisplay = selectedTypes[0];
+        }
+
+        warningMessage = `
+            <div class="govuk-warning-text govuk-!-margin-top-5 govuk-!-margin-bottom-0">
+                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                <strong class="govuk-warning-text__text">
+                    <span class="govuk-warning-text__assistive">Warning</span>
+                    You have selected ${selectedTypesDisplay} as your response type. This means ${flowType} flow is your flow.
+                </strong>
+            </div>
+        `;
+    }
+}
 
     // Remove existing warning, if any
     $('.govuk-warning-text').remove();

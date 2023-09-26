@@ -1,8 +1,8 @@
+const { URL } = require('url');
 const {
   AUTHENTICATION_FLOWS,
-  RESPONSE_TYPES,
-  AUTHENTICATION_FLOWS_PATTERNS
-} = require('../../constants/serviceConfigConstants')
+  AUTHENTICATION_FLOWS_PATTERNS,
+} = require('../../constants/serviceConfigConstants');
 const { getSearchDetailsForUserById } = require('./../../infrastructure/search');
 const { getInvitation, getUserById } = require('./../../infrastructure/directories');
 const { getServicesForUser } = require('../../infrastructure/access');
@@ -397,22 +397,30 @@ const determineAuthFlowByRespType = (responseTypes) => {
   return foundPattern ? foundPattern.flow : AUTHENTICATION_FLOWS.UNKNOWN_FLOW;
 };
 
-function processConfigurationTypes(configurationTypes) {
-  let processedTypes = configurationTypes;
-  if (processedTypes) {
-    processedTypes = Array.isArray(processedTypes) ? processedTypes : [processedTypes];
+const processConfigurationTypes = (configurationTypes) => {
+  let processedTypes = configurationTypes || [];
+  if (processedTypes && !Array.isArray(processedTypes)) {
+    processedTypes = [configurationTypes];
   }
   return processedTypes;
-}
+};
 
-function processRedirectUris(uris) {
+const processRedirectUris = (uris) => {
   let processedUris = uris;
   if (processedUris) {
     processedUris = Array.isArray(processedUris) ? processedUris : [processedUris];
     processedUris = processedUris.map((x) => x.trim()).filter((x) => x !== '');
   }
   return processedUris;
-}
+};
+
+const isValidUrl = (urlString) => {
+  try {
+    return !!new URL(urlString);
+  } catch (error) {
+    return false;
+  }
+};
 
 module.exports = {
   mapUserToSupportModel,
@@ -432,4 +440,5 @@ module.exports = {
   determineAuthFlowByRespType,
   processRedirectUris,
   processConfigurationTypes,
+  isValidUrl,
 };
