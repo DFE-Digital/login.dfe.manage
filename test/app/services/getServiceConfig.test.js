@@ -9,6 +9,7 @@ const { getRequestMock, getResponseMock } = require('../../utils');
 const { getServiceConfig } = require('../../../src/app/services/serviceConfig');
 const { getServiceById } = require('../../../src/infrastructure/applications');
 const { getUserServiceRoles } = require('../../../src/app/services/utils');
+const { ACTIONS } = require('../../../src/constants/serviceConfigConstants');
 
 const res = getResponseMock();
 
@@ -146,7 +147,7 @@ describe('when getting the service config page', () => {
   });
 
   it('should persist user-modified service configuration values during an amend operation on the review page', async () => {
-    req.query.action = 'amendChanges';
+    req.query.action = ACTIONS.AMEND_CHANGES;
     req.session.serviceConfigurationChanges = {
       clientSecret: { secretNewValue: 'new-secret', newValue: 'EXPUNGED', oldValue: 'EXPUNGED' },
       serviceHome: { newValue: 'https://new.servicehome.com', oldValue: 'https://old.servicehome.com' },
@@ -176,7 +177,7 @@ describe('when getting the service config page', () => {
   });
 
   it('should persist the user-modified value of tokenEndpointAuthMethod during an amend operation on the review page', async () => {
-    req.query.action = 'amendChanges';
+    req.query.action = ACTIONS.AMEND_CHANGES;
     req.session.serviceConfigurationChanges = {
       token_endpoint_auth_method: { newValue: 'client_secret_post', oldValue: null },
     };

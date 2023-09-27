@@ -6,68 +6,12 @@ const {
 } = require('./utils');
 const {
   AUTHENTICATION_FLOWS,
+  ERROR_MESSAGES,
+  SERVICE_CONFIG_CHANGES_SUMMARY_DETAILS,
 } = require('../../constants/serviceConfigConstants');
 
-const serviceConfigChangesSummaryDetails = {
-  serviceHome: {
-    title: 'Home URL',
-    description: 'The home page of the service you want to configure. It is usually the service landing page from DfE Sign-in.',
-    changeLink: 'service-configuration?action=amendChanges#serviceHome-form-group',
-    displayOrder: 1,
-  },
-  postResetUrl: {
-    title: 'Post password-reset URL',
-    description: 'Where you want to redirect users after they have reset their password. It is usually the DfE Sign-in home page.',
-    changeLink: 'service-configuration?action=amendChanges#postResetUrl-form-group',
-    displayOrder: 2,
-  },
-  redirectUris: {
-    title: 'Redirect URL',
-    description: 'Where you want to redirect users after they have authenticated.',
-    changeLink: 'service-configuration?action=amendChanges#redirect_uris-form-group',
-    displayOrder: 3,
-  },
-  postLogoutRedirectUris: {
-    title: 'Logout redirect URL',
-    description: 'Where you want to redirect users after they log out of a service.',
-    changeLink: 'service-configuration?action=amendChanges#post_logout_redirect_uris-form-group',
-    displayOrder: 4,
-  },
-  responseTypes: {
-    title: 'Response types',
-    description: 'A value that determines the authentication flow.',
-    changeLink: 'service-configuration?action=amendChanges#response_types-form-group',
-    displayOrder: 5,
-  },
-  refreshToken: {
-    title: 'Refresh token',
-    description: 'Select this field if you want to get new access tokens when they have expired without interaction with the user.',
-    changeLink: 'service-configuration?action=amendChanges#refresh_token-form-group',
-    displayOrder: 6,
-  },
-  clientSecret: {
-    title: 'Client secret',
-    description: 'A value that is created automatically by the system and acts as a password for the service.',
-    changeLink: 'service-configuration?action=amendChanges#clientSecret-form-group',
-    displayOrder: 7,
-  },
-  tokenEndpointAuthMethod: {
-    title: 'Token endpoint authentication method',
-    description: 'The way your service authenticates to the DfE Sign-in token endpoint. Select the method that applies.',
-    changeLink: 'service-configuration?action=amendChanges#tokenEndpointAuthMethod-form-group',
-    displayOrder: 8,
-  },
-
-  apiSecret: {
-    title: 'API Secret',
-    description: 'A value that is created automatically by the system and acts as a password for the DfE Sign-in public API.',
-    changeLink: 'service-configuration?action=amendChanges#apiSecret-form-group',
-    displayOrder: 9,
-  },
-};
-
 const getServiceConfigMapping = (key, sid) => {
-  const mapping = { ...serviceConfigChangesSummaryDetails[key] };
+  const mapping = { ...SERVICE_CONFIG_CHANGES_SUMMARY_DETAILS[key] };
   if (mapping) {
     mapping.changeLink = `/services/${sid}/${mapping.changeLink}`;
   }
@@ -137,6 +81,16 @@ const validate = async (req, currentService) => {
   const selectedRedirects = processRedirectUris(serviceConfigurationChanges.redirectUris?.newValue);
   const selectedLogout = processRedirectUris(serviceConfigurationChanges.postLogoutRedirectUris?.newValue);
 
+  let tokenEndpointAuthMethod;
+
+  if (serviceConfigurationChanges?.tokenEndpointAuthMethod?.newValue !== undefined) {
+    tokenEndpointAuthMethod = serviceConfigurationChanges.tokenEndpointAuthMethod.newValue === 'client_secret_post'
+      ? 'client_secret_post'
+      : null;
+  } else {
+    tokenEndpointAuthMethod = undefined;
+  }
+
   const model = {
     service: {
       name: currentService.name,
@@ -148,7 +102,7 @@ const validate = async (req, currentService) => {
       responseTypes,
       apiSecret: serviceConfigurationChanges?.apiSecret?.secretNewValue,
       clientSecret: serviceConfigurationChanges?.clientSecret?.secretNewValue,
-      tokenEndpointAuthMethod: serviceConfigurationChanges?.tokenEndpointAuthMethod?.newValue === 'client_secret_post' ? 'client_secret_post' : null,
+      tokenEndpointAuthMethod,
     },
     backLink: `/services/${req.params.sid}/service-configuration`,
     cancelLink: `/services/${req.params.sid}`,
@@ -159,36 +113,39 @@ const validate = async (req, currentService) => {
   };
 
   if (!serviceConfigurationChanges || Object.keys(serviceConfigurationChanges).length === 0) {
-    model.validationMessages.noChangesMade = 'No changes have been made';
+    model.validationMessages.noChangesMade = ERROR_MESSAGES.NO_CHANGES_MADE;
   }
 
   if (model.service.serviceHome && !urlValidation.test(model.service.serviceHome)) {
-    model.validationMessages.serviceHome = 'Please enter a valid home Url';
+    model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_URL;
   }
 
   if (model.service.postResetUrl && !urlValidation.test(model.service.postResetUrl) && model.service?.postResetUrl.trim() !== '') {
-    model.validationMessages.postResetUrl = 'Please enter a valid Post-reset Url';
+    model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_POST_PASSWORD_RESET_URL;
+  }
+  if (model.service.responseTypes && model.service.responseTypes.length === 1 && model.service.responseTypes.includes('token')) {
+    model.validationMessages.respnseTypes = ERROR_MESSAGES.RESPONSE_TYPE_TOKEN_ERROR;
   }
 
   if (model.service.redirectUris && model.service.redirectUris.some((x) => !urlValidation.test(x))) {
-    model.validationMessages.redirect_uris = 'Invalid redirect Url';
+    model.validationMessages.redirect_uris = ERROR_MESSAGES.INVALID_REDIRECT_URL;
   } else if (model.service.redirectUris && model.service.redirectUris.some((value, i) => model.service.redirectUris.indexOf(value) !== i)) {
-    model.validationMessages.redirect_uris = 'Redirect Urls must be unique';
+    model.validationMessages.redirect_uris = ERROR_MESSAGES.REDIRECT_URLS_NOT_UNIQUE;
   }
 
   if (model.service.postLogoutRedirectUris && model.service.postLogoutRedirectUris.some((x) => !urlValidation.test(x))) {
-    model.validationMessages.post_logout_redirect_uris = 'Invalid logout redirect Url';
+    model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.INVALID_POST_LOGOUT_URL;
   } else if (model.service.postLogoutRedirectUris && model.service.postLogoutRedirectUris.some((value, i) => model.service.postLogoutRedirectUris.indexOf(value) !== i)) {
-    model.validationMessages.post_logout_redirect_uris = 'Logout redirect Urls must be unique';
+    model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.POST_LOGOUT_URL_NOT_UNIQUE;
   }
   if (model.service.clientSecret && model.service.clientSecret !== currentService.clientSecret) {
     try {
       const validateClientSecret = niceware.passphraseToBytes(model.service.clientSecret.split('-'));
       if (validateClientSecret.length < 8) {
-        model.validationMessages.clientSecret = 'Invalid client secret';
+        model.validationMessages.clientSecret = ERROR_MESSAGES.INVALID_CLIENT_SECRET;
       }
     } catch (e) {
-      model.validationMessages.clientSecret = 'Invalid client secret';
+      model.validationMessages.clientSecret = ERROR_MESSAGES.INVALID_CLIENT_SECRET;
     }
   }
 
@@ -196,10 +153,10 @@ const validate = async (req, currentService) => {
     try {
       const validateApiSecret = niceware.passphraseToBytes(model.service.apiSecret.split('-'));
       if (validateApiSecret.length !== 8) {
-        model.validationMessages.apiSecret = 'Invalid api secret';
+        model.validationMessages.apiSecret = ERROR_MESSAGES.INVALID_API_SECRET;
       }
     } catch (e) {
-      model.validationMessages.apiSecret = 'Invalid api secret';
+      model.validationMessages.apiSecret = ERROR_MESSAGES.INVALID_API_SECRET;
     }
   }
   return model;
@@ -286,7 +243,7 @@ const postConfirmServiceConfig = async (req, res) => {
       grant_types: model.service.grantTypes,
       response_types: model.service.responseTypes,
       apiSecret: model.service.apiSecret,
-      tokenEndpointAuthMethod: model.service.tokenEndpointAuthMethod === 'client_secret_post' ? 'client_secret_post' : null,
+      tokenEndpointAuthMethod: model.service.tokenEndpointAuthMethod,
     };
 
     logger.audit(`${req.user.email} (id: ${req.user.sub}) updated service configuration for service ${model.service.name} (id: ${req.params.sid})`, {

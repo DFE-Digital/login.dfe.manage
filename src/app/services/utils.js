@@ -398,11 +398,10 @@ const determineAuthFlowByRespType = (responseTypes) => {
 };
 
 const processConfigurationTypes = (configurationTypes) => {
-  let processedTypes = configurationTypes || [];
-  if (processedTypes && !Array.isArray(processedTypes)) {
-    processedTypes = [configurationTypes];
+  if (configurationTypes === undefined) {
+    return undefined;
   }
-  return processedTypes;
+  return Array.isArray(configurationTypes) ? configurationTypes : [configurationTypes];
 };
 
 const processRedirectUris = (uris) => {

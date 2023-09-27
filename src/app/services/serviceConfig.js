@@ -2,6 +2,9 @@ const niceware = require('niceware');
 const {
   AUTHENTICATION_FLOWS,
   GRANT_TYPES,
+  ACTIONS,
+  TOKEN_ENDPOINT_AUTH_METHOD,
+  ERROR_MESSAGES,
 } = require('../../constants/serviceConfigConstants');
 const { getServiceById } = require('../../infrastructure/applications');
 const {
@@ -16,15 +19,15 @@ const buildServiceModelFromObject = (service, sessionService = {}) => {
   let tokenEndpointAuthMethod = null;
 
   const sessionValue = sessionService?.tokenEndpointAuthMethod?.newValue;
-  const fallbackValue = service.relyingParty.token_endpoint_auth_method === 'client_secret_post' ? 'client_secret_post' : null;
+  const fallbackValue = service.relyingParty.token_endpoint_auth_method === TOKEN_ENDPOINT_AUTH_METHOD.CLIENT_SECRET_POST ? TOKEN_ENDPOINT_AUTH_METHOD.CLIENT_SECRET_POST : null;
 
   const responseTypes = (sessionService?.responseTypes?.newValue || service.relyingParty.response_types) || [];
   const authFlowType = determineAuthFlowByRespType(responseTypes);
 
-  tokenEndpointAuthMethod = (sessionValue !== undefined && authFlowType !== 'implicitFlow') ? sessionValue : fallbackValue;
+  tokenEndpointAuthMethod = (sessionValue !== undefined && (authFlowType === AUTHENTICATION_FLOWS.HYBRID_FLOW || authFlowType === AUTHENTICATION_FLOWS.AUTHORISATION_CODE_FLOW)) ? sessionValue : fallbackValue;
 
   let grantTypes = [];
-  if (sessionService?.grantTypes?.newValue && authFlowType !== 'implicitFlow') {
+  if (sessionService?.grantTypes?.newValue && authFlowType !== AUTHENTICATION_FLOWS.IMPLICIT_FLOW) {
     grantTypes = sessionService?.grantTypes?.newValue;
   } else {
     grantTypes = service.relyingParty?.grant_types || [];
@@ -51,7 +54,7 @@ const buildServiceModelFromObject = (service, sessionService = {}) => {
 
 const buildCurrentServiceModel = async (req) => {
   try {
-    const sessionService = req.query?.action === 'amendChanges' ? req.session.serviceConfigurationChanges : {};
+    const sessionService = req.query?.action === ACTIONS.AMEND_CHANGES ? req.session.serviceConfigurationChanges : {};
     const service = await getServiceById(req.params.sid, req.id);
     const currentServiceModel = buildServiceModelFromObject(service, sessionService);
     const oldServiceConfigModel = buildServiceModelFromObject(service);
@@ -67,7 +70,7 @@ const buildCurrentServiceModel = async (req) => {
 
 const getServiceConfig = async (req, res) => {
   try {
-    if (req.session.serviceConfigurationChanges && req.query.action !== 'amendChanges') {
+    if (req.session.serviceConfigurationChanges && req.query.action !== ACTIONS.AMEND_CHANGES) {
       req.session.serviceConfigurationChanges = {};
     }
     const manageRolesForService = await getUserServiceRoles(req);
@@ -87,10 +90,9 @@ const getServiceConfig = async (req, res) => {
 };
 
 const validate = async (req, currentService, oldService) => {
-  const urlValidation = /^https?:\/\/(.*)/;
   const manageRolesForService = await getUserServiceRoles(req);
 
-  const responseTypes = processConfigurationTypes(req.body.response_types);
+  const responseTypes = processConfigurationTypes(req.body.response_types) || [];
   const selectedRedirects = processRedirectUris(req.body.redirect_uris);
   const selectedLogout = processRedirectUris(req.body.post_logout_redirect_uris);
 
@@ -100,7 +102,8 @@ const validate = async (req, currentService, oldService) => {
   const isAuthorisationCodeFlow = authFlowType === AUTHENTICATION_FLOWS.AUTHORISATION_CODE_FLOW;
   const isHybridFlow = authFlowType === AUTHENTICATION_FLOWS.HYBRID_FLOW;
 
-  const refreshToken = (req.body.refresh_token && !isImplicitFlow) ? req.body.refresh_token : null;
+  const refreshToken = (req.body.refresh_token && (isAuthorisationCodeFlow || isHybridFlow)) ? req.body.refresh_token : null;
+
   let grantTypes = [];
 
   if (isHybridFlow || isAuthorisationCodeFlow) {
@@ -110,6 +113,22 @@ const validate = async (req, currentService, oldService) => {
     }
   } else if (isImplicitFlow) {
     grantTypes = [GRANT_TYPES.IMPLICIT];
+  } else {
+    grantTypes = oldService?.grantTypes;
+  }
+
+  let tokenEndpointAuthMethod;
+
+  if (isHybridFlow || isAuthorisationCodeFlow) {
+    if (req.body.tokenEndpointAuthMethod === TOKEN_ENDPOINT_AUTH_METHOD.CLIENT_SECRET_POST) {
+      tokenEndpointAuthMethod = TOKEN_ENDPOINT_AUTH_METHOD.CLIENT_SECRET_POST;
+    } else {
+      tokenEndpointAuthMethod = null;
+    }
+  } else if (isImplicitFlow) {
+    tokenEndpointAuthMethod = null;
+  } else {
+    tokenEndpointAuthMethod = oldService?.tokenEndpointAuthMethod;
   }
 
   const model = {
@@ -117,7 +136,7 @@ const validate = async (req, currentService, oldService) => {
       name: currentService.name,
       description: currentService.description,
       clientId: currentService.clientId,
-      clientSecret: !isImplicitFlow ? req.body.clientSecret : oldService.clientSecret,
+      clientSecret: (isHybridFlow || isAuthorisationCodeFlow) ? req.body.clientSecret : oldService.clientSecret,
       serviceHome: (req.body.serviceHome || '').trim(),
       postResetUrl: (req.body.postResetUrl || '').trim(),
       redirectUris: selectedRedirects,
@@ -125,7 +144,7 @@ const validate = async (req, currentService, oldService) => {
       grantTypes: grantTypes || [],
       responseTypes,
       apiSecret: req.body.apiSecret,
-      tokenEndpointAuthMethod: req.body.tokenEndpointAuthMethod === 'client_secret_post' ? 'client_secret_post' : null,
+      tokenEndpointAuthMethod,
       refreshToken,
     },
     authFlowType,
@@ -137,56 +156,42 @@ const validate = async (req, currentService, oldService) => {
   };
 
   if (model.service.serviceHome && !isValidUrl(model.service.serviceHome)) {
-    model.validationMessages.serviceHome = 'Please enter a valid home Url';
+    model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_URL;
   }
 
-  if (model.service.responseTypes.length === 0) {
-    model.validationMessages.respnseTypes = 'Select at least 1 response type';
+  if (!model.service.responseTypes || model.service.responseTypes.length === 0) {
+    model.validationMessages.respnseTypes = ERROR_MESSAGES.MISSING_RESPONSE_TYPE;
   } else if (model.service.responseTypes.length === 1 && model.service.responseTypes.includes('token')) {
-    model.validationMessages.respnseTypes = 'You must select more than 1 response type when selecting  \'token\' as a response type';
+    model.validationMessages.respnseTypes = ERROR_MESSAGES.RESPONSE_TYPE_TOKEN_ERROR;
   }
-
-  // if (!model.service.clientId) {
-  //   model.validationMessages.clientId = 'Client Id must be present';
-  // } else if (model.service.clientId.length > 50) {
-  //   model.validationMessages.clientId = 'Client Id must be 50 characters or less';
-  // } else if (!/^[A-Za-z0-9-]+$/.test(model.service.clientId)) {
-  //   model.validationMessages.clientId = 'Client Id must only contain letters, numbers, and hyphens';
-  // } else if (
-  //   model.service.clientId.toLowerCase() !== currentService.clientId.toLowerCase()
-  //   && await getServiceById(model.service.clientId, req.id)
-  // ) {
-  //   // If getServiceById returns truthy, then that clientId is already in use.
-  //   model.validationMessages.clientId = 'Client Id is unavailable, try another';
-  // }
 
   if (!isValidUrl(model.service.postResetUrl) && model.service.postResetUrl.trim() !== '') {
-    model.validationMessages.postResetUrl = 'Please enter a valid Post-reset Url';
+    model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_POST_PASSWORD_RESET_URL;
   }
 
   if (!model.service.redirectUris || !model.service.redirectUris.length > 0) {
-    model.validationMessages.redirect_uris = 'At least one redirect Url must be specified';
+    model.validationMessages.redirect_uris = ERROR_MESSAGES.MISSING_REDIRECT_URL;
   } else if (model.service.redirectUris.some((x) => !isValidUrl(x))) {
-    model.validationMessages.redirect_uris = 'Invalid redirect Url';
+    model.validationMessages.redirect_uris = ERROR_MESSAGES.INVALID_REDIRECT_URL;
   } else if (model.service.redirectUris.some((value, i) => model.service.redirectUris.indexOf(value) !== i)) {
-    model.validationMessages.redirect_uris = 'Redirect Urls must be unique';
+    model.validationMessages.redirect_uris = ERROR_MESSAGES.REDIRECT_URLS_NOT_UNIQUE;
   }
 
   if (!model.service.postLogoutRedirectUris || !model.service.postLogoutRedirectUris.length > 0) {
-    model.validationMessages.post_logout_redirect_uris = 'At least one logout redirect Url must be specified';
+    model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.MISSING_POST_LOGOUT_URL;
   } else if (model.service.postLogoutRedirectUris.some((x) => !isValidUrl(x))) {
-    model.validationMessages.post_logout_redirect_uris = 'Invalid logout redirect Url';
+    model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.INVALID_POST_LOGOUT_URL;
   } else if (model.service.postLogoutRedirectUris.some((value, i) => model.service.postLogoutRedirectUris.indexOf(value) !== i)) {
-    model.validationMessages.post_logout_redirect_uris = 'Logout redirect Urls must be unique';
+    model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.POST_LOGOUT_URL_NOT_UNIQUE;
   }
-  if (model.service.clientSecret && (!isImplicitFlow && model.service.clientSecret !== currentService.clientSecret)) {
+  if (model.service.clientSecret && ((isAuthorisationCodeFlow || isHybridFlow) && model.service.clientSecret !== currentService.clientSecret)) {
     try {
       const validateClientSecret = niceware.passphraseToBytes(model.service.clientSecret.split('-'));
       if (validateClientSecret.length < 8) {
-        model.validationMessages.clientSecret = 'Invalid client secret';
+        model.validationMessages.clientSecret = ERROR_MESSAGES.INVALID_CLIENT_SECRET;
       }
     } catch (e) {
-      model.validationMessages.clientSecret = 'Invalid client secret';
+      model.validationMessages.clientSecret = ERROR_MESSAGES.INVALID_CLIENT_SECRET;
     }
   }
 
@@ -194,10 +199,10 @@ const validate = async (req, currentService, oldService) => {
     try {
       const validateApiSecret = niceware.passphraseToBytes(model.service.apiSecret.split('-'));
       if (validateApiSecret.length !== 8) {
-        model.validationMessages.apiSecret = 'Invalid api secret';
+        model.validationMessages.apiSecret = ERROR_MESSAGES.INVALID_API_SECRET;
       }
     } catch (e) {
-      model.validationMessages.apiSecret = 'Invalid api secret';
+      model.validationMessages.apiSecret = ERROR_MESSAGES.INVALID_API_SECRET;
     }
   }
   return model;
