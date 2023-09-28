@@ -47,7 +47,7 @@ const ERROR_MESSAGES = {
   INVALID_CLIENT_SECRET: 'Invalid client secret',
   INVALID_API_SECRET: 'Invalid API secret',
   MISSING_RESPONSE_TYPE: 'Select at least 1 response type',
-  RESPONSE_TYPE_TOKEN_ERROR: 'You must select more than 1 response type when selecting  \'token\' as a response type',
+  RESPONSE_TYPE_TOKEN_ERROR: 'You must select more than 1 response type when selecting \'token\' as a response type',
   NO_CHANGES_MADE: 'No changes have been made',
 };
 

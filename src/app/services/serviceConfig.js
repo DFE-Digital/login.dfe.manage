@@ -93,8 +93,8 @@ const validate = async (req, currentService, oldService) => {
   const manageRolesForService = await getUserServiceRoles(req);
 
   const responseTypes = processConfigurationTypes(req.body.response_types) || [];
-  const selectedRedirects = processRedirectUris(req.body.redirect_uris);
-  const selectedLogout = processRedirectUris(req.body.post_logout_redirect_uris);
+  const selectedRedirects = processRedirectUris(req.body.redirect_uris) || [];
+  const selectedLogout = processRedirectUris(req.body.post_logout_redirect_uris) || [];
 
   const authFlowType = determineAuthFlowByRespType(responseTypes);
 
@@ -155,7 +155,7 @@ const validate = async (req, currentService, oldService) => {
     currentNavigation: 'configuration',
   };
 
-  if (model.service.serviceHome && !isValidUrl(model.service.serviceHome)) {
+  if (model.service.serviceHome != null && !isValidUrl(model.service.serviceHome)) {
     model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_URL;
   }
 
@@ -165,7 +165,7 @@ const validate = async (req, currentService, oldService) => {
     model.validationMessages.respnseTypes = ERROR_MESSAGES.RESPONSE_TYPE_TOKEN_ERROR;
   }
 
-  if (!isValidUrl(model.service.postResetUrl) && model.service.postResetUrl.trim() !== '') {
+  if (model.service.postResetUrl != null && !isValidUrl(model.service.postResetUrl)) {
     model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_POST_PASSWORD_RESET_URL;
   }
 
@@ -184,7 +184,7 @@ const validate = async (req, currentService, oldService) => {
   } else if (model.service.postLogoutRedirectUris.some((value, i) => model.service.postLogoutRedirectUris.indexOf(value) !== i)) {
     model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.POST_LOGOUT_URL_NOT_UNIQUE;
   }
-  if (model.service.clientSecret && ((isAuthorisationCodeFlow || isHybridFlow) && model.service.clientSecret !== currentService.clientSecret)) {
+  if (model.service.clientSecret != null && ((isAuthorisationCodeFlow || isHybridFlow) && model.service.clientSecret !== currentService.clientSecret)) {
     try {
       const validateClientSecret = niceware.passphraseToBytes(model.service.clientSecret.split('-'));
       if (validateClientSecret.length < 8) {

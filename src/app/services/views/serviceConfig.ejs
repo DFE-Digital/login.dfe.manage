@@ -34,52 +34,53 @@
   
   <% function generateRedirectUrlsSection({ sectionId, headingText, hintText, dataValues, validationMessages }) { %>
     <div id="<%= sectionId %>-form-group" data-<%= sectionId %>-counter="<%= (dataValues.length > 0) ? (dataValues.length + 1) : 2 %>" class="govuk-form-group <%= (validationMessages !== undefined) ? 'govuk-form-group--error' : '' %>">
-        <h1 class="govuk-heading-m govuk-!-margin-bottom-2" id="<%= sectionId %>-heading"> <%= headingText %> </h1>
-        <div id="<%= sectionId %>-hint" class="govuk-hint">
-            <%= hintText %>
-        </div>
-
-        <% if (dataValues.length > 0) { %>
-            <% if (validationMessages !== undefined) { %>
-            <p id="<%= sectionId %>-validation" class="govuk-error-message">
-                <span class="govuk-visually-hidden">Error:</span>
-                <%= validationMessages %>
-            </p>
-            <% } %>
-            <% for (let i = 0; i < dataValues.length; i++) { 
-                const url = dataValues[i];
-            %>
-                <div class="govuk-body dfe-flex-container" id="<%= sectionId %>-input-group-<%= i+1 %>">
-                    <label for="<%= sectionId %>-input-<%= i+1 %>" class="govuk-label govuk-label--s govuk-visually-hidden">
-                       <%= headingText %>
+        <div id="<%= sectionId %>">
+            <h1 class="govuk-heading-m govuk-!-margin-bottom-2" id="<%= sectionId %>-heading"> <%= headingText %> </h1>
+            <div id="<%= sectionId %>-hint" class="govuk-hint">
+                <%= hintText %>
+            </div>
+            <% if (dataValues.length > 0) { %>
+                <% if (validationMessages !== undefined) { %>
+                <p id="<%= sectionId %>-validation" class="govuk-error-message">
+                    <span class="govuk-visually-hidden">Error:</span>
+                    <%= validationMessages %>
+                </p>
+                <% } %>
+                <% for (let i = 0; i < dataValues.length; i++) { 
+                    const url = dataValues[i];
+                %>
+                    <div class="govuk-body dfe-flex-container" id="<%= sectionId %>-input-group-<%= i+1 %>">
+                        <label for="<%= sectionId %>-input-<%= i+1 %>" class="govuk-label govuk-label--s govuk-visually-hidden">
+                        <%= headingText %>
+                        </label>
+                        <input
+                            class="form-control dfe-flex-input-grow govuk-input"
+                            id="<%= sectionId %>-input-<%= i+1 %>"
+                            name="<%= sectionId %>"
+                            value="<%= url %>" />
+                        <a href="#" class="govuk-link govuk-link--no-visited-state remove-redirect" id="<%= sectionId %>-remove-<%= i+1 %>" data-group-id="<%= i+1 %>">Remove</a>
+                    </div>
+                <% } %>
+            <% } else { %>
+                <% if (validationMessages !== undefined) { %>
+                <p id="<%= sectionId %>-validation" class="govuk-error-message">
+                    <span class="govuk-visually-hidden">Error:</span>
+                    <%= validationMessages %>
+                </p>
+                <% } %>
+                <div class="govuk-body dfe-flex-container" id="<%= sectionId %>-input-group-1">
+                    <label for="<%= sectionId %>-1" class="govuk-label govuk-label--s govuk-visually-hidden">
+                    <%= headingText %>
                     </label>
                     <input
                         class="form-control dfe-flex-input-grow govuk-input"
-                        id="<%= sectionId %>-input-<%= i+1 %>"
+                        id="<%= sectionId %>-1"
                         name="<%= sectionId %>"
-                        value="<%= url %>" />
-                    <a href="#" class="govuk-link govuk-link--no-visited-state remove-redirect" id="<%= sectionId %>-remove-<%= i+1 %>" data-group-id="<%= i+1 %>">Remove</a>
+                    />
+                    <a href="#" class="govuk-link govuk-link--no-visited-state remove-redirect" id="<%= sectionId %>-remove-1" data-group-id="1">Remove</a>
                 </div>
             <% } %>
-        <% } else { %>
-            <% if (validationMessages !== undefined) { %>
-            <p id="<%= sectionId %>-validation" class="govuk-error-message">
-                <span class="govuk-visually-hidden">Error:</span>
-                <%= validationMessages %>
-            </p>
-            <% } %>
-            <div class="govuk-body dfe-flex-container" id="<%= sectionId %>-input-group-1">
-                <label for="<%= sectionId %>-1" class="govuk-label govuk-label--s govuk-visually-hidden">
-                   <%= headingText %>
-                </label>
-                <input
-                    class="form-control dfe-flex-input-grow govuk-input"
-                    id="<%= sectionId %>-1"
-                    name="<%= sectionId %>"
-                />
-                <a href="#" class="govuk-link govuk-link--no-visited-state remove-redirect" id="<%= sectionId %>-remove-1" data-group-id="1">Remove</a>
-            </div>
-        <% } %>
+        </div>
     </div>
     <a href="" class="govuk-button" id="<%= sectionId %>-add">Add URL</a>
 <% } %>
@@ -390,106 +391,3 @@
 </div>
 <script src="/assets/javascript/niceware.js" async></script>
 
-<script>
-  $(document).ready(function() {
-  // Initialize: Check the checkboxes and display the appropriate message and sections
-  updateSections();
-
-  // Event listener for the checkboxes
-  $('#response_types-id_token, #response_types-token, #response_types-code').change(function() {
-    updateSections();
-  });
-
-  // Function to add or update the warning div and secret input section
-  function updateSections() {
-    // Save the current scroll position
-//    var savedScrollPosition = $(window).scrollTop();
-
-    let selectedTypes = [];
-
-    if ($('#response_types-id_token').is(':checked')) {
-      selectedTypes.push('ID token');
-    }
-
-    if ($('#response_types-token').is(':checked')) {
-      selectedTypes.push('Token');
-    }
-
-    if ($('#response_types-code').is(':checked')) {
-      selectedTypes.push('Code');
-    }
-
-    let warningMessage = "";
-
-if (selectedTypes.length > 0) {
-
-    selectedTypes.sort((a, b) => {
-        const order = ['Code', 'ID token', 'Token'];
-        return order.indexOf(a) - order.indexOf(b);
-    });
-    
-    let flowType = 'Implicit';
-
-    if (selectedTypes.length === 1 && selectedTypes.includes('Code')) {
-        flowType = 'Authorisation';
-    } else if ((selectedTypes.includes('Code') && selectedTypes.includes('Token')) || 
-            (selectedTypes.includes('Code') && selectedTypes.includes('ID token'))) {
-        flowType = 'Hybrid';
-    }
-
-    if (selectedTypes.length === 1 && selectedTypes.includes('Token')) {
-        warningMessage = '';
-    } else {
-        let selectedTypesDisplay;
-        
-        if (selectedTypes.length > 1) {
-            let allButLast = selectedTypes.slice(0, -1).join(', ');
-            let last = selectedTypes[selectedTypes.length - 1];
-            selectedTypesDisplay = `${allButLast} and ${last}`;
-        } else {
-            selectedTypesDisplay = selectedTypes[0];
-        }
-
-        warningMessage = `
-            <div class="govuk-warning-text govuk-!-margin-top-5 govuk-!-margin-bottom-0">
-                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-                <strong class="govuk-warning-text__text">
-                    <span class="govuk-warning-text__assistive">Warning</span>
-                    You have selected ${selectedTypesDisplay} as your response type. This means ${flowType} flow is your flow.
-                </strong>
-            </div>
-        `;
-    }
-}
-
-    // Remove existing warning, if any
-    $('.govuk-warning-text').remove();
-
-    // Add the new warning
-    if (warningMessage) {
-      $('#response_types-fieldset').append(warningMessage);
-    }
-
-    if ($('#response_types-code').is(':checked')) {
-      $('#refresh_token-wrapper').show(); 
-      $('#refresh_token-wrapper :input').prop('disabled', false);  
-      $('#clientSecret-wrapper').show(); 
-      $('#clientSecret-wrapper :input').prop('disabled', false);  
-      $('#tokenEndpointAuthMethod-wrapper').show();
-      $('#tokenEndpointAuthMethod-wrapper select').prop('disabled', false)
-    } else {
-      $('#refresh_token-wrapper').hide(); 
-      $('#refresh_token-wrapper :input').prop('disabled', true);  
-      $('#clientSecret-wrapper').hide(); 
-      $('#clientSecret-wrapper :input').prop('disabled', true); 
-      $('#tokenEndpointAuthMethod-wrapper').hide();
-      $('#tokenEndpointAuthMethod-wrapper select').prop('disabled', true) 
-    }
-
-//     $('html, body').animate({
-//   scrollTop: savedScrollPosition
-//     }, 400, 'swing');  
-}
-});
-
-</script>

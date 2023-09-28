@@ -2,7 +2,10 @@ const niceware = require('niceware');
 const { getServiceById, updateService } = require('../../infrastructure/applications');
 const logger = require('../../infrastructure/logger');
 const {
-  getUserServiceRoles, processRedirectUris, processConfigurationTypes,
+  getUserServiceRoles,
+  processRedirectUris,
+  processConfigurationTypes,
+  isValidUrl,
 } = require('./utils');
 const {
   AUTHENTICATION_FLOWS,
@@ -71,7 +74,6 @@ const buildCurrentServiceModel = async (req) => {
 };
 
 const validate = async (req, currentService) => {
-  const urlValidation = /^https?:\/\/(.*)/;
   const manageRolesForService = await getUserServiceRoles(req);
 
   const { serviceConfigurationChanges } = req.session;
@@ -116,24 +118,25 @@ const validate = async (req, currentService) => {
     model.validationMessages.noChangesMade = ERROR_MESSAGES.NO_CHANGES_MADE;
   }
 
-  if (model.service.serviceHome && !urlValidation.test(model.service.serviceHome)) {
+  if (model.service.serviceHome != null && !isValidUrl(model.service.serviceHome)) {
     model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_URL;
   }
 
-  if (model.service.postResetUrl && !urlValidation.test(model.service.postResetUrl) && model.service?.postResetUrl.trim() !== '') {
+  if (model.service.postResetUrl != null && !isValidUrl(model.service.postResetUrl)) {
     model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_POST_PASSWORD_RESET_URL;
   }
+
   if (model.service.responseTypes && model.service.responseTypes.length === 1 && model.service.responseTypes.includes('token')) {
     model.validationMessages.respnseTypes = ERROR_MESSAGES.RESPONSE_TYPE_TOKEN_ERROR;
   }
 
-  if (model.service.redirectUris && model.service.redirectUris.some((x) => !urlValidation.test(x))) {
+  if (model.service.redirectUris && model.service.redirectUris.some((x) => !isValidUrl(x))) {
     model.validationMessages.redirect_uris = ERROR_MESSAGES.INVALID_REDIRECT_URL;
   } else if (model.service.redirectUris && model.service.redirectUris.some((value, i) => model.service.redirectUris.indexOf(value) !== i)) {
     model.validationMessages.redirect_uris = ERROR_MESSAGES.REDIRECT_URLS_NOT_UNIQUE;
   }
 
-  if (model.service.postLogoutRedirectUris && model.service.postLogoutRedirectUris.some((x) => !urlValidation.test(x))) {
+  if (model.service.postLogoutRedirectUris && model.service.postLogoutRedirectUris.some((x) => !isValidUrl(x))) {
     model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.INVALID_POST_LOGOUT_URL;
   } else if (model.service.postLogoutRedirectUris && model.service.postLogoutRedirectUris.some((value, i) => model.service.postLogoutRedirectUris.indexOf(value) !== i)) {
     model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.POST_LOGOUT_URL_NOT_UNIQUE;
@@ -214,7 +217,11 @@ const postConfirmServiceConfig = async (req, res) => {
       model.csrfToken = req.csrfToken();
       return res.render('services/views/confirmServiceConfig', model);
     }
-    const editedFields = Object.entries(req.session.serviceConfigurationChanges)
+
+    // excluding the authFlowType from the req.session.serviceConfigurationChanges object
+    const { authFlowType, ...serviceConfigurationChanges } = req.session.serviceConfigurationChanges;
+
+    const editedFields = Object.entries(serviceConfigurationChanges)
       .filter(([field, oldValue]) => {
         const newValue = Array.isArray(model.service[field])
           ? model.service[field].sort()
@@ -246,6 +253,8 @@ const postConfirmServiceConfig = async (req, res) => {
       tokenEndpointAuthMethod: model.service.tokenEndpointAuthMethod,
     };
 
+    await updateService(req.params.sid, updatedService, req.id);
+
     logger.audit(`${req.user.email} (id: ${req.user.sub}) updated service configuration for service ${model.service.name} (id: ${req.params.sid})`, {
       type: 'manage',
       subType: 'service-config-updated',
@@ -255,15 +264,13 @@ const postConfirmServiceConfig = async (req, res) => {
       editedFields,
     });
 
-    await updateService(req.params.sid, updatedService, req.id);
-
     res.flash('title', 'Success');
     res.flash('heading', 'Service configuration changed');
     res.flash('message', `Your changes to service configuration for ${model.service.name} have been saved.`);
 
     return res.redirect(`/services/${req.params.sid}`);
   } catch (error) {
-    throw new Error();
+    throw new Error(error);
   }
 };
 
