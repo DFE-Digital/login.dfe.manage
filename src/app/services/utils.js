@@ -392,7 +392,9 @@ const arraysEqual = (a, b) => {
 const determineAuthFlowByRespType = (responseTypes) => {
   if (!responseTypes) return AUTHENTICATION_FLOWS.UNKNOWN_FLOW;
 
-  const foundPattern = AUTHENTICATION_FLOWS_PATTERNS.find((pattern) => arraysEqual(pattern.types, responseTypes));
+  const sortedResponseTypes = [...responseTypes].sort();
+
+  const foundPattern = AUTHENTICATION_FLOWS_PATTERNS.find((pattern) => arraysEqual(pattern.types.sort(), sortedResponseTypes));
 
   return foundPattern ? foundPattern.flow : AUTHENTICATION_FLOWS.UNKNOWN_FLOW;
 };

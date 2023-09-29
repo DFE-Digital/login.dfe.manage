@@ -253,7 +253,7 @@
                 
 
                     <%# Response types section %>
-                    <div class="govuk-form-group<%= (locals.validationMessages.respnseTypes !== undefined) ? ' govuk-form-group--error' : ''%>" id="response_types-form-group">
+                    <div class="govuk-form-group<%= (locals.validationMessages.responseTypes !== undefined) ? ' govuk-form-group--error' : ''%>" id="response_types-form-group">
                         <fieldset class="govuk-fieldset" id="response_types-fieldset" aria-describedby="response_types-hint">
                             <legend class="govuk-fieldset__legend" id="response_types-legend">
                                 <h1 class="govuk-heading-m govuk-!-margin-bottom-2" id="response_types-heading"> Response types </h1>
@@ -261,10 +261,10 @@
                             <div id="response_types-hint" class="govuk-hint">
                                 A value that determines the authentication flow. Select all that apply.
                             </div>
-                            <% if (locals.validationMessages.respnseTypes !== undefined){ %>
-                                <p id="respnseTypes" class="govuk-error-message">
+                            <% if (locals.validationMessages.responseTypes !== undefined){ %>
+                                <p id="responseTypes" class="govuk-error-message">
                                 <span class="govuk-visually-hidden">Error:</span>
-                                <%=locals.validationMessages.respnseTypes %>
+                                <%=locals.validationMessages.responseTypes %>
                                 </p>
                                 <% } %>
                             <div class="govuk-checkboxes" id="response_types-checkboxes">

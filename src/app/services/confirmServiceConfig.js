@@ -127,7 +127,7 @@ const validate = async (req, currentService) => {
   }
 
   if (model.service.responseTypes && model.service.responseTypes.length === 1 && model.service.responseTypes.includes('token')) {
-    model.validationMessages.respnseTypes = ERROR_MESSAGES.RESPONSE_TYPE_TOKEN_ERROR;
+    model.validationMessages.responseTypes = ERROR_MESSAGES.RESPONSE_TYPE_TOKEN_ERROR;
   }
 
   if (model.service.redirectUris && model.service.redirectUris.some((x) => !isValidUrl(x))) {

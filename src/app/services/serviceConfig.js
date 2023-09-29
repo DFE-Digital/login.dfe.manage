@@ -160,9 +160,9 @@ const validate = async (req, currentService, oldService) => {
   }
 
   if (!model.service.responseTypes || model.service.responseTypes.length === 0) {
-    model.validationMessages.respnseTypes = ERROR_MESSAGES.MISSING_RESPONSE_TYPE;
+    model.validationMessages.responseTypes = ERROR_MESSAGES.MISSING_RESPONSE_TYPE;
   } else if (model.service.responseTypes.length === 1 && model.service.responseTypes.includes('token')) {
-    model.validationMessages.respnseTypes = ERROR_MESSAGES.RESPONSE_TYPE_TOKEN_ERROR;
+    model.validationMessages.responseTypes = ERROR_MESSAGES.RESPONSE_TYPE_TOKEN_ERROR;
   }
 
   if (model.service.postResetUrl != null && !isValidUrl(model.service.postResetUrl)) {
@@ -205,6 +205,7 @@ const validate = async (req, currentService, oldService) => {
       model.validationMessages.apiSecret = ERROR_MESSAGES.INVALID_API_SECRET;
     }
   }
+  console.log(model)
   return model;
 };
 
