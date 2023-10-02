@@ -3,7 +3,17 @@ const mockUtils = require('../../utils');
 jest.mock('./../../../src/infrastructure/config', () => mockUtils.configMockFactory());
 jest.mock('./../../../src/infrastructure/logger', () => mockUtils.loggerMockFactory());
 jest.mock('./../../../src/infrastructure/applications');
-jest.mock('../../../src/app/services/utils');
+jest.mock('../../../src/app/services/utils', () => {
+  const actualUtilsFunctions = jest.requireActual('../../../src/app/services/utils');
+  return {
+    ...actualUtilsFunctions,
+    processRedirectUris: jest.fn(actualUtilsFunctions.processRedirectUris),
+    determineAuthFlowByRespType: jest.fn(actualUtilsFunctions.determineAuthFlowByRespType),
+    getUserServiceRoles: jest.fn(actualUtilsFunctions.getUserServiceRoles),
+    processConfigurationTypes: jest.fn(actualUtilsFunctions.processConfigurationTypes),
+    isValidUrl: jest.fn(actualUtilsFunctions.isValidUrl),
+  };
+});
 
 const { getRequestMock, getResponseMock } = require('../../utils');
 const { postConfirmServiceConfig } = require('../../../src/app/services/confirmServiceConfig');
@@ -17,8 +27,9 @@ const currentServiceInfo = {
   id: 'service1',
   name: 'service one',
   description: 'service description',
+
   relyingParty: {
-    token_endpoint_auth_method: 'test',
+    token_endpoint_auth_method: null,
     client_id: 'clientid',
     client_secret: 'dewier-thrombi-confounder-mikado',
     api_secret: 'dewier-thrombi-confounder-mikado',
@@ -34,7 +45,7 @@ const currentServiceInfo = {
       'implicit',
       'authorization_code',
     ],
-    response_types: ['response-type-1', 'response-type-2', 'response-type-3'],
+    response_types: ['code', 'id_token'],
   },
 };
 
@@ -62,6 +73,11 @@ describe('when confirming service config changes in the review page', () => {
 
     res.mockResetAll();
     req.session.serviceConfigurationChanges = {
+      authFlowType: 'authorisationCodeFlow',
+      serviceHome: {
+        newValue: 'https://new-service-home.com',
+        oldValue: 'http://old-service-home.com',
+      },
       postResetUrl: { oldValue: 'https://www.postreset.com', newValue: 'https://new-post-reset-url' },
       redirectUris: {
         oldValue: ['https://www.redirect.com'],
@@ -77,12 +93,16 @@ describe('when confirming service config changes in the review page', () => {
         ],
       },
       responseTypes: {
-        oldValue: ['response-type-1', 'response-type-2', 'response-type-3'],
-        newValue: ['response-type-2', 'response-type-3'],
+        oldValue: ['code', 'id_token'],
+        newValue: ['token', 'id_token'],
       },
-      serviceHome: {
-        oldValue: 'http://old-service-home.com',
-        newValue: 'http://new-service-home.com',
+      grantTypes: {
+        newValue: ['authorisation_code', 'refresh_token'],
+        oldValue: ['implicit', 'authorization_code'],
+        serviceHome: {
+          oldValue: 'http://old-service-home.com',
+          newValue: 'http://new-service-home.com',
+        },
       },
       apiSecret: {
         oldValue: 'EXPUNGED',
@@ -94,9 +114,12 @@ describe('when confirming service config changes in the review page', () => {
         newValue: 'EXPUNGED',
         secretNewValue: 'outshine-wringing-imparting-submitted',
       },
+      tokenEndpointAuthMethod: {
+        oldValue: null,
+        newValue: 'client_secret_post',
+      },
     };
   });
-
   it('then it should redirect to service configuration page if there are no changes stored in session', async () => {
     req.session.serviceConfigurationChanges = undefined;
     await postConfirmServiceConfig(req, res);
@@ -113,7 +136,7 @@ describe('when confirming service config changes in the review page', () => {
     expect(res.render.mock.calls[0][0]).toBe('services/views/confirmServiceConfig');
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        serviceHome: 'Please enter a valid home Url',
+        serviceHome: 'Please enter a valid home URL',
       },
     }));
   });
@@ -126,7 +149,7 @@ describe('when confirming service config changes in the review page', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        postResetUrl: 'Please enter a valid Post-reset Url',
+        postResetUrl: 'Please enter a valid post password-reset URL',
       },
     }));
   });
@@ -139,7 +162,7 @@ describe('when confirming service config changes in the review page', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        redirect_uris: 'Invalid redirect Url',
+        redirect_uris: 'Invalid redirect URL',
       },
     }));
   });
@@ -152,7 +175,7 @@ describe('when confirming service config changes in the review page', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        redirect_uris: 'Redirect Urls must be unique',
+        redirect_uris: 'Redirect URLs must be unique',
       },
     }));
   });
@@ -165,7 +188,7 @@ describe('when confirming service config changes in the review page', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        post_logout_redirect_uris: 'Logout redirect Urls must be unique',
+        post_logout_redirect_uris: 'Logout redirect URLs must be unique',
       },
     }));
   });
@@ -178,7 +201,7 @@ describe('when confirming service config changes in the review page', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        post_logout_redirect_uris: 'Invalid logout redirect Url',
+        post_logout_redirect_uris: 'Invalid logout redirect URL',
       },
     }));
   });
@@ -204,7 +227,7 @@ describe('when confirming service config changes in the review page', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        apiSecret: 'Invalid api secret',
+        apiSecret: 'Invalid API secret',
       },
     }));
   });
@@ -217,13 +240,24 @@ describe('when confirming service config changes in the review page', () => {
       {
         apiSecret: 'outshine-wringing-imparting-submitted',
         clientSecret: 'outshine-wringing-imparting-submitted',
-        grant_types: undefined,
+        grant_types: [
+          'authorisation_code',
+          'refresh_token',
+        ],
         postResetUrl: 'https://new-post-reset-url',
-        post_logout_redirect_uris: ['http://new-logout-url-1.com', 'http://new-logout-url-2.com'],
-        redirect_uris: ['https://www.new-redirect.com'],
-        response_types: ['response-type-2', 'response-type-3'],
-        serviceHome: 'http://new-service-home.com',
-        tokenEndpointAuthMethod: null,
+        post_logout_redirect_uris: [
+          'http://new-logout-url-1.com',
+          'http://new-logout-url-2.com',
+        ],
+        redirect_uris: [
+          'https://www.new-redirect.com',
+        ],
+        response_types: [
+          'id_token',
+          'token',
+        ],
+        serviceHome: 'https://new-service-home.com',
+        tokenEndpointAuthMethod: 'client_secret_post',
       },
     );
     expect(updateService.mock.calls[0][2]).toBe('correlationId');
@@ -241,6 +275,11 @@ describe('when confirming service config changes in the review page', () => {
       userEmail: 'user@unit.test',
       editedService: 'service1',
       editedFields: [
+        {
+          name: 'serviceHome',
+          newValue: 'https://new-service-home.com',
+          oldValue: 'http://old-service-home.com',
+        },
         {
           name: 'postResetUrl',
           newValue: 'https://new-post-reset-url',
@@ -268,19 +307,24 @@ describe('when confirming service config changes in the review page', () => {
         {
           name: 'responseTypes',
           newValue: [
-            'response-type-2',
-            'response-type-3',
+            'id_token',
+            'token',
           ],
           oldValue: [
-            'response-type-1',
-            'response-type-2',
-            'response-type-3',
+            'code',
+            'id_token',
           ],
         },
         {
-          name: 'serviceHome',
-          newValue: 'http://new-service-home.com',
-          oldValue: 'http://old-service-home.com',
+          name: 'grantTypes',
+          newValue: [
+            'authorisation_code',
+            'refresh_token',
+          ],
+          oldValue: [
+            'implicit',
+            'authorization_code',
+          ],
         },
         {
           name: 'apiSecret',
@@ -291,6 +335,11 @@ describe('when confirming service config changes in the review page', () => {
           name: 'clientSecret',
           newValue: 'EXPUNGED',
           oldValue: 'EXPUNGED',
+        },
+        {
+          name: 'tokenEndpointAuthMethod',
+          newValue: 'client_secret_post',
+          oldValue: null,
         },
       ],
     });

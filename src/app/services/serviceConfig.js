@@ -205,7 +205,6 @@ const validate = async (req, currentService, oldService) => {
       model.validationMessages.apiSecret = ERROR_MESSAGES.INVALID_API_SECRET;
     }
   }
-  console.log(model)
   return model;
 };
 

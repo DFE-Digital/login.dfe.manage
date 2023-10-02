@@ -59,6 +59,11 @@ describe('when getting the Review service config changes page', () => {
 
     res.mockResetAll();
     req.session.serviceConfigurationChanges = {
+      authFlowType: 'authorisationCodeFlow',
+      serviceHome: {
+        newValue: 'https://new-service-home.com',
+        oldValue: 'http://old-service-home.com',
+      },
       postResetUrl: { oldValue: 'https://www.postreset.com', newValue: 'https://new-post-reset-url' },
       redirectUris: {
         oldValue: ['https://www.redirect.com'],
@@ -73,18 +78,35 @@ describe('when getting the Review service config changes page', () => {
           'http://new-logout-url-2.com',
         ],
       },
-      responseTypes: {
-        oldValue: ['response-type-1', 'response-type-2', 'response-type-3'],
-        newValue: ['response-type-2', 'response-type-3'],
+      refreshToken: {
+        oldValue: undefined,
+        newValue: 'refresh_token',
       },
-      serviceHome: {
-        oldValue: 'http://old-service-home.com',
-        newValue: 'http://new-service-home.com',
+      responseTypes: {
+        oldValue: ['code', 'id_token'],
+        newValue: ['token', 'id_token'],
+      },
+      grantTypes: {
+        newValue: ['authorisation_code', 'refresh_token'],
+        oldValue: ['implicit', 'authorization_code'],
+        serviceHome: {
+          oldValue: 'http://old-service-home.com',
+          newValue: 'http://new-service-home.com',
+        },
       },
       apiSecret: {
         oldValue: 'EXPUNGED',
         newValue: 'EXPUNGED',
-        secretNewValue: 'newsecret-value-interring-burnie',
+        secretNewValue: 'outshine-wringing-imparting-submitted',
+      },
+      clientSecret: {
+        oldValue: 'EXPUNGED',
+        newValue: 'EXPUNGED',
+        secretNewValue: 'outshine-wringing-imparting-submitted',
+      },
+      tokenEndpointAuthMethod: {
+        oldValue: null,
+        newValue: 'client_secret_post',
       },
     };
   });
@@ -156,14 +178,12 @@ describe('when getting the Review service config changes page', () => {
     expect(res.render.mock.calls[0][1].currentNavigation).toEqual('configuration');
   });
 
-  it('then it should include the service name, service client secret and api secret in the model', async () => {
+  it('then it should include the service name in the model', async () => {
     await getConfirmServiceConfig(req, res);
 
     expect(res.render.mock.calls[0][1]).toMatchObject({
       service: {
         name: 'service one',
-        clientSecret: 'dewier-thrombi-confounder-mikado',
-        apiSecret: 'dewier-thrombi-confounder-mikado',
       },
     });
   });
@@ -175,28 +195,36 @@ describe('when getting the Review service config changes page', () => {
 
     expect(serviceChanges).toBeDefined();
     expect(serviceChanges).toBeInstanceOf(Array);
-    expect(serviceChanges.length).toEqual(6);
+    expect(serviceChanges.length).toEqual(10);
 
     expect(serviceChanges).toMatchObject([
       {
-        title: 'Home URL',
-        description: 'The home page of the service you want to configure. It is usually the service landing page from DfE Sign-in.',
+        addedValues: [
+          'https://new-service-home.com',
+        ],
         changeLink: '/services/service1/service-configuration?action=amendChanges#serviceHome-form-group',
+        description: 'The home page of the service you want to configure. It is usually the service landing page from DfE Sign-in.',
         displayOrder: 1,
+        newValue: 'https://new-service-home.com',
         oldValue: 'http://old-service-home.com',
-        newValue: 'http://new-service-home.com',
-        addedValues: ['http://new-service-home.com'],
-        removedValues: ['http://old-service-home.com'],
+        removedValues: [
+          'http://old-service-home.com',
+        ],
+        title: 'Home URL',
       },
       {
-        title: 'Post password-reset URL',
-        description: 'Where you want to redirect users after they have reset their password. It is usually the DfE Sign-in home page.',
+        addedValues: [
+          'https://new-post-reset-url',
+        ],
         changeLink: '/services/service1/service-configuration?action=amendChanges#postResetUrl-form-group',
+        description: 'Where you want to redirect users after they have reset their password. It is usually the DfE Sign-in home page.',
         displayOrder: 2,
-        oldValue: 'https://www.postreset.com',
         newValue: 'https://new-post-reset-url',
-        addedValues: ['https://new-post-reset-url'],
-        removedValues: ['https://www.postreset.com'],
+        oldValue: 'https://www.postreset.com',
+        removedValues: [
+          'https://www.postreset.com',
+        ],
+        title: 'Post password-reset URL',
       },
       {
         addedValues: [
@@ -217,39 +245,103 @@ describe('when getting the Review service config changes page', () => {
         title: 'Redirect URL',
       },
       {
-        title: 'Logout redirect URL',
-        description: 'Where you want to redirect users after they log out of a service.',
+        addedValues: [
+          'http://new-logout-url-1.com',
+          'http://new-logout-url-2.com',
+        ],
         changeLink: '/services/service1/service-configuration?action=amendChanges#post_logout_redirect_uris-form-group',
+        description: 'Where you want to redirect users after they log out of a service.',
         displayOrder: 4,
-        oldValue: ['http://old-logout-url-1.com'],
-        newValue: ['http://new-logout-url-1.com', 'http://new-logout-url-2.com'],
-        addedValues: ['http://new-logout-url-1.com', 'http://new-logout-url-2.com'],
-        removedValues: ['http://old-logout-url-1.com'],
+        newValue: [
+          'http://new-logout-url-1.com',
+          'http://new-logout-url-2.com',
+        ],
+        oldValue: [
+          'http://old-logout-url-1.com',
+        ],
+        removedValues: [
+          'http://old-logout-url-1.com',
+        ],
+        title: 'Logout redirect URL',
       },
       {
-
-        oldValue: ['response-type-1', 'response-type-2', 'response-type-3'],
-        newValue: ['response-type-2', 'response-type-3'],
+        addedValues: [
+          'token',
+        ],
+        changeLink: '/services/service1/service-configuration?action=amendChanges#response_types-form-group',
+        description: 'A value that determines the authentication flow.',
         displayOrder: 5,
+        newValue: [
+          'token',
+          'id_token',
+        ],
+        oldValue: [
+          'code',
+          'id_token',
+        ],
         removedValues: [
-          'response-type-1',
+          'code',
         ],
         title: 'Response types',
-        description: 'A value that determines the authentication flow.',
-        changeLink: '/services/service1/service-configuration?action=amendChanges#response_types-form-group',
       },
       {
-        title: 'API Secret',
-        description: 'A value that is created automatically by the system and acts as a password for the DfE Sign-in public API.',
-        changeLink: '/services/service1/service-configuration?action=amendChanges#apiSecret-form-group',
-        displayOrder: 7,
-        oldValue: 'EXPUNGED',
-        newValue: 'EXPUNGED',
-        addedValues: [],
-        removedValues: [],
-        secretNewValue: 'newsecret-value-interring-burnie',
+        changeLink: '/services/service1/service-configuration?action=amendChanges#refresh_token-form-group',
+        description: 'Select this field if you want to get new access tokens when they have expired without interaction with the user.',
+        displayOrder: 6,
+        newValue: 'refresh_token',
+        oldValue: undefined,
+        title: 'Refresh token',
       },
-
+      {
+        addedValues: [
+          'authorisation_code',
+          'refresh_token',
+        ],
+        changeLink: '/services/service1/undefined',
+        newValue: [
+          'authorisation_code',
+          'refresh_token',
+        ],
+        oldValue: [
+          'implicit',
+          'authorization_code',
+        ],
+        removedValues: [
+          'implicit',
+          'authorization_code',
+        ],
+        serviceHome: {
+          newValue: 'http://new-service-home.com',
+          oldValue: 'http://old-service-home.com',
+        },
+      },
+      {
+        changeLink: '/services/service1/service-configuration?action=amendChanges#clientSecret-form-group',
+        description: 'A value that is created automatically by the system and acts as a password for the service.',
+        displayOrder: 7,
+        secretNewValue: 'outshine-wringing-imparting-submitted',
+        title: 'Client secret',
+      },
+      {
+        addedValues: [
+          'client_secret_post',
+        ],
+        changeLink: '/services/service1/service-configuration?action=amendChanges#tokenEndpointAuthMethod-form-group',
+        description: 'The way your service authenticates to the DfE Sign-in token endpoint. Select the method that applies.',
+        displayOrder: 8,
+        newValue: 'client_secret_post',
+        oldValue: null,
+        title: 'Token endpoint authentication method',
+      },
+      {
+        changeLink: '/services/service1/service-configuration?action=amendChanges#apiSecret-form-group',
+        description: 'A value that is created automatically by the system and acts as a password for the DfE Sign-in public API.',
+        displayOrder: 9,
+        newValue: 'EXPUNGED',
+        oldValue: 'EXPUNGED',
+        secretNewValue: 'outshine-wringing-imparting-submitted',
+        title: 'API Secret',
+      },
     ]);
   });
 

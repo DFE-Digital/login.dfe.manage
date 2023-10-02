@@ -3,7 +3,17 @@ jest.mock('./../../../src/infrastructure/config', () => require('../../utils').c
 // eslint-disable-next-line global-require
 jest.mock('./../../../src/infrastructure/logger', () => require('../../utils').loggerMockFactory());
 jest.mock('./../../../src/infrastructure/applications');
-jest.mock('../../../src/app/services/utils');
+jest.mock('../../../src/app/services/utils', () => {
+  const actualUtilsFunctions = jest.requireActual('../../../src/app/services/utils');
+  return {
+    ...actualUtilsFunctions,
+    processRedirectUris: jest.fn(actualUtilsFunctions.processRedirectUris),
+    determineAuthFlowByRespType: jest.fn(actualUtilsFunctions.determineAuthFlowByRespType),
+    getUserServiceRoles: jest.fn(actualUtilsFunctions.getUserServiceRoles),
+    processConfigurationTypes: jest.fn(actualUtilsFunctions.processConfigurationTypes),
+    isValidUrl: jest.fn(actualUtilsFunctions.isValidUrl),
+  };
+});
 
 const { getRequestMock, getResponseMock } = require('../../utils');
 const { getServiceConfig } = require('../../../src/app/services/serviceConfig');
@@ -154,8 +164,8 @@ describe('when getting the service config page', () => {
       postResetUrl: { newValue: 'https://new.postreset.com', oldValue: 'https://old.postreset.com' },
       redirectUris: { newValue: ['https://new.redirect.com'], oldValue: ['https://old.redirect.com'] },
       postLogoutRedirectUris: { newValue: ['https://new.logout.com'], oldValue: ['https://old.logout.com'] },
-      grantTypes: { newValue: ['new-implicit', 'new-authorization_code'], oldValue: ['old-implicit', 'old-authorization_code'] },
-      responseTypes: { newValue: ['new-code'], oldValue: ['old-code'] },
+      grantTypes: { newValue: ['refresh_token', 'authorization_code'], oldValue: ['implicit'] },
+      responseTypes: { newValue: ['code', 'id_token'], oldValue: ['code'] },
       apiSecret: { secretNewValue: 'new-api-secret', oldValue: 'old-api-secret' },
     };
 
@@ -165,21 +175,22 @@ describe('when getting the service config page', () => {
       clientId: 'clientid',
       clientSecret: 'new-secret',
       description: 'service description',
-      grantTypes: ['new-implicit', 'new-authorization_code'],
+      grantTypes: ['refresh_token', 'authorization_code'],
       name: 'service one',
       postLogoutRedirectUris: ['https://new.logout.com'],
       postResetUrl: 'https://new.postreset.com',
       redirectUris: ['https://new.redirect.com'],
-      responseTypes: ['new-code'],
+      responseTypes: ['code', 'id_token'],
       serviceHome: 'https://new.servicehome.com',
       tokenEndpointAuthMethod: null,
+      refreshToken: 'refresh_token',
     });
   });
 
   it('should persist the user-modified value of tokenEndpointAuthMethod during an amend operation on the review page', async () => {
     req.query.action = ACTIONS.AMEND_CHANGES;
     req.session.serviceConfigurationChanges = {
-      token_endpoint_auth_method: { newValue: 'client_secret_post', oldValue: null },
+      tokenEndpointAuthMethod: { newValue: 'client_secret_post', oldValue: null },
     };
 
     await getServiceConfig(req, res);
@@ -212,7 +223,7 @@ describe('when getting the service config page', () => {
       redirectUris: { newValue: ['https://new.redirect.com'], oldValue: ['https://old.redirect.com'] },
       postLogoutRedirectUris: { newValue: ['https://new.logout.com'], oldValue: ['https://old.logout.com'] },
       grantTypes: { newValue: ['new-implicit', 'new-authorization_code'], oldValue: ['old-implicit', 'old-authorization_code'] },
-      responseTypes: { newValue: ['new-code'], oldValue: ['old-code'] },
+      responseTypes: { newValue: ['id_token', 'code'], oldValue: ['code'] },
       apiSecret: { secretNewValue: 'new-api-secret', oldValue: 'old-api-secret' },
     };
     await getServiceConfig(req, res);
