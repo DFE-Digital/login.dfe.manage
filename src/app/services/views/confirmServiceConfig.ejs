@@ -1,3 +1,4 @@
+<% const serviceConfigHelpLink = `${locals.urls.help}/manageConsole/${locals.serviceId}/how-to-edit-service-config`; %>
 
 <div class="govuk-width-container govuk-main-wrapper">
     <div class="govuk-grid-row">
@@ -8,13 +9,13 @@
             </h1>
             <p class="govuk-body-l">Review these details before changing service configuration for <%=locals.service.name%>.</p>
         </div>
-       <%# TODO: add help link   %> 
+
         <div class="govuk-grid-column-one-third">
             <aside id="related-actions" class="govuk-!-margin-top-0">
                 <h2 class="govuk-heading-m">Related actions</h2>
                 <ul class="govuk-list">
                     <li>
-                        <a class="govuk-link-bold" href="">Help with service configuration</a>
+                        <a class="govuk-link-bold" href="<%= serviceConfigHelpLink %>">Help with service configuration</a>
                     </li>
                 </ul>
             </aside>
