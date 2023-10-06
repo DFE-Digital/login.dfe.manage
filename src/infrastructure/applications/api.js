@@ -72,9 +72,12 @@ const updateService = async (id, serviceDetails, correlationId) => {
   if (serviceDetails.description) {
     body.description = serviceDetails.description;
   }
-  body.tokenEndpointAuthMethod = serviceDetails.tokenEndpointAuthMethod ? serviceDetails.tokenEndpointAuthMethod : null;
-  body.postResetUrl = serviceDetails.postResetUrl ? serviceDetails.postResetUrl : null;
-
+  if (serviceDetails.postResetUrl) {
+    body.postResetUrl = serviceDetails.postResetUrl === '' ? null : serviceDetails.postResetUrl;
+  }
+  if (serviceDetails.tokenEndpointAuthMethod !== undefined) {
+    body.tokenEndpointAuthMethod = serviceDetails.tokenEndpointAuthMethod;
+  }
   return callApi(`services/${id}`, 'PATCH', body, correlationId);
 };
 
