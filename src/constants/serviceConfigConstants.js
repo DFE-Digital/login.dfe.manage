@@ -32,7 +32,10 @@ const AUTHENTICATION_FLOWS_PATTERNS = [
 ];
 
 // Token endpoint authentication method
-const TOKEN_ENDPOINT_AUTH_METHOD = { CLIENT_SECRET_POST: 'client_secret_post' };
+const TOKEN_ENDPOINT_AUTH_METHOD = {
+  CLIENT_SECRET_POST: 'client_secret_post',
+  CLIENT_SECRET_BASIC: 'client_secret_basic',
+};
 
 // Error messages for Service config form validation
 const ERROR_MESSAGES = {
