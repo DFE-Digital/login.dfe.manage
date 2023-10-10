@@ -182,7 +182,7 @@ describe('when getting the service config page', () => {
       redirectUris: ['https://new.redirect.com'],
       responseTypes: ['code', 'id_token'],
       serviceHome: 'https://new.servicehome.com',
-      tokenEndpointAuthMethod: null,
+      tokenEndpointAuthMethod: 'client_secret_basic',
       refreshToken: 'refresh_token',
     });
   });
@@ -190,7 +190,7 @@ describe('when getting the service config page', () => {
   it('should persist the user-modified value of tokenEndpointAuthMethod during an amend operation on the review page', async () => {
     req.query.action = ACTIONS.AMEND_CHANGES;
     req.session.serviceConfigurationChanges = {
-      tokenEndpointAuthMethod: { newValue: 'client_secret_post', oldValue: null },
+      tokenEndpointAuthMethod: { newValue: 'client_secret_post', oldValue: 'client_secret_basic' },
     };
 
     await getServiceConfig(req, res);
@@ -210,7 +210,7 @@ describe('when getting the service config page', () => {
     expect(res.render.mock.calls[0][1].service.tokenEndpointAuthMethod).toEqual('client_secret_post');
   });
 
-  it('should set tokenEndpointAuthMethod to null when relyingParty.token_endpoint_auth_method is null', async () => {
+  it('should set tokenEndpointAuthMethod to client_secret_basic when relyingParty.token_endpoint_auth_method is client_secret_basic', async () => {
     getServiceById.mockReturnValue({
       relyingParty: {
         token_endpoint_auth_method: null,
@@ -229,7 +229,7 @@ describe('when getting the service config page', () => {
     await getServiceConfig(req, res);
 
     expect(res.render.mock.calls[0][1].service).toMatchObject({
-      tokenEndpointAuthMethod: null,
+      tokenEndpointAuthMethod: 'client_secret_basic',
     });
   });
 

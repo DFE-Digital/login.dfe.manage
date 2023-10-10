@@ -11,6 +11,7 @@ const {
   AUTHENTICATION_FLOWS,
   ERROR_MESSAGES,
   SERVICE_CONFIG_CHANGES_SUMMARY_DETAILS,
+  TOKEN_ENDPOINT_AUTH_METHOD,
 } = require('../../constants/serviceConfigConstants');
 
 const getServiceConfigMapping = (key, sid) => {
@@ -241,6 +242,8 @@ const postConfirmServiceConfig = async (req, res) => {
         };
       });
 
+    const { CLIENT_SECRET_POST } = TOKEN_ENDPOINT_AUTH_METHOD;
+
     const updatedService = {
       clientSecret: model.service.clientSecret,
       serviceHome: model.service.serviceHome,
@@ -250,7 +253,8 @@ const postConfirmServiceConfig = async (req, res) => {
       grant_types: model.service.grantTypes,
       response_types: model.service.responseTypes,
       apiSecret: model.service.apiSecret,
-      tokenEndpointAuthMethod: model.service.tokenEndpointAuthMethod,
+      // If tokenEndpointAuthMethod isn't 'client_secret_post', store NULL in the DB.
+      tokenEndpointAuthMethod: model.service.tokenEndpointAuthMethod === CLIENT_SECRET_POST ? CLIENT_SECRET_POST : null,
     };
 
     await updateService(req.params.sid, updatedService, req.id);

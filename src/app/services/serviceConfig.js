@@ -17,14 +17,14 @@ const {
 
 const buildServiceModelFromObject = (service, sessionService = {}) => {
   let tokenEndpointAuthMethod = null;
-
+  const { CLIENT_SECRET_POST, CLIENT_SECRET_BASIC } = TOKEN_ENDPOINT_AUTH_METHOD;
   const sessionValue = sessionService?.tokenEndpointAuthMethod?.newValue;
-  const fallbackValue = service.relyingParty.token_endpoint_auth_method === TOKEN_ENDPOINT_AUTH_METHOD.CLIENT_SECRET_POST ? TOKEN_ENDPOINT_AUTH_METHOD.CLIENT_SECRET_POST : null;
+  const fallbackValue = service.relyingParty.token_endpoint_auth_method === CLIENT_SECRET_POST ? CLIENT_SECRET_POST : CLIENT_SECRET_BASIC;
 
   const responseTypes = (sessionService?.responseTypes?.newValue || service.relyingParty.response_types) || [];
   const authFlowType = determineAuthFlowByRespType(responseTypes);
 
-  tokenEndpointAuthMethod = (sessionValue !== undefined && (authFlowType === AUTHENTICATION_FLOWS.HYBRID_FLOW || authFlowType === AUTHENTICATION_FLOWS.AUTHORISATION_CODE_FLOW)) ? sessionValue : fallbackValue;
+  tokenEndpointAuthMethod = (sessionValue && (authFlowType === AUTHENTICATION_FLOWS.HYBRID_FLOW || authFlowType === AUTHENTICATION_FLOWS.AUTHORISATION_CODE_FLOW)) ? sessionValue : fallbackValue;
 
   let grantTypes = [];
   if (sessionService?.grantTypes?.newValue && authFlowType !== AUTHENTICATION_FLOWS.IMPLICIT_FLOW) {
@@ -118,15 +118,16 @@ const validate = async (req, currentService, oldService) => {
   }
 
   let tokenEndpointAuthMethod;
+  const { CLIENT_SECRET_POST, CLIENT_SECRET_BASIC } = TOKEN_ENDPOINT_AUTH_METHOD;
 
   if (isHybridFlow || isAuthorisationCodeFlow) {
-    if (req.body.tokenEndpointAuthMethod === TOKEN_ENDPOINT_AUTH_METHOD.CLIENT_SECRET_POST) {
-      tokenEndpointAuthMethod = TOKEN_ENDPOINT_AUTH_METHOD.CLIENT_SECRET_POST;
+    if (req.body.tokenEndpointAuthMethod === CLIENT_SECRET_POST) {
+      tokenEndpointAuthMethod = CLIENT_SECRET_POST;
     } else {
-      tokenEndpointAuthMethod = null;
+      tokenEndpointAuthMethod = CLIENT_SECRET_BASIC;
     }
   } else if (isImplicitFlow) {
-    tokenEndpointAuthMethod = null;
+    tokenEndpointAuthMethod = CLIENT_SECRET_BASIC;
   } else {
     tokenEndpointAuthMethod = oldService?.tokenEndpointAuthMethod;
   }

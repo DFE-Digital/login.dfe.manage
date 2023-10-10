@@ -347,9 +347,8 @@
                                 id="tokenEndpointAuthMethod"
                                 name="tokenEndpointAuthMethod"
                                 disabled>
-                                <option disabled value>Select token endpoint authentication method</option>
                                 <option <%=((locals.service.tokenEndpointAuthMethod && locals.service.tokenEndpointAuthMethod) === 'client_secret_post') ? 'selected="selected"' : ''%> value="client_secret_post">client_secret_post</option>
-                                <option <%=!locals.service.tokenEndpointAuthMethod ? 'selected="selected"' : ''%>value="">none</option>
+                                <option <%=(!locals.service.tokenEndpointAuthMethod || (locals.service.tokenEndpointAuthMethod && locals.service.tokenEndpointAuthMethod) === 'client_secret_basic' ? 'selected="selected"' : '')%>value="client_secret_basic">client_secret_basic</option>
                             </select>
                         </div>
                     </div>

@@ -576,7 +576,7 @@ describe('when editing the service configuration', () => {
     expect(res.redirect.mock.calls).toHaveLength(1);
     expect(req.session.serviceConfigurationChanges.authFlowType).toEqual('authorisationCodeFlow');
     expect(req.session.serviceConfigurationChanges.tokenEndpointAuthMethod).toEqual(
-      { newValue: 'client_secret_post', oldValue: null },
+      { newValue: 'client_secret_post', oldValue: 'client_secret_basic' },
     );
   });
 
@@ -610,7 +610,7 @@ describe('when editing the service configuration', () => {
     expect(res.redirect.mock.calls).toHaveLength(1);
     expect(req.session.serviceConfigurationChanges.authFlowType).toEqual('hybridFlow');
     expect(req.session.serviceConfigurationChanges.tokenEndpointAuthMethod).toEqual(
-      { newValue: 'client_secret_post', oldValue: null },
+      { newValue: 'client_secret_post', oldValue: 'client_secret_basic' },
     );
   });
 
