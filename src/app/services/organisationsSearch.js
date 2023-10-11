@@ -4,7 +4,7 @@ const {
 } = require('../../infrastructure/organisations');
 const { getServiceById } = require('../../infrastructure/applications');
 const {
-  getUserServiceRoles, unpackMultiSelect, isSelected, getSortInfo, getParamsSource, getSafeCriteria, getValidPageNumber, objectToQueryString,
+  getUserServiceRoles, unpackMultiSelect, isSelected, getSortInfo, getParamsSource, getValidPageNumber, objectToQueryString,
 } = require('./utils');
 const logger = require('../../infrastructure/logger');
 
@@ -63,7 +63,8 @@ const search = async (req) => {
   const { method, body, query } = req;
   const paramsSource = getParamsSource(method, body, query);
   const criteria = paramsSource.criteria || '';
-  const safeCriteria = getSafeCriteria(paramsSource);
+  
+  const safeCriteria = criteria;
 
   const pageNumber = getValidPageNumber(paramsSource.page);
 
@@ -185,6 +186,7 @@ const post = async (req, res) => {
     organisationStatus: model.selectedOrgStatuses,
     organisationType: model.selectedOrgTypes,
   };
+
 
   const query = objectToQueryString(queryParameters);
   return res.redirect(`?${query}`);
