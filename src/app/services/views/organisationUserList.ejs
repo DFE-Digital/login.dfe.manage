@@ -88,11 +88,19 @@
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__cell">
                             <p class="service-link">
-                                <a 
+                                <% if(locals.organisation === undefined) {%>
+                                    <a 
                                     class="govuk-link breakable"
                                     href="/services/<%= locals.serviceId %>/users/<%= users[i].id %>/organisations">
                                     <%= user.firstName %> <%= user.lastName %>
                                 </a>
+                                <% } else {%> 
+                                <a 
+                                    class="govuk-link breakable"
+                                    href="/services/<%= locals.serviceId %>/users/<%= users[i].id %>/organisations/<%=locals.organisation.id%>/userDetails">
+                                    <%= user.firstName %> <%= user.lastName %>
+                                </a>
+                                <%}%>
                             </p>
                         </th>
 

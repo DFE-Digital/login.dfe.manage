@@ -84,6 +84,7 @@ const services = (csrf) => {
   router.post('/:sid/users/:uid/confirm-details', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(hasInvite), asyncWrapper(postConfirmInvitation));
 
   router.get('/:sid/users/:uid/organisations', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getUserOrganisations));
+  router.get('/:sid/users/:uid/organisations/:oid/userDetails', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getUserOrganisations));
 
   router.get('/:sid/users/:uid/organisations/:oid', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getEditService));
   router.post('/:sid/users/:uid/organisations/:oid', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postEditService));
@@ -96,6 +97,9 @@ const services = (csrf) => {
 
   router.get('/:sid/users/:uid/organisations/:oid/associate-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getAssociateService));
   router.post('/:sid/users/:uid/organisations/:oid/associate-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postAssociateService));
+
+  router.get('/:sid/users/:uid/organisations/:oid/:ciod/associate-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getAssociateService));
+  router.post('/:sid/users/:uid/organisations/:oid/:coid/associate-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postAssociateService));
 
   router.get('/:sid/users/:uid/organisations/:oid/confirm-associate-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getConfirmAssociateService));
   router.post('/:sid/users/:uid/organisations/:oid/confirm-associate-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postConfirmAssociateService));

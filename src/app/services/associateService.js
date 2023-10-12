@@ -13,18 +13,26 @@ const getViewModel = async (req) => {
   const policyResult = await policyEngine.getPolicyApplicationResultsForUser(req.params.uid.startsWith('inv-') ? undefined : req.params.uid, req.params.oid, req.params.sid, req.id);
   const serviceRoles = policyResult.rolesAvailableToUser;
   const manageRolesForService = await getUserServiceRoles(req);
+  let links = '';
+
+  if(req.params.ciod === undefined){
+    links = `/services/${req.params.sid}/users/${req.params.uid}/organisations`;
+  }else{
+    links = `/services/${req.params.sid}/users/${req.params.uid}/organisations/${req.params.ciod}/userDetails`;
+  }
 
   return {
     csrfToken: req.csrfToken(),
-    cancelLink: `/services/${req.params.sid}/users/${req.params.uid}/organisations`,
+    cancelLink: links,
     service,
     serviceRoles,
     selectedRoles: [],
     user,
-    backLink: `/services/${req.params.sid}/users/${req.params.uid}/organisations`,
+    backLink: links,
     organisation,
     validationMessages: {},
     serviceId: req.params.sid,
+    organisationId: req.params.ciod,
     userRoles: manageRolesForService,
     currentNavigation: 'users',
   };

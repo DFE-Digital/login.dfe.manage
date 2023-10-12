@@ -41,7 +41,13 @@
 						<% } %> <% let isOrgAssociatdWithCurrentService =
 						org.services.some(s => s.id === currentService.id); %> <% if
 						(!isOrgAssociatdWithCurrentService && (user.status.id !== -2 && user.status.id !== 0)) { %>
-						<dt class="govuk-label"><a class ="govuk-link" href="organisations/<%=org.id%>/associate-service">Give access to service</a></dt>
+						<dt class="govuk-label">
+							<% if(locals.organisationId === undefined) {%>
+								<a class ="govuk-link" href="/services/<%= locals.serviceId%>/users/<%=user.id %>/organisations/<%=org.id%>/associate-service">Give access to service</a>
+								<%} else {%>
+							<a class ="govuk-link" href="/services/<%= locals.serviceId%>/users/<%=user.id %>/organisations/<%=org.id%>/<%=locals.organisationId%>/associate-service">Give access to service</a>
+							<% }%>
+						</dt>
 						<% }%>
 						<article class="organisation-services" style="margin-bottom: 0">
 							<section class="organisation">
