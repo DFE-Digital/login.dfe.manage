@@ -321,10 +321,6 @@ const isSelected = (source, target) => source.some((x) => x.toLowerCase() === ta
 
 const getParamsSource = (reqMethod, reqBody, reqQuery) => (reqMethod.toUpperCase() === 'POST' ? reqBody : reqQuery);
 
-const getSafeCriteria = (paramsSource) => {
-  const criteria = paramsSource.criteria || '';
-  return criteria.includes('-') ? `"${criteria}"` : criteria;
-};
 
 const getSortInfo = (paramsSource, sortKeys) => {
   let sortBy = 'name';
@@ -435,7 +431,6 @@ module.exports = {
   isSelected,
   getParamsSource,
   getSortInfo,
-  getSafeCriteria,
   getValidPageNumber,
   objectToQueryString,
   determineAuthFlowByRespType,
