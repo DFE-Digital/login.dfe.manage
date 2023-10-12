@@ -119,11 +119,13 @@ const validate = async (req, currentService) => {
     model.validationMessages.noChangesMade = ERROR_MESSAGES.NO_CHANGES_MADE;
   }
 
-  if (model.service.serviceHome != null && !isValidUrl(model.service.serviceHome)) {
+  const { serviceHome } = model.service;
+  if (serviceHome && !isValidUrl(serviceHome)) {
     model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_URL;
   }
 
-  if (model.service.postResetUrl != null && !isValidUrl(model.service.postResetUrl)) {
+  const { postResetUrl } = model.service;
+  if (postResetUrl && !isValidUrl(postResetUrl)) {
     model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_POST_PASSWORD_RESET_URL;
   }
 

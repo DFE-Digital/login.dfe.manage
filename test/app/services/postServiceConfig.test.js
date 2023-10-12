@@ -135,27 +135,11 @@ describe('when editing the service configuration', () => {
     });
   });
 
-  it('then it should render view with validation if service home url is an empty string', async () => {
+  it('then it should render view without validation if service home url is an empty string', async () => {
     req.body.serviceHome = '';
 
     await postServiceConfig(req, res);
-    expect(res.render.mock.calls).toHaveLength(1);
-    expect(res.render.mock.calls[0][0]).toBe('services/views/serviceConfig');
-    expect(res.render.mock.calls[0][1]).toEqual({
-      authFlowType: 'hybridFlow',
-      backLink: '/services/service1',
-      csrfToken: 'token',
-      currentNavigation: 'configuration',
-      service: {
-        ...updatedServiceModel,
-        serviceHome: req.body.serviceHome,
-      },
-      serviceId: 'service1',
-      userRoles: [],
-      validationMessages: {
-        serviceHome: 'Please enter a valid home URL',
-      },
-    });
+    expect(res.render.mock.calls).toHaveLength(0);
   });
 
   it('then it should render view with validation if redirect urls are not unique', async () => {
@@ -197,17 +181,12 @@ describe('when editing the service configuration', () => {
     }));
   });
 
-  it('then it should render view with validation if Post-reset Url is an empty string', async () => {
+  it('then it should render view without validation if Post-reset Url is an empty string', async () => {
     req.body.postResetUrl = '';
 
     await postServiceConfig(req, res);
 
-    expect(res.render.mock.calls).toHaveLength(1);
-    expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
-      validationMessages: {
-        postResetUrl: 'Please enter a valid post password-reset URL',
-      },
-    }));
+    expect(res.render.mock.calls).toHaveLength(0);
   });
 
   it('then it should render view with validation if no redirect Urls are specified', async () => {

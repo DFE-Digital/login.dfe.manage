@@ -156,8 +156,10 @@ const validate = async (req, currentService, oldService) => {
     currentNavigation: 'configuration',
   };
 
-  if (model.service.serviceHome != null && !isValidUrl(model.service.serviceHome)) {
-    model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_URL;
+  if (model.service.serviceHome !== null && !isValidUrl(model.service.serviceHome)) {
+    if (model.service.serviceHome !== '') {
+      model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_URL;
+    }
   }
 
   if (!model.service.responseTypes || model.service.responseTypes.length === 0) {
@@ -167,7 +169,9 @@ const validate = async (req, currentService, oldService) => {
   }
 
   if (model.service.postResetUrl != null && !isValidUrl(model.service.postResetUrl)) {
-    model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_POST_PASSWORD_RESET_URL;
+    if (model.service.postResetUrl !== '') {
+      model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_POST_PASSWORD_RESET_URL;
+    }
   }
 
   if (!model.service.redirectUris || !model.service.redirectUris.length > 0) {
