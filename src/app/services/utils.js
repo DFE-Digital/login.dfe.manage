@@ -1,3 +1,8 @@
+const { URL } = require('url');
+const {
+  AUTHENTICATION_FLOWS,
+  AUTHENTICATION_FLOWS_PATTERNS,
+} = require('../../constants/serviceConfigConstants');
 const { getSearchDetailsForUserById } = require('./../../infrastructure/search');
 const { getInvitation, getUserById } = require('./../../infrastructure/directories');
 const { getServicesForUser } = require('../../infrastructure/access');
@@ -316,10 +321,6 @@ const isSelected = (source, target) => source.some((x) => x.toLowerCase() === ta
 
 const getParamsSource = (reqMethod, reqBody, reqQuery) => (reqMethod.toUpperCase() === 'POST' ? reqBody : reqQuery);
 
-const getSafeCriteria = (paramsSource) => {
-  const criteria = paramsSource.criteria || '';
-  return criteria.includes('-') ? `"${criteria}"` : criteria;
-};
 
 const getSortInfo = (paramsSource, sortKeys) => {
   let sortBy = 'name';
@@ -379,6 +380,45 @@ const objectToQueryString = (obj) => Object.entries(obj)
   })
   .join('&');
 
+const arraysEqual = (a, b) => {
+  if (a.length !== b.length) return false;
+  return a.every((element, index) => element === b[index]);
+};
+
+const determineAuthFlowByRespType = (responseTypes) => {
+  if (!responseTypes) return AUTHENTICATION_FLOWS.UNKNOWN_FLOW;
+
+  const sortedResponseTypes = [...responseTypes].sort();
+
+  const foundPattern = AUTHENTICATION_FLOWS_PATTERNS.find((pattern) => arraysEqual(pattern.types.sort(), sortedResponseTypes));
+
+  return foundPattern ? foundPattern.flow : AUTHENTICATION_FLOWS.UNKNOWN_FLOW;
+};
+
+const processConfigurationTypes = (configurationTypes) => {
+  if (configurationTypes === undefined) {
+    return undefined;
+  }
+  return Array.isArray(configurationTypes) ? configurationTypes : [configurationTypes];
+};
+
+const processRedirectUris = (uris) => {
+  let processedUris = uris;
+  if (processedUris) {
+    processedUris = Array.isArray(processedUris) ? processedUris : [processedUris];
+    processedUris = processedUris.map((x) => x.trim()).filter((x) => x !== '');
+  }
+  return processedUris;
+};
+
+const isValidUrl = (urlString) => {
+  try {
+    return !!new URL(urlString);
+  } catch (error) {
+    return false;
+  }
+};
+
 module.exports = {
   mapUserToSupportModel,
   getUserDetails,
@@ -391,7 +431,10 @@ module.exports = {
   isSelected,
   getParamsSource,
   getSortInfo,
-  getSafeCriteria,
   getValidPageNumber,
   objectToQueryString,
+  determineAuthFlowByRespType,
+  processRedirectUris,
+  processConfigurationTypes,
+  isValidUrl,
 };
