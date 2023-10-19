@@ -15,10 +15,10 @@ const getViewModel = async (req) => {
   const manageRolesForService = await getUserServiceRoles(req);
   let links = '';
 
-  if(req.params.ciod === undefined){
+  if(req.params.currentIod === undefined){
     links = `/services/${req.params.sid}/users/${req.params.uid}/organisations`;
   }else{
-    links = `/services/${req.params.sid}/users/${req.params.uid}/organisations/${req.params.ciod}/userDetails`;
+    links = `/services/${req.params.sid}/users/${req.params.uid}/organisations/${req.params.currentIod}/userDetails`;
   }
 
   return {
@@ -32,7 +32,7 @@ const getViewModel = async (req) => {
     organisation,
     validationMessages: {},
     serviceId: req.params.sid,
-    organisationId: req.params.ciod,
+    organisationId: req.params.currentIod,
     userRoles: manageRolesForService,
     currentNavigation: 'users',
   };

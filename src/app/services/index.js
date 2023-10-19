@@ -103,7 +103,7 @@ const services = (csrf) => {
   router.get('/:sid/users/:uid/organisations/:oid/associate-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getAssociateService));
   router.post('/:sid/users/:uid/organisations/:oid/associate-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postAssociateService));
 
-  router.get('/:sid/users/:uid/organisations/:oid/:ciod/associate-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getAssociateService));
+  router.get('/:sid/users/:uid/organisations/:oid/:currentIod/associate-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getAssociateService));
   router.post('/:sid/users/:uid/organisations/:oid/:coid/associate-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(postAssociateService));
 
   router.get('/:sid/users/:uid/organisations/:oid/confirm-associate-service', csrf, isManageUserForService, hasRole('serviceSup'), asyncWrapper(getConfirmAssociateService));

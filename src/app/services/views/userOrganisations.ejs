@@ -45,7 +45,7 @@
 							<% if(locals.organisationId === undefined) {%>
 								<a class ="govuk-link" href="/services/<%= locals.serviceId%>/users/<%=user.id %>/organisations/<%=org.id%>/associate-service">Give access to service</a>
 								<%} else {%>
-							<a class ="govuk-link" href="/services/<%= locals.serviceId%>/users/<%=user.id %>/organisations/<%=org.id%>/<%=locals.organisationId%>/associate-service">Give access to service</a>
+							<a class ="govuk-link" href="/services/<%= locals.serviceId%>/users/<%=user.id %>/organisations/<%=org.id%>/<%=locals.currentOrgId%>/associate-service">Give access to service</a>
 							<% }%>
 						</dt>
 						<% }%>

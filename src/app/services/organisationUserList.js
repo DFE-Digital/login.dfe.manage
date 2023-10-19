@@ -54,7 +54,6 @@ const render = async (req, res) => {
   const organisation = await getOrganisationByIdV2(req.params.oid, req.id);
   const manageRolesForService = await getUserServiceRoles(req);
   const service = await getServiceById(req.params.sid, req.id);
-const orgID = organisation.id;
   const result = await search(req);
 
   const users = result.users.map((user) => {
@@ -67,11 +66,10 @@ const orgID = organisation.id;
   return res.render('services/views/organisationUserList', {
     csrfToken: req.csrfToken(),
     serviceId: req.params.sid,
-    currentOrgId: orgID,
     service,
     backLink: `/services/${req.params.sid}/organisations`,
     organisation,
-    organisationId: req.params.oid,
+    currentOrgId: req.params.oid,
     users,
     page: result.page,
     numberOfPages: result.numberOfPages,
