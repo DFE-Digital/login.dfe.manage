@@ -82,14 +82,23 @@ const getUserOrganisations = async (req, res) => {
     userEmail: req.user.email,
     viewedUser: user.id,
   });
+  let links ='';
+    if(req.params.oid === undefined)
+    {
+       links = `/services/${req.params.sid}/users`;
+    }else{
+       links = `/services/${req.params.sid}/organisations/${req.params.oid}/users`;
+    }
+ 
 
   return res.render('services/views/userOrganisations', {
     csrfToken: req.csrfToken(),
     user,
     organisations: visibleOrganisations,
     isInvitation: req.params.uid.startsWith('inv-'),
-    backLink: true,
+    backLink: links,
     serviceId: req.params.sid,
+    currentOrgId: req.params.oid,
     userRoles: manageRolesForService,
     currentNavigation: 'users',
     currentService,

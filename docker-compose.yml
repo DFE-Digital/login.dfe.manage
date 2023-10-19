@@ -1,0 +1,13 @@
+version: '3.4'
+
+services:
+  logindfemanage:
+    image: logindfemanage
+    build:
+      context: .
+      dockerfile: ./Docker/Dockerfile
+    environment:
+      NODE_ENV: production
+      settings: ./config/login.dfe.manage.local.json,
+    ports:
+      - 41015:41015
