@@ -85,21 +85,6 @@ describe('when confirming service config changes in the review page', () => {
     res.mockResetAll();
 
     retreiveRedirectUrls.mockReset();
-    // retreiveRedirectUrls.mockReturnValue({
-    //   redirectUris: {
-    //     oldValue: ['https://www.redirect.com'],
-    //     newValue: ['https://www.new-redirect.com'],
-    //   },
-    //   postLogoutRedirectUris: {
-    //     oldValue: [
-    //       'http://old-logout-url-1.com',
-    //     ],
-    //     newValue: [
-    //       'http://new-logout-url-1.com',
-    //       'http://new-logout-url-2.com',
-    //     ],
-    //   },
-    // });
 
     req.session.serviceConfigurationChanges = {
       authFlowType: 'authorisationCodeFlow',
