@@ -12,7 +12,13 @@ const {
   ERROR_MESSAGES,
   SERVICE_CONFIG_CHANGES_SUMMARY_DETAILS,
   TOKEN_ENDPOINT_AUTH_METHOD,
+  REDIRECT_URLS_CHANGES,
 } = require('../../constants/serviceConfigConstants');
+
+const {
+  deleteRedirectUrlsFromCache,
+  retreiveRedirectUrls,
+} = require('../../infrastructure/utils/serviceConfigCache');
 
 const getServiceConfigMapping = (key, sid) => {
   const mapping = { ...SERVICE_CONFIG_CHANGES_SUMMARY_DETAILS[key] };
@@ -77,7 +83,10 @@ const buildCurrentServiceModel = async (req) => {
 const validate = async (req, currentService) => {
   const manageRolesForService = await getUserServiceRoles(req);
 
-  const { serviceConfigurationChanges } = req.session;
+  let { serviceConfigurationChanges } = req.session;
+  const redirectUrlsChanges = retreiveRedirectUrls(REDIRECT_URLS_CHANGES, req.params.sid);
+  // adding redirectUrlsChanges if they exist
+  serviceConfigurationChanges = redirectUrlsChanges ? { ...serviceConfigurationChanges, ...redirectUrlsChanges } : serviceConfigurationChanges;
 
   const grantTypes = processConfigurationTypes(serviceConfigurationChanges.grantTypes?.newValue);
   const responseTypes = processConfigurationTypes(serviceConfigurationChanges.responseTypes?.newValue);
@@ -178,7 +187,12 @@ const getConfirmServiceConfig = async (req, res) => {
     const currentService = await buildCurrentServiceModel(req);
 
     const authFlowTypeValue = req.session.serviceConfigurationChanges?.authFlowType;
-    const serviceConfigChanges = req.session.serviceConfigurationChanges;
+    let serviceConfigChanges = req.session.serviceConfigurationChanges;
+
+    const redirectUrlsChanges = retreiveRedirectUrls(REDIRECT_URLS_CHANGES, req.params.sid);
+
+    serviceConfigChanges = redirectUrlsChanges ? { ...serviceConfigChanges, ...redirectUrlsChanges } : serviceConfigChanges;
+
     const { authFlowType, ...changedServiceParams } = serviceConfigChanges;
 
     const serviceChanges = createFlattenedMappedServiceConfigChanges(
@@ -222,7 +236,11 @@ const postConfirmServiceConfig = async (req, res) => {
     }
 
     // excluding the authFlowType from the req.session.serviceConfigurationChanges object
-    const { authFlowType, ...serviceConfigurationChanges } = req.session.serviceConfigurationChanges;
+    const { authFlowType, ...serviceConfigChanges } = req.session.serviceConfigurationChanges;
+
+    const redirectUrlsChanges = retreiveRedirectUrls(REDIRECT_URLS_CHANGES, req.params.sid);
+
+    const serviceConfigurationChanges = redirectUrlsChanges ? { ...serviceConfigChanges, ...redirectUrlsChanges } : serviceConfigChanges;
 
     const editedFields = Object.entries(serviceConfigurationChanges)
       .filter(([field, oldValue]) => {
@@ -269,6 +287,8 @@ const postConfirmServiceConfig = async (req, res) => {
       editedService: req.params.sid,
       editedFields,
     });
+
+    deleteRedirectUrlsFromCache(REDIRECT_URLS_CHANGES, req.params.sid);
 
     res.flash('title', 'Success');
     res.flash('heading', 'Service configuration changed');

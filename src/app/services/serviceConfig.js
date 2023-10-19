@@ -5,6 +5,7 @@ const {
   ACTIONS,
   TOKEN_ENDPOINT_AUTH_METHOD,
   ERROR_MESSAGES,
+  REDIRECT_URLS_CHANGES,
 } = require('../../constants/serviceConfigConstants');
 const { getServiceById } = require('../../infrastructure/applications');
 const {
@@ -14,6 +15,12 @@ const {
   processConfigurationTypes,
   isValidUrl,
 } = require('./utils');
+
+const {
+  saveRedirectUrls,
+  deleteRedirectUrlsFromCache,
+  retreiveRedirectUrls,
+} = require('../../infrastructure/utils/serviceConfigCache');
 
 const buildServiceModelFromObject = (service, sessionService = {}) => {
   let tokenEndpointAuthMethod = null;
@@ -52,9 +59,22 @@ const buildServiceModelFromObject = (service, sessionService = {}) => {
   };
 };
 
+const getSessionServiceForAmendChanges = (req) => {
+  if (req.query?.action === ACTIONS.AMEND_CHANGES) {
+    let sessionService = req.session.serviceConfigurationChanges;
+    const redirectUrlsChanges = retreiveRedirectUrls(REDIRECT_URLS_CHANGES, req.params.sid);
+
+    if (redirectUrlsChanges) {
+      sessionService = { ...sessionService, ...redirectUrlsChanges };
+    }
+    return sessionService;
+  }
+  return {};
+};
+
 const buildCurrentServiceModel = async (req) => {
   try {
-    const sessionService = req.query?.action === ACTIONS.AMEND_CHANGES ? req.session.serviceConfigurationChanges : {};
+    const sessionService = getSessionServiceForAmendChanges(req);
     const service = await getServiceById(req.params.sid, req.id);
     const currentServiceModel = buildServiceModelFromObject(service, sessionService);
     const oldServiceConfigModel = buildServiceModelFromObject(service);
@@ -70,8 +90,9 @@ const buildCurrentServiceModel = async (req) => {
 
 const getServiceConfig = async (req, res) => {
   try {
-    if (req.session.serviceConfigurationChanges && req.query.action !== ACTIONS.AMEND_CHANGES) {
+    if (req.query.action !== ACTIONS.AMEND_CHANGES) {
       req.session.serviceConfigurationChanges = {};
+      deleteRedirectUrlsFromCache(REDIRECT_URLS_CHANGES, req.params.sid);
     }
     const manageRolesForService = await getUserServiceRoles(req);
     const serviceModel = await buildCurrentServiceModel(req);
@@ -250,19 +271,31 @@ const postServiceConfig = async (req, res) => {
       });
 
     req.session.serviceConfigurationChanges = {};
-
+    const redirectUrlsChanges = {};
     editedFields.forEach(({
       name, oldValue, newValue, isSecret, secretNewValue,
     }) => {
-      if (!req.session.serviceConfigurationChanges[name]) {
-        req.session.serviceConfigurationChanges[name] = {};
-      }
-      req.session.serviceConfigurationChanges[name].oldValue = oldValue;
-      req.session.serviceConfigurationChanges[name].newValue = newValue;
-      if (isSecret) {
-        req.session.serviceConfigurationChanges[name].secretNewValue = secretNewValue;
+      if (name === 'redirectUris' || name === 'postLogoutRedirectUris') {
+        if (!redirectUrlsChanges[name]) {
+          redirectUrlsChanges[name] = {};
+        }
+        redirectUrlsChanges[name].oldValue = oldValue;
+        redirectUrlsChanges[name].newValue = newValue;
+      } else {
+        if (!req.session.serviceConfigurationChanges[name]) {
+          req.session.serviceConfigurationChanges[name] = {};
+        }
+        req.session.serviceConfigurationChanges[name].oldValue = oldValue;
+        req.session.serviceConfigurationChanges[name].newValue = newValue;
+        if (isSecret) {
+          req.session.serviceConfigurationChanges[name].secretNewValue = secretNewValue;
+        }
       }
     });
+
+    if (Object.keys(redirectUrlsChanges).length > 0) {
+      saveRedirectUrls(REDIRECT_URLS_CHANGES, redirectUrlsChanges, req.params.sid);
+    }
     req.session.serviceConfigurationChanges.authFlowType = model.authFlowType;
 
     return res.redirect('review-service-configuration#');
