@@ -15,11 +15,22 @@ jest.mock('../../../src/app/services/utils', () => {
   };
 });
 
+jest.mock('../../../src/infrastructure/utils/serviceConfigCache', () => ({
+  retreiveRedirectUrls: jest.fn(),
+  deleteRedirectUrlsFromCache: jest.fn(),
+
+}));
+
 const { getRequestMock, getResponseMock } = require('../../utils');
 const { postConfirmServiceConfig } = require('../../../src/app/services/confirmServiceConfig');
 const { getServiceById, updateService } = require('../../../src/infrastructure/applications');
 const { getUserServiceRoles } = require('../../../src/app/services/utils');
 const logger = require('../../../src/infrastructure/logger');
+const { REDIRECT_URLS_CHANGES } = require('../../../src/constants/serviceConfigConstants');
+const {
+  retreiveRedirectUrls,
+  deleteRedirectUrlsFromCache,
+} = require('../../../src/infrastructure/utils/serviceConfigCache');
 
 const res = getResponseMock();
 
@@ -72,6 +83,24 @@ describe('when confirming service config changes in the review page', () => {
     getUserServiceRoles.mockImplementation(() => Promise.resolve([]));
 
     res.mockResetAll();
+
+    retreiveRedirectUrls.mockReset();
+    // retreiveRedirectUrls.mockReturnValue({
+    //   redirectUris: {
+    //     oldValue: ['https://www.redirect.com'],
+    //     newValue: ['https://www.new-redirect.com'],
+    //   },
+    //   postLogoutRedirectUris: {
+    //     oldValue: [
+    //       'http://old-logout-url-1.com',
+    //     ],
+    //     newValue: [
+    //       'http://new-logout-url-1.com',
+    //       'http://new-logout-url-2.com',
+    //     ],
+    //   },
+    // });
+
     req.session.serviceConfigurationChanges = {
       authFlowType: 'authorisationCodeFlow',
       serviceHome: {
@@ -79,19 +108,7 @@ describe('when confirming service config changes in the review page', () => {
         oldValue: 'http://old-service-home.com',
       },
       postResetUrl: { oldValue: 'https://www.postreset.com', newValue: 'https://new-post-reset-url' },
-      redirectUris: {
-        oldValue: ['https://www.redirect.com'],
-        newValue: ['https://www.new-redirect.com'],
-      },
-      postLogoutRedirectUris: {
-        oldValue: [
-          'http://old-logout-url-1.com',
-        ],
-        newValue: [
-          'http://new-logout-url-1.com',
-          'http://new-logout-url-2.com',
-        ],
-      },
+
       responseTypes: {
         oldValue: ['code', 'id_token'],
         newValue: ['token', 'id_token'],
@@ -155,7 +172,12 @@ describe('when confirming service config changes in the review page', () => {
   });
 
   it('then it should render view with validation if any of the redirect Urls are invalid', async () => {
-    req.session.serviceConfigurationChanges.redirectUris.newValue = ['https://valid-url.com', 'invalid-url'];
+    retreiveRedirectUrls.mockReturnValue({
+      redirectUris: {
+        oldValue: ['https://www.redirect.com'],
+        newValue: ['https://valid-url.com', 'invalid-url'],
+      },
+    });
 
     await postConfirmServiceConfig(req, res);
 
@@ -168,7 +190,12 @@ describe('when confirming service config changes in the review page', () => {
   });
 
   it('then it should render view with validation if redirect Urls are not unique', async () => {
-    req.session.serviceConfigurationChanges.redirectUris.newValue = ['https://valid-url.com', 'https://valid-url.com'];
+    retreiveRedirectUrls.mockReturnValue({
+      redirectUris: {
+        oldValue: ['https://www.redirect.com'],
+        newValue: ['https://valid-url.com', 'https://valid-url.com'],
+      },
+    });
 
     await postConfirmServiceConfig(req, res);
 
@@ -181,7 +208,12 @@ describe('when confirming service config changes in the review page', () => {
   });
 
   it('then it should render view with validation if logout redirect Urls are not unique', async () => {
-    req.session.serviceConfigurationChanges.postLogoutRedirectUris.newValue = ['https://duplicate-url.com', 'https://duplicate-url.com'];
+    retreiveRedirectUrls.mockReturnValue({
+      postLogoutRedirectUris: {
+        oldValue: ['https://www.redirect.com'],
+        newValue: ['https://duplicate-url.com', 'https://duplicate-url.com'],
+      },
+    });
 
     await postConfirmServiceConfig(req, res);
 
@@ -194,7 +226,12 @@ describe('when confirming service config changes in the review page', () => {
   });
 
   it('then it should render view with validation if any of the logout redirect Urls are invalid', async () => {
-    req.session.serviceConfigurationChanges.postLogoutRedirectUris.newValue = ['https://valid-url.com', 'invalid'];
+    retreiveRedirectUrls.mockReturnValue({
+      postLogoutRedirectUris: {
+        oldValue: ['https://www.redirect.com'],
+        newValue: ['https://valid-url.com', 'invalid'],
+      },
+    });
 
     await postConfirmServiceConfig(req, res);
 
@@ -233,6 +270,21 @@ describe('when confirming service config changes in the review page', () => {
   });
 
   it('then it should update the service if no errors are displayed', async () => {
+    retreiveRedirectUrls.mockReturnValue({
+      redirectUris: {
+        oldValue: ['https://www.redirect.com'],
+        newValue: ['https://www.new-redirect.com'],
+      },
+      postLogoutRedirectUris: {
+        oldValue: [
+          'http://old-logout-url-1.com',
+        ],
+        newValue: [
+          'http://new-logout-url-1.com',
+          'http://new-logout-url-2.com',
+        ],
+      },
+    });
     await postConfirmServiceConfig(req, res);
     expect(updateService.mock.calls).toHaveLength(1);
     expect(updateService.mock.calls[0][0]).toBe('service1');
@@ -264,16 +316,26 @@ describe('when confirming service config changes in the review page', () => {
   });
 
   it('then it should audit the service being edited and it should return a mix of explicit/expunged elements in the audit editedFields array, if a mix of secret/non-secret fields have been updated', async () => {
+    retreiveRedirectUrls.mockReturnValue({
+      redirectUris: {
+        oldValue: ['https://www.redirect.com'],
+        newValue: ['https://www.new-redirect.com'],
+      },
+      postLogoutRedirectUris: {
+        oldValue: [
+          'http://old-logout-url-1.com',
+        ],
+        newValue: [
+          'http://new-logout-url-1.com',
+          'http://new-logout-url-2.com',
+        ],
+      },
+    });
     await postConfirmServiceConfig(req, res);
 
     expect(logger.audit.mock.calls).toHaveLength(1);
     expect(logger.audit.mock.calls[0][0]).toBe('user@unit.test (id: user1) updated service configuration for service service one (id: service1)');
     expect(logger.audit.mock.calls[0][1]).toMatchObject({
-      type: 'manage',
-      subType: 'service-config-updated',
-      userId: 'user1',
-      userEmail: 'user@unit.test',
-      editedService: 'service1',
       editedFields: [
         {
           name: 'serviceHome',
@@ -284,25 +346,6 @@ describe('when confirming service config changes in the review page', () => {
           name: 'postResetUrl',
           newValue: 'https://new-post-reset-url',
           oldValue: 'https://www.postreset.com',
-        },
-        {
-          name: 'redirectUris',
-          newValue: [
-            'https://www.new-redirect.com',
-          ],
-          oldValue: [
-            'https://www.redirect.com',
-          ],
-        },
-        {
-          name: 'postLogoutRedirectUris',
-          newValue: [
-            'http://new-logout-url-1.com',
-            'http://new-logout-url-2.com',
-          ],
-          oldValue: [
-            'http://old-logout-url-1.com',
-          ],
         },
         {
           name: 'responseTypes',
@@ -341,7 +384,31 @@ describe('when confirming service config changes in the review page', () => {
           newValue: 'client_secret_post',
           oldValue: null,
         },
+        {
+          name: 'redirectUris',
+          newValue: [
+            'https://www.new-redirect.com',
+          ],
+          oldValue: [
+            'https://www.redirect.com',
+          ],
+        },
+        {
+          name: 'postLogoutRedirectUris',
+          newValue: [
+            'http://new-logout-url-1.com',
+            'http://new-logout-url-2.com',
+          ],
+          oldValue: [
+            'http://old-logout-url-1.com',
+          ],
+        },
       ],
+      editedService: 'service1',
+      subType: 'service-config-updated',
+      type: 'manage',
+      userEmail: 'user@unit.test',
+      userId: 'user1',
     });
   });
 
@@ -368,6 +435,14 @@ describe('when confirming service config changes in the review page', () => {
       oldValue: 'http://old-service-home.com',
     },
     ]);
+  });
+
+  it('should then remove the redirect urls stored in app cache', async () => {
+    await postConfirmServiceConfig(req, res);
+
+    expect(deleteRedirectUrlsFromCache).toHaveBeenCalledTimes(1);
+    expect(deleteRedirectUrlsFromCache.mock.calls[0][0]).toBe(REDIRECT_URLS_CHANGES);
+    expect(deleteRedirectUrlsFromCache.mock.calls[0][1]).toBe('service1');
   });
 
   it('should redirect to Dashboard page and display success banner if service successfuly updated', async () => {

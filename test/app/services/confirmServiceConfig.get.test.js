@@ -4,11 +4,20 @@ jest.mock('./../../../src/infrastructure/config', () => require('../../utils').c
 jest.mock('./../../../src/infrastructure/logger', () => require('../../utils').loggerMockFactory());
 jest.mock('./../../../src/infrastructure/applications');
 jest.mock('../../../src/app/services/utils');
+jest.mock('../../../src/infrastructure/utils/serviceConfigCache', () => ({
+  retreiveRedirectUrls: jest.fn(),
+  deleteRedirectUrlsFromCache: jest.fn(),
+
+}));
 
 const { getRequestMock, getResponseMock } = require('../../utils');
 const { getConfirmServiceConfig } = require('../../../src/app/services/confirmServiceConfig');
 const { getServiceById } = require('../../../src/infrastructure/applications');
 const { getUserServiceRoles } = require('../../../src/app/services/utils');
+
+const {
+  retreiveRedirectUrls,
+} = require('../../../src/infrastructure/utils/serviceConfigCache');
 
 const res = getResponseMock();
 
@@ -56,15 +65,8 @@ describe('when getting the Review service config changes page', () => {
     });
     getUserServiceRoles.mockReset();
     getUserServiceRoles.mockImplementation(() => Promise.resolve([]));
-
-    res.mockResetAll();
-    req.session.serviceConfigurationChanges = {
-      authFlowType: 'authorisationCodeFlow',
-      serviceHome: {
-        newValue: 'https://new-service-home.com',
-        oldValue: 'http://old-service-home.com',
-      },
-      postResetUrl: { oldValue: 'https://www.postreset.com', newValue: 'https://new-post-reset-url' },
+    retreiveRedirectUrls.mockReset();
+    retreiveRedirectUrls.mockReturnValue({
       redirectUris: {
         oldValue: ['https://www.redirect.com'],
         newValue: ['https://www.new-redirect.com'],
@@ -78,6 +80,16 @@ describe('when getting the Review service config changes page', () => {
           'http://new-logout-url-2.com',
         ],
       },
+    });
+
+    res.mockResetAll();
+    req.session.serviceConfigurationChanges = {
+      authFlowType: 'authorisationCodeFlow',
+      serviceHome: {
+        newValue: 'https://new-service-home.com',
+        oldValue: 'http://old-service-home.com',
+      },
+      postResetUrl: { oldValue: 'https://www.postreset.com', newValue: 'https://new-post-reset-url' },
       refreshToken: {
         oldValue: undefined,
         newValue: 'refresh_token',
@@ -228,6 +240,59 @@ describe('when getting the Review service config changes page', () => {
       },
       {
         addedValues: [
+          'token',
+        ],
+        changeLink: '/services/service1/service-configuration?action=amendChanges#response_types-form-group',
+        description: 'A value that determines the authentication flow.',
+        displayOrder: 5,
+        newValue: [
+          'token',
+          'id_token',
+        ],
+        oldValue: [
+          'code',
+          'id_token',
+        ],
+        removedValues: [
+          'code',
+        ],
+        title: 'Response types',
+      },
+      {
+        addedValues: [],
+        changeLink: '/services/service1/service-configuration?action=amendChanges#refresh_token-form-group',
+        description: 'Select this field if you want to get new access tokens when they have expired without interaction with the user.',
+        displayOrder: 6,
+        newValue: 'refresh_token',
+        oldValue: undefined,
+        removedValues: [],
+        title: 'Refresh token',
+      },
+      {
+        addedValues: [
+          'authorisation_code',
+          'refresh_token',
+        ],
+        changeLink: '/services/service1/undefined',
+        newValue: [
+          'authorisation_code',
+          'refresh_token',
+        ],
+        oldValue: [
+          'implicit',
+          'authorization_code',
+        ],
+        removedValues: [
+          'implicit',
+          'authorization_code',
+        ],
+        serviceHome: {
+          newValue: 'http://new-service-home.com',
+          oldValue: 'http://old-service-home.com',
+        },
+      },
+      {
+        addedValues: [
           'https://www.new-redirect.com',
         ],
         changeLink: '/services/service1/service-configuration?action=amendChanges#redirect_uris-form-group',
@@ -265,60 +330,13 @@ describe('when getting the Review service config changes page', () => {
         title: 'Logout redirect URL',
       },
       {
-        addedValues: [
-          'token',
-        ],
-        changeLink: '/services/service1/service-configuration?action=amendChanges#response_types-form-group',
-        description: 'A value that determines the authentication flow.',
-        displayOrder: 5,
-        newValue: [
-          'token',
-          'id_token',
-        ],
-        oldValue: [
-          'code',
-          'id_token',
-        ],
-        removedValues: [
-          'code',
-        ],
-        title: 'Response types',
-      },
-      {
-        changeLink: '/services/service1/service-configuration?action=amendChanges#refresh_token-form-group',
-        description: 'Select this field if you want to get new access tokens when they have expired without interaction with the user.',
-        displayOrder: 6,
-        newValue: 'refresh_token',
-        oldValue: undefined,
-        title: 'Refresh token',
-      },
-      {
-        addedValues: [
-          'authorisation_code',
-          'refresh_token',
-        ],
-        changeLink: '/services/service1/undefined',
-        newValue: [
-          'authorisation_code',
-          'refresh_token',
-        ],
-        oldValue: [
-          'implicit',
-          'authorization_code',
-        ],
-        removedValues: [
-          'implicit',
-          'authorization_code',
-        ],
-        serviceHome: {
-          newValue: 'http://new-service-home.com',
-          oldValue: 'http://old-service-home.com',
-        },
-      },
-      {
+        addedValues: [],
         changeLink: '/services/service1/service-configuration?action=amendChanges#clientSecret-form-group',
         description: 'A value that is created automatically by the system and acts as a password for the service.',
         displayOrder: 7,
+        newValue: 'EXPUNGED',
+        oldValue: 'EXPUNGED',
+        removedValues: [],
         secretNewValue: 'outshine-wringing-imparting-submitted',
         title: 'Client secret',
       },
@@ -331,14 +349,17 @@ describe('when getting the Review service config changes page', () => {
         displayOrder: 8,
         newValue: 'client_secret_post',
         oldValue: null,
+        removedValues: [],
         title: 'Token endpoint authentication method',
       },
       {
+        addedValues: [],
         changeLink: '/services/service1/service-configuration?action=amendChanges#apiSecret-form-group',
         description: 'A value that is created automatically by the system and acts as a password for the DfE Sign-in public API.',
         displayOrder: 9,
         newValue: 'EXPUNGED',
         oldValue: 'EXPUNGED',
+        removedValues: [],
         secretNewValue: 'outshine-wringing-imparting-submitted',
         title: 'API Secret',
       },

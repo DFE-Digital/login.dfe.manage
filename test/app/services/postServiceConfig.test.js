@@ -14,11 +14,18 @@ jest.mock('../../../src/app/services/utils', () => {
     isValidUrl: jest.fn(actualUtilsFunctions.isValidUrl),
   };
 });
+jest.mock('../../../src/infrastructure/utils/serviceConfigCache', () => ({
+  retreiveRedirectUrls: jest.fn(),
+  deleteRedirectUrlsFromCache: jest.fn(),
+  saveRedirectUrls: jest.fn(),
+}));
 
 const { getRequestMock, getResponseMock } = require('../../utils');
 const { postServiceConfig } = require('../../../src/app/services/serviceConfig');
 const { getServiceById, updateService } = require('../../../src/infrastructure/applications');
 const { getUserServiceRoles } = require('../../../src/app/services/utils');
+const { saveRedirectUrls } = require('../../../src/infrastructure/utils/serviceConfigCache');
+const { REDIRECT_URLS_CHANGES } = require('../../../src/constants/serviceConfigConstants');
 
 const res = getResponseMock();
 
@@ -591,6 +598,26 @@ describe('when editing the service configuration', () => {
     expect(req.session.serviceConfigurationChanges.tokenEndpointAuthMethod).toEqual(
       { newValue: 'client_secret_post', oldValue: 'client_secret_basic' },
     );
+  });
+
+  it('should save the redirect and postRedirect urls into the app cache memory', async () => {
+    req.body.redirect_uris = ['https://www.new-redirect.com'];
+    req.body.post_logout_redirect_uris = ['http://new-logout-url-1.com', 'http://new-logout-url-2.com'];
+
+    await postServiceConfig(req, res);
+
+    expect(saveRedirectUrls).toHaveBeenCalledTimes(1);
+    expect(saveRedirectUrls.mock.calls[0][0]).toBe(REDIRECT_URLS_CHANGES);
+    expect(saveRedirectUrls.mock.calls[0][1]).toEqual({
+      postLogoutRedirectUris: {
+        newValue: ['http://new-logout-url-1.com', 'http://new-logout-url-2.com'],
+        oldValue: ['https://www.logout.com'],
+      },
+      redirectUris: {
+        newValue: ['https://www.new-redirect.com'],
+        oldValue: ['https://www.redirect.com'],
+      },
+    });
   });
 
   it('should redirect to Review service configuration changes when no validation messages and Continue button is pressed', async () => {
