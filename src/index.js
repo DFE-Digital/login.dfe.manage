@@ -1,22 +1,23 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const expressLayouts = require('express-ejs-layouts');
-const logger = require('./infrastructure/logger');
 const http = require('http');
 const https = require('https');
 const path = require('path');
-const config = require('./infrastructure/config');
-const configSchema = require('./infrastructure/config/schema');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const sanitization = require('login.dfe.sanitization');
 const csurf = require('csurf');
 const flash = require('login.dfe.express-flash-2');
-const oidc = require('./infrastructure/oidc');
 const session = require('cookie-session');
-const { setUserContext, isManageUser } = require('./infrastructure/utils');
 const { getErrorHandler, ejsErrorPages } = require('login.dfe.express-error-handling');
 const moment = require('moment');
+const storage = require('node-persist');
+const { setUserContext, isManageUser } = require('./infrastructure/utils');
+const oidc = require('./infrastructure/oidc');
+const configSchema = require('./infrastructure/config/schema');
+const config = require('./infrastructure/config');
+const logger = require('./infrastructure/logger');
 
 const registerRoutes = require('./routes');
 
@@ -24,6 +25,37 @@ configSchema.validate();
 
 https.globalAgent.maxSockets = http.globalAgent.maxSockets = config.hostingEnvironment.agentKeepAlive.maxSockets || 50;
 
+storage.init({
+  dir: 'relative/path/to/persist',
+
+  stringify: JSON.stringify,
+
+  parse: JSON.parse,
+
+  encoding: 'utf8',
+
+  // can also be custom logging function
+  logging: false,
+
+  // ttl* [NEW], can be true for 24h default or a number in MILLISECONDS or a valid Javascript Date object
+  ttl: false,
+
+  // every 2 minutes the process will clean-up the expired cache
+  expiredInterval: 2 * 60 * 1000,
+
+  // in some cases, you (or some other service) might add non-valid storage files to your
+  // storage dir, i.e. Google Drive, make this true if you'd like to ignore these files and not throw an error
+  forgiveParseErrors: false,
+
+  // instead of writing to file immediately, each "file" will have its own mini queue to avoid corrupted files, keep in mind that this would not properly work in multi-process setting.
+  writeQueue: true,
+
+  // how often to check for pending writes, don't worry if you feel like 1s is a lot, it actually tries to process every time you setItem as well
+  writeQueueIntervalMs: 1000,
+
+  // if you setItem() multiple times to the same key, only the last one would be set, BUT the others would still resolve with the results of the last one, if you turn this to false, each one will execute, but might slow down the writing process.
+  writeQueueWriteOnlyLast: true,
+});
 
 const init = async () => {
   const csrf = csurf({
@@ -43,14 +75,14 @@ const init = async () => {
       hsts: {
         maxAge: config.hostingEnvironment.hstsMaxAge,
         preload: true,
-      }
+      },
     }));
   } else {
     app.use(helmet({
       noCache: true,
       frameguard: {
         action: 'deny',
-      }
+      },
     }));
   }
 
@@ -103,9 +135,9 @@ const init = async () => {
   app.use(cookieParser());
   app.use(sanitization({
     sanitizer: (key, value) => {
-      //add exception for fields that we don't want to encode
+      // add exception for fields that we don't want to encode
       const fieldToNotSanitize = ['criteria'];
-      if (fieldToNotSanitize.find(x => x.toLowerCase() === key.toLowerCase())) {
+      if (fieldToNotSanitize.find((x) => x.toLowerCase() === key.toLowerCase())) {
         return value;
       }
       return sanitization.defaultSanitizer(key, value);

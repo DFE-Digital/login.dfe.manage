@@ -1,4 +1,5 @@
 const niceware = require('niceware');
+const storage = require('node-persist');
 const { getServiceById, updateService } = require('../../infrastructure/applications');
 const logger = require('../../infrastructure/logger');
 const {
@@ -84,7 +85,9 @@ const validate = async (req, currentService) => {
   const manageRolesForService = await getUserServiceRoles(req);
 
   let { serviceConfigurationChanges } = req.session;
-  const redirectUrlsChanges = retreiveRedirectUrls(REDIRECT_URLS_CHANGES, req.params.sid);
+  // const redirectUrlsChanges = retreiveRedirectUrls(REDIRECT_URLS_CHANGES, req.params.sid);
+  const redirectUrlsChanges = await storage.getItem(REDIRECT_URLS_CHANGES);
+  console.log('Redirect urls changes', redirectUrlsChanges);
   // adding redirectUrlsChanges if they exist
   serviceConfigurationChanges = redirectUrlsChanges ? { ...serviceConfigurationChanges, ...redirectUrlsChanges } : serviceConfigurationChanges;
 
@@ -189,7 +192,9 @@ const getConfirmServiceConfig = async (req, res) => {
     const authFlowTypeValue = req.session.serviceConfigurationChanges?.authFlowType;
     let serviceConfigChanges = req.session.serviceConfigurationChanges;
 
-    const redirectUrlsChanges = retreiveRedirectUrls(REDIRECT_URLS_CHANGES, req.params.sid);
+    // const redirectUrlsChanges = retreiveRedirectUrls(REDIRECT_URLS_CHANGES, req.params.sid);
+    const redirectUrlsChanges = await storage.getItem(REDIRECT_URLS_CHANGES);
+    console.log('Redirect urls changes', redirectUrlsChanges);
 
     serviceConfigChanges = redirectUrlsChanges ? { ...serviceConfigChanges, ...redirectUrlsChanges } : serviceConfigChanges;
 
@@ -238,7 +243,9 @@ const postConfirmServiceConfig = async (req, res) => {
     // excluding the authFlowType from the req.session.serviceConfigurationChanges object
     const { authFlowType, ...serviceConfigChanges } = req.session.serviceConfigurationChanges;
 
-    const redirectUrlsChanges = retreiveRedirectUrls(REDIRECT_URLS_CHANGES, req.params.sid);
+    // const redirectUrlsChanges = retreiveRedirectUrls(REDIRECT_URLS_CHANGES, req.params.sid);
+    const redirectUrlsChanges = await storage.getItem(REDIRECT_URLS_CHANGES);
+    console.log('Redirect urls changes', redirectUrlsChanges);
 
     const serviceConfigurationChanges = redirectUrlsChanges ? { ...serviceConfigChanges, ...redirectUrlsChanges } : serviceConfigChanges;
 

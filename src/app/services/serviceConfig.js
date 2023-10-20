@@ -1,3 +1,4 @@
+const storage = require('node-persist');
 const niceware = require('niceware');
 const {
   AUTHENTICATION_FLOWS,
@@ -59,10 +60,12 @@ const buildServiceModelFromObject = (service, sessionService = {}) => {
   };
 };
 
-const getSessionServiceForAmendChanges = (req) => {
+const getSessionServiceForAmendChanges = async (req) => {
   if (req.query?.action === ACTIONS.AMEND_CHANGES) {
     let sessionService = req.session.serviceConfigurationChanges;
-    const redirectUrlsChanges = retreiveRedirectUrls(REDIRECT_URLS_CHANGES, req.params.sid);
+    // const redirectUrlsChanges = retreiveRedirectUrls(REDIRECT_URLS_CHANGES, req.params.sid);
+    const redirectUrlsChanges = await storage.getItem(REDIRECT_URLS_CHANGES);
+    console.log('retreived Redirect urls changes', redirectUrlsChanges);
 
     if (redirectUrlsChanges) {
       sessionService = { ...sessionService, ...redirectUrlsChanges };
@@ -294,7 +297,9 @@ const postServiceConfig = async (req, res) => {
     });
 
     if (Object.keys(redirectUrlsChanges).length > 0) {
-      saveRedirectUrls(REDIRECT_URLS_CHANGES, redirectUrlsChanges, req.params.sid);
+      // saveRedirectUrls(REDIRECT_URLS_CHANGES, redirectUrlsChanges, req.params.sid);
+      await storage.setItem(REDIRECT_URLS_CHANGES, redirectUrlsChanges);
+      console.log('stored redirect ursl')
     }
     req.session.serviceConfigurationChanges.authFlowType = model.authFlowType;
 
