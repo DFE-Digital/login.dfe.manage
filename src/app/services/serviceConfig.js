@@ -1,5 +1,5 @@
-const storage = require('node-persist');
 const niceware = require('niceware');
+const logger = require('../../infrastructure/logger/index');
 const {
   AUTHENTICATION_FLOWS,
   GRANT_TYPES,
@@ -18,9 +18,9 @@ const {
 } = require('./utils');
 
 const {
-  saveRedirectUrls,
-  deleteRedirectUrlsFromCache,
-  retreiveRedirectUrls,
+  saveRedirectUrlsToStorage,
+  deleteRedirectUrlsFromStorage,
+  retreiveRedirectUrlsFromStorage,
 } = require('../../infrastructure/utils/serviceConfigCache');
 
 const buildServiceModelFromObject = (service, sessionService = {}) => {
@@ -63,21 +63,24 @@ const buildServiceModelFromObject = (service, sessionService = {}) => {
 const getSessionServiceForAmendChanges = async (req) => {
   if (req.query?.action === ACTIONS.AMEND_CHANGES) {
     let sessionService = req.session.serviceConfigurationChanges;
-    // const redirectUrlsChanges = retreiveRedirectUrls(REDIRECT_URLS_CHANGES, req.params.sid);
-    const redirectUrlsChanges = await storage.getItem(REDIRECT_URLS_CHANGES);
-    console.log('retreived Redirect urls changes', redirectUrlsChanges);
+    try {
+      const redirectUrlsChanges = await retreiveRedirectUrlsFromStorage(REDIRECT_URLS_CHANGES, req.params.sid);
 
-    if (redirectUrlsChanges) {
-      sessionService = { ...sessionService, ...redirectUrlsChanges };
+      if (redirectUrlsChanges) {
+        sessionService = { ...sessionService, ...redirectUrlsChanges };
+      }
+      return sessionService;
+    } catch (error) {
+      logger.error(`Error occurred while retrieving redirect URLs from local storage for service ID - ${req.params.sid}:`, error);
+      return sessionService;
     }
-    return sessionService;
   }
   return {};
 };
 
 const buildCurrentServiceModel = async (req) => {
   try {
-    const sessionService = getSessionServiceForAmendChanges(req);
+    const sessionService = await getSessionServiceForAmendChanges(req);
     const service = await getServiceById(req.params.sid, req.id);
     const currentServiceModel = buildServiceModelFromObject(service, sessionService);
     const oldServiceConfigModel = buildServiceModelFromObject(service);
@@ -95,7 +98,7 @@ const getServiceConfig = async (req, res) => {
   try {
     if (req.query.action !== ACTIONS.AMEND_CHANGES) {
       req.session.serviceConfigurationChanges = {};
-      deleteRedirectUrlsFromCache(REDIRECT_URLS_CHANGES, req.params.sid);
+      await deleteRedirectUrlsFromStorage(REDIRECT_URLS_CHANGES, req.params.sid);
     }
     const manageRolesForService = await getUserServiceRoles(req);
     const serviceModel = await buildCurrentServiceModel(req);
@@ -297,9 +300,7 @@ const postServiceConfig = async (req, res) => {
     });
 
     if (Object.keys(redirectUrlsChanges).length > 0) {
-      // saveRedirectUrls(REDIRECT_URLS_CHANGES, redirectUrlsChanges, req.params.sid);
-      await storage.setItem(REDIRECT_URLS_CHANGES, redirectUrlsChanges);
-      console.log('stored redirect ursl')
+      await saveRedirectUrlsToStorage(REDIRECT_URLS_CHANGES, redirectUrlsChanges, req.params.sid);
     }
     req.session.serviceConfigurationChanges.authFlowType = model.authFlowType;
 

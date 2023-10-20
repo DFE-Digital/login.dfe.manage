@@ -1,50 +1,50 @@
-const appCache = require('./AppCache');
+const localStorage = require('node-persist');
 const logger = require('../logger/index');
 
-const saveRedirectUrls = (redirectUrlsKey, redirectUrlsObject, serviceId) => {
+const saveRedirectUrlsToStorage = async (redirectUrlsKey, redirectUrlsObject, serviceId) => {
   try {
-    const saveStatus = appCache.save(redirectUrlsKey, redirectUrlsObject);
+    const saveStatus = await localStorage.setItem(redirectUrlsKey, redirectUrlsObject);
     if (saveStatus) {
-      logger.info(`${redirectUrlsKey} data saved to cache successfully for service ID:${serviceId}`);
+      logger.info(`${redirectUrlsKey} data passed to local storage successfully for service ID:${serviceId}`);
     }
   } catch (error) {
-    logger.error(`Error while saving ${redirectUrlsKey} data to cache for service ID ${serviceId}:`, error);
+    logger.error(`Error while passing ${redirectUrlsKey} data to local storage for service ID ${serviceId}:`, error);
   }
 };
 
-const retreiveRedirectUrls = (redirectUrlsKey, serviceId) => {
+const retreiveRedirectUrlsFromStorage = async (redirectUrlsKey, serviceId) => {
   try {
-    const result = appCache.retrieve(redirectUrlsKey);
+    const result = await localStorage.getItem(redirectUrlsKey);
     if (result) {
-      logger.info(`${redirectUrlsKey} data retrieved successfully from cache for service ID: ${serviceId}`);
+      logger.info(`${redirectUrlsKey} data retrieved successfully from local storage for service ID: ${serviceId}`);
     } else {
-      logger.info(`No available ${redirectUrlsKey} data to retreive from the cache for service ID: ${serviceId}`);
+      logger.info(`No available ${redirectUrlsKey} data to be retreived from the loacal storage for service ID: ${serviceId}`);
     }
     return result;
   } catch (error) {
-    logger.error(`Error while retrieving ${redirectUrlsKey} data from cache for service ID:${serviceId}:`, error);
+    logger.error(`Error while retrieving ${redirectUrlsKey} data from local storage for service ID:${serviceId}:`, error);
     throw error;
   }
 };
 
-const deleteRedirectUrlsFromCache = (redirectUrlsKey, serviceId) => {
+const deleteRedirectUrlsFromStorage = async (redirectUrlsKey, serviceId) => {
   try {
-    const result = appCache.delete(redirectUrlsKey);
+    const result = await localStorage.del(redirectUrlsKey);
     if (result) {
-      logger.info(`${redirectUrlsKey} data deleted successfully from cache for service ID ${serviceId}`);
+      logger.info(`${redirectUrlsKey} data removed successfully from local storage for service ID ${serviceId}`);
     } else {
-      logger.info(`No ${redirectUrlsKey} data available to be deleted from cache for service ID ${serviceId}`);
+      logger.info(`No ${redirectUrlsKey} data available to be removed from local storage for service ID ${serviceId}`);
     }
 
     return result;
   } catch (error) {
-    logger.error(`Error while deleting ${redirectUrlsKey} data from cache for service ${serviceId}:`, error);
+    logger.error(`Error while removing ${redirectUrlsKey} data from local storage for service ${serviceId}:`, error);
     throw error;
   }
 };
 
 module.exports = {
-  saveRedirectUrls,
-  retreiveRedirectUrls,
-  deleteRedirectUrlsFromCache,
+  saveRedirectUrlsToStorage,
+  retreiveRedirectUrlsFromStorage,
+  deleteRedirectUrlsFromStorage,
 };

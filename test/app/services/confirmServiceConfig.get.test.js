@@ -5,8 +5,8 @@ jest.mock('./../../../src/infrastructure/logger', () => require('../../utils').l
 jest.mock('./../../../src/infrastructure/applications');
 jest.mock('../../../src/app/services/utils');
 jest.mock('../../../src/infrastructure/utils/serviceConfigCache', () => ({
-  retreiveRedirectUrls: jest.fn(),
-  deleteRedirectUrlsFromCache: jest.fn(),
+  retreiveRedirectUrlsFromStorage: jest.fn(),
+  deleteRedirectUrlsFromStorage: jest.fn(),
 
 }));
 
@@ -16,7 +16,7 @@ const { getServiceById } = require('../../../src/infrastructure/applications');
 const { getUserServiceRoles } = require('../../../src/app/services/utils');
 
 const {
-  retreiveRedirectUrls,
+  retreiveRedirectUrlsFromStorage,
 } = require('../../../src/infrastructure/utils/serviceConfigCache');
 
 const res = getResponseMock();
@@ -65,8 +65,8 @@ describe('when getting the Review service config changes page', () => {
     });
     getUserServiceRoles.mockReset();
     getUserServiceRoles.mockImplementation(() => Promise.resolve([]));
-    retreiveRedirectUrls.mockReset();
-    retreiveRedirectUrls.mockReturnValue({
+    retreiveRedirectUrlsFromStorage.mockReset();
+    retreiveRedirectUrlsFromStorage.mockReturnValue({
       redirectUris: {
         oldValue: ['https://www.redirect.com'],
         newValue: ['https://www.new-redirect.com'],

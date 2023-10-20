@@ -15,16 +15,16 @@ jest.mock('../../../src/app/services/utils', () => {
   };
 });
 jest.mock('../../../src/infrastructure/utils/serviceConfigCache', () => ({
-  retreiveRedirectUrls: jest.fn(),
-  deleteRedirectUrlsFromCache: jest.fn(),
-  saveRedirectUrls: jest.fn(),
+  retreiveRedirectUrlsFromStorage: jest.fn(),
+  deleteRedirectUrlsFromStorage: jest.fn(),
+  saveRedirectUrlsToStorage: jest.fn(),
 }));
 
 const { getRequestMock, getResponseMock } = require('../../utils');
 const { postServiceConfig } = require('../../../src/app/services/serviceConfig');
 const { getServiceById, updateService } = require('../../../src/infrastructure/applications');
 const { getUserServiceRoles } = require('../../../src/app/services/utils');
-const { saveRedirectUrls } = require('../../../src/infrastructure/utils/serviceConfigCache');
+const { saveRedirectUrlsToStorage } = require('../../../src/infrastructure/utils/serviceConfigCache');
 const { REDIRECT_URLS_CHANGES } = require('../../../src/constants/serviceConfigConstants');
 
 const res = getResponseMock();
@@ -606,9 +606,9 @@ describe('when editing the service configuration', () => {
 
     await postServiceConfig(req, res);
 
-    expect(saveRedirectUrls).toHaveBeenCalledTimes(1);
-    expect(saveRedirectUrls.mock.calls[0][0]).toBe(REDIRECT_URLS_CHANGES);
-    expect(saveRedirectUrls.mock.calls[0][1]).toEqual({
+    expect(saveRedirectUrlsToStorage).toHaveBeenCalledTimes(1);
+    expect(saveRedirectUrlsToStorage.mock.calls[0][0]).toBe(REDIRECT_URLS_CHANGES);
+    expect(saveRedirectUrlsToStorage.mock.calls[0][1]).toEqual({
       postLogoutRedirectUris: {
         newValue: ['http://new-logout-url-1.com', 'http://new-logout-url-2.com'],
         oldValue: ['https://www.logout.com'],

@@ -15,8 +15,8 @@ jest.mock('../../../src/app/services/utils', () => {
   };
 });
 jest.mock('../../../src/infrastructure/utils/serviceConfigCache', () => ({
-  retreiveRedirectUrls: jest.fn(),
-  deleteRedirectUrlsFromCache: jest.fn(),
+  retreiveRedirectUrlsFromStorage: jest.fn(),
+  deleteRedirectUrlsFromStorage: jest.fn(),
 
 }));
 
@@ -26,7 +26,7 @@ const { getServiceById } = require('../../../src/infrastructure/applications');
 const { getUserServiceRoles } = require('../../../src/app/services/utils');
 const { ACTIONS, REDIRECT_URLS_CHANGES } = require('../../../src/constants/serviceConfigConstants');
 const {
-  retreiveRedirectUrls,
+  retreiveRedirectUrlsFromStorage,
 } = require('../../../src/infrastructure/utils/serviceConfigCache');
 
 const res = getResponseMock();
@@ -77,8 +77,8 @@ describe('when getting the service config page', () => {
     });
     getUserServiceRoles.mockReset();
     getUserServiceRoles.mockImplementation(() => Promise.resolve([]));
-    retreiveRedirectUrls.mockReset();
-    retreiveRedirectUrls.mockReturnValue({
+    retreiveRedirectUrlsFromStorage.mockReset();
+    retreiveRedirectUrlsFromStorage.mockReturnValue({
       redirectUris: { newValue: ['https://new.redirect.com'], oldValue: ['https://old.redirect.com'] },
       postLogoutRedirectUris: { newValue: ['https://new.logout.com'], oldValue: ['https://old.logout.com'] },
     });
@@ -180,9 +180,9 @@ describe('when getting the service config page', () => {
     };
 
     await getServiceConfig(req, res);
-    expect(retreiveRedirectUrls).toHaveBeenCalledTimes(1);
-    expect(retreiveRedirectUrls.mock.calls[0][0]).toBe(REDIRECT_URLS_CHANGES);
-    expect(retreiveRedirectUrls.mock.calls[0][1]).toBe('service1');
+    expect(retreiveRedirectUrlsFromStorage).toHaveBeenCalledTimes(1);
+    expect(retreiveRedirectUrlsFromStorage.mock.calls[0][0]).toBe(REDIRECT_URLS_CHANGES);
+    expect(retreiveRedirectUrlsFromStorage.mock.calls[0][1]).toBe('service1');
     expect(res.render.mock.calls[0][1].service).toEqual({
       apiSecret: 'new-api-secret',
       clientId: 'clientid',
