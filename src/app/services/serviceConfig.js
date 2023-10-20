@@ -19,7 +19,7 @@ const {
 
 const {
   saveRedirectUrlsToStorage,
-  deleteRedirectUrlsFromStorage,
+  deleteFromLocalStorage,
   retreiveRedirectUrlsFromStorage,
 } = require('../../infrastructure/utils/serviceConfigCache');
 
@@ -64,7 +64,8 @@ const getSessionServiceForAmendChanges = async (req) => {
   if (req.query?.action === ACTIONS.AMEND_CHANGES) {
     let sessionService = req.session.serviceConfigurationChanges;
     try {
-      const redirectUrlsChanges = await retreiveRedirectUrlsFromStorage(REDIRECT_URLS_CHANGES, req.params.sid);
+      const serviceConfigChangesKey = `${REDIRECT_URLS_CHANGES}_${req.session.passport.user.sub}_${req.params.sid}`;
+      const redirectUrlsChanges = await retreiveRedirectUrlsFromStorage(serviceConfigChangesKey, req.params.sid);
 
       if (redirectUrlsChanges) {
         sessionService = { ...sessionService, ...redirectUrlsChanges };
@@ -98,7 +99,8 @@ const getServiceConfig = async (req, res) => {
   try {
     if (req.query.action !== ACTIONS.AMEND_CHANGES) {
       req.session.serviceConfigurationChanges = {};
-      await deleteRedirectUrlsFromStorage(REDIRECT_URLS_CHANGES, req.params.sid);
+      const serviceConfigChangesKey = `${REDIRECT_URLS_CHANGES}_${req.session.passport.user.sub}_${req.params.sid}`;
+      await deleteFromLocalStorage(serviceConfigChangesKey);
     }
     const manageRolesForService = await getUserServiceRoles(req);
     const serviceModel = await buildCurrentServiceModel(req);
@@ -300,7 +302,8 @@ const postServiceConfig = async (req, res) => {
     });
 
     if (Object.keys(redirectUrlsChanges).length > 0) {
-      await saveRedirectUrlsToStorage(REDIRECT_URLS_CHANGES, redirectUrlsChanges, req.params.sid);
+      const serviceConfigChangesKey = `${REDIRECT_URLS_CHANGES}_${req.session.passport.user.sub}_${req.params.sid}`;
+      await saveRedirectUrlsToStorage(serviceConfigChangesKey, redirectUrlsChanges, req.params.sid);
     }
     req.session.serviceConfigurationChanges.authFlowType = model.authFlowType;
 

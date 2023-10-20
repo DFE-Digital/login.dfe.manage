@@ -27,18 +27,28 @@ const retreiveRedirectUrlsFromStorage = async (redirectUrlsKey, serviceId) => {
   }
 };
 
-const deleteRedirectUrlsFromStorage = async (redirectUrlsKey, serviceId) => {
+const deleteFromLocalStorage = async (keyWord) => {
   try {
-    const result = await localStorage.del(redirectUrlsKey);
-    if (result) {
-      logger.info(`${redirectUrlsKey} data removed successfully from local storage for service ID ${serviceId}`);
-    } else {
-      logger.info(`No ${redirectUrlsKey} data available to be removed from local storage for service ID ${serviceId}`);
-    }
+    const storageKeys = await localStorage.keys();
+    const keysToDelete = storageKeys.filter((key) => key.includes(keyWord));
 
-    return result;
+    const deletePromises = keysToDelete.map(async (key) => {
+      const result = await localStorage.del(key);
+      if (result) {
+        return `${key} data removed successfully from local storage`;
+      }
+      return `No data with key ${key} available to be removed from local storage`;
+    });
+
+    const results = await Promise.all(deletePromises);
+
+    results.forEach((message) => {
+      logger.info(message);
+    });
+
+    return true;
   } catch (error) {
-    logger.error(`Error while removing ${redirectUrlsKey} data from local storage for service ${serviceId}:`, error);
+    logger.error(`Error while removing ${keyWord} data from local storage:`, error);
     throw error;
   }
 };
@@ -46,5 +56,5 @@ const deleteRedirectUrlsFromStorage = async (redirectUrlsKey, serviceId) => {
 module.exports = {
   saveRedirectUrlsToStorage,
   retreiveRedirectUrlsFromStorage,
-  deleteRedirectUrlsFromStorage,
+  deleteFromLocalStorage,
 };

@@ -16,7 +16,7 @@ const {
 } = require('../../constants/serviceConfigConstants');
 
 const {
-  deleteRedirectUrlsFromStorage,
+  deleteFromLocalStorage,
   retreiveRedirectUrlsFromStorage,
 } = require('../../infrastructure/utils/serviceConfigCache');
 
@@ -85,7 +85,8 @@ const validate = async (req, currentService) => {
     const manageRolesForService = await getUserServiceRoles(req);
 
     let { serviceConfigurationChanges } = req.session;
-    const redirectUrlsChanges = await retreiveRedirectUrlsFromStorage(REDIRECT_URLS_CHANGES, req.params.sid);
+    const serviceConfigChangesKey = `${REDIRECT_URLS_CHANGES}_${req.session.passport.user.sub}_${req.params.sid}`;
+    const redirectUrlsChanges = await retreiveRedirectUrlsFromStorage(serviceConfigChangesKey, req.params.sid);
 
     // adding redirectUrlsChanges if they exist
     serviceConfigurationChanges = redirectUrlsChanges ? { ...serviceConfigurationChanges, ...redirectUrlsChanges } : serviceConfigurationChanges;
@@ -188,13 +189,14 @@ const getConfirmServiceConfig = async (req, res) => {
     return res.redirect(`/services/${sid}/service-configuration`);
   }
   try {
+    const serviceConfigChangesKey = `${REDIRECT_URLS_CHANGES}_${req.session.passport.user.sub}_${req.params.sid}`;
     const manageRolesForService = await getUserServiceRoles(req);
     const currentService = await buildCurrentServiceModel(req);
 
     const authFlowTypeValue = req.session.serviceConfigurationChanges?.authFlowType;
     let serviceConfigChanges = req.session.serviceConfigurationChanges;
 
-    const redirectUrlsChanges = await retreiveRedirectUrlsFromStorage(REDIRECT_URLS_CHANGES, req.params.sid);
+    const redirectUrlsChanges = await retreiveRedirectUrlsFromStorage(serviceConfigChangesKey, req.params.sid);
 
     serviceConfigChanges = redirectUrlsChanges ? { ...serviceConfigChanges, ...redirectUrlsChanges } : serviceConfigChanges;
 
@@ -232,6 +234,7 @@ const postConfirmServiceConfig = async (req, res) => {
       return res.redirect(`/services/${req.params.sid}/service-configuration`);
     }
 
+    const serviceConfigChangesKey = `${REDIRECT_URLS_CHANGES}_${req.session.passport.user.sub}_${req.params.sid}`;
     const currentService = await buildCurrentServiceModel(req);
     const model = await validate(req, currentService);
 
@@ -243,7 +246,7 @@ const postConfirmServiceConfig = async (req, res) => {
     // excluding the authFlowType from the req.session.serviceConfigurationChanges object
     const { authFlowType, ...serviceConfigChanges } = req.session.serviceConfigurationChanges;
 
-    const redirectUrlsChanges = await retreiveRedirectUrlsFromStorage(REDIRECT_URLS_CHANGES, req.params.sid);
+    const redirectUrlsChanges = await retreiveRedirectUrlsFromStorage(serviceConfigChangesKey, req.params.sid);
 
     const serviceConfigurationChanges = redirectUrlsChanges ? { ...serviceConfigChanges, ...redirectUrlsChanges } : serviceConfigChanges;
 
@@ -293,7 +296,7 @@ const postConfirmServiceConfig = async (req, res) => {
       editedFields,
     });
 
-    await deleteRedirectUrlsFromStorage(REDIRECT_URLS_CHANGES, req.params.sid);
+    await deleteFromLocalStorage(serviceConfigChangesKey);
 
     res.flash('title', 'Success');
     res.flash('heading', 'Service configuration changed');

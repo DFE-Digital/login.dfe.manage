@@ -17,7 +17,7 @@ jest.mock('../../../src/app/services/utils', () => {
 
 jest.mock('../../../src/infrastructure/utils/serviceConfigCache', () => ({
   retreiveRedirectUrlsFromStorage: jest.fn(),
-  deleteRedirectUrlsFromStorage: jest.fn(),
+  deleteFromLocalStorage: jest.fn(),
 
 }));
 
@@ -29,7 +29,7 @@ const logger = require('../../../src/infrastructure/logger');
 const { REDIRECT_URLS_CHANGES } = require('../../../src/constants/serviceConfigConstants');
 const {
   retreiveRedirectUrlsFromStorage,
-  deleteRedirectUrlsFromStorage,
+  deleteFromLocalStorage,
 } = require('../../../src/infrastructure/utils/serviceConfigCache');
 
 const res = getResponseMock();
@@ -75,6 +75,13 @@ describe('when confirming service config changes in the review page', () => {
         }],
       },
       query: {},
+      session: {
+        passport: {
+          user: {
+            sub: 'user_id_uuid',
+          },
+        },
+      },
     });
 
     getServiceById.mockReset();
@@ -425,9 +432,8 @@ describe('when confirming service config changes in the review page', () => {
   it('should then remove the redirect urls stored in app cache', async () => {
     await postConfirmServiceConfig(req, res);
 
-    expect(deleteRedirectUrlsFromStorage).toHaveBeenCalledTimes(1);
-    expect(deleteRedirectUrlsFromStorage.mock.calls[0][0]).toBe(REDIRECT_URLS_CHANGES);
-    expect(deleteRedirectUrlsFromStorage.mock.calls[0][1]).toBe('service1');
+    expect(deleteFromLocalStorage).toHaveBeenCalledTimes(1);
+    expect(deleteFromLocalStorage.mock.calls[0][0]).toBe(`${REDIRECT_URLS_CHANGES}_${req.session.passport.user.sub}_${req.params.sid}`);
   });
 
   it('should redirect to Dashboard page and display success banner if service successfuly updated', async () => {

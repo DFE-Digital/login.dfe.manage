@@ -26,7 +26,9 @@ configSchema.validate();
 https.globalAgent.maxSockets = http.globalAgent.maxSockets = config.hostingEnvironment.agentKeepAlive.maxSockets || 50;
 
 const init = async () => {
-  localStorage.init();
+  localStorage.init({
+    ttl: 60 * 60 * 1000,
+  });
 
   const csrf = csurf({
     cookie: {

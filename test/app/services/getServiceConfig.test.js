@@ -16,7 +16,7 @@ jest.mock('../../../src/app/services/utils', () => {
 });
 jest.mock('../../../src/infrastructure/utils/serviceConfigCache', () => ({
   retreiveRedirectUrlsFromStorage: jest.fn(),
-  deleteRedirectUrlsFromStorage: jest.fn(),
+  deleteFromLocalStorage: jest.fn(),
 
 }));
 
@@ -46,6 +46,13 @@ describe('when getting the service config page', () => {
         }],
       },
       query: {},
+      session: {
+        passport: {
+          user: {
+            sub: 'user_id_uuid',
+          },
+        },
+      },
     });
 
     getServiceById.mockReset();
@@ -181,8 +188,8 @@ describe('when getting the service config page', () => {
 
     await getServiceConfig(req, res);
     expect(retreiveRedirectUrlsFromStorage).toHaveBeenCalledTimes(1);
-    expect(retreiveRedirectUrlsFromStorage.mock.calls[0][0]).toBe(REDIRECT_URLS_CHANGES);
-    expect(retreiveRedirectUrlsFromStorage.mock.calls[0][1]).toBe('service1');
+    expect(retreiveRedirectUrlsFromStorage.mock.calls[0][0]).toBe(`${REDIRECT_URLS_CHANGES}_${req.session.passport.user.sub}_${req.params.sid}`);
+
     expect(res.render.mock.calls[0][1].service).toEqual({
       apiSecret: 'new-api-secret',
       clientId: 'clientid',

@@ -16,7 +16,7 @@ jest.mock('../../../src/app/services/utils', () => {
 });
 jest.mock('../../../src/infrastructure/utils/serviceConfigCache', () => ({
   retreiveRedirectUrlsFromStorage: jest.fn(),
-  deleteRedirectUrlsFromStorage: jest.fn(),
+  deleteFromLocalStorage: jest.fn(),
   saveRedirectUrlsToStorage: jest.fn(),
 }));
 
@@ -107,7 +107,13 @@ describe('when editing the service configuration', () => {
         sid: 'service1',
       },
       query: {},
-
+      session: {
+        passport: {
+          user: {
+            sub: 'user_id_uuid',
+          },
+        },
+      },
     });
 
     getUserServiceRoles.mockReset();
@@ -607,7 +613,7 @@ describe('when editing the service configuration', () => {
     await postServiceConfig(req, res);
 
     expect(saveRedirectUrlsToStorage).toHaveBeenCalledTimes(1);
-    expect(saveRedirectUrlsToStorage.mock.calls[0][0]).toBe(REDIRECT_URLS_CHANGES);
+    expect(saveRedirectUrlsToStorage.mock.calls[0][0]).toBe(`${REDIRECT_URLS_CHANGES}_${req.session.passport.user.sub}_${req.params.sid}`);
     expect(saveRedirectUrlsToStorage.mock.calls[0][1]).toEqual({
       postLogoutRedirectUris: {
         newValue: ['http://new-logout-url-1.com', 'http://new-logout-url-2.com'],

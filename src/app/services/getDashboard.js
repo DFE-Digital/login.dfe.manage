@@ -2,7 +2,7 @@
 
 const { getServiceById } = require('../../infrastructure/applications');
 const { getUserServiceRoles } = require('./utils');
-const { deleteRedirectUrlsFromStorage } = require('../../infrastructure/utils/serviceConfigCache');
+const { deleteFromLocalStorage } = require('../../infrastructure/utils/serviceConfigCache');
 const { REDIRECT_URLS_CHANGES } = require('../../constants/serviceConfigConstants');
 const logger = require('../../infrastructure/logger/index');
 
@@ -12,7 +12,8 @@ const getDashboard = async (req, res) => {
   }
   // remove service redirect URLs configuration chages form node storgage if they exist
   try {
-    await deleteRedirectUrlsFromStorage(REDIRECT_URLS_CHANGES, req.params.sid);
+    const serviceConfigChangesKey = `${REDIRECT_URLS_CHANGES}_${req.session.passport.user.sub}_${req.params.sid}`;
+    await deleteFromLocalStorage(serviceConfigChangesKey);
   } catch (error) {
     logger.error(`Error occurred while removing redirect URLs from local storage for service ID - ${req.params.sid}:`, error);
   }

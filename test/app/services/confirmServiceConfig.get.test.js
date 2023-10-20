@@ -6,7 +6,7 @@ jest.mock('./../../../src/infrastructure/applications');
 jest.mock('../../../src/app/services/utils');
 jest.mock('../../../src/infrastructure/utils/serviceConfigCache', () => ({
   retreiveRedirectUrlsFromStorage: jest.fn(),
-  deleteRedirectUrlsFromStorage: jest.fn(),
+  deleteFromLocalStorage: jest.fn(),
 
 }));
 
@@ -36,6 +36,13 @@ describe('when getting the Review service config changes page', () => {
         }],
       },
       query: {},
+      session: {
+        passport: {
+          user: {
+            sub: 'user_id_uuid',
+          },
+        },
+      },
     });
 
     getServiceById.mockReset();
