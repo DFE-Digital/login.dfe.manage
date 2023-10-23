@@ -4,6 +4,7 @@ const sortBy = require('lodash/sortBy');
 const chunk = require('lodash/chunk');
 const { getServiceSummaries } = require('../../infrastructure/applications');
 const logger = require('../../infrastructure/logger');
+const { deleteFromLocalStorage } = require('../../infrastructure/utils/serviceConfigCache');
 
 const getServiceDetails = async (req) => {
   // Unique service IDs obtained from the user's manage roles.
@@ -35,6 +36,11 @@ const get = async (req, res) => {
   if (!req.userServices || req.userServices.roles.length === 0) {
     return res.status(401).render('errors/views/notAuthorised');
   }
+
+  // clear service config changes for UID from local storage
+  const serviceConfigChangesKey = `${req.session.passport.user.sub}`;
+  await deleteFromLocalStorage(serviceConfigChangesKey);
+
   const userServices = await getServiceDetails(req);
   if (userServices.length === 1) {
     const service = userServices[0];

@@ -12,7 +12,13 @@ const {
   ERROR_MESSAGES,
   SERVICE_CONFIG_CHANGES_SUMMARY_DETAILS,
   TOKEN_ENDPOINT_AUTH_METHOD,
+  REDIRECT_URLS_CHANGES,
 } = require('../../constants/serviceConfigConstants');
+
+const {
+  deleteFromLocalStorage,
+  retreiveRedirectUrlsFromStorage,
+} = require('../../infrastructure/utils/serviceConfigCache');
 
 const getServiceConfigMapping = (key, sid) => {
   const mapping = { ...SERVICE_CONFIG_CHANGES_SUMMARY_DETAILS[key] };
@@ -75,97 +81,106 @@ const buildCurrentServiceModel = async (req) => {
 };
 
 const validate = async (req, currentService) => {
-  const manageRolesForService = await getUserServiceRoles(req);
+  try {
+    const manageRolesForService = await getUserServiceRoles(req);
 
-  const { serviceConfigurationChanges } = req.session;
+    let { serviceConfigurationChanges } = req.session;
+    const serviceConfigChangesKey = `${REDIRECT_URLS_CHANGES}_${req.session.passport.user.sub}_${req.params.sid}`;
+    const redirectUrlsChanges = await retreiveRedirectUrlsFromStorage(serviceConfigChangesKey, req.params.sid);
 
-  const grantTypes = processConfigurationTypes(serviceConfigurationChanges.grantTypes?.newValue);
-  const responseTypes = processConfigurationTypes(serviceConfigurationChanges.responseTypes?.newValue);
-  const selectedRedirects = processRedirectUris(serviceConfigurationChanges.redirectUris?.newValue);
-  const selectedLogout = processRedirectUris(serviceConfigurationChanges.postLogoutRedirectUris?.newValue);
+    // adding redirectUrlsChanges if they exist
+    serviceConfigurationChanges = redirectUrlsChanges ? { ...serviceConfigurationChanges, ...redirectUrlsChanges } : serviceConfigurationChanges;
 
-  let tokenEndpointAuthMethod;
+    const grantTypes = processConfigurationTypes(serviceConfigurationChanges.grantTypes?.newValue);
+    const responseTypes = processConfigurationTypes(serviceConfigurationChanges.responseTypes?.newValue);
+    const selectedRedirects = processRedirectUris(serviceConfigurationChanges.redirectUris?.newValue);
+    const selectedLogout = processRedirectUris(serviceConfigurationChanges.postLogoutRedirectUris?.newValue);
 
-  if (serviceConfigurationChanges?.tokenEndpointAuthMethod?.newValue !== undefined) {
-    tokenEndpointAuthMethod = serviceConfigurationChanges.tokenEndpointAuthMethod.newValue === 'client_secret_post'
-      ? 'client_secret_post'
-      : null;
-  } else {
-    tokenEndpointAuthMethod = undefined;
-  }
+    let tokenEndpointAuthMethod;
 
-  const model = {
-    service: {
-      name: currentService.name,
-      serviceHome: serviceConfigurationChanges?.serviceHome?.newValue,
-      postResetUrl: serviceConfigurationChanges?.postResetUrl?.newValue,
-      redirectUris: selectedRedirects,
-      postLogoutRedirectUris: selectedLogout,
-      grantTypes,
-      responseTypes,
-      apiSecret: serviceConfigurationChanges?.apiSecret?.secretNewValue,
-      clientSecret: serviceConfigurationChanges?.clientSecret?.secretNewValue,
-      tokenEndpointAuthMethod,
-    },
-    backLink: `/services/${req.params.sid}/service-configuration`,
-    cancelLink: `/services/${req.params.sid}`,
-    validationMessages: {},
-    serviceId: req.params.sid,
-    userRoles: manageRolesForService,
-    currentNavigation: 'configuration',
-  };
+    if (serviceConfigurationChanges?.tokenEndpointAuthMethod?.newValue !== undefined) {
+      tokenEndpointAuthMethod = serviceConfigurationChanges.tokenEndpointAuthMethod.newValue === 'client_secret_post'
+        ? 'client_secret_post'
+        : null;
+    } else {
+      tokenEndpointAuthMethod = undefined;
+    }
 
-  if (!serviceConfigurationChanges || Object.keys(serviceConfigurationChanges).length === 0) {
-    model.validationMessages.noChangesMade = ERROR_MESSAGES.NO_CHANGES_MADE;
-  }
+    const model = {
+      service: {
+        name: currentService.name,
+        serviceHome: serviceConfigurationChanges?.serviceHome?.newValue,
+        postResetUrl: serviceConfigurationChanges?.postResetUrl?.newValue,
+        redirectUris: selectedRedirects,
+        postLogoutRedirectUris: selectedLogout,
+        grantTypes,
+        responseTypes,
+        apiSecret: serviceConfigurationChanges?.apiSecret?.secretNewValue,
+        clientSecret: serviceConfigurationChanges?.clientSecret?.secretNewValue,
+        tokenEndpointAuthMethod,
+      },
+      backLink: `/services/${req.params.sid}/service-configuration`,
+      cancelLink: `/services/${req.params.sid}`,
+      validationMessages: {},
+      serviceId: req.params.sid,
+      userRoles: manageRolesForService,
+      currentNavigation: 'configuration',
+    };
 
-  const { serviceHome } = model.service;
-  if (serviceHome && !isValidUrl(serviceHome)) {
-    model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_URL;
-  }
+    if (!serviceConfigurationChanges || Object.keys(serviceConfigurationChanges).length === 0) {
+      model.validationMessages.noChangesMade = ERROR_MESSAGES.NO_CHANGES_MADE;
+    }
 
-  const { postResetUrl } = model.service;
-  if (postResetUrl && !isValidUrl(postResetUrl)) {
-    model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_POST_PASSWORD_RESET_URL;
-  }
+    const { serviceHome } = model.service;
+    if (serviceHome && !isValidUrl(serviceHome)) {
+      model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_URL;
+    }
 
-  if (model.service.responseTypes && model.service.responseTypes.length === 1 && model.service.responseTypes.includes('token')) {
-    model.validationMessages.responseTypes = ERROR_MESSAGES.RESPONSE_TYPE_TOKEN_ERROR;
-  }
+    const { postResetUrl } = model.service;
+    if (postResetUrl && !isValidUrl(postResetUrl)) {
+      model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_POST_PASSWORD_RESET_URL;
+    }
 
-  if (model.service.redirectUris && model.service.redirectUris.some((x) => !isValidUrl(x))) {
-    model.validationMessages.redirect_uris = ERROR_MESSAGES.INVALID_REDIRECT_URL;
-  } else if (model.service.redirectUris && model.service.redirectUris.some((value, i) => model.service.redirectUris.indexOf(value) !== i)) {
-    model.validationMessages.redirect_uris = ERROR_MESSAGES.REDIRECT_URLS_NOT_UNIQUE;
-  }
+    if (model.service.responseTypes && model.service.responseTypes.length === 1 && model.service.responseTypes.includes('token')) {
+      model.validationMessages.responseTypes = ERROR_MESSAGES.RESPONSE_TYPE_TOKEN_ERROR;
+    }
 
-  if (model.service.postLogoutRedirectUris && model.service.postLogoutRedirectUris.some((x) => !isValidUrl(x))) {
-    model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.INVALID_POST_LOGOUT_URL;
-  } else if (model.service.postLogoutRedirectUris && model.service.postLogoutRedirectUris.some((value, i) => model.service.postLogoutRedirectUris.indexOf(value) !== i)) {
-    model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.POST_LOGOUT_URL_NOT_UNIQUE;
-  }
-  if (model.service.clientSecret && model.service.clientSecret !== currentService.clientSecret) {
-    try {
-      const validateClientSecret = niceware.passphraseToBytes(model.service.clientSecret.split('-'));
-      if (validateClientSecret.length < 8) {
+    if (model.service.redirectUris && model.service.redirectUris.some((x) => !isValidUrl(x))) {
+      model.validationMessages.redirect_uris = ERROR_MESSAGES.INVALID_REDIRECT_URL;
+    } else if (model.service.redirectUris && model.service.redirectUris.some((value, i) => model.service.redirectUris.indexOf(value) !== i)) {
+      model.validationMessages.redirect_uris = ERROR_MESSAGES.REDIRECT_URLS_NOT_UNIQUE;
+    }
+
+    if (model.service.postLogoutRedirectUris && model.service.postLogoutRedirectUris.some((x) => !isValidUrl(x))) {
+      model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.INVALID_POST_LOGOUT_URL;
+    } else if (model.service.postLogoutRedirectUris && model.service.postLogoutRedirectUris.some((value, i) => model.service.postLogoutRedirectUris.indexOf(value) !== i)) {
+      model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.POST_LOGOUT_URL_NOT_UNIQUE;
+    }
+    if (model.service.clientSecret && model.service.clientSecret !== currentService.clientSecret) {
+      try {
+        const validateClientSecret = niceware.passphraseToBytes(model.service.clientSecret.split('-'));
+        if (validateClientSecret.length < 8) {
+          model.validationMessages.clientSecret = ERROR_MESSAGES.INVALID_CLIENT_SECRET;
+        }
+      } catch (e) {
         model.validationMessages.clientSecret = ERROR_MESSAGES.INVALID_CLIENT_SECRET;
       }
-    } catch (e) {
-      model.validationMessages.clientSecret = ERROR_MESSAGES.INVALID_CLIENT_SECRET;
     }
-  }
 
-  if (model.service.apiSecret && model.service.apiSecret !== currentService.apiSecret) {
-    try {
-      const validateApiSecret = niceware.passphraseToBytes(model.service.apiSecret.split('-'));
-      if (validateApiSecret.length !== 8) {
+    if (model.service.apiSecret && model.service.apiSecret !== currentService.apiSecret) {
+      try {
+        const validateApiSecret = niceware.passphraseToBytes(model.service.apiSecret.split('-'));
+        if (validateApiSecret.length !== 8) {
+          model.validationMessages.apiSecret = ERROR_MESSAGES.INVALID_API_SECRET;
+        }
+      } catch (e) {
         model.validationMessages.apiSecret = ERROR_MESSAGES.INVALID_API_SECRET;
       }
-    } catch (e) {
-      model.validationMessages.apiSecret = ERROR_MESSAGES.INVALID_API_SECRET;
     }
+    return model;
+  } catch (error) {
+    throw new Error(error);
   }
-  return model;
 };
 
 const getConfirmServiceConfig = async (req, res) => {
@@ -174,11 +189,17 @@ const getConfirmServiceConfig = async (req, res) => {
     return res.redirect(`/services/${sid}/service-configuration`);
   }
   try {
+    const serviceConfigChangesKey = `${REDIRECT_URLS_CHANGES}_${req.session.passport.user.sub}_${req.params.sid}`;
     const manageRolesForService = await getUserServiceRoles(req);
     const currentService = await buildCurrentServiceModel(req);
 
     const authFlowTypeValue = req.session.serviceConfigurationChanges?.authFlowType;
-    const serviceConfigChanges = req.session.serviceConfigurationChanges;
+    let serviceConfigChanges = req.session.serviceConfigurationChanges;
+
+    const redirectUrlsChanges = await retreiveRedirectUrlsFromStorage(serviceConfigChangesKey, req.params.sid);
+
+    serviceConfigChanges = redirectUrlsChanges ? { ...serviceConfigChanges, ...redirectUrlsChanges } : serviceConfigChanges;
+
     const { authFlowType, ...changedServiceParams } = serviceConfigChanges;
 
     const serviceChanges = createFlattenedMappedServiceConfigChanges(
@@ -213,6 +234,7 @@ const postConfirmServiceConfig = async (req, res) => {
       return res.redirect(`/services/${req.params.sid}/service-configuration`);
     }
 
+    const serviceConfigChangesKey = `${REDIRECT_URLS_CHANGES}_${req.session.passport.user.sub}_${req.params.sid}`;
     const currentService = await buildCurrentServiceModel(req);
     const model = await validate(req, currentService);
 
@@ -222,7 +244,11 @@ const postConfirmServiceConfig = async (req, res) => {
     }
 
     // excluding the authFlowType from the req.session.serviceConfigurationChanges object
-    const { authFlowType, ...serviceConfigurationChanges } = req.session.serviceConfigurationChanges;
+    const { authFlowType, ...serviceConfigChanges } = req.session.serviceConfigurationChanges;
+
+    const redirectUrlsChanges = await retreiveRedirectUrlsFromStorage(serviceConfigChangesKey, req.params.sid);
+
+    const serviceConfigurationChanges = redirectUrlsChanges ? { ...serviceConfigChanges, ...redirectUrlsChanges } : serviceConfigChanges;
 
     const editedFields = Object.entries(serviceConfigurationChanges)
       .filter(([field, oldValue]) => {
@@ -269,6 +295,8 @@ const postConfirmServiceConfig = async (req, res) => {
       editedService: req.params.sid,
       editedFields,
     });
+
+    await deleteFromLocalStorage(serviceConfigChangesKey);
 
     res.flash('title', 'Success');
     res.flash('heading', 'Service configuration changed');
