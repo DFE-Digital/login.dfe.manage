@@ -1,22 +1,23 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const expressLayouts = require('express-ejs-layouts');
-const logger = require('./infrastructure/logger');
 const http = require('http');
 const https = require('https');
 const path = require('path');
-const config = require('./infrastructure/config');
-const configSchema = require('./infrastructure/config/schema');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const sanitization = require('login.dfe.sanitization');
 const csurf = require('csurf');
 const flash = require('login.dfe.express-flash-2');
-const oidc = require('./infrastructure/oidc');
 const session = require('cookie-session');
-const { setUserContext, isManageUser } = require('./infrastructure/utils');
 const { getErrorHandler, ejsErrorPages } = require('login.dfe.express-error-handling');
 const moment = require('moment');
+const localStorage = require('node-persist');
+const { setUserContext, isManageUser } = require('./infrastructure/utils');
+const oidc = require('./infrastructure/oidc');
+const configSchema = require('./infrastructure/config/schema');
+const config = require('./infrastructure/config');
+const logger = require('./infrastructure/logger');
 
 const registerRoutes = require('./routes');
 
@@ -24,8 +25,11 @@ configSchema.validate();
 
 https.globalAgent.maxSockets = http.globalAgent.maxSockets = config.hostingEnvironment.agentKeepAlive.maxSockets || 50;
 
-
 const init = async () => {
+  localStorage.init({
+    ttl: 60 * 60 * 1000,
+  });
+
   const csrf = csurf({
     cookie: {
       secure: true,
@@ -124,9 +128,9 @@ const init = async () => {
   app.use(cookieParser());
   app.use(sanitization({
     sanitizer: (key, value) => {
-      //add exception for fields that we don't want to encode
+      // add exception for fields that we don't want to encode
       const fieldToNotSanitize = ['criteria'];
-      if (fieldToNotSanitize.find(x => x.toLowerCase() === key.toLowerCase())) {
+      if (fieldToNotSanitize.find((x) => x.toLowerCase() === key.toLowerCase())) {
         return value;
       }
       return sanitization.defaultSanitizer(key, value);
