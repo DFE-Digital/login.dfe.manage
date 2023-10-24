@@ -1,6 +1,6 @@
 'use strict';
 
-const winston = require('winston');
+const { createLogger, format, transports } = require('winston');
 const config = require('./../config');
 const WinstonSequelizeTransport = require('login.dfe.audit.winston-sequelize-transport');
 const appInsights = require('applicationinsights');
@@ -8,7 +8,7 @@ const AppInsightsTransport = require('login.dfe.winston-appinsights');
 
 const logLevel = (config && config.loggerSettings && config.loggerSettings.logLevel) ? config.loggerSettings.logLevel : 'info';
 
-const loggerConfig = {
+const levelsAndColor = {
   levels: {
     audit: 0,
     error: 1,
@@ -27,7 +27,16 @@ const loggerConfig = {
   transports: [],
 };
 
-loggerConfig.transports.push(new (winston.transports.Console)({level: logLevel, colorize: true}));
+const loggerConfig = {
+  levels: levelsAndColor.levels,
+  colorize: true,
+  format: format.combine(
+    format.simple(),
+  ),
+  transports: [],
+};
+
+loggerConfig.transports.push(new transports.Console({ level: logLevel, colorize: true }));
 
 const sequelizeTransport = WinstonSequelizeTransport(config);
 if (sequelizeTransport) {
@@ -44,7 +53,7 @@ if (config.hostingEnvironment.applicationInsights) {
   }));
 }
 
-const logger = new (winston.Logger)(loggerConfig);
+const logger = createLogger(loggerConfig);
 
 process.on('unhandledRejection', (reason, p) => {
   logger.error('Unhandled Rejection at:', p, 'reason:', reason);

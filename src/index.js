@@ -49,14 +49,35 @@ const init = async () => {
         preload: true,
       },
     }));
-  } else {
-    app.use(helmet({
-      noCache: true,
-      frameguard: {
-        action: 'deny',
-      },
-    }));
   }
+  logger.info('set helmet policy defaults');
+
+  // Setting helmet Content Security Policy
+  const scriptSources = ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'localhost', '*.signin.education.gov.uk'];
+
+  app.use(helmet.contentSecurityPolicy({
+    browserSniff: false,
+    setAllHeaders: false,
+    directives: {
+      defaultSrc: ["'self'"],
+      childSrc: ["'none'"],
+      objectSrc: ["'none'"],
+      scriptSrc: scriptSources,
+      styleSrc: ["'self'", "'unsafe-inline'", 'localhost', '*.signin.education.gov.uk'],
+      imgSrc: ["'self'", 'data:', 'blob:', 'localhost', '*.signin.education.gov.uk'],
+      fontSrc: ["'self'", 'data:', '*.signin.education.gov.uk'],
+      connectSrc: ["'self'"],
+      formAction: ["'self'", '*'],
+    },
+  }));
+
+  logger.info('Set helmet filters');
+
+  app.use(helmet.xssFilter());
+  app.use(helmet.frameguard('false'));
+  app.use(helmet.ieNoOpen());
+
+  logger.info('helmet setup complete');
 
   let assetsUrl = config.assets.url;
   assetsUrl = assetsUrl.endsWith('/') ? assetsUrl.substr(0, assetsUrl.length - 1) : assetsUrl;
@@ -119,6 +140,25 @@ const init = async () => {
   app.set('views', path.resolve(__dirname, 'app'));
   app.use(expressLayouts);
   app.set('layout', 'layouts/layout');
+
+    /*
+    Addressing issue with latest version of passport dependency packge
+    TypeError: req.session.regenerate is not a function
+    Reference: https://github.com/jaredhanson/passport/issues/907#issuecomment-1697590189
+  */
+    app.use((request, response, next) => {
+      if (request.session && !request.session.regenerate) {
+      request.session.regenerate = (cb) => {
+        cb();
+      };
+    }
+    if (request.session && !request.session.save) {
+      request.session.save = (cb) => {
+        cb();
+      };
+    }
+    next();
+  });
 
   await oidc.init(app);
   app.use(setUserContext);
