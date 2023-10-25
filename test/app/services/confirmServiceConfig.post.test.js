@@ -26,7 +26,7 @@ const { postConfirmServiceConfig } = require('../../../src/app/services/confirmS
 const { getServiceById, updateService } = require('../../../src/infrastructure/applications');
 const { getUserServiceRoles } = require('../../../src/app/services/utils');
 const logger = require('../../../src/infrastructure/logger');
-const { REDIRECT_URLS_CHANGES } = require('../../../src/constants/serviceConfigConstants');
+const { REDIRECT_URLS_CHANGES, ERROR_MESSAGES } = require('../../../src/constants/serviceConfigConstants');
 const {
   retreiveRedirectUrlsFromStorage,
   deleteFromLocalStorage,
@@ -145,7 +145,7 @@ describe('when confirming service config changes in the review page', () => {
     expect(res.render.mock.calls[0][0]).toBe('services/views/confirmServiceConfig');
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        serviceHome: 'Please enter a valid home URL',
+        serviceHome: `${ERROR_MESSAGES.INVALID_HOME_URL}`,
       },
     }));
   });
@@ -158,7 +158,7 @@ describe('when confirming service config changes in the review page', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        postResetUrl: 'Please enter a valid post password-reset URL',
+        postResetUrl: `${ERROR_MESSAGES.INVALID_POST_PASSWORD_RESET_URL}`,
       },
     }));
   });
@@ -176,7 +176,7 @@ describe('when confirming service config changes in the review page', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        redirect_uris: 'Invalid redirect URL',
+        redirect_uris: `${ERROR_MESSAGES.INVALID_REDIRECT_URL}`,
       },
     }));
   });
@@ -194,7 +194,7 @@ describe('when confirming service config changes in the review page', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        redirect_uris: 'Redirect URLs must be unique',
+        redirect_uris: `${ERROR_MESSAGES.REDIRECT_URLS_NOT_UNIQUE}`,
       },
     }));
   });
@@ -212,7 +212,7 @@ describe('when confirming service config changes in the review page', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        post_logout_redirect_uris: 'Logout redirect URLs must be unique',
+        post_logout_redirect_uris: `${ERROR_MESSAGES.POST_LOGOUT_URL_NOT_UNIQUE}`,
       },
     }));
   });
@@ -230,7 +230,7 @@ describe('when confirming service config changes in the review page', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        post_logout_redirect_uris: 'Invalid logout redirect URL',
+        post_logout_redirect_uris: `${ERROR_MESSAGES.INVALID_POST_LOGOUT_URL}`,
       },
     }));
   });
@@ -243,7 +243,7 @@ describe('when confirming service config changes in the review page', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        clientSecret: 'Invalid client secret',
+        clientSecret: `${ERROR_MESSAGES.INVALID_CLIENT_SECRET}`,
       },
     }));
   });
@@ -256,7 +256,7 @@ describe('when confirming service config changes in the review page', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        apiSecret: 'Invalid API secret',
+        apiSecret: `${ERROR_MESSAGES.INVALID_API_SECRET}`,
       },
     }));
   });
