@@ -138,7 +138,7 @@ describe('when confirming service config changes in the review page', () => {
   });
 
   it('then it should render view with validation if service home not a valid url', async () => {
-    req.session.serviceConfigurationChanges.serviceHome.newValue = ['invalid-url'];
+    req.session.serviceConfigurationChanges.serviceHome.newValue = 'invalid-url';
 
     await postConfirmServiceConfig(req, res);
     expect(res.render.mock.calls).toHaveLength(1);

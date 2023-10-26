@@ -114,7 +114,7 @@ const SERVICE_CONFIG_CHANGES_SUMMARY_DETAILS = {
   },
 
   apiSecret: {
-    title: 'API Secret',
+    title: 'API secret',
     description: 'A value that is created automatically by the system and acts as a password for the DfE Sign-in public API.',
     changeLink: `${amendChangesBaseUrl}#apiSecret-form-group`,
     displayOrder: 9,

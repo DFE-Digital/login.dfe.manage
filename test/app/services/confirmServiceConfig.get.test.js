@@ -368,7 +368,7 @@ describe('when getting the Review service config changes page', () => {
         oldValue: 'EXPUNGED',
         removedValues: [],
         secretNewValue: 'outshine-wringing-imparting-submitted',
-        title: 'API Secret',
+        title: 'API secret',
       },
     ]);
   });
