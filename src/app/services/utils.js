@@ -412,14 +412,11 @@ const processRedirectUris = (uris) => {
 };
 
 const isValidUrl = (urlString) => {
-  console.log(urlString)
-  if (urlString.trim() !== urlString) {
-    return false;
-  }
-
   try {
-    const url = new URL(urlString);
-    return url.protocol === 'http:' || url.protocol === 'https:';
+    if (/\s/.test(urlString)) {
+      return false;
+    }
+    return !!new URL(urlString);
   } catch (error) {
     return false;
   }

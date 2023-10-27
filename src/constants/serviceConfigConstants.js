@@ -39,16 +39,16 @@ const TOKEN_ENDPOINT_AUTH_METHOD = {
 
 // Error messages for Service config form validation
 const ERROR_MESSAGES = {
-  INVALID_HOME_URL: 'Enter a home URL in the correct format. The URL must not include spaces or the following characters " < > # % { } | \\ ^ ~ [ ] `',
-  INVALID_POST_PASSWORD_RESET_URL: 'Enter a post password-reset URL in the correct format. The URL must not include spaces or the following characters " < > # % { } | \\ ^ ~ [ ] `',
+  INVALID_HOME_URL: 'Enter a home URL in the correct format',
+  INVALID_POST_PASSWORD_RESET_URL: 'Enter a post password-reset URL in the correct format',
   MISSING_REDIRECT_URL: 'Enter at least 1 redirect URL',
-  INVALID_REDIRECT_URL: 'Enter a redirect URL in the correct format. The URL must not include spaces or the following characters " < > # % { } | \\ ^ ~ [ ] `',
+  INVALID_REDIRECT_URL: 'Enter a redirect URL in the correct format',
   REDIRECT_URLS_NOT_UNIQUE: 'Redirect URL must be unique',
   MISSING_POST_LOGOUT_URL: 'Enter at least 1 logout redirect URL',
-  INVALID_POST_LOGOUT_URL: 'Enter a logout redirect URL in the correct format. The URL must not include spaces or the following characters " < > # % { } | \\ ^ ~ [ ] `',
+  INVALID_POST_LOGOUT_URL: 'Enter a logout redirect URL in the correct format',
   POST_LOGOUT_URL_NOT_UNIQUE: 'Logout redirect URL must be unique',
-  INVALID_CLIENT_SECRET: 'Client secret cannot be validated. Click ‘regenerate’.',
-  INVALID_API_SECRET: 'API secret cannot be validated. Click ‘regenerate’.',
+  INVALID_CLIENT_SECRET: 'Client secret cannot be validated. Click ‘regenerate’',
+  INVALID_API_SECRET: 'API secret cannot be validated. Click ‘regenerate’',
   MISSING_RESPONSE_TYPE: 'Select at least 1 response type',
   RESPONSE_TYPE_TOKEN_ERROR: 'Select more than 1 response type when ‘token’ is selected as a response type',
   NO_CHANGES_MADE: 'No changes have been made',
