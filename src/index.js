@@ -58,6 +58,7 @@ const init = async () => {
   app.use(helmet.contentSecurityPolicy({
     browserSniff: false,
     setAllHeaders: false,
+    useDefaults: false,
     directives: {
       defaultSrc: ["'self'"],
       childSrc: ["'none'"],
