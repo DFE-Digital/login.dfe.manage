@@ -53,7 +53,7 @@ const init = async () => {
   logger.info('set helmet policy defaults');
 
   // Setting helmet Content Security Policy
-  const scriptSources = ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'localhost', 'https://localhost:41015', '*.signin.education.gov.uk'];
+  const scriptSources = ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'localhost', 'https://localhost:3001', '*.signin.education.gov.uk'];
 
   app.use(helmet.contentSecurityPolicy({
     browserSniff: false,
@@ -64,9 +64,9 @@ const init = async () => {
       childSrc: ["'none'"],
       objectSrc: ["'none'"],
       scriptSrc: scriptSources,
-      styleSrc: ["'self'", "'unsafe-inline'", 'localhost', 'https://localhost:41015', '*.signin.education.gov.uk'],
-      imgSrc: ["'self'", 'data:', 'blob:', 'localhost', 'https://localhost:41015', '*.signin.education.gov.uk'],
-      fontSrc: ["'self'", 'data:', '*.signin.education.gov.uk'],
+      styleSrc: ["'self'", "'unsafe-inline'", 'localhost', 'https://localhost:3001', '*.signin.education.gov.uk'],
+      imgSrc: ["'self'", 'data:', 'blob:', 'localhost', 'https://localhost:3001', '*.signin.education.gov.uk'],
+      fontSrc: ["'self'", 'data:', 'https://localhost:3001', '*.signin.education.gov.uk'],
       connectSrc: ["'self'"],
       formAction: ["'self'", '*'],
     },
