@@ -413,6 +413,9 @@ const processRedirectUris = (uris) => {
 
 const isValidUrl = (urlString) => {
   try {
+    if (/\s/.test(urlString)) {
+      return false;
+    }
     return !!new URL(urlString);
   } catch (error) {
     return false;
