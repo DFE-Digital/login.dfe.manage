@@ -65,6 +65,13 @@ const setUserContext = async (req, res, next) => {
   next();
 };
 
+const userStatusMap = [
+  { id: -2, name: 'Deactivated Invitation' },
+  { id: -1, name: 'Invited' },
+  { id: 0, name: 'Deactivated' },
+  { id: 1, name: 'Active' },
+];
+
 const mapUserStatus = (status, changedOn = null) => {
   // TODO: use userStatusMap
   if (status === -2) {
@@ -78,6 +85,15 @@ const mapUserStatus = (status, changedOn = null) => {
   }
   return { id: 1, description: 'Active', changedOn };
 };
+
+const lastLoginIntervalsMap = [
+  { id: 'lastWeek', name: 'Last week' },
+  { id: 'lastMonth', name: 'Last month' },
+  { id: 'last3Months', name: 'Last 3 months' },
+  { id: 'last6Months', name: 'Last 6 months' },
+  { id: 'onePlusYear', name: '1+ year' },
+  { id: 'never', name: 'Never' },
+];
 
 const mapUserRole = (roleId) => {
   if (roleId === 10000) {
@@ -95,4 +111,6 @@ module.exports = {
   mapUserStatus,
   mapUserRole,
   hasInvite,
+  userStatusMap,
+  lastLoginIntervalsMap,
 };
