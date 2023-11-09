@@ -73,9 +73,9 @@
                                                 <%= category.name %>
                                             </h3>
                                         </div>
-                                        <ul class="filter-tags">
+                                        <ul class="filter-tags <%= categoryNameKebabCase %>-options-list">
                                             <% category.options.forEach((option, i) => { %>
-                                                <li id="<%= categoryNameKebabCase %>-option-<%= i+1 %>" class="dfe-hidden" onclick="hideMe('<%= categoryNameKebabCase %>-option-<%= i+1 %>', '<%= category.name %>', 'show-hide-<%=categoryNameKebabCase%>-<%= i+1 %>')">
+                                                <li id="<%= categoryNameKebabCase %>-option-<%= i+1 %>" class="dfe-hidden <%= categoryNameKebabCase %>-option" onclick="hideMe('<%= categoryNameKebabCase %>-option-<%= i+1 %>', '<%= category.name %>', 'show-hide-<%=categoryNameKebabCase%>-<%= i+1 %>')">
                                                     <a class="govuk-link filter__tag link">
                                                         <span class="govuk-visually-hidden">Remove this filter</span>
                                                         <%= option.name %>
@@ -119,7 +119,7 @@
                                         <% category.options.forEach((option, i) => { %>
                                             <div class="govuk-checkboxes__item">
                                                 <input 
-                                                    class="govuk-checkboxes__input dfe-filter-input"
+                                                    class="govuk-checkboxes__input dfe-filter-input <%= categoryNameKebabCase %>-checkboxes-input"
                                                     name="<%= category.inputName %>"
                                                     id="show-hide-<%= categoryNameKebabCase %>-<%= i+1 %>"
                                                     type="checkbox" 

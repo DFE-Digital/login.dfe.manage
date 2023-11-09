@@ -326,6 +326,63 @@ const isSelected = (source, target) => source.some((x) => x.toLowerCase() === ta
 
 const getParamsSource = (reqMethod, reqBody, reqQuery) => (reqMethod.toUpperCase() === 'POST' ? reqBody : reqQuery);
 
+const buildFilters = (paramsSource, ...filterParams) => {
+  const filters = {};
+
+  filterParams.forEach((param) => {
+    const selectedValues = unpackMultiSelect(paramsSource[param]);
+    if (selectedValues) {
+      filters[param] = selectedValues;
+    }
+  });
+
+  return Object.keys(filters).length > 0 ? filters : undefined;
+};
+
+function mapLastLoginValuesToDateValues(values) {
+  const now = new Date();
+
+  return values.map((value) => {
+    let result;
+    let lastWeek;
+    let lastMonth;
+    let last3Months;
+    let last6Months;
+
+    switch (value) {
+      case 'lastWeek':
+        lastWeek = new Date(now);
+        lastWeek.setDate(now.getDate() - 7);
+        result = lastWeek.getTime();
+        break;
+      case 'lastMonth':
+        lastMonth = new Date(now);
+        lastMonth.setMonth(now.getMonth() - 1);
+        result = lastMonth.getTime();
+        break;
+      case 'last3Months':
+        last3Months = new Date(now);
+        last3Months.setMonth(now.getMonth() - 3);
+        result = last3Months.getTime();
+        break;
+      case 'last6Months':
+        last6Months = new Date(now);
+        last6Months.setMonth(now.getMonth() - 6);
+        result = last6Months.getTime();
+        break;
+      case 'onePlusYear':
+        result = 1;
+        break;
+      case 'never':
+        result = 0;
+        break;
+      default:
+        result = null;
+        break;
+    }
+    return result;
+  });
+}
 
 const getSortInfo = (paramsSource, sortKeys) => {
   let sortBy = 'name';
@@ -445,4 +502,6 @@ module.exports = {
   processRedirectUris,
   processConfigurationTypes,
   isValidUrl,
+  buildFilters,
+  mapLastLoginValuesToDateValues,
 };
