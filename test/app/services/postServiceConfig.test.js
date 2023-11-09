@@ -25,7 +25,7 @@ const { postServiceConfig } = require('../../../src/app/services/serviceConfig')
 const { getServiceById, updateService } = require('../../../src/infrastructure/applications');
 const { getUserServiceRoles } = require('../../../src/app/services/utils');
 const { saveRedirectUrlsToStorage } = require('../../../src/infrastructure/utils/serviceConfigCache');
-const { REDIRECT_URLS_CHANGES } = require('../../../src/constants/serviceConfigConstants');
+const { REDIRECT_URLS_CHANGES, ERROR_MESSAGES } = require('../../../src/constants/serviceConfigConstants');
 
 const res = getResponseMock();
 
@@ -143,7 +143,7 @@ describe('when editing the service configuration', () => {
       serviceId: 'service1',
       userRoles: [],
       validationMessages: {
-        serviceHome: 'Please enter a valid home URL',
+        serviceHome: `${ERROR_MESSAGES.INVALID_HOME_URL}`,
       },
     });
   });
@@ -176,7 +176,7 @@ describe('when editing the service configuration', () => {
       serviceId: 'service1',
       userRoles: [],
       validationMessages: {
-        redirect_uris: 'Redirect URLs must be unique',
+        redirect_uris: `${ERROR_MESSAGES.REDIRECT_URLS_NOT_UNIQUE}`,
       },
     });
   });
@@ -189,7 +189,7 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        postResetUrl: 'Please enter a valid post password-reset URL',
+        postResetUrl: `${ERROR_MESSAGES.INVALID_POST_PASSWORD_RESET_URL}`,
       },
     }));
   });
@@ -210,7 +210,7 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        redirect_uris: 'At least one redirect URL must be specified',
+        redirect_uris: `${ERROR_MESSAGES.MISSING_REDIRECT_URL}`,
       },
     }));
   });
@@ -223,7 +223,7 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        redirect_uris: 'Invalid redirect URL',
+        redirect_uris: `${ERROR_MESSAGES.INVALID_REDIRECT_URL}`,
       },
     }));
   });
@@ -236,7 +236,7 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        redirect_uris: 'Redirect URLs must be unique',
+        redirect_uris: `${ERROR_MESSAGES.REDIRECT_URLS_NOT_UNIQUE}`,
       },
     }));
   });
@@ -249,7 +249,7 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        post_logout_redirect_uris: 'Logout redirect URLs must be unique',
+        post_logout_redirect_uris: `${ERROR_MESSAGES.POST_LOGOUT_URL_NOT_UNIQUE}`,
       },
     }));
   });
@@ -262,7 +262,7 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        post_logout_redirect_uris: 'Invalid logout redirect URL',
+        post_logout_redirect_uris: `${ERROR_MESSAGES.INVALID_POST_LOGOUT_URL}`,
       },
     }));
   });
@@ -275,7 +275,7 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        post_logout_redirect_uris: 'At least one logout redirect URL must be specified',
+        post_logout_redirect_uris: `${ERROR_MESSAGES.MISSING_POST_LOGOUT_URL}`,
       },
     }));
   });
@@ -288,7 +288,7 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        clientSecret: 'Invalid client secret',
+        clientSecret: `${ERROR_MESSAGES.INVALID_CLIENT_SECRET}`,
       },
     }));
   });
@@ -301,7 +301,7 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        apiSecret: 'Invalid API secret',
+        apiSecret: `${ERROR_MESSAGES.INVALID_API_SECRET}`,
       },
     }));
   });
@@ -314,7 +314,7 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        responseTypes: 'Select at least 1 response type',
+        responseTypes: `${ERROR_MESSAGES.MISSING_RESPONSE_TYPE}`,
       },
     }));
   });
@@ -327,7 +327,7 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        responseTypes: 'Select at least 1 response type',
+        responseTypes: `${ERROR_MESSAGES.MISSING_RESPONSE_TYPE}`,
       },
     }));
   });
@@ -340,7 +340,7 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        responseTypes: "You must select more than 1 response type when selecting 'token' as a response type",
+        responseTypes: `${ERROR_MESSAGES.RESPONSE_TYPE_TOKEN_ERROR}`,
       },
     }));
   });
