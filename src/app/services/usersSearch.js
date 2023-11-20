@@ -31,11 +31,11 @@ const search = async (req) => {
   }
   const safeCriteria = criteria;
   if (criteria.indexOf('-') !== -1) {
-    criteria = "\"" + criteria + "\"";
+    criteria = `"${criteria}"`;
   }
 
   let page = paramsSource.page ? parseInt(paramsSource.page, 10) : 1;
-  if (isNaN(page)) {
+  if (Number.isNaN(page)) {
     page = 1;
   }
 
@@ -57,14 +57,14 @@ const search = async (req) => {
   }
 
   const results = await searchForUsers(
-    `${criteria}*`,
+    `${encodeURIComponent(criteria)}*`,
     page,
     sortBy,
     sortAsc ? 'asc' : 'desc',
     mappedToDateFilters,
   );
 
-  logger.audit(`${req.user.email} (id: ${req.user.sub}) searched for users in manage using criteria "${criteria}"`, {
+  logger.audit(`${req.user.email} (id: ${req.user.sub}) searched for users in manage using criteria "${(criteria)}"`, {
     type: 'manage',
     subType: 'user-search',
     userId: req.user.sub,
@@ -126,7 +126,6 @@ const getFiltersModel = async (req) => {
 
   if (showFilters) {
     const selectedOrganisationCategories = unpackMultiSelect(paramsSource.organisationCategories);
-    // const selectedLastLoginIntervals = unpackMultiSelect(paramsSource.lastLoginInterval);
 
     organisationCategories = (await getOrganisationCategories(id)).map((category) => ({
       id: category.id,

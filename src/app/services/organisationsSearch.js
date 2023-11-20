@@ -63,7 +63,7 @@ const search = async (req) => {
   const { method, body, query } = req;
   const paramsSource = getParamsSource(method, body, query);
   const criteria = paramsSource.criteria || '';
-  
+
   const safeCriteria = criteria;
 
   const pageNumber = getValidPageNumber(paramsSource.page);
@@ -79,7 +79,7 @@ const search = async (req) => {
   if (showOrganisations === 'currentService') {
     results = await searchOrgsAssociatedWithService(
       req.params.sid,
-      safeCriteria,
+      encodeURIComponent(safeCriteria),
       pageNumber,
       sortBy,
       sortAsc ? 'asc' : 'desc',
@@ -100,7 +100,7 @@ const search = async (req) => {
     });
   } else {
     results = await searchOrganisations(
-      safeCriteria,
+      encodeURIComponent(safeCriteria),
       orgTypes,
       pageNumber,
       sortBy,
@@ -186,7 +186,6 @@ const post = async (req, res) => {
     organisationStatus: model.selectedOrgStatuses,
     organisationType: model.selectedOrgTypes,
   };
-
 
   const query = objectToQueryString(queryParameters);
   return res.redirect(`?${query}`);
