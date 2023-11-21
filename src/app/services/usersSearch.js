@@ -64,7 +64,7 @@ const search = async (req) => {
     mappedToDateFilters,
   );
 
-  logger.audit(`${req.user.email} (id: ${req.user.sub}) searched for users in manage using criteria "${(criteria)}"`, {
+  logger.audit(`${req.user.email} (id: ${req.user.sub}) searched for users in manage using criteria "${criteria}"`, {
     type: 'manage',
     subType: 'user-search',
     userId: req.user.sub,
