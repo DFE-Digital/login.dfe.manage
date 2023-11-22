@@ -46,7 +46,7 @@ const buildServiceModelFromObject = (service, sessionService = {}) => {
   return {
     name: service.name || '',
     description: service.description || '',
-    clientId: service.relyingParty.client_id || '',
+    clientId: (sessionService?.clientId?.newValue || service.relyingParty.client_id) || '',
     clientSecret: (sessionService?.clientSecret?.secretNewValue || service.relyingParty.client_secret) || '',
     serviceHome: (sessionService?.serviceHome?.newValue || service.relyingParty.service_home) || '',
     postResetUrl: (sessionService?.postResetUrl?.newValue || service.relyingParty.postResetUrl) || '',
@@ -165,7 +165,7 @@ const validate = async (req, currentService, oldService) => {
     service: {
       name: currentService.name,
       description: currentService.description,
-      clientId: currentService.clientId,
+      clientId: req.body.clientId,
       clientSecret: (isHybridFlow || isAuthorisationCodeFlow) ? req.body.clientSecret : oldService.clientSecret,
       serviceHome: (req.body.serviceHome || '').trim(),
       postResetUrl: (req.body.postResetUrl || '').trim(),
