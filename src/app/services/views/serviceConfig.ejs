@@ -204,7 +204,7 @@
                             <li>token endpoint authentication method</li>
                         </ul>
                     </div>
-                    <div class="govuk-form-group" id="clientId-form-group">
+                    <div class="govuk-form-group<%= (locals.validationMessages.clientId !== undefined) ? ' govuk-form-group--error' : ''%>" id="clientId-form-group">
                         <h1 class="govuk-label-wrapper">
                             <label class="govuk-label govuk-label--m" for="clientId">
                                 Client ID
@@ -213,11 +213,26 @@
                         <div id="client-id-hint" class="govuk-hint">
                             A unique identifier of the service that is created manually by the DfE Sign-in team.
                         </div>
-
+                    
+                        <% if (locals.validationMessages.clientId !== undefined){ %>
+                            <p id="validation-clientId" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span>
+                            <%=locals.validationMessages.clientId %>
+                            </p>
+                            <% } %>
+                        
                         <input class="form-control govuk-input govuk-!-width-one-half" id="clientId"
                             name="clientId"
                             type="text" 
                             value="<%=locals.service.clientId%>"/>
+                        
+                        <div class="govuk-warning-text govuk-!-margin-top-3">
+                            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                            <strong class="govuk-warning-text__text">
+                            <span class="govuk-warning-text__assistive">Warning</span>
+                            Changing the client ID may cause validation issues.
+                            </strong>
+                        </div>
                     </div>
 
                     <%# Redirect and Post logout URLS sections  %> 

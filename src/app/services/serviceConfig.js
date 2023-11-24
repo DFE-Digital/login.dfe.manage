@@ -185,8 +185,10 @@ const validate = async (req, currentService, oldService) => {
     currentNavigation: 'configuration',
   };
 
-  if (model.service.serviceHome !== null && !isValidUrl(model.service.serviceHome)) {
-    if (model.service.serviceHome !== '') {
+  const { serviceHome, postResetUrl, clientId } = model.service;
+
+  if (serviceHome !== null && !isValidUrl(serviceHome)) {
+    if (serviceHome !== '') {
       model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_URL;
     }
   }
@@ -197,10 +199,24 @@ const validate = async (req, currentService, oldService) => {
     model.validationMessages.responseTypes = ERROR_MESSAGES.RESPONSE_TYPE_TOKEN_ERROR;
   }
 
-  if (model.service.postResetUrl != null && !isValidUrl(model.service.postResetUrl)) {
-    if (model.service.postResetUrl !== '') {
+  if (postResetUrl != null && !isValidUrl(postResetUrl)) {
+    if (postResetUrl !== '') {
       model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_POST_PASSWORD_RESET_URL;
     }
+  }
+
+  if (!clientId) {
+    model.validationMessages.clientId = ERROR_MESSAGES.MISSING_CLIENT_ID;
+  } else if (clientId.length > 50) {
+    model.validationMessages.clientId = ERROR_MESSAGES.INVALID_CLIENT_ID_LENGTH;
+  } else if (!/^[A-Za-z0-9-]+$/.test(clientId)) {
+    model.validationMessages.clientId = ERROR_MESSAGES.INVALID_CLIENT_ID;
+  } else if (
+    clientId.toLowerCase() !== currentService.clientId.toLowerCase()
+    && await getServiceById(clientId, req.id)
+  ) {
+    // If getServiceById returns truthy, then that clientId is already in use.
+    model.validationMessages.clientId = ERROR_MESSAGES.CLIENT_ID_UNAVAILABLE;
   }
 
   if (!model.service.redirectUris || !model.service.redirectUris.length > 0) {

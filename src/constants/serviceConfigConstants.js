@@ -41,6 +41,10 @@ const TOKEN_ENDPOINT_AUTH_METHOD = {
 const ERROR_MESSAGES = {
   INVALID_HOME_URL: 'Enter a home URL in the correct format',
   INVALID_POST_PASSWORD_RESET_URL: 'Enter a post password-reset URL in the correct format',
+  MISSING_CLIENT_ID: 'Enter the client ID',
+  INVALID_CLIENT_ID: 'Client ID must only contain letters a to z, hyphens and numbers',
+  INVALID_CLIENT_ID_LENGTH: 'Client ID must be 50 characters or less',
+  CLIENT_ID_UNAVAILABLE: 'Client ID must be unique',
   MISSING_REDIRECT_URL: 'Enter at least 1 redirect URL',
   INVALID_REDIRECT_URL: 'Enter a redirect URL in the correct format',
   REDIRECT_URLS_NOT_UNIQUE: 'Redirect URL must be unique',
@@ -79,7 +83,7 @@ const SERVICE_CONFIG_CHANGES_SUMMARY_DETAILS = {
   clientId: {
     title: 'Client ID',
     description: 'A unique identifier of the service that is created manually by the DfE Sign-in team.',
-    changeLink: `${amendChangesBaseUrl}#`,
+    changeLink: `${amendChangesBaseUrl}#clientId-form-group`,
     displayOrder: 3,
   },
   redirectUris: {

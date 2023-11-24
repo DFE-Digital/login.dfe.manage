@@ -60,6 +60,7 @@ const currentServiceInfo = {
 // Represents the request body and the updateService info.
 const requestServiceInfo = {
   clientSecret: 'outshine-wringing-imparting-submitted',
+  clientId: 'new-client-id',
   serviceHome: 'https://www.servicehome2.com',
   postResetUrl: 'https://www.postreset2.com',
   redirect_uris: [
@@ -83,7 +84,7 @@ const requestServiceInfo = {
 // Represents the model used for validation and the view.
 const updatedServiceModel = {
   name: currentServiceInfo.name || '',
-  clientId: currentServiceInfo.relyingParty.client_id || '',
+  clientId: requestServiceInfo.clientId,
   description: currentServiceInfo.description,
   clientSecret: requestServiceInfo.clientSecret,
   serviceHome: requestServiceInfo.serviceHome,
