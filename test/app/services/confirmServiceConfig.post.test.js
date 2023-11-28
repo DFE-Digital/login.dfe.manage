@@ -12,6 +12,7 @@ jest.mock('../../../src/app/services/utils', () => {
     getUserServiceRoles: jest.fn(actualUtilsFunctions.getUserServiceRoles),
     processConfigurationTypes: jest.fn(actualUtilsFunctions.processConfigurationTypes),
     isValidUrl: jest.fn(actualUtilsFunctions.isValidUrl),
+    checkClientId: jest.fn(),
   };
 });
 
@@ -24,7 +25,7 @@ jest.mock('../../../src/infrastructure/utils/serviceConfigCache', () => ({
 const { getRequestMock, getResponseMock } = require('../../utils');
 const { postConfirmServiceConfig } = require('../../../src/app/services/confirmServiceConfig');
 const { getServiceById, updateService } = require('../../../src/infrastructure/applications');
-const { getUserServiceRoles } = require('../../../src/app/services/utils');
+const { getUserServiceRoles, checkClientId } = require('../../../src/app/services/utils');
 const logger = require('../../../src/infrastructure/logger');
 const { REDIRECT_URLS_CHANGES, ERROR_MESSAGES } = require('../../../src/constants/serviceConfigConstants');
 const {
@@ -127,6 +128,10 @@ describe('when confirming service config changes in the review page', () => {
         oldValue: null,
         newValue: 'client_secret_post',
       },
+      clientId: {
+        newValue: 'new-client-id',
+        oldValue: 'clientid',
+      },
     };
   });
   it('then it should redirect to service configuration page if there are no changes stored in session', async () => {
@@ -161,6 +166,53 @@ describe('when confirming service config changes in the review page', () => {
         postResetUrl: `${ERROR_MESSAGES.INVALID_POST_PASSWORD_RESET_URL}`,
       },
     }));
+  });
+
+  it('then it should render view with validation if client ID is too long', async () => {
+    req.session.serviceConfigurationChanges.clientId.newValue = 'long-client-id-long-client-id-long-client-id-long-client-id-long-client-id-long-client-id-long-client-id';
+
+    await postConfirmServiceConfig(req, res);
+
+    expect(res.render.mock.calls).toHaveLength(1);
+    expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
+      validationMessages: {
+        clientId: `${ERROR_MESSAGES.INVALID_CLIENT_ID_LENGTH}`,
+      },
+    }));
+  });
+
+  it('then it should render view with validation if client ID is not containing only letters a to z, hyphens and numbers', async () => {
+    req.session.serviceConfigurationChanges.clientId.newValue = 'client-id_1_$';
+
+    await postConfirmServiceConfig(req, res);
+
+    expect(res.render.mock.calls).toHaveLength(1);
+    expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
+      validationMessages: {
+        clientId: `${ERROR_MESSAGES.INVALID_CLIENT_ID}`,
+      },
+    }));
+  });
+
+  it('then it should render view with validation if client ID already exists', async () => {
+    req.session.serviceConfigurationChanges.clientId.newValue = 'client-id-new';
+    checkClientId.mockReset().mockReturnValueOnce(true);
+    await postConfirmServiceConfig(req, res);
+
+    expect(res.render.mock.calls).toHaveLength(1);
+    expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
+      validationMessages: {
+        clientId: `${ERROR_MESSAGES.CLIENT_ID_UNAVAILABLE}`,
+      },
+    }));
+  });
+
+  it('then it should render view without validation if client ID is present, only contain letters a to z, hyphens and numbers,is 50 characters or less and is unique ', async () => {
+    req.session.serviceConfigurationChanges.clientId.newValue = 'client-id-new';
+    checkClientId.mockReset().mockReturnValueOnce(false);
+    await postConfirmServiceConfig(req, res);
+
+    expect(res.render.mock.calls).toHaveLength(0);
   });
 
   it('then it should render view with validation if any of the redirect Urls are invalid', async () => {
@@ -283,6 +335,7 @@ describe('when confirming service config changes in the review page', () => {
     expect(updateService.mock.calls[0][1]).toEqual(
       {
         apiSecret: 'outshine-wringing-imparting-submitted',
+        clientId: 'new-client-id',
         clientSecret: 'outshine-wringing-imparting-submitted',
         grant_types: [
           'authorisation_code',
@@ -328,7 +381,7 @@ describe('when confirming service config changes in the review page', () => {
     expect(logger.audit.mock.calls).toHaveLength(1);
     expect(logger.audit.mock.calls[0][0]).toBe('user@unit.test (id: user1) updated service configuration for service service one (id: service1)');
     expect(logger.audit.mock.calls[0][1]).toMatchObject({
-      editedFields: [
+      editedFields: expect.arrayContaining([
         {
           name: 'serviceHome',
           newValue: 'https://new-service-home.com',
@@ -395,7 +448,12 @@ describe('when confirming service config changes in the review page', () => {
             'http://old-logout-url-1.com',
           ],
         },
-      ],
+        {
+          name: 'clientId',
+          newValue: 'new-client-id',
+          oldValue: 'clientid',
+        },
+      ]),
       editedService: 'service1',
       subType: 'service-config-updated',
       type: 'manage',

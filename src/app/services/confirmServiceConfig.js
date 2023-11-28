@@ -6,6 +6,7 @@ const {
   processRedirectUris,
   processConfigurationTypes,
   isValidUrl,
+  checkClientId,
 } = require('./utils');
 const {
   AUTHENTICATION_FLOWS,
@@ -145,7 +146,7 @@ const validate = async (req, currentService) => {
       model.validationMessages.clientId = ERROR_MESSAGES.INVALID_CLIENT_ID_LENGTH;
     } else if (clientId && !/^[A-Za-z0-9-]+$/.test(clientId)) {
       model.validationMessages.clientId = ERROR_MESSAGES.INVALID_CLIENT_ID;
-    } else if (clientId && clientId.toLowerCase() !== currentService.clientId.toLowerCase() && await getServiceById(clientId, req.id)
+    } else if (clientId && await checkClientId(clientId, req.id)
     ) {
       // If getServiceById returns truthy, then that clientId is already in use.
       model.validationMessages.clientId = ERROR_MESSAGES.CLIENT_ID_UNAVAILABLE;
