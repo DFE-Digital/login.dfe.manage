@@ -1,4 +1,5 @@
 const niceware = require('niceware');
+const he = require('he');
 const logger = require('../../infrastructure/logger/index');
 const {
   AUTHENTICATION_FLOWS,
@@ -166,7 +167,7 @@ const validate = async (req, currentService, oldService) => {
     service: {
       name: currentService.name,
       description: currentService.description,
-      clientId: req.body.clientId,
+      clientId: he.decode(req.body.clientId),
       clientSecret: (isHybridFlow || isAuthorisationCodeFlow) ? req.body.clientSecret : oldService.clientSecret,
       serviceHome: (req.body.serviceHome || '').trim(),
       postResetUrl: (req.body.postResetUrl || '').trim(),
@@ -208,10 +209,10 @@ const validate = async (req, currentService, oldService) => {
 
   if (!clientId) {
     model.validationMessages.clientId = ERROR_MESSAGES.MISSING_CLIENT_ID;
-  } else if (clientId.length > 50) {
-    model.validationMessages.clientId = ERROR_MESSAGES.INVALID_CLIENT_ID_LENGTH;
   } else if (!/^[A-Za-z0-9-]+$/.test(clientId)) {
     model.validationMessages.clientId = ERROR_MESSAGES.INVALID_CLIENT_ID;
+  } else if (clientId.length > 50) {
+    model.validationMessages.clientId = ERROR_MESSAGES.INVALID_CLIENT_ID_LENGTH;
   } else if (
     clientId.toLowerCase() !== currentService.clientId.toLowerCase()
     && await checkClientId(clientId, req.id)
