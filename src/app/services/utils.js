@@ -10,6 +10,7 @@ const { mapUserStatus } = require('./../../infrastructure/utils');
 const { getOrganisationByIdV2 } = require('./../../infrastructure/organisations');
 const { mapAsync } = require('./../../utils/asyncHelpers');
 const config = require('./../../infrastructure/config');
+const { getServiceById } = require('../../infrastructure/applications/api');
 
 const mapUserToSupportModel = (user, userFromSearch) => {
   return {
@@ -484,6 +485,11 @@ const isValidUrl = (urlString) => {
   }
 };
 
+const checkClientId = async (clientId, reqId) => {
+  const service = await getServiceById(clientId, reqId);
+  return !!service;
+};
+
 module.exports = {
   mapUserToSupportModel,
   getUserDetails,
@@ -504,4 +510,5 @@ module.exports = {
   isValidUrl,
   buildFilters,
   mapLastLoginValuesToDateValues,
+  checkClientId,
 };

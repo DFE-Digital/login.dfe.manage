@@ -12,6 +12,7 @@ jest.mock('../../../src/app/services/utils', () => {
     getUserServiceRoles: jest.fn(actualUtilsFunctions.getUserServiceRoles),
     processConfigurationTypes: jest.fn(actualUtilsFunctions.processConfigurationTypes),
     isValidUrl: jest.fn(actualUtilsFunctions.isValidUrl),
+    checkClientId: jest.fn(),
   };
 });
 jest.mock('../../../src/infrastructure/utils/serviceConfigCache', () => ({
@@ -23,7 +24,7 @@ jest.mock('../../../src/infrastructure/utils/serviceConfigCache', () => ({
 const { getRequestMock, getResponseMock } = require('../../utils');
 const { postServiceConfig } = require('../../../src/app/services/serviceConfig');
 const { getServiceById, updateService } = require('../../../src/infrastructure/applications');
-const { getUserServiceRoles } = require('../../../src/app/services/utils');
+const { getUserServiceRoles, checkClientId } = require('../../../src/app/services/utils');
 const { saveRedirectUrlsToStorage } = require('../../../src/infrastructure/utils/serviceConfigCache');
 const { REDIRECT_URLS_CHANGES, ERROR_MESSAGES } = require('../../../src/constants/serviceConfigConstants');
 
@@ -60,6 +61,7 @@ const currentServiceInfo = {
 // Represents the request body and the updateService info.
 const requestServiceInfo = {
   clientSecret: 'outshine-wringing-imparting-submitted',
+  clientId: 'new-client-id',
   serviceHome: 'https://www.servicehome2.com',
   postResetUrl: 'https://www.postreset2.com',
   redirect_uris: [
@@ -83,7 +85,7 @@ const requestServiceInfo = {
 // Represents the model used for validation and the view.
 const updatedServiceModel = {
   name: currentServiceInfo.name || '',
-  clientId: currentServiceInfo.relyingParty.client_id || '',
+  clientId: requestServiceInfo.clientId,
   description: currentServiceInfo.description,
   clientSecret: requestServiceInfo.clientSecret,
   serviceHome: requestServiceInfo.serviceHome,
@@ -118,6 +120,7 @@ describe('when editing the service configuration', () => {
 
     getUserServiceRoles.mockReset();
     getUserServiceRoles.mockImplementation(() => Promise.resolve([]));
+    checkClientId.mockReset();
 
     updateService.mockReset();
     getServiceById.mockReset();
@@ -192,6 +195,66 @@ describe('when editing the service configuration', () => {
         postResetUrl: `${ERROR_MESSAGES.INVALID_POST_PASSWORD_RESET_URL}`,
       },
     }));
+  });
+
+  it('then it should render view with validation if client ID is not present', async () => {
+    req.body.clientId = '';
+
+    await postServiceConfig(req, res);
+
+    expect(res.render.mock.calls).toHaveLength(1);
+    expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
+      validationMessages: {
+        clientId: `${ERROR_MESSAGES.MISSING_CLIENT_ID}`,
+      },
+    }));
+  });
+
+  it('then it should render view with validation if client ID is too long', async () => {
+    req.body.clientId = 'long-client-id-long-client-id-long-client-id-long-client-id-long-client-id-long-client-id-long-client-id';
+
+    await postServiceConfig(req, res);
+
+    expect(res.render.mock.calls).toHaveLength(1);
+    expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
+      validationMessages: {
+        clientId: `${ERROR_MESSAGES.INVALID_CLIENT_ID_LENGTH}`,
+      },
+    }));
+  });
+
+  it('then it should render view with validation if client ID is not containing only letters a to z, hyphens and numbers', async () => {
+    req.body.clientId = 'client-id_1_$';
+
+    await postServiceConfig(req, res);
+
+    expect(res.render.mock.calls).toHaveLength(1);
+    expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
+      validationMessages: {
+        clientId: `${ERROR_MESSAGES.INVALID_CLIENT_ID}`,
+      },
+    }));
+  });
+
+  it('then it should render view with validation if client ID already exists', async () => {
+    req.body.clientId = 'client-id-new';
+    checkClientId.mockReset().mockReturnValueOnce(true);
+    await postServiceConfig(req, res);
+
+    expect(res.render.mock.calls).toHaveLength(1);
+    expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
+      validationMessages: {
+        clientId: `${ERROR_MESSAGES.CLIENT_ID_UNAVAILABLE}`,
+      },
+    }));
+  });
+
+  it('then it should render view without validation if client ID is present, only contain letters a to z, hyphens and numbers,is 50 characters or less and is unique ', async () => {
+    req.body.clientId = 'client-id-new';
+    checkClientId.mockReset().mockReturnValueOnce(false);
+    await postServiceConfig(req, res);
+
+    expect(res.render.mock.calls).toHaveLength(0);
   });
 
   it('then it should render view without validation if Post-reset Url is an empty string', async () => {

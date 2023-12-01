@@ -41,6 +41,10 @@ const TOKEN_ENDPOINT_AUTH_METHOD = {
 const ERROR_MESSAGES = {
   INVALID_HOME_URL: 'Enter a home URL in the correct format',
   INVALID_POST_PASSWORD_RESET_URL: 'Enter a post password-reset URL in the correct format',
+  MISSING_CLIENT_ID: 'Enter the client ID',
+  INVALID_CLIENT_ID: 'Client ID must only contain letters a to z, hyphens and numbers',
+  INVALID_CLIENT_ID_LENGTH: 'Client ID must be 50 characters or less',
+  CLIENT_ID_UNAVAILABLE: 'Client ID must be unique',
   MISSING_REDIRECT_URL: 'Enter at least 1 redirect URL',
   INVALID_REDIRECT_URL: 'Enter a redirect URL in the correct format',
   REDIRECT_URLS_NOT_UNIQUE: 'Redirect URL must be unique',
@@ -76,48 +80,54 @@ const SERVICE_CONFIG_CHANGES_SUMMARY_DETAILS = {
     changeLink: `${amendChangesBaseUrl}#postResetUrl-form-group`,
     displayOrder: 2,
   },
+  clientId: {
+    title: 'Client ID',
+    description: 'A unique identifier of the service that is created manually by the DfE Sign-in team.',
+    changeLink: `${amendChangesBaseUrl}#clientId-form-group`,
+    displayOrder: 3,
+  },
   redirectUris: {
     title: 'Redirect URL',
     description: 'Where you want to redirect users after they have authenticated.',
     changeLink: `${amendChangesBaseUrl}#redirect_uris-form-group`,
-    displayOrder: 3,
+    displayOrder: 4,
   },
   postLogoutRedirectUris: {
     title: 'Logout redirect URL',
     description: 'Where you want to redirect users after they log out of a service.',
     changeLink: `${amendChangesBaseUrl}#post_logout_redirect_uris-form-group`,
-    displayOrder: 4,
+    displayOrder: 5,
   },
   responseTypes: {
     title: 'Response types',
     description: 'A value that determines the authentication flow.',
     changeLink: `${amendChangesBaseUrl}#response_types-form-group`,
-    displayOrder: 5,
+    displayOrder: 6,
   },
   refreshToken: {
     title: 'Refresh token',
     description: 'Select this field if you want to get new access tokens when they have expired without interaction with the user.',
     changeLink: `${amendChangesBaseUrl}#refresh_token-form-group`,
-    displayOrder: 6,
+    displayOrder: 7,
   },
   clientSecret: {
     title: 'Client secret',
     description: 'A value that is created automatically by the system and acts as a password for the service.',
     changeLink: `${amendChangesBaseUrl}#clientSecret-form-group`,
-    displayOrder: 7,
+    displayOrder: 8,
   },
   tokenEndpointAuthMethod: {
     title: 'Token endpoint authentication method',
     description: 'The way your service authenticates to the DfE Sign-in token endpoint. Select the method that applies.',
     changeLink: `${amendChangesBaseUrl}#tokenEndpointAuthMethod-form-group`,
-    displayOrder: 8,
+    displayOrder: 9,
   },
 
   apiSecret: {
     title: 'API secret',
     description: 'A value that is created automatically by the system and acts as a password for the DfE Sign-in public API.',
     changeLink: `${amendChangesBaseUrl}#apiSecret-form-group`,
-    displayOrder: 9,
+    displayOrder: 10,
   },
 };
 
