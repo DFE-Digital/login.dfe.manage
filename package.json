@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "dev": "settings='./config/login.dfe.manage.dev.json' nodemon src/index.js",
-    "test": "./node_modules/.bin/jest",
+    "test": "jest --coverage",
     "start": "node src/index.js"
   },
   "engines": {
