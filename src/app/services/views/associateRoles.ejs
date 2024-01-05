@@ -26,7 +26,7 @@
                         <% if (locals.validationMessages.roles !== undefined) { %>
                         <p id="validation-selected-role" class="govuk-error-message">
                             <span class="govuk-visually-hidden">Error:</span>
-                            <%=locals.validationMessages.roles%>
+                            <%-locals.validationMessages.roles%>
                         </p>
                         <% } %> <% if (locals.serviceRoles.length > 0) { %>
                         <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
