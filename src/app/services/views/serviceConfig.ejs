@@ -118,7 +118,7 @@
                 <h2 class="govuk-heading-m">Related actions</h2>
                 <ul class="govuk-list">
                     <li>
-                        <a class="govuk-link-bold" href="<%= serviceConfigHelpLink %>">Help with service configuration</a>
+                        <a rel="noreferrer noopener" target="_blank" class="govuk-link-bold" href="<%= serviceConfigHelpLink %>">Help with service configuration (opens in new tab)</a>
                     </li>
                 </ul>
             </aside>
@@ -135,7 +135,7 @@
                     </legend>
 
                     <div id="service_details-description">
-                        <p class="govuk-body">Read the <a class="govuk-link-bold" href="<%= serviceConfigHelpLink %>#service-details">service configuration help page</a> to find out more about service details:</p>
+                        <p class="govuk-body">Read the <a rel="noreferrer noopener" target="_blank"  class="govuk-link-bold" href="<%= serviceConfigHelpLink %>#service-details">service configuration help page</a> to find out more about service details:</p>
                         <ul class="govuk-list govuk-list--bullet">
                             <li>home URL</li>
                             <li>post password-reset URL</li>
@@ -193,7 +193,7 @@
                     </legend>
 
                     <div id="openID_connect-description">
-                        <p class="govuk-body">Read the <a class="govuk-link-bold" href="<%= serviceConfigHelpLink %>#openid-connect">service configuration help page</a> to find out more about OpenID Connect:</p>
+                        <p class="govuk-body">Read the <a rel="noreferrer noopener" target="_blank" class="govuk-link-bold" href="<%= serviceConfigHelpLink %>#openid-connect">service configuration help page</a> to find out more about OpenID Connect:</p>
                         <ul class="govuk-list govuk-list--bullet">
                             <li>client ID</li>
                             <li>redirect URL</li>
@@ -204,21 +204,35 @@
                             <li>token endpoint authentication method</li>
                         </ul>
                     </div>
-                    <div class="govuk-form-group" id="clientId-form-group">
+                    <div class="govuk-form-group<%= (locals.validationMessages.clientId !== undefined) ? ' govuk-form-group--error' : ''%>" id="clientId-form-group">
                         <h1 class="govuk-label-wrapper">
                             <label class="govuk-label govuk-label--m" for="clientId">
                                 Client ID
                             </label>
                         </h1>
                         <div id="client-id-hint" class="govuk-hint">
-                            A unique identifier of the service that is created manually by the DfE Sign-in team. You cannot change this value.
+                            A unique identifier of the service that is created manually by the DfE Sign-in team.
                         </div>
-
-                        <input class="form-control govuk-input read-only-input govuk-!-width-one-half" id="clientId"
+                    
+                        <% if (locals.validationMessages.clientId !== undefined){ %>
+                            <p id="validation-clientId" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span>
+                            <%=locals.validationMessages.clientId %>
+                            </p>
+                            <% } %>
+                        
+                        <input class="form-control govuk-input govuk-!-width-one-half" id="clientId"
                             name="clientId"
                             type="text" 
-                            readonly="readonly"
                             value="<%=locals.service.clientId%>"/>
+                        
+                        <div class="govuk-warning-text govuk-!-margin-top-3">
+                            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                            <strong class="govuk-warning-text__text">
+                            <span class="govuk-warning-text__assistive">Warning</span>
+                            Changing the client ID may cause validation issues.
+                            </strong>
+                        </div>
                     </div>
 
                     <%# Redirect and Post logout URLS sections  %> 
@@ -363,7 +377,7 @@
                     </legend>
 
                     <div id="api-description">
-                        <p class="govuk-body">Read the <a class="govuk-link-bold" href="<%= serviceConfigHelpLink %>#api-id">service configuration help page</a> to find out more about API.</p>
+                        <p class="govuk-body">Read the <a rel="noreferrer noopener" target="_blank" class="govuk-link-bold" href="<%= serviceConfigHelpLink %>#api-id">service configuration help page</a> to find out more about API.</p>
                     </div>
 
                     <%# API secret new section %>

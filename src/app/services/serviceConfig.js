@@ -1,4 +1,5 @@
 const niceware = require('niceware');
+const he = require('he');
 const logger = require('../../infrastructure/logger/index');
 const {
   AUTHENTICATION_FLOWS,
@@ -15,6 +16,7 @@ const {
   processRedirectUris,
   processConfigurationTypes,
   isValidUrl,
+  checkClientId,
 } = require('./utils');
 
 const {
@@ -46,7 +48,7 @@ const buildServiceModelFromObject = (service, sessionService = {}) => {
   return {
     name: service.name || '',
     description: service.description || '',
-    clientId: service.relyingParty.client_id || '',
+    clientId: (sessionService?.clientId?.newValue || service.relyingParty.client_id) || '',
     clientSecret: (sessionService?.clientSecret?.secretNewValue || service.relyingParty.client_secret) || '',
     serviceHome: (sessionService?.serviceHome?.newValue || service.relyingParty.service_home) || '',
     postResetUrl: (sessionService?.postResetUrl?.newValue || service.relyingParty.postResetUrl) || '',
@@ -165,7 +167,7 @@ const validate = async (req, currentService, oldService) => {
     service: {
       name: currentService.name,
       description: currentService.description,
-      clientId: currentService.clientId,
+      clientId: he.decode(req.body.clientId),
       clientSecret: (isHybridFlow || isAuthorisationCodeFlow) ? req.body.clientSecret : oldService.clientSecret,
       serviceHome: (req.body.serviceHome || '').trim(),
       postResetUrl: (req.body.postResetUrl || '').trim(),
@@ -185,8 +187,10 @@ const validate = async (req, currentService, oldService) => {
     currentNavigation: 'configuration',
   };
 
-  if (model.service.serviceHome !== null && !isValidUrl(model.service.serviceHome)) {
-    if (model.service.serviceHome !== '') {
+  const { serviceHome, postResetUrl, clientId } = model.service;
+
+  if (serviceHome !== null && !isValidUrl(serviceHome)) {
+    if (serviceHome !== '') {
       model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_URL;
     }
   }
@@ -197,10 +201,24 @@ const validate = async (req, currentService, oldService) => {
     model.validationMessages.responseTypes = ERROR_MESSAGES.RESPONSE_TYPE_TOKEN_ERROR;
   }
 
-  if (model.service.postResetUrl != null && !isValidUrl(model.service.postResetUrl)) {
-    if (model.service.postResetUrl !== '') {
+  if (postResetUrl != null && !isValidUrl(postResetUrl)) {
+    if (postResetUrl !== '') {
       model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_POST_PASSWORD_RESET_URL;
     }
+  }
+
+  if (!clientId) {
+    model.validationMessages.clientId = ERROR_MESSAGES.MISSING_CLIENT_ID;
+  } else if (!/^[A-Za-z0-9-]+$/.test(clientId)) {
+    model.validationMessages.clientId = ERROR_MESSAGES.INVALID_CLIENT_ID;
+  } else if (clientId.length > 50) {
+    model.validationMessages.clientId = ERROR_MESSAGES.INVALID_CLIENT_ID_LENGTH;
+  } else if (
+    clientId.toLowerCase() !== currentService.clientId.toLowerCase()
+    && await checkClientId(clientId, req.id)
+  ) {
+    // If getServiceById returns truthy, then that clientId is already in use.
+    model.validationMessages.clientId = ERROR_MESSAGES.CLIENT_ID_UNAVAILABLE;
   }
 
   if (!model.service.redirectUris || !model.service.redirectUris.length > 0) {

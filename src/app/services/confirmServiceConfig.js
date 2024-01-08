@@ -6,6 +6,7 @@ const {
   processRedirectUris,
   processConfigurationTypes,
   isValidUrl,
+  checkClientId,
 } = require('./utils');
 const {
   AUTHENTICATION_FLOWS,
@@ -111,6 +112,7 @@ const validate = async (req, currentService) => {
         name: currentService.name,
         serviceHome: serviceConfigurationChanges?.serviceHome?.newValue,
         postResetUrl: serviceConfigurationChanges?.postResetUrl?.newValue,
+        clientId: serviceConfigurationChanges?.clientId?.newValue,
         redirectUris: selectedRedirects,
         postLogoutRedirectUris: selectedLogout,
         grantTypes,
@@ -127,18 +129,27 @@ const validate = async (req, currentService) => {
       currentNavigation: 'configuration',
     };
 
-    if (!serviceConfigurationChanges || Object.keys(serviceConfigurationChanges).length === 0) {
+    if (Object.keys(serviceConfigurationChanges).length === 1 && 'authFlowType' in serviceConfigurationChanges) {
       model.validationMessages.noChangesMade = ERROR_MESSAGES.NO_CHANGES_MADE;
     }
 
-    const { serviceHome } = model.service;
+    const { serviceHome, postResetUrl, clientId } = model.service;
     if (serviceHome && !isValidUrl(serviceHome)) {
       model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_URL;
     }
 
-    const { postResetUrl } = model.service;
     if (postResetUrl && !isValidUrl(postResetUrl)) {
       model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_POST_PASSWORD_RESET_URL;
+    }
+
+    if (clientId && clientId.length > 50) {
+      model.validationMessages.clientId = ERROR_MESSAGES.INVALID_CLIENT_ID_LENGTH;
+    } else if (clientId && !/^[A-Za-z0-9-]+$/.test(clientId)) {
+      model.validationMessages.clientId = ERROR_MESSAGES.INVALID_CLIENT_ID;
+    } else if (clientId && await checkClientId(clientId, req.id)
+    ) {
+      // If getServiceById returns truthy, then that clientId is already in use.
+      model.validationMessages.clientId = ERROR_MESSAGES.CLIENT_ID_UNAVAILABLE;
     }
 
     if (model.service.responseTypes && model.service.responseTypes.length === 1 && model.service.responseTypes.includes('token')) {
@@ -275,6 +286,7 @@ const postConfirmServiceConfig = async (req, res) => {
     const updatedService = {
       clientSecret: model.service.clientSecret,
       serviceHome: model.service.serviceHome,
+      clientId: model.service.clientId,
       postResetUrl: model.service.postResetUrl,
       redirect_uris: model.service.redirectUris,
       post_logout_redirect_uris: model.service.postLogoutRedirectUris,
