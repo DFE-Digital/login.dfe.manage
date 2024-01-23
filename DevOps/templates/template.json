@@ -30,6 +30,13 @@
                 "description": "The App Service Plan name"
             }
         },
+        "wsorgsyncUrl" : {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "On Demand Org sync URL"
+            }
+        },
         "appServicePlanRG": {
             "type": "string",
             "metadata": {
@@ -148,7 +155,8 @@
                     "additionalAppSettings": {
                         "value": {
                             "WEBSITE_HEALTHCHECK_MAXPINGFAILURES": "4",
-                            "AUDIT_HTTP_TRIGGER_URL": "[parameters('auditHttpTriggerInvokeUrl')]"
+                            "AUDIT_HTTP_TRIGGER_URL": "[parameters('auditHttpTriggerInvokeUrl')]", 
+                            "WSORG_SYNC_URL":"[parameters('wsorgsyncUrl')]"
                         }
                     },
                      "healthCheckPath": {
