@@ -1,5 +1,6 @@
 const niceware = require('niceware');
 const he = require('he');
+const { Utils } = require('sequelize');
 const logger = require('../../infrastructure/logger/index');
 const {
   AUTHENTICATION_FLOWS,
@@ -15,6 +16,8 @@ const {
   determineAuthFlowByRespType,
   processRedirectUris,
   processConfigurationTypes,
+  isCorrectProtocol,
+  isCorrectLength,
   isValidUrl,
   checkClientId,
 } = require('./utils');
@@ -24,6 +27,7 @@ const {
   deleteFromLocalStorage,
   retreiveRedirectUrlsFromStorage,
 } = require('../../infrastructure/utils/serviceConfigCache');
+const UrlValidator = require('./urlValidator');
 
 const buildServiceModelFromObject = (service, sessionService = {}) => {
   let tokenEndpointAuthMethod = null;
@@ -188,10 +192,32 @@ const validate = async (req, currentService, oldService) => {
   };
 
   const { serviceHome, postResetUrl, clientId } = model.service;
+  const urlValidator = new UrlValidator(serviceHome);
 
-  if (serviceHome !== null && !isValidUrl(serviceHome)) {
+  const lengthResult = await isCorrectLength(urlValidator);
+  if (serviceHome !== null && !lengthResult) {
+    model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_LENTGH;
+  }
+  const validUrl = await isValidUrl(urlValidator);
+  if (serviceHome !== null && !validUrl) {
     if (serviceHome !== '') {
+      if (model.validationMessages.serviceHome !== '' && model.validationMessages.serviceHome !== undefined) {
+        model.validationMessages.serviceHome += ERROR_MESSAGES.INVALID_HOME_CHARACTERS;
+      } else {
+        model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_CHARACTERS;
+      }
+    } else {
       model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_URL;
+    }
+  }
+  if (lengthResult && !validUrl) {
+    const validProtocol = await isCorrectProtocol(urlValidator);
+    if (!validProtocol) {
+      if (model.validationMessages.serviceHome !== '' && model.validationMessages.serviceHome !== undefined) {
+        model.validationMessages.serviceHome += ERROR_MESSAGES.INVALID_HOME_PROTOCOL;
+      } else {
+        model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_PROTOCOL;
+      }
     }
   }
 
@@ -200,13 +226,35 @@ const validate = async (req, currentService, oldService) => {
   } else if (model.service.responseTypes.length === 1 && model.service.responseTypes.includes('token')) {
     model.validationMessages.responseTypes = ERROR_MESSAGES.RESPONSE_TYPE_TOKEN_ERROR;
   }
-
-  if (postResetUrl != null && !isValidUrl(postResetUrl)) {
+  const postUrlValidator = new UrlValidator(postResetUrl);
+  const isPostResetUrlValid = await isValidUrl(postUrlValidator);
+  if (postResetUrl != null && !isPostResetUrlValid) {
     if (postResetUrl !== '') {
-      model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_POST_PASSWORD_RESET_URL;
+      if (model.validationMessages.postResetUrl !== '' && model.validationMessages.postResetUrl !== undefined) {
+        model.validationMessages.postResetUrl += ERROR_MESSAGES.INVALID_RESETPASS_CHARACTERS;
+      } else {
+        model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_RESETPASS_CHARACTERS;
+      }
     }
   }
-
+  const isPOstResetUrlToLength = await isCorrectLength(postUrlValidator);
+  if (!isPOstResetUrlToLength) {
+    if (model.validationMessages.postResetUrl !== '' && model.validationMessages.postResetUrl !== undefined) {
+      model.validationMessages.postResetUrl += ERROR_MESSAGES.INVALID_RESETPASS_LENTGH;
+    } else {
+      model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_RESETPASS_LENTGH;
+    }
+  }
+  if (isPostResetUrlValid && isPOstResetUrlToLength) {
+    const isPostResetUrlProtocol = await isCorrectProtocol(postUrlValidator);
+    if (!isPostResetUrlProtocol) {
+      if (model.validationMessages.postResetUrl !== '' && model.validationMessages.postResetUrl !== undefined) {
+        model.validationMessages.postResetUrl += ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL;
+      } else {
+        model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL;
+      }
+    }
+  }
   if (!clientId) {
     model.validationMessages.clientId = ERROR_MESSAGES.MISSING_CLIENT_ID;
   } else if (!/^[A-Za-z0-9-]+$/.test(clientId)) {
@@ -223,16 +271,60 @@ const validate = async (req, currentService, oldService) => {
 
   if (!model.service.redirectUris || !model.service.redirectUris.length > 0) {
     model.validationMessages.redirect_uris = ERROR_MESSAGES.MISSING_REDIRECT_URL;
-  } else if (model.service.redirectUris.some((x) => !isValidUrl(x))) {
-    model.validationMessages.redirect_uris = ERROR_MESSAGES.INVALID_REDIRECT_URL;
+  } else if (model.service.redirectUris.length > 0) {
+    await Promise.all(model.service.redirectUris.map(async (x) => {
+      const redirecturlValidator = new UrlValidator(x);
+      const isRCorrectLength = await isCorrectLength(redirecturlValidator);
+      const isCorrectUtl = await isValidUrl(redirecturlValidator);
+      if (!isRCorrectLength) {
+        if (model.validationMessages.redirect_uris !== '' && model.validationMessages.redirect_uris !== undefined) {
+          model.validationMessages.redirect_uris += ERROR_MESSAGES.INVALID_REDIRECT_LENTGH;
+        } else {
+          model.validationMessages.redirect_uris = ERROR_MESSAGES.INVALID_REDIRECT_LENTGH;
+        }
+      }
+      if (!isCorrectUtl) {
+        if (model.validationMessages.redirect_uris !== '' && model.validationMessages.redirect_uris !== undefined) {
+          model.validationMessages.redirect_uris += ERROR_MESSAGES.INVALID_REDIRECT_CHARACTERS;
+        } else {
+          model.validationMessages.redirect_uris = ERROR_MESSAGES.INVALID_REDIRECT_CHARACTERS;
+        }
+      }
+      if (isCorrectUtl && isRCorrectLength) {
+        const isValidProtocol = await isCorrectProtocol(redirecturlValidator);
+        if (!isValidProtocol) {
+          if (model.validationMessages.redirect_uris !== '' && model.validationMessages.redirect_uris !== undefined) {
+            model.validationMessages.redirect_uris += ERROR_MESSAGES.INVALID_REDIRECT_PROTOCOL;
+          } else {
+            model.validationMessages.redirect_uris = ERROR_MESSAGES.INVALID_REDIRECT_PROTOCOL;
+          }
+        }
+      }
+    }));
   } else if (model.service.redirectUris.some((value, i) => model.service.redirectUris.indexOf(value) !== i)) {
     model.validationMessages.redirect_uris = ERROR_MESSAGES.REDIRECT_URLS_NOT_UNIQUE;
   }
 
   if (!model.service.postLogoutRedirectUris || !model.service.postLogoutRedirectUris.length > 0) {
     model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.MISSING_POST_LOGOUT_URL;
-  } else if (model.service.postLogoutRedirectUris.some((x) => !isValidUrl(x))) {
-    model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.INVALID_POST_LOGOUT_URL;
+  } else if (model.service.postLogoutRedirectUris.length > 0) {
+    await Promise.all(model.service.postLogoutRedirectUris.map(async (x) => {
+      const postRedirecturlValidator = new UrlValidator(x);
+      const isRDCorrectLength = await isCorrectLength(postRedirecturlValidator);
+      const estCorrect = await isValidUrl(postRedirecturlValidator);
+      if (!isRDCorrectLength) {
+        model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_LENTGH;
+      }
+      if (estCorrect !== true) {
+        model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_CHARACTERS;
+      }
+      if (isRDCorrectLength && estCorrect) {
+        const testRDProtocol = await isCorrectProtocol(postRedirecturlValidator);
+        if (!testRDProtocol) {
+          model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_PROTOCOL;
+        }
+      }
+    }));
   } else if (model.service.postLogoutRedirectUris.some((value, i) => model.service.postLogoutRedirectUris.indexOf(value) !== i)) {
     model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.POST_LOGOUT_URL_NOT_UNIQUE;
   }

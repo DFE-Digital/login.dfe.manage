@@ -11,6 +11,8 @@ const { getOrganisationByIdV2 } = require('./../../infrastructure/organisations'
 const { mapAsync } = require('./../../utils/asyncHelpers');
 const config = require('./../../infrastructure/config');
 const { getServiceById } = require('../../infrastructure/applications/api');
+const { urlValidator } = require('./urlValidator');
+
 
 const mapUserToSupportModel = (user, userFromSearch) => {
   return {
@@ -474,15 +476,21 @@ const processRedirectUris = (uris) => {
   return processedUris;
 };
 
-const isValidUrl = (urlString) => {
-  try {
-    if (/\s/.test(urlString)) {
-      return false;
-    }
-    return !!new URL(urlString);
-  } catch (error) {
-    return false;
-  }
+const isCorrectProtocol = async(urlValidator) =>{
+
+  return await urlValidator.isValidProtocal(['http', 'https'])
+  .then((result) => {  return result;})
+  .catch((err) =>{ return err;});
+  
+}
+const isCorrectLength = async(urlValidator) =>{
+  return await urlValidator.isCorrectLength(200).then((result) => {  return result;}).catch((err) => { return err;});
+ 
+}
+const isValidUrl = async(urlValidator) => {
+  return await urlValidator.isValidUrl()
+  .then((result) => {  return result;})
+  .catch((err) => { return err;});
 };
 
 const checkClientId = async (clientId, reqId) => {
@@ -507,6 +515,8 @@ module.exports = {
   determineAuthFlowByRespType,
   processRedirectUris,
   processConfigurationTypes,
+  isCorrectProtocol,
+  isCorrectLength,
   isValidUrl,
   buildFilters,
   mapLastLoginValuesToDateValues,

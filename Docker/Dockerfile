@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/javascript-node:14
+FROM mcr.microsoft.com/devcontainers/javascript-node:18
 
 ENV PORT 8080
 ENV settings /home/site/wwwroot/config/login.dfe.services.tran.json

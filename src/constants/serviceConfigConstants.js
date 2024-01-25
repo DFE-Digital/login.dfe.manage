@@ -56,6 +56,18 @@ const ERROR_MESSAGES = {
   MISSING_RESPONSE_TYPE: 'Select at least 1 response type',
   RESPONSE_TYPE_TOKEN_ERROR: 'Select more than 1 response type when ‘token’ is selected as a response type',
   NO_CHANGES_MADE: 'No changes have been made',
+  INVALID_HOME_PROTOCOL: 'Enter a home URL in the correct format. The URL must follow http or https protocols only ',
+  INVALID_HOME_LENTGH: 'Home URL must be 200 characters or less ',
+  INVALID_HOME_CHARACTERS: 'Enter a home URL in the correct format. The URL must not include spaces or the following characters " < > # % { } | \\ ^ ~ [ ] ` ',
+  INVALID_REDIRECT_PROTOCOL: 'Enter a redirect URL in the correct format. The URL must follow http or https protocols only ',
+  INVALID_REDIRECT_LENTGH: 'Redirect URL must be 200 characters or less ',
+  INVALID_REDIRECT_CHARACTERS: 'Enter a redirect URL in the correct format. The URL must not include spaces or the following characters " < > # % { } | \\ ^ ~ [ ] ` ',
+  INVALID_RESETPASS_PROTOCOL: 'Enter a post password-reset URL in the correct format. The URL must follow http or https protocols only ',
+  INVALID_RESETPASS_LENTGH: 'Post password-reset URL must be 200 characters or less ',
+  INVALID_RESETPASS_CHARACTERS: 'Enter a post password-reset URL in the correct format. The URL must not include spaces or the following characters " < > # % { } | \\ ^ ~ [ ] ` ',
+  INVALID_LOGOUT_REDIRECT_PROTOCOL: 'Enter a logout redirect URL in the correct format. The URL must follow http or https protocols only ',
+  INVALID_LOGOUT_REDIRECT_LENTGH: 'Logout redirect URL must be 200 characters or less ',
+  INVALID_LOGOUT_REDIRECT_CHARACTERS: 'Enter a logout redirect URL in the correct format. The URL must not include spaces or the following characters " < > # % { } | \\ ^ ~ [ ] ` ',
 };
 
 // Query parameter actions
