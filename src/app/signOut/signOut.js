@@ -2,14 +2,19 @@
 
 const url = require('url');
 const passport = require('passport');
-const config = require('./../../infrastructure/config');
+const config = require('../../infrastructure/config');
 const logger = require('../../infrastructure/logger');
 
 const logout = (req, res) => {
+  req.session.regenerate(() => {
+    logger.info('session regenrate triggered');
+  });
   req.logout(() => {
     logger.info('user logged out.');
   });
   req.session = null; // Needed to clear session and completely logout
+  res.clearCookie('connect.sid');
+  req.user = null;
 };
 
 const signUserOut = (req, res) => {
