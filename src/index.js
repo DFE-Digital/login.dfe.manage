@@ -9,15 +9,25 @@ const cookieParser = require('cookie-parser');
 const sanitization = require('login.dfe.sanitization');
 const csurf = require('csurf');
 const flash = require('login.dfe.express-flash-2');
-const session = require('cookie-session');
+const session = require('express-session');
 const { getErrorHandler, ejsErrorPages } = require('login.dfe.express-error-handling');
 const moment = require('moment');
 const localStorage = require('node-persist');
+const Redis = require('ioredis');
+const RedisStore = require('connect-redis').default;
 const { setUserContext, isManageUser } = require('./infrastructure/utils');
 const oidc = require('./infrastructure/oidc');
 const configSchema = require('./infrastructure/config/schema');
 const config = require('./infrastructure/config');
 const logger = require('./infrastructure/logger');
+
+const redisClient = new Redis(config.serviceMapping.params.connectionString);
+
+// Initialize store.
+const redisStore = new RedisStore({
+  client: redisClient,
+  prefix: 'ManageSessions:',
+});
 
 const registerRoutes = require('./routes');
 
@@ -124,11 +134,21 @@ const init = async () => {
     expiryInMinutes = sessionExpiry;
   }
   app.use(session({
+    store: redisStore,
     keys: [config.hostingEnvironment.sessionSecret],
     maxAge: expiryInMinutes * 60000, // Expiry in milliseconds
     httpOnly: true,
     secure: true,
+    resave: true,
+    saveUninitialized: true,
+    secret: config.hostingEnvironment.sessionSecret,
+    cookie: {
+      httpOnly: true,
+      secure: true,
+      maxAge: expiryInMinutes * 60000, // Expiry in milliseconds
+    },
   }));
+
   app.use((req, res, next) => {
     req.session.now = Date.now();
     next();
@@ -152,25 +172,6 @@ const init = async () => {
   app.set('views', path.resolve(__dirname, 'app'));
   app.use(expressLayouts);
   app.set('layout', 'layouts/layout');
-
-    /*
-    Addressing issue with latest version of passport dependency packge
-    TypeError: req.session.regenerate is not a function
-    Reference: https://github.com/jaredhanson/passport/issues/907#issuecomment-1697590189
-  */
-    app.use((request, response, next) => {
-      if (request.session && !request.session.regenerate) {
-      request.session.regenerate = (cb) => {
-        cb();
-      };
-    }
-    if (request.session && !request.session.save) {
-      request.session.save = (cb) => {
-        cb();
-      };
-    }
-    next();
-  });
 
   await oidc.init(app);
   app.use(setUserContext);
