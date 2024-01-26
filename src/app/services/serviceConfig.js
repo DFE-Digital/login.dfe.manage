@@ -196,7 +196,11 @@ const validate = async (req, currentService, oldService) => {
 
   const lengthResult = await isCorrectLength(urlValidator);
   if (serviceHome !== null && !lengthResult) {
-    model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_LENTGH;
+    if (model.validationMessages.serviceHome !== '' && model.validationMessages.serviceHome !== undefined) {
+      model.validationMessages.serviceHome += ERROR_MESSAGES.INVALID_HOME_LENTGH;
+    } else {
+      model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_LENTGH;
+    }
   }
   const validUrl = await isValidUrl(urlValidator);
   if (serviceHome !== null && !validUrl) {
@@ -313,15 +317,27 @@ const validate = async (req, currentService, oldService) => {
       const isRDCorrectLength = await isCorrectLength(postRedirecturlValidator);
       const estCorrect = await isValidUrl(postRedirecturlValidator);
       if (!isRDCorrectLength) {
-        model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_LENTGH;
+        if (model.validationMessages.post_logout_redirect_uris !== '' || model.validationMessages.post_logout_redirect_uris !== undefined) {
+          model.validationMessages.post_logout_redirect_uris += ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_LENTGH;
+        } else {
+          model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_LENTGH;
+        }
       }
       if (estCorrect !== true) {
-        model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_CHARACTERS;
+        if (model.validationMessages.post_logout_redirect_uris !== '' || model.validationMessages.post_logout_redirect_uris !== undefined) {
+          model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_CHARACTERS;
+        } else {
+          model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_CHARACTERS;
+        }
       }
       if (isRDCorrectLength && estCorrect) {
         const testRDProtocol = await isCorrectProtocol(postRedirecturlValidator);
         if (!testRDProtocol) {
-          model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_PROTOCOL;
+          if (model.validationMessages.post_logout_redirect_uris !== '' || model.validationMessages.post_logout_redirect_uris !== undefined) {
+            model.validationMessages.post_logout_redirect_uris += ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_PROTOCOL;
+          } else {
+            model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_PROTOCOL;
+          }
         }
       }
     }));

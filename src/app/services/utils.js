@@ -478,7 +478,7 @@ const processRedirectUris = (uris) => {
 
 const isCorrectProtocol = async(urlValidator) =>{
 
-  return await urlValidator.isValidProtocal(['http', 'https'])
+  return await urlValidator.isValidProtocal()
   .then((result) => {  return result;})
   .catch((err) =>{ return err;});
   
