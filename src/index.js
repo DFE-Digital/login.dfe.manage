@@ -21,12 +21,13 @@ const configSchema = require('./infrastructure/config/schema');
 const config = require('./infrastructure/config');
 const logger = require('./infrastructure/logger');
 
-const redisClient = new Redis(config.serviceMapping.params.connectionString);
+// const redisClient = new Redis(config.serviceMapping.params.connectionString);
+const redisClient = new Redis('redis://127.0.0.1:6379');
 
 // Initialize store.
 const redisStore = new RedisStore({
   client: redisClient,
-  prefix: 'ManageSessions:',
+  prefix: 'CookieSession:',
 });
 
 const registerRoutes = require('./routes');
@@ -134,6 +135,7 @@ const init = async () => {
     expiryInMinutes = sessionExpiry;
   }
   app.use(session({
+    name: 'session',
     store: redisStore,
     keys: [config.hostingEnvironment.sessionSecret],
     maxAge: expiryInMinutes * 60000, // Expiry in milliseconds
