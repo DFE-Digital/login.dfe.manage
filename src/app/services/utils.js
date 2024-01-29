@@ -11,7 +11,7 @@ const { getOrganisationByIdV2 } = require('./../../infrastructure/organisations'
 const { mapAsync } = require('./../../utils/asyncHelpers');
 const config = require('./../../infrastructure/config');
 const { getServiceById } = require('../../infrastructure/applications/api');
-const { urlValidator } = require('./urlValidator');
+const { urlValidator } = require('login.dfe.validation/src/urlValidator');
 
 
 const mapUserToSupportModel = (user, userFromSearch) => {
@@ -488,7 +488,7 @@ const isCorrectLength = async(urlValidator) =>{
  
 }
 const isValidUrl = async(urlValidator) => {
-  return await urlValidator.isValidUrl()
+  return await urlValidator.IsValidUrl()
   .then((result) => {  return result;})
   .catch((err) => { return err;});
 };

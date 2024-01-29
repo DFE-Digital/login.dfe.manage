@@ -1,6 +1,7 @@
 const niceware = require('niceware');
 const he = require('he');
 const { Utils } = require('sequelize');
+const UrlValidator = require('login.dfe.validation/src/urlValidator');
 const logger = require('../../infrastructure/logger/index');
 const {
   AUTHENTICATION_FLOWS,
@@ -27,7 +28,6 @@ const {
   deleteFromLocalStorage,
   retreiveRedirectUrlsFromStorage,
 } = require('../../infrastructure/utils/serviceConfigCache');
-const UrlValidator = require('./urlValidator');
 
 const buildServiceModelFromObject = (service, sessionService = {}) => {
   let tokenEndpointAuthMethod = null;
@@ -214,14 +214,13 @@ const validate = async (req, currentService, oldService) => {
       model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_URL;
     }
   }
-  if (lengthResult && !validUrl) {
-    const validProtocol = await isCorrectProtocol(urlValidator);
-    if (!validProtocol) {
-      if (model.validationMessages.serviceHome !== '' && model.validationMessages.serviceHome !== undefined) {
-        model.validationMessages.serviceHome += ERROR_MESSAGES.INVALID_HOME_PROTOCOL;
-      } else {
-        model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_PROTOCOL;
-      }
+
+  const validProtocol = await isCorrectProtocol(urlValidator);
+  if (!validProtocol) {
+    if (model.validationMessages.serviceHome !== '' && model.validationMessages.serviceHome !== undefined) {
+      model.validationMessages.serviceHome += ERROR_MESSAGES.INVALID_HOME_PROTOCOL;
+    } else {
+      model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_PROTOCOL;
     }
   }
 
@@ -249,16 +248,16 @@ const validate = async (req, currentService, oldService) => {
       model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_RESETPASS_LENTGH;
     }
   }
-  if (isPostResetUrlValid && isPOstResetUrlToLength) {
-    const isPostResetUrlProtocol = await isCorrectProtocol(postUrlValidator);
-    if (!isPostResetUrlProtocol) {
-      if (model.validationMessages.postResetUrl !== '' && model.validationMessages.postResetUrl !== undefined) {
-        model.validationMessages.postResetUrl += ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL;
-      } else {
-        model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL;
-      }
+
+  const isPostResetUrlProtocol = await isCorrectProtocol(postUrlValidator);
+  if (!isPostResetUrlProtocol) {
+    if (model.validationMessages.postResetUrl !== '' && model.validationMessages.postResetUrl !== undefined) {
+      model.validationMessages.postResetUrl += ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL;
+    } else {
+      model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL;
     }
   }
+
   if (!clientId) {
     model.validationMessages.clientId = ERROR_MESSAGES.MISSING_CLIENT_ID;
   } else if (!/^[A-Za-z0-9-]+$/.test(clientId)) {
@@ -294,14 +293,13 @@ const validate = async (req, currentService, oldService) => {
           model.validationMessages.redirect_uris = ERROR_MESSAGES.INVALID_REDIRECT_CHARACTERS;
         }
       }
-      if (isCorrectUtl && isRCorrectLength) {
-        const isValidProtocol = await isCorrectProtocol(redirecturlValidator);
-        if (!isValidProtocol) {
-          if (model.validationMessages.redirect_uris !== '' && model.validationMessages.redirect_uris !== undefined) {
-            model.validationMessages.redirect_uris += ERROR_MESSAGES.INVALID_REDIRECT_PROTOCOL;
-          } else {
-            model.validationMessages.redirect_uris = ERROR_MESSAGES.INVALID_REDIRECT_PROTOCOL;
-          }
+
+      const isValidProtocol = await isCorrectProtocol(redirecturlValidator);
+      if (!isValidProtocol) {
+        if (model.validationMessages.redirect_uris !== '' && model.validationMessages.redirect_uris !== undefined) {
+          model.validationMessages.redirect_uris += ERROR_MESSAGES.INVALID_REDIRECT_PROTOCOL;
+        } else {
+          model.validationMessages.redirect_uris = ERROR_MESSAGES.INVALID_REDIRECT_PROTOCOL;
         }
       }
     }));
@@ -317,27 +315,26 @@ const validate = async (req, currentService, oldService) => {
       const isRDCorrectLength = await isCorrectLength(postRedirecturlValidator);
       const estCorrect = await isValidUrl(postRedirecturlValidator);
       if (!isRDCorrectLength) {
-        if (model.validationMessages.post_logout_redirect_uris !== '' || model.validationMessages.post_logout_redirect_uris !== undefined) {
+        if (model.validationMessages.post_logout_redirect_uris !== '' && model.validationMessages.post_logout_redirect_uris !== undefined) {
           model.validationMessages.post_logout_redirect_uris += ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_LENTGH;
         } else {
           model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_LENTGH;
         }
       }
       if (estCorrect !== true) {
-        if (model.validationMessages.post_logout_redirect_uris !== '' || model.validationMessages.post_logout_redirect_uris !== undefined) {
-          model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_CHARACTERS;
+        if (model.validationMessages.post_logout_redirect_uris !== '' && model.validationMessages.post_logout_redirect_uris !== undefined) {
+          model.validationMessages.post_logout_redirect_uris += ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_CHARACTERS;
         } else {
           model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_CHARACTERS;
         }
       }
-      if (isRDCorrectLength && estCorrect) {
-        const testRDProtocol = await isCorrectProtocol(postRedirecturlValidator);
-        if (!testRDProtocol) {
-          if (model.validationMessages.post_logout_redirect_uris !== '' || model.validationMessages.post_logout_redirect_uris !== undefined) {
-            model.validationMessages.post_logout_redirect_uris += ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_PROTOCOL;
-          } else {
-            model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_PROTOCOL;
-          }
+
+      const testRDProtocol = await isCorrectProtocol(postRedirecturlValidator);
+      if (!testRDProtocol) {
+        if (model.validationMessages.post_logout_redirect_uris !== '' && model.validationMessages.post_logout_redirect_uris !== undefined) {
+          model.validationMessages.post_logout_redirect_uris += ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_PROTOCOL;
+        } else {
+          model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_PROTOCOL;
         }
       }
     }));
