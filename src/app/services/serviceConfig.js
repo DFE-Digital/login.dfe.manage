@@ -303,7 +303,8 @@ const validate = async (req, currentService, oldService) => {
         }
       }
     }));
-  } else if (model.service.redirectUris.some((value, i) => model.service.redirectUris.indexOf(value) !== i)) {
+  }
+  if (model.service.redirectUris.some((value, i) => model.service.redirectUris.indexOf(value) !== i)) {
     model.validationMessages.redirect_uris = ERROR_MESSAGES.REDIRECT_URLS_NOT_UNIQUE;
   }
 
@@ -338,9 +339,12 @@ const validate = async (req, currentService, oldService) => {
         }
       }
     }));
-  } else if (model.service.postLogoutRedirectUris.some((value, i) => model.service.postLogoutRedirectUris.indexOf(value) !== i)) {
+  }
+
+  if (model.service.postLogoutRedirectUris.some((value, i) => model.service.postLogoutRedirectUris.indexOf(value) !== i)) {
     model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.POST_LOGOUT_URL_NOT_UNIQUE;
   }
+
   if (model.service.clientSecret != null && ((isAuthorisationCodeFlow || isHybridFlow) && model.service.clientSecret !== currentService.clientSecret)) {
     try {
       const validateClientSecret = niceware.passphraseToBytes(model.service.clientSecret.split('-'));

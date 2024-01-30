@@ -1,36 +1,33 @@
 const { URL } = require('url');
+const { urlValidator } = require('login.dfe.validation/src/urlValidator');
 const {
   AUTHENTICATION_FLOWS,
   AUTHENTICATION_FLOWS_PATTERNS,
 } = require('../../constants/serviceConfigConstants');
-const { getSearchDetailsForUserById } = require('./../../infrastructure/search');
-const { getInvitation, getUserById } = require('./../../infrastructure/directories');
+const { getSearchDetailsForUserById } = require('../../infrastructure/search');
+const { getInvitation, getUserById } = require('../../infrastructure/directories');
 const { getServicesForUser } = require('../../infrastructure/access');
-const { mapUserStatus } = require('./../../infrastructure/utils');
-const { getOrganisationByIdV2 } = require('./../../infrastructure/organisations');
-const { mapAsync } = require('./../../utils/asyncHelpers');
-const config = require('./../../infrastructure/config');
+const { mapUserStatus } = require('../../infrastructure/utils');
+const { getOrganisationByIdV2 } = require('../../infrastructure/organisations');
+const { mapAsync } = require('../../utils/asyncHelpers');
+const config = require('../../infrastructure/config');
 const { getServiceById } = require('../../infrastructure/applications/api');
-const { urlValidator } = require('login.dfe.validation/src/urlValidator');
 
-
-const mapUserToSupportModel = (user, userFromSearch) => {
-  return {
-    id: user.sub,
-    name: `${user.given_name} ${user.family_name}`,
-    firstName: user.given_name,
-    lastName: user.family_name,
-    email: user.email,
-    organisation: userFromSearch.primaryOrganisation ? {
-      name: userFromSearch.primaryOrganisation
-    } : null,
-    organisations: userFromSearch.organisations,
-    lastLogin: userFromSearch.lastLogin ? new Date(userFromSearch.lastLogin) : null,
-    successfulLoginsInPast12Months: userFromSearch.numberOfSuccessfulLoginsInPast12Months,
-    status: mapUserStatus(userFromSearch.status.id, userFromSearch.statusLastChangedOn),
-    pendingEmail: userFromSearch.pendingEmail,
-  };
-};
+const mapUserToSupportModel = (user, userFromSearch) => ({
+  id: user.sub,
+  name: `${user.given_name} ${user.family_name}`,
+  firstName: user.given_name,
+  lastName: user.family_name,
+  email: user.email,
+  organisation: userFromSearch.primaryOrganisation ? {
+    name: userFromSearch.primaryOrganisation,
+  } : null,
+  organisations: userFromSearch.organisations,
+  lastLogin: userFromSearch.lastLogin ? new Date(userFromSearch.lastLogin) : null,
+  successfulLoginsInPast12Months: userFromSearch.numberOfSuccessfulLoginsInPast12Months,
+  status: mapUserStatus(userFromSearch.status.id, userFromSearch.statusLastChangedOn),
+  pendingEmail: userFromSearch.pendingEmail,
+});
 
 const getUserDetailsById = async (uid, correlationId) => {
   if (uid.startsWith('inv-')) {
@@ -46,45 +43,42 @@ const getUserDetailsById = async (uid, correlationId) => {
       loginsInPast12Months: {
         successful: 0,
       },
-      deactivated: invitation.deactivated
-    };
-  } else {
-    const userSearch = await getSearchDetailsForUserById(uid);
-    const rawUser = await getUserById(uid, correlationId);
-    const user = mapUserToSupportModel(rawUser, userSearch);
-    const serviceDetails = await getServicesForUser(uid, correlationId);
-
-    const ktsDetails = serviceDetails ? serviceDetails.find((c) => c.serviceId.toLowerCase() === config.serviceMapping.key2SuccessServiceId.toLowerCase()) : undefined;
-    let externalIdentifier = '';
-    if (ktsDetails && ktsDetails.identifiers) {
-      const key = ktsDetails.identifiers.find((a) => a.key = 'k2s-id');
-      if (key) {
-        externalIdentifier = key.value;
-      }
-    }
-
-    return {
-      id: uid,
-      name: user.name,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      lastLogin: user.lastLogin,
-      status: user.status,
-      loginsInPast12Months: {
-        successful: user.successfulLoginsInPast12Months,
-      },
-      serviceId: config.serviceMapping.key2SuccessServiceId,
-      orgId: ktsDetails ? ktsDetails.organisationId : '',
-      ktsId: externalIdentifier,
-      pendingEmail: user.pendingEmail,
+      deactivated: invitation.deactivated,
     };
   }
+  const userSearch = await getSearchDetailsForUserById(uid);
+  const rawUser = await getUserById(uid, correlationId);
+  const user = mapUserToSupportModel(rawUser, userSearch);
+  const serviceDetails = await getServicesForUser(uid, correlationId);
+
+  const ktsDetails = serviceDetails ? serviceDetails.find((c) => c.serviceId.toLowerCase() === config.serviceMapping.key2SuccessServiceId.toLowerCase()) : undefined;
+  let externalIdentifier = '';
+  if (ktsDetails && ktsDetails.identifiers) {
+    const key = ktsDetails.identifiers.find((a) => a.key = 'k2s-id');
+    if (key) {
+      externalIdentifier = key.value;
+    }
+  }
+
+  return {
+    id: uid,
+    name: user.name,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    lastLogin: user.lastLogin,
+    status: user.status,
+    loginsInPast12Months: {
+      successful: user.successfulLoginsInPast12Months,
+    },
+    serviceId: config.serviceMapping.key2SuccessServiceId,
+    orgId: ktsDetails ? ktsDetails.organisationId : '',
+    ktsId: externalIdentifier,
+    pendingEmail: user.pendingEmail,
+  };
 };
 
-const getUserDetails = async (req) => {
-  return getUserDetailsById(req.params.uid, req.id);
-};
+const getUserDetails = async (req) => getUserDetailsById(req.params.uid, req.id);
 
 const getFriendlyUser = async (userId, correlationId) => {
   const user = await getUserById(userId, correlationId);
@@ -106,7 +100,7 @@ const getFriendlyOrganisation = async (organisationId, correlationId) => {
     { label: 'UPIN', value: organisation.upin },
     { label: 'UKPRN', value: organisation.ukprn },
     { label: 'type', value: organisation.category.name },
-  ].filter(x => x.value).map(x => `${x.label}: ${x.value}`).join(', ');
+  ].filter((x) => x.value).map((x) => `${x.label}: ${x.value}`).join(', ');
 
   return `${organisation.name} (${identifiers})`;
 };
@@ -127,7 +121,7 @@ const getFriendlyOrganisationCategory = async (categoryId) => {
     { id: '052', name: 'Billing Authority' },
   ];
 
-  const category = categories.find(x => x.id === categoryId);
+  const category = categories.find((x) => x.id === categoryId);
   if (category) {
     return category.name;
   }
@@ -145,7 +139,7 @@ const getFriendlyOrganisationPhaseOfEducation = async (phaseOfEducationId) => {
     { id: '7', name: 'All through' },
   ];
 
-  const phaseOfEducation = phasesOfEducation.find(x => x.id === phaseOfEducationId);
+  const phaseOfEducation = phasesOfEducation.find((x) => x.id === phaseOfEducationId);
   if (phaseOfEducation) {
     return phaseOfEducation.name;
   }
@@ -166,7 +160,7 @@ const getFriendlyOrganisationRegion = async (regionCodeId) => {
     { id: 'Z', name: 'Not Applicable' },
   ];
 
-  const regionCode = regionCodes.find(x => x.id === regionCodeId);
+  const regionCode = regionCodes.find((x) => x.id === regionCodeId);
   if (regionCode) {
     return regionCode.name;
   }
@@ -186,7 +180,7 @@ const getFriendlyOrganisationStatus = async (statusId) => {
     { id: '10', name: 'Locked restructure' },
   ];
 
-  const status = organisationStatus.find(x => x.id === statusId);
+  const status = organisationStatus.find((x) => x.id === statusId);
   if (status) {
     return status.name;
   }
@@ -236,7 +230,7 @@ const getFriendlyOrganisationType = async (typeId) => {
     { id: '57', name: 'Academy secure 16 to 19' },
   ];
 
-  const establishmentType = establishmentTypes.find(x => x.id === typeId);
+  const establishmentType = establishmentTypes.find((x) => x.id === typeId);
   if (establishmentType) {
     return establishmentType.name;
   }
@@ -256,7 +250,7 @@ const getFriendlyFieldName = (fieldName) => {
     { source: 'role.id', friendly: 'role' },
   ];
 
-  const conversion = conversions.find(x => x.source === fieldName);
+  const conversion = conversions.find((x) => x.source === fieldName);
   if (conversion) {
     return conversion.friendly;
   }
@@ -274,21 +268,17 @@ const getFriendlyValues = async (fieldName, values, correlationId) => {
     { source: 'organisation.type.id', valueConverter: getFriendlyOrganisationType },
   ];
 
-  const conversion = conversions.find(x => x.source === fieldName);
+  const conversion = conversions.find((x) => x.source === fieldName);
   if (conversion) {
-    const convertedValues = await mapAsync(values, (value) => {
-      return conversion.valueConverter(value, correlationId);
-    });
+    const convertedValues = await mapAsync(values, (value) => conversion.valueConverter(value, correlationId));
     return convertedValues;
   }
   return values;
 };
 
-const delay = async (milliseconds) => {
-  return new Promise((resolve) => {
-    setTimeout(resolve, milliseconds);
-  });
-};
+const delay = async (milliseconds) => new Promise((resolve) => {
+  setTimeout(resolve, milliseconds);
+});
 
 const waitForIndexToUpdate = async (uid, updatedCheck) => {
   const abandonTime = Date.now() + 10000;
@@ -476,22 +466,13 @@ const processRedirectUris = (uris) => {
   return processedUris;
 };
 
-const isCorrectProtocol = async(urlValidator) =>{
-
-  return await urlValidator.isValidProtocal()
-  .then((result) => {  return result;})
-  .catch((err) =>{ return err;});
-  
-}
-const isCorrectLength = async(urlValidator) =>{
-  return await urlValidator.isCorrectLength(200).then((result) => {  return result;}).catch((err) => { return err;});
- 
-}
-const isValidUrl = async(urlValidator) => {
-  return await urlValidator.IsValidUrl()
-  .then((result) => {  return result;})
-  .catch((err) => { return err;});
-};
+const isCorrectProtocol = async (urlValidator) => await urlValidator.isValidProtocal()
+  .then((result) => result)
+  .catch((err) => err);
+const isCorrectLength = async (urlValidator) => await urlValidator.isCorrectLength(200).then((result) => result).catch((err) => err);
+const isValidUrl = async (urlValidator) => await urlValidator.IsValidUrl()
+  .then((result) => result)
+  .catch((err) => err);
 
 const checkClientId = async (clientId, reqId) => {
   const service = await getServiceById(clientId, reqId);
