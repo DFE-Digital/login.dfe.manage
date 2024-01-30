@@ -21,8 +21,7 @@ const configSchema = require('./infrastructure/config/schema');
 const config = require('./infrastructure/config');
 const logger = require('./infrastructure/logger');
 
-// const redisClient = new Redis(config.serviceMapping.params.connectionString);
-const redisClient = new Redis('redis://127.0.0.1:6379');
+const redisClient = new Redis(config.serviceMapping.params.connectionString);
 
 // Initialize store.
 const redisStore = new RedisStore({
