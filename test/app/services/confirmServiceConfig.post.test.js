@@ -1,5 +1,6 @@
-const mockUtils = require('../../utils');
 const { urlValidator } = require('login.dfe.validation/src/urlValidator');
+const mockUtils = require('../../utils');
+
 jest.mock('login.dfe.validation');
 jest.mock('./../../../src/infrastructure/config', () => mockUtils.configMockFactory());
 jest.mock('./../../../src/infrastructure/logger', () => mockUtils.loggerMockFactory());
@@ -153,15 +154,19 @@ describe('when confirming service config changes in the review page', () => {
 
   it('then it should render view with validation if service home not a valid url', async () => {
     req.session.serviceConfigurationChanges.serviceHome.newValue = 'invalid-url';
+    req.session.serviceConfigurationChanges.redirectUris = {};
+    req.session.serviceConfigurationChanges.redirectUris.oldValue = ['https://google.com', 'https://yahoo.com'];
+    req.session.serviceConfigurationChanges.postLogoutRedirectUris = {};
+    req.session.serviceConfigurationChanges.postLogoutRedirectUris.oldValue = ['https://google.com', 'https://yahoo.com'];
 
     await postConfirmServiceConfig(req, res);
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][0]).toBe('services/views/confirmServiceConfig');
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        //postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
-        post_logout_redirect_uris: `${ERROR_MESSAGES.MISSING_POST_LOGOUT_URL}`,
-        redirect_uris: `${ERROR_MESSAGES.MISSING_REDIRECT_URL}`,
+        // postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
+        // post_logout_redirect_uris: `${ERROR_MESSAGES.MISSING_POST_LOGOUT_URL}`,
+        // redirect_uris: `${ERROR_MESSAGES.MISSING_REDIRECT_URL}`,
         serviceHome: `${ERROR_MESSAGES.INVALID_HOME_PROTOCOL}`,
       },
     }));
@@ -169,7 +174,10 @@ describe('when confirming service config changes in the review page', () => {
 
   it('then it should render view with validation if Post-reset Url is not valid', async () => {
     req.session.serviceConfigurationChanges.postResetUrl.newValue = 'invalid-url';
-
+    req.session.serviceConfigurationChanges.redirectUris = {};
+    req.session.serviceConfigurationChanges.redirectUris.oldValue = ['https://google.com', 'https://yahoo.com'];
+    req.session.serviceConfigurationChanges.postLogoutRedirectUris = {};
+    req.session.serviceConfigurationChanges.postLogoutRedirectUris.oldValue = ['https://google.com', 'https://yahoo.com'];
     await postConfirmServiceConfig(req, res);
 
     expect(res.render.mock.calls).toHaveLength(1);
@@ -177,51 +185,56 @@ describe('when confirming service config changes in the review page', () => {
       validationMessages: {
         postResetUrl: `${ERROR_MESSAGES.INVALID_POST_PASSWORD_RESET_URL}`,
         postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
-        post_logout_redirect_uris: `${ERROR_MESSAGES.MISSING_POST_LOGOUT_URL}`,
-        redirect_uris: `${ERROR_MESSAGES.MISSING_REDIRECT_URL}`,
+        // post_logout_redirect_uris: `${ERROR_MESSAGES.MISSING_POST_LOGOUT_URL}`,
+        // redirect_uris: `${ERROR_MESSAGES.MISSING_REDIRECT_URL}`,
       },
     }));
   });
 
   it('then it should render view with validation if client ID is too long', async () => {
     req.session.serviceConfigurationChanges.clientId.newValue = 'long-client-id-long-client-id-long-client-id-long-client-id-long-client-id-long-client-id-long-client-id';
-
+    req.session.serviceConfigurationChanges.redirectUris = {};
+    req.session.serviceConfigurationChanges.redirectUris.oldValue = ['https://google.com', 'https://yahoo.com'];
+    req.session.serviceConfigurationChanges.postLogoutRedirectUris = {};
+    req.session.serviceConfigurationChanges.postLogoutRedirectUris.oldValue = ['https://google.com', 'https://yahoo.com'];
     await postConfirmServiceConfig(req, res);
 
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
         clientId: `${ERROR_MESSAGES.INVALID_CLIENT_ID_LENGTH}`,
-        redirect_uris: `${ERROR_MESSAGES.REDIRECT_URLS_NOT_UNIQUE}`,
-       // postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
-        //post_logout_redirect_uris: `${ERROR_MESSAGES.POST_LOGOUT_URL_NOT_UNIQUE}`,
+        // redirect_uris: `${ERROR_MESSAGES.REDIRECT_URLS_NOT_UNIQUE}`,
+        // postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
+        // post_logout_redirect_uris: `${ERROR_MESSAGES.POST_LOGOUT_URL_NOT_UNIQUE}`,
         //
-        post_logout_redirect_uris: `${ERROR_MESSAGES.MISSING_POST_LOGOUT_URL}`,
-        redirect_uris: `${ERROR_MESSAGES.MISSING_REDIRECT_URL}`,
+        // post_logout_redirect_uris: `${ERROR_MESSAGES.MISSING_POST_LOGOUT_URL}`,
+        // redirect_uris: `${ERROR_MESSAGES.MISSING_REDIRECT_URL}`,
       },
     }));
   });
 
   it('then it should render view with validation if client ID is not containing only letters a to z, hyphens and numbers', async () => {
     req.session.serviceConfigurationChanges.clientId.newValue = 'client-id_1_$';
-
+    req.session.serviceConfigurationChanges.redirectUris = {};
+    req.session.serviceConfigurationChanges.redirectUris.oldValue = ['https://google.com', 'https://yahoo.com'];
+    req.session.serviceConfigurationChanges.postLogoutRedirectUris = {};
+    req.session.serviceConfigurationChanges.postLogoutRedirectUris.oldValue = ['https://google.com', 'https://yahoo.com'];
     await postConfirmServiceConfig(req, res);
 
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
         clientId: `${ERROR_MESSAGES.INVALID_CLIENT_ID}`,
-        redirect_uris: `${ERROR_MESSAGES.REDIRECT_URLS_NOT_UNIQUE}`,
-        //postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
-        post_logout_redirect_uris: `${ERROR_MESSAGES.POST_LOGOUT_URL_NOT_UNIQUE}`,
-        post_logout_redirect_uris: `${ERROR_MESSAGES.MISSING_POST_LOGOUT_URL}`,
-        redirect_uris: `${ERROR_MESSAGES.MISSING_REDIRECT_URL}`,
       },
     }));
   });
 
   it('then it should render view with validation if client ID already exists', async () => {
     req.session.serviceConfigurationChanges.clientId.newValue = 'client-id-new';
+    req.session.serviceConfigurationChanges.redirectUris = {};
+    req.session.serviceConfigurationChanges.redirectUris.oldValue = ['https://google.com', 'https://yahoo.com'];
+    req.session.serviceConfigurationChanges.postLogoutRedirectUris = {};
+    req.session.serviceConfigurationChanges.postLogoutRedirectUris.oldValue = ['https://google.com', 'https://yahoo.com'];
     checkClientId.mockReset().mockReturnValueOnce(true);
     await postConfirmServiceConfig(req, res);
 
@@ -229,8 +242,6 @@ describe('when confirming service config changes in the review page', () => {
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
         clientId: `${ERROR_MESSAGES.CLIENT_ID_UNAVAILABLE}`,
-        post_logout_redirect_uris: `${ERROR_MESSAGES.MISSING_POST_LOGOUT_URL}`,
-        redirect_uris: `${ERROR_MESSAGES.MISSING_REDIRECT_URL}`,
       },
     }));
   });
@@ -238,9 +249,14 @@ describe('when confirming service config changes in the review page', () => {
   it('then it should render view without validation if client ID is present, only contain letters a to z, hyphens and numbers,is 50 characters or less and is unique ', async () => {
     req.session.serviceConfigurationChanges.clientId.newValue = 'client-id-new';
     checkClientId.mockReset().mockReturnValueOnce(false);
+    req.session.serviceConfigurationChanges.redirectUris = {};
+    req.session.serviceConfigurationChanges.redirectUris.oldValue = ['https://google.com', 'https://yahoo.com'];
+    req.session.serviceConfigurationChanges.postLogoutRedirectUris = {};
+    req.session.serviceConfigurationChanges.postLogoutRedirectUris.oldValue = ['https://google.com', 'https://yahoo.com'];
+
     await postConfirmServiceConfig(req, res);
 
-    expect(res.render.mock.calls).toHaveLength(1);
+    expect(res.render.mock.calls).toHaveLength(0);
   });
 
   it('then it should render view with validation if any of the redirect Urls are invalid', async () => {
@@ -251,16 +267,15 @@ describe('when confirming service config changes in the review page', () => {
       },
     });
 
+    req.session.serviceConfigurationChanges.postLogoutRedirectUris = {};
+    req.session.serviceConfigurationChanges.postLogoutRedirectUris.oldValue = ['https://google.com', 'https://yahoo.com'];
+
     await postConfirmServiceConfig(req, res);
 
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
         redirect_uris: `${ERROR_MESSAGES.INVALID_REDIRECT_PROTOCOL}`,
-
-       // postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
-        post_logout_redirect_uris: `${ERROR_MESSAGES.MISSING_POST_LOGOUT_URL}`,
-
       },
     }));
   });
@@ -272,14 +287,14 @@ describe('when confirming service config changes in the review page', () => {
         newValue: ['https://valid-url.com', 'https://valid-url.com'],
       },
     });
-
+    req.session.serviceConfigurationChanges.postLogoutRedirectUris = {};
+    req.session.serviceConfigurationChanges.postLogoutRedirectUris.oldValue = ['https://google.com', 'https://yahoo.com'];
     await postConfirmServiceConfig(req, res);
 
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
         redirect_uris: `${ERROR_MESSAGES.REDIRECT_URLS_NOT_UNIQUE}`,
-        post_logout_redirect_uris: `${ERROR_MESSAGES.MISSING_POST_LOGOUT_URL}`,
       },
     }));
   });
@@ -291,6 +306,8 @@ describe('when confirming service config changes in the review page', () => {
         newValue: ['https://duplicate-url.com', 'https://duplicate-url.com'],
       },
     });
+    req.session.serviceConfigurationChanges.redirectUris = {};
+    req.session.serviceConfigurationChanges.redirectUris.oldValue = ['https://google.com', 'https://yahoo.com'];
 
     await postConfirmServiceConfig(req, res);
 
@@ -298,10 +315,10 @@ describe('when confirming service config changes in the review page', () => {
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
 
-        redirect_uris: `${ERROR_MESSAGES.MISSING_REDIRECT_URL}`,
-        //post_logout_redirect_uris: `${ERROR_MESSAGES.MISSING_POST_LOGOUT_URL}`,
+        // redirect_uris: `${ERROR_MESSAGES.MISSING_REDIRECT_URL}`,
+        // post_logout_redirect_uris: `${ERROR_MESSAGES.MISSING_POST_LOGOUT_URL}`,
         post_logout_redirect_uris: `${ERROR_MESSAGES.POST_LOGOUT_URL_NOT_UNIQUE}`,
-        //postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
+        // postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
 
       },
     }));
@@ -314,6 +331,8 @@ describe('when confirming service config changes in the review page', () => {
         newValue: ['https://valid-url.com', 'invalid'],
       },
     });
+    req.session.serviceConfigurationChanges.redirectUris = {};
+    req.session.serviceConfigurationChanges.redirectUris.oldValue = ['https://google.com', 'https://yahoo.com'];
 
     await postConfirmServiceConfig(req, res);
 
@@ -321,32 +340,35 @@ describe('when confirming service config changes in the review page', () => {
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
         post_logout_redirect_uris: `${ERROR_MESSAGES.INVALID_POST_LOGOUT_URL}`,
-        //postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
+        // postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
         post_logout_redirect_uris: `${ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_PROTOCOL}`,
-        redirect_uris: `${ERROR_MESSAGES.MISSING_REDIRECT_URL}`,
+        // redirect_uris: `${ERROR_MESSAGES.MISSING_REDIRECT_URL}`,
       },
     }));
   });
 
   it('then it should render view with validation if client secret is invalid', async () => {
     req.session.serviceConfigurationChanges.clientSecret.secretNewValue = 'invalid-secret';
-
+    req.session.serviceConfigurationChanges.redirectUris = {};
+    req.session.serviceConfigurationChanges.redirectUris.oldValue = ['https://google.com', 'https://yahoo.com'];
+    req.session.serviceConfigurationChanges.postLogoutRedirectUris = {};
+    req.session.serviceConfigurationChanges.postLogoutRedirectUris.oldValue = ['https://google.com', 'https://yahoo.com'];
     await postConfirmServiceConfig(req, res);
 
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
         clientSecret: `${ERROR_MESSAGES.INVALID_CLIENT_SECRET}`,
-        redirect_uris: `${ERROR_MESSAGES.INVALID_REDIRECT_PROTOCOL}`,
-        post_logout_redirect_uris: `${ERROR_MESSAGES.MISSING_POST_LOGOUT_URL}`,
-        redirect_uris: `${ERROR_MESSAGES.MISSING_REDIRECT_URL}`,
-
       },
     }));
   });
 
   it('then it should render view with validation if API secret is invalid', async () => {
     req.session.serviceConfigurationChanges.apiSecret.secretNewValue = 'invalid-secret';
+    req.session.serviceConfigurationChanges.redirectUris = {};
+    req.session.serviceConfigurationChanges.redirectUris.oldValue = ['https://google.com', 'https://yahoo.com'];
+    req.session.serviceConfigurationChanges.postLogoutRedirectUris = {};
+    req.session.serviceConfigurationChanges.postLogoutRedirectUris.oldValue = ['https://google.com', 'https://yahoo.com'];
 
     await postConfirmServiceConfig(req, res);
 
@@ -354,9 +376,6 @@ describe('when confirming service config changes in the review page', () => {
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
         apiSecret: `${ERROR_MESSAGES.INVALID_API_SECRET}`,
-        //postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
-        post_logout_redirect_uris: `${ERROR_MESSAGES.MISSING_POST_LOGOUT_URL}`,
-        redirect_uris: `${ERROR_MESSAGES.MISSING_REDIRECT_URL}`,
       },
     }));
   });
@@ -644,17 +663,17 @@ describe('when confirming service config changes in the review page', () => {
     await postConfirmServiceConfig(req, res);
 
     expect(logger.audit.mock.calls).toHaveLength(1);
-   /* expect(logger.audit.mock.calls[0][1]).toHaveProperty('editedFields', [{
+    /* expect(logger.audit.mock.calls[0][1]).toHaveProperty('editedFields', [{
       name: 'postResetUrl',
-      newValue: 'https://newpostreseturl',
+      newValue: 'https://newpostreseturl.com',
       oldValue: 'https://www.postreset.com',
     },
     {
-      name: 'serviceHome',
-      newValue: 'http://new-service-home.com',
-      oldValue: 'http://old-service-home.com',
+      name: 'postLogoutRedirectUris',
+      newValue: 'https://newpostlogoutreseturl.com',
+      oldValue: 'https://www.postlogoutreset.com',
     },
-    ]);*/
+    ]); */
   });
 
   it('should then remove the redirect urls stored in app cache', async () => {

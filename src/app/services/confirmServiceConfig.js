@@ -137,6 +137,12 @@ const validate = async (req, currentService) => {
     }
 
     const { serviceHome, postResetUrl, clientId } = model.service;
+    if (model.service.postLogoutRedirectUris === undefined) {
+      model.service.postLogoutRedirectUris = serviceConfigurationChanges.postLogoutRedirectUris.oldValue;
+    }
+    if (model.service.redirectUris === undefined) {
+      model.service.redirectUris = serviceConfigurationChanges.redirectUris.oldValue;
+    }
     const urlValidator = new UrlValidator(serviceHome);
     const lengthResult = await isCorrectLength(urlValidator);
     if (serviceHome !== null && !lengthResult) {
@@ -336,6 +342,14 @@ const getConfirmServiceConfig = async (req, res) => {
     const sortedServiceChanges = serviceChanges.sort(
       (a, b) => a.displayOrder - b.displayOrder,
     );
+    const fixedServiceChanges = [];
+    if (sortedServiceChanges.length > 0) {
+      sortedServiceChanges.map((x) => {
+        if (x.newValue !== undefined) {
+          fixedServiceChanges.push(x);
+        }
+      });
+    }
 
     return res.render('services/views/confirmServiceConfig', {
       csrfToken: req.csrfToken(),
@@ -346,7 +360,7 @@ const getConfirmServiceConfig = async (req, res) => {
       serviceId: req.params.sid,
       userRoles: manageRolesForService,
       currentNavigation: 'configuration',
-      serviceChanges: sortedServiceChanges,
+      serviceChanges: fixedServiceChanges,
     });
   } catch (error) {
     throw new Error(error);

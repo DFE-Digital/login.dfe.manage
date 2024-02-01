@@ -374,14 +374,14 @@ const postServiceConfig = async (req, res) => {
 
     const currentService = serviceModels.currentServiceModel;
     const { oldServiceConfigModel } = serviceModels;
-    const model = await validate(req, currentService, oldServiceConfigModel);
+    const model = await validate(req, currentService, serviceModels.oldServiceConfigModel);
 
     if (Object.keys(model.validationMessages).length > 0) {
       model.csrfToken = req.csrfToken();
       return res.render('services/views/serviceConfig', model);
     }
 
-    const editedFields = Object.entries(oldServiceConfigModel)
+    const editedFields = Object.entries(serviceModels.oldServiceConfigModel)
       .filter(([field, oldValue]) => {
         const newValue = Array.isArray(model.service[field]) ? model.service[field].sort() : model.service[field];
         return Array.isArray(oldValue) ? !(
@@ -406,7 +406,7 @@ const postServiceConfig = async (req, res) => {
 
     req.session.serviceConfigurationChanges = {};
     const redirectUrlsChanges = {};
-    editedFields.forEach(({
+    editedFields.map(({
       name, oldValue, newValue, isSecret, secretNewValue,
     }) => {
       if (name === 'redirectUris' || name === 'postLogoutRedirectUris') {
@@ -432,7 +432,16 @@ const postServiceConfig = async (req, res) => {
       await saveRedirectUrlsToStorage(serviceConfigChangesKey, redirectUrlsChanges, req.params.sid);
     }
     req.session.serviceConfigurationChanges.authFlowType = model.authFlowType;
-
+    if (req.session.serviceConfigurationChanges.postLogoutRedirectUris === undefined) {
+      req.session.serviceConfigurationChanges.postLogoutRedirectUris = {};
+      req.session.serviceConfigurationChanges.postLogoutRedirectUris.oldValue = model.service.postLogoutRedirectUris;
+      req.session.serviceConfigurationChanges.postLogoutRedirectUris.newValue = undefined;
+    }
+    if (req.session.serviceConfigurationChanges.redirectUris === undefined) {
+      req.session.serviceConfigurationChanges.redirectUris = {};
+      req.session.serviceConfigurationChanges.redirectUris.oldValue = model.service.redirectUris;
+      req.session.serviceConfigurationChanges.redirectUris.newValue = undefined;
+    }
     return res.redirect('review-service-configuration#');
   } catch (error) {
     throw new Error(error);
