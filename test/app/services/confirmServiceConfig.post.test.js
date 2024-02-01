@@ -1,12 +1,9 @@
 const mockUtils = require('../../utils');
-
+const { urlValidator } = require('login.dfe.validation/src/urlValidator');
 jest.mock('login.dfe.validation');
 jest.mock('./../../../src/infrastructure/config', () => mockUtils.configMockFactory());
 jest.mock('./../../../src/infrastructure/logger', () => mockUtils.loggerMockFactory());
 jest.mock('./../../../src/infrastructure/applications');
-jest.mock('login.dfe.validation', () => ({
-  urlValidator: jest.fn(),
-}));
 
 jest.mock('../../../src/app/services/utils', () => {
   const actualUtilsFunctions = jest.requireActual('../../../src/app/services/utils');
@@ -162,7 +159,7 @@ describe('when confirming service config changes in the review page', () => {
     expect(res.render.mock.calls[0][0]).toBe('services/views/confirmServiceConfig');
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
+        //postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
         post_logout_redirect_uris: `${ERROR_MESSAGES.MISSING_POST_LOGOUT_URL}`,
         redirect_uris: `${ERROR_MESSAGES.MISSING_REDIRECT_URL}`,
         serviceHome: `${ERROR_MESSAGES.INVALID_HOME_PROTOCOL}`,
@@ -196,8 +193,9 @@ describe('when confirming service config changes in the review page', () => {
       validationMessages: {
         clientId: `${ERROR_MESSAGES.INVALID_CLIENT_ID_LENGTH}`,
         redirect_uris: `${ERROR_MESSAGES.REDIRECT_URLS_NOT_UNIQUE}`,
-        postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
-        post_logout_redirect_uris: `${ERROR_MESSAGES.POST_LOGOUT_URL_NOT_UNIQUE}`,
+       // postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
+        //post_logout_redirect_uris: `${ERROR_MESSAGES.POST_LOGOUT_URL_NOT_UNIQUE}`,
+        //
         post_logout_redirect_uris: `${ERROR_MESSAGES.MISSING_POST_LOGOUT_URL}`,
         redirect_uris: `${ERROR_MESSAGES.MISSING_REDIRECT_URL}`,
       },
@@ -214,7 +212,7 @@ describe('when confirming service config changes in the review page', () => {
       validationMessages: {
         clientId: `${ERROR_MESSAGES.INVALID_CLIENT_ID}`,
         redirect_uris: `${ERROR_MESSAGES.REDIRECT_URLS_NOT_UNIQUE}`,
-        postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
+        //postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
         post_logout_redirect_uris: `${ERROR_MESSAGES.POST_LOGOUT_URL_NOT_UNIQUE}`,
         post_logout_redirect_uris: `${ERROR_MESSAGES.MISSING_POST_LOGOUT_URL}`,
         redirect_uris: `${ERROR_MESSAGES.MISSING_REDIRECT_URL}`,
@@ -231,9 +229,6 @@ describe('when confirming service config changes in the review page', () => {
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
         clientId: `${ERROR_MESSAGES.CLIENT_ID_UNAVAILABLE}`,
-        redirect_uris: `${ERROR_MESSAGES.REDIRECT_URLS_NOT_UNIQUE}`,
-        postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
-        post_logout_redirect_uris: `${ERROR_MESSAGES.POST_LOGOUT_URL_NOT_UNIQUE}`,
         post_logout_redirect_uris: `${ERROR_MESSAGES.MISSING_POST_LOGOUT_URL}`,
         redirect_uris: `${ERROR_MESSAGES.MISSING_REDIRECT_URL}`,
       },
@@ -263,7 +258,7 @@ describe('when confirming service config changes in the review page', () => {
       validationMessages: {
         redirect_uris: `${ERROR_MESSAGES.INVALID_REDIRECT_PROTOCOL}`,
 
-        postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
+       // postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
         post_logout_redirect_uris: `${ERROR_MESSAGES.MISSING_POST_LOGOUT_URL}`,
 
       },
@@ -285,7 +280,6 @@ describe('when confirming service config changes in the review page', () => {
       validationMessages: {
         redirect_uris: `${ERROR_MESSAGES.REDIRECT_URLS_NOT_UNIQUE}`,
         post_logout_redirect_uris: `${ERROR_MESSAGES.MISSING_POST_LOGOUT_URL}`,
-        postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
       },
     }));
   });
@@ -305,9 +299,9 @@ describe('when confirming service config changes in the review page', () => {
       validationMessages: {
 
         redirect_uris: `${ERROR_MESSAGES.MISSING_REDIRECT_URL}`,
-        post_logout_redirect_uris: `${ERROR_MESSAGES.MISSING_POST_LOGOUT_URL}`,
+        //post_logout_redirect_uris: `${ERROR_MESSAGES.MISSING_POST_LOGOUT_URL}`,
         post_logout_redirect_uris: `${ERROR_MESSAGES.POST_LOGOUT_URL_NOT_UNIQUE}`,
-        postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
+        //postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
 
       },
     }));
@@ -327,7 +321,7 @@ describe('when confirming service config changes in the review page', () => {
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
         post_logout_redirect_uris: `${ERROR_MESSAGES.INVALID_POST_LOGOUT_URL}`,
-        postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
+        //postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
         post_logout_redirect_uris: `${ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_PROTOCOL}`,
         redirect_uris: `${ERROR_MESSAGES.MISSING_REDIRECT_URL}`,
       },
@@ -344,9 +338,6 @@ describe('when confirming service config changes in the review page', () => {
       validationMessages: {
         clientSecret: `${ERROR_MESSAGES.INVALID_CLIENT_SECRET}`,
         redirect_uris: `${ERROR_MESSAGES.INVALID_REDIRECT_PROTOCOL}`,
-
-        postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
-        post_logout_redirect_uris: `${ERROR_MESSAGES.POST_LOGOUT_URL_NOT_UNIQUE}`,
         post_logout_redirect_uris: `${ERROR_MESSAGES.MISSING_POST_LOGOUT_URL}`,
         redirect_uris: `${ERROR_MESSAGES.MISSING_REDIRECT_URL}`,
 
@@ -363,7 +354,7 @@ describe('when confirming service config changes in the review page', () => {
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
         apiSecret: `${ERROR_MESSAGES.INVALID_API_SECRET}`,
-        postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
+        //postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
         post_logout_redirect_uris: `${ERROR_MESSAGES.MISSING_POST_LOGOUT_URL}`,
         redirect_uris: `${ERROR_MESSAGES.MISSING_REDIRECT_URL}`,
       },

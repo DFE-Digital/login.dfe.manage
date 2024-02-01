@@ -1,5 +1,3 @@
-const { URL } = require('url');
-const { urlValidator } = require('login.dfe.validation/src/urlValidator');
 const {
   AUTHENTICATION_FLOWS,
   AUTHENTICATION_FLOWS_PATTERNS,
@@ -466,13 +464,11 @@ const processRedirectUris = (uris) => {
   return processedUris;
 };
 
-const isCorrectProtocol = async (urlValidator) => await urlValidator.isValidProtocal()
+const isCorrectProtocol = async (urlValidator) => urlValidator.isValidProtocal()
   .then((result) => result)
   .catch((err) => err);
-const isCorrectLength = async (urlValidator) => await urlValidator.isCorrectLength(200).then((result) => result).catch((err) => err);
-const isValidUrl = async (urlValidator) => await urlValidator.IsValidUrl()
-  .then((result) => result)
-  .catch((err) => err);
+const isCorrectLength = async (urlValidator) => urlValidator.isCorrectLength(200).then((result) => result).catch((err) => err);
+const isValidUrl = async (urlValidator) => urlValidator.IsValidUrl().then((result) => result).catch((err) => err);
 
 const checkClientId = async (clientId, reqId) => {
   const service = await getServiceById(clientId, reqId);

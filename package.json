@@ -46,7 +46,7 @@
     "login.dfe.request-promise-retry": "git+https://github.com/DFE-Digital/login.dfe.request-promise-retry.git#v3.0.0",
     "login.dfe.sanitization": "git+https://github.com/DFE-Digital/login.dfe.sanitization.git#v3.0.0",
     "login.dfe.service-notifications.jobs.client": "git+https://github.com/DFE-Digital/login.dfe.service-notifications.jobs.client.git#v2.0.0",
-    "login.dfe.validation": "git+https://github.com/DFE-Digital/login.dfe.validation.git#v2.0.11",
+    "login.dfe.validation": "git+https://github.com/DFE-Digital/login.dfe.validation.git#v2.0.14",
     "login.dfe.winston-appinsights": "git+https://github.com/DFE-Digital/login.dfe.winston-appinsights.git#v5.0.0",
     "moment": "^2.29.2",
     "niceware": "^1.0.6",

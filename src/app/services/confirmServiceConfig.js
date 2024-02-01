@@ -18,6 +18,7 @@ const {
   TOKEN_ENDPOINT_AUTH_METHOD,
   REDIRECT_URLS_CHANGES,
 } = require('../../constants/serviceConfigConstants');
+
 const {
   deleteFromLocalStorage,
   retreiveRedirectUrlsFromStorage,
@@ -136,9 +137,7 @@ const validate = async (req, currentService) => {
     }
 
     const { serviceHome, postResetUrl, clientId } = model.service;
-
     const urlValidator = new UrlValidator(serviceHome);
-
     const lengthResult = await isCorrectLength(urlValidator);
     if (serviceHome !== null && !lengthResult) {
       if (model.validationMessages.serviceHome !== '' && model.validationMessages.serviceHome !== undefined) {
@@ -159,7 +158,6 @@ const validate = async (req, currentService) => {
         model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_URL;
       }
     }
-
     const validProtocol = await isCorrectProtocol(urlValidator);
     if (!validProtocol) {
       if (model.validationMessages.serviceHome !== '' && model.validationMessages.serviceHome !== undefined) {
@@ -171,15 +169,14 @@ const validate = async (req, currentService) => {
 
     const postUrlValidator = new UrlValidator(postResetUrl);
     const isPostResetUrlValid = await isValidUrl(postUrlValidator);
-    if (postResetUrl != null && !isPostResetUrlValid) {
-      if (postResetUrl !== '') {
-        if (model.validationMessages.postResetUrl !== '' && model.validationMessages.postResetUrl !== undefined) {
-          model.validationMessages.postResetUrl += ERROR_MESSAGES.INVALID_RESETPASS_CHARACTERS;
-        } else {
-          model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_RESETPASS_CHARACTERS;
-        }
+    if (postResetUrl && !isPostResetUrlValid) {
+      if (model.validationMessages.postResetUrl !== '' && model.validationMessages.postResetUrl !== undefined) {
+        model.validationMessages.postResetUrl += ERROR_MESSAGES.INVALID_RESETPASS_CHARACTERS;
+      } else {
+        model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_RESETPASS_CHARACTERS;
       }
     }
+
     const isPOstResetUrlToLength = await isCorrectLength(postUrlValidator);
     if (!isPOstResetUrlToLength) {
       if (model.validationMessages.postResetUrl !== '' && model.validationMessages.postResetUrl !== undefined) {
@@ -247,7 +244,6 @@ const validate = async (req, currentService) => {
         model.validationMessages.redirect_uris = ERROR_MESSAGES.REDIRECT_URLS_NOT_UNIQUE;
       }
     }
-   
 
     if (!model.service.postLogoutRedirectUris || !model.service.postLogoutRedirectUris.length > 0) {
       model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.MISSING_POST_LOGOUT_URL;
@@ -285,7 +281,6 @@ const validate = async (req, currentService) => {
       }
     }
 
-    
     if (model.service.clientSecret && model.service.clientSecret !== currentService.clientSecret) {
       try {
         const validateClientSecret = niceware.passphraseToBytes(model.service.clientSecret.split('-'));
@@ -307,7 +302,6 @@ const validate = async (req, currentService) => {
         model.validationMessages.apiSecret = ERROR_MESSAGES.INVALID_API_SECRET;
       }
     }
-   
     return model;
   } catch (error) {
     throw new Error(error);
