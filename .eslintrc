@@ -10,7 +10,7 @@
   },
   "rules": {
     "prettier/prettier": ["error"],
-    "quotes": [2, "single", { "avoidEscape": true }],
+    "quotes": [1, "double", { "avoidEscape": true }],
     "comma-dangle": 0,
     "max-len": 0
   },
