@@ -1,8 +1,8 @@
-const niceware = require('niceware');
-const he = require('he');
-const { Utils } = require('sequelize');
-const UrlValidator = require('login.dfe.validation/src/urlValidator');
-const logger = require('../../infrastructure/logger/index');
+const niceware = require("niceware");
+const he = require("he");
+const { Utils } = require("sequelize");
+const UrlValidator = require("login.dfe.validation/src/urlValidator");
+const logger = require("../../infrastructure/logger/index");
 const {
   AUTHENTICATION_FLOWS,
   GRANT_TYPES,
@@ -10,8 +10,8 @@ const {
   TOKEN_ENDPOINT_AUTH_METHOD,
   ERROR_MESSAGES,
   REDIRECT_URLS_CHANGES,
-} = require('../../constants/serviceConfigConstants');
-const { getServiceById } = require('../../infrastructure/applications');
+} = require("../../constants/serviceConfigConstants");
+const { getServiceById } = require("../../infrastructure/applications");
 const {
   getUserServiceRoles,
   determineAuthFlowByRespType,
@@ -21,13 +21,13 @@ const {
   isCorrectLength,
   isValidUrl,
   checkClientId,
-} = require('./utils');
+} = require("./utils");
 
 const {
   saveRedirectUrlsToStorage,
   deleteFromLocalStorage,
   retreiveRedirectUrlsFromStorage,
-} = require('../../infrastructure/utils/serviceConfigCache');
+} = require("../../infrastructure/utils/serviceConfigCache");
 
 const buildServiceModelFromObject = (service, sessionService = {}) => {
   let tokenEndpointAuthMethod = null;
@@ -50,17 +50,17 @@ const buildServiceModelFromObject = (service, sessionService = {}) => {
   const refreshToken = grantTypes.includes(GRANT_TYPES.REFRESH_TOKEN) ? GRANT_TYPES.REFRESH_TOKEN : null;
 
   return {
-    name: service.name || '',
-    description: service.description || '',
-    clientId: (sessionService?.clientId?.newValue || service.relyingParty.client_id) || '',
-    clientSecret: (sessionService?.clientSecret?.secretNewValue || service.relyingParty.client_secret) || '',
-    serviceHome: (sessionService?.serviceHome?.newValue || service.relyingParty.service_home) || '',
-    postResetUrl: (sessionService?.postResetUrl?.newValue || service.relyingParty.postResetUrl) || '',
+    name: service.name || "",
+    description: service.description || "",
+    clientId: (sessionService?.clientId?.newValue || service.relyingParty.client_id) || "",
+    clientSecret: (sessionService?.clientSecret?.secretNewValue || service.relyingParty.client_secret) || "",
+    serviceHome: (sessionService?.serviceHome?.newValue || service.relyingParty.service_home) || "",
+    postResetUrl: (sessionService?.postResetUrl?.newValue || service.relyingParty.postResetUrl) || "",
     redirectUris: (sessionService?.redirectUris?.newValue || service.relyingParty.redirect_uris) || [],
     postLogoutRedirectUris: (sessionService?.postLogoutRedirectUris?.newValue || service.relyingParty.post_logout_redirect_uris) || [],
     grantTypes,
     responseTypes,
-    apiSecret: (sessionService?.apiSecret?.secretNewValue || service.relyingParty.api_secret) || '',
+    apiSecret: (sessionService?.apiSecret?.secretNewValue || service.relyingParty.api_secret) || "",
     refreshToken,
     tokenEndpointAuthMethod,
   };
@@ -110,14 +110,14 @@ const getServiceConfig = async (req, res) => {
     }
     const manageRolesForService = await getUserServiceRoles(req);
     const serviceModel = await buildCurrentServiceModel(req);
-    return res.render('services/views/serviceConfig', {
+    return res.render("services/views/serviceConfig", {
       csrfToken: req.csrfToken(),
       service: serviceModel.currentServiceModel,
       backLink: `/services/${req.params.sid}`,
       validationMessages: {},
       serviceId: req.params.sid,
       userRoles: manageRolesForService,
-      currentNavigation: 'configuration',
+      currentNavigation: "configuration",
     });
   } catch (error) {
     throw new Error(error);
@@ -173,8 +173,8 @@ const validate = async (req, currentService, oldService) => {
       description: currentService.description,
       clientId: he.decode(req.body.clientId),
       clientSecret: (isHybridFlow || isAuthorisationCodeFlow) ? req.body.clientSecret : oldService.clientSecret,
-      serviceHome: (req.body.serviceHome || '').trim(),
-      postResetUrl: (req.body.postResetUrl || '').trim(),
+      serviceHome: (req.body.serviceHome || "").trim(),
+      postResetUrl: (req.body.postResetUrl || "").trim(),
       redirectUris: selectedRedirects,
       postLogoutRedirectUris: selectedLogout,
       grantTypes: grantTypes || [],
@@ -188,7 +188,7 @@ const validate = async (req, currentService, oldService) => {
     validationMessages: {},
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
-    currentNavigation: 'configuration',
+    currentNavigation: "configuration",
   };
 
   const { serviceHome, postResetUrl, clientId } = model.service;
@@ -196,7 +196,7 @@ const validate = async (req, currentService, oldService) => {
 
   const lengthResult = await isCorrectLength(urlValidator);
   if (serviceHome !== null && !lengthResult) {
-    if (model.validationMessages.serviceHome !== '' && model.validationMessages.serviceHome !== undefined) {
+    if (model.validationMessages.serviceHome !== "" && model.validationMessages.serviceHome !== undefined) {
       model.validationMessages.serviceHome += ERROR_MESSAGES.INVALID_HOME_LENTGH;
     } else {
       model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_LENTGH;
@@ -204,8 +204,8 @@ const validate = async (req, currentService, oldService) => {
   }
   const validUrl = await isValidUrl(urlValidator);
   if (serviceHome !== null && !validUrl) {
-    if (serviceHome !== '') {
-      if (model.validationMessages.serviceHome !== '' && model.validationMessages.serviceHome !== undefined) {
+    if (serviceHome !== "") {
+      if (model.validationMessages.serviceHome !== "" && model.validationMessages.serviceHome !== undefined) {
         model.validationMessages.serviceHome += ERROR_MESSAGES.INVALID_HOME_CHARACTERS;
       } else {
         model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_CHARACTERS;
@@ -217,7 +217,7 @@ const validate = async (req, currentService, oldService) => {
 
   const validProtocol = await isCorrectProtocol(urlValidator);
   if (!validProtocol) {
-    if (model.validationMessages.serviceHome !== '' && model.validationMessages.serviceHome !== undefined) {
+    if (model.validationMessages.serviceHome !== "" && model.validationMessages.serviceHome !== undefined) {
       model.validationMessages.serviceHome += ERROR_MESSAGES.INVALID_HOME_PROTOCOL;
     } else {
       model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_PROTOCOL;
@@ -226,14 +226,14 @@ const validate = async (req, currentService, oldService) => {
 
   if (!model.service.responseTypes || model.service.responseTypes.length === 0) {
     model.validationMessages.responseTypes = ERROR_MESSAGES.MISSING_RESPONSE_TYPE;
-  } else if (model.service.responseTypes.length === 1 && model.service.responseTypes.includes('token')) {
+  } else if (model.service.responseTypes.length === 1 && model.service.responseTypes.includes("token")) {
     model.validationMessages.responseTypes = ERROR_MESSAGES.RESPONSE_TYPE_TOKEN_ERROR;
   }
   const postUrlValidator = new UrlValidator(postResetUrl);
   const isPostResetUrlValid = await isValidUrl(postUrlValidator);
   if (postResetUrl != null && !isPostResetUrlValid) {
-    if (postResetUrl !== '') {
-      if (model.validationMessages.postResetUrl !== '' && model.validationMessages.postResetUrl !== undefined) {
+    if (postResetUrl !== "") {
+      if (model.validationMessages.postResetUrl !== "" && model.validationMessages.postResetUrl !== undefined) {
         model.validationMessages.postResetUrl += ERROR_MESSAGES.INVALID_RESETPASS_CHARACTERS;
       } else {
         model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_RESETPASS_CHARACTERS;
@@ -242,7 +242,7 @@ const validate = async (req, currentService, oldService) => {
   }
   const isPOstResetUrlToLength = await isCorrectLength(postUrlValidator);
   if (!isPOstResetUrlToLength) {
-    if (model.validationMessages.postResetUrl !== '' && model.validationMessages.postResetUrl !== undefined) {
+    if (model.validationMessages.postResetUrl !== "" && model.validationMessages.postResetUrl !== undefined) {
       model.validationMessages.postResetUrl += ERROR_MESSAGES.INVALID_RESETPASS_LENTGH;
     } else {
       model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_RESETPASS_LENTGH;
@@ -251,7 +251,7 @@ const validate = async (req, currentService, oldService) => {
 
   const isPostResetUrlProtocol = await isCorrectProtocol(postUrlValidator);
   if (!isPostResetUrlProtocol) {
-    if (model.validationMessages.postResetUrl !== '' && model.validationMessages.postResetUrl !== undefined) {
+    if (model.validationMessages.postResetUrl !== "" && model.validationMessages.postResetUrl !== undefined) {
       model.validationMessages.postResetUrl += ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL;
     } else {
       model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL;
@@ -280,14 +280,14 @@ const validate = async (req, currentService, oldService) => {
       const isRCorrectLength = await isCorrectLength(redirecturlValidator);
       const isCorrectUtl = await isValidUrl(redirecturlValidator);
       if (!isRCorrectLength) {
-        if (model.validationMessages.redirect_uris !== '' && model.validationMessages.redirect_uris !== undefined) {
+        if (model.validationMessages.redirect_uris !== "" && model.validationMessages.redirect_uris !== undefined) {
           model.validationMessages.redirect_uris += ERROR_MESSAGES.INVALID_REDIRECT_LENTGH;
         } else {
           model.validationMessages.redirect_uris = ERROR_MESSAGES.INVALID_REDIRECT_LENTGH;
         }
       }
       if (!isCorrectUtl) {
-        if (model.validationMessages.redirect_uris !== '' && model.validationMessages.redirect_uris !== undefined) {
+        if (model.validationMessages.redirect_uris !== "" && model.validationMessages.redirect_uris !== undefined) {
           model.validationMessages.redirect_uris += ERROR_MESSAGES.INVALID_REDIRECT_CHARACTERS;
         } else {
           model.validationMessages.redirect_uris = ERROR_MESSAGES.INVALID_REDIRECT_CHARACTERS;
@@ -296,7 +296,7 @@ const validate = async (req, currentService, oldService) => {
 
       const isValidProtocol = await isCorrectProtocol(redirecturlValidator);
       if (!isValidProtocol) {
-        if (model.validationMessages.redirect_uris !== '' && model.validationMessages.redirect_uris !== undefined) {
+        if (model.validationMessages.redirect_uris !== "" && model.validationMessages.redirect_uris !== undefined) {
           model.validationMessages.redirect_uris += ERROR_MESSAGES.INVALID_REDIRECT_PROTOCOL;
         } else {
           model.validationMessages.redirect_uris = ERROR_MESSAGES.INVALID_REDIRECT_PROTOCOL;
@@ -316,14 +316,14 @@ const validate = async (req, currentService, oldService) => {
       const isRDCorrectLength = await isCorrectLength(postRedirecturlValidator);
       const estCorrect = await isValidUrl(postRedirecturlValidator);
       if (!isRDCorrectLength) {
-        if (model.validationMessages.post_logout_redirect_uris !== '' && model.validationMessages.post_logout_redirect_uris !== undefined) {
+        if (model.validationMessages.post_logout_redirect_uris !== "" && model.validationMessages.post_logout_redirect_uris !== undefined) {
           model.validationMessages.post_logout_redirect_uris += ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_LENTGH;
         } else {
           model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_LENTGH;
         }
       }
       if (estCorrect !== true) {
-        if (model.validationMessages.post_logout_redirect_uris !== '' && model.validationMessages.post_logout_redirect_uris !== undefined) {
+        if (model.validationMessages.post_logout_redirect_uris !== "" && model.validationMessages.post_logout_redirect_uris !== undefined) {
           model.validationMessages.post_logout_redirect_uris += ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_CHARACTERS;
         } else {
           model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_CHARACTERS;
@@ -332,7 +332,7 @@ const validate = async (req, currentService, oldService) => {
 
       const testRDProtocol = await isCorrectProtocol(postRedirecturlValidator);
       if (!testRDProtocol) {
-        if (model.validationMessages.post_logout_redirect_uris !== '' && model.validationMessages.post_logout_redirect_uris !== undefined) {
+        if (model.validationMessages.post_logout_redirect_uris !== "" && model.validationMessages.post_logout_redirect_uris !== undefined) {
           model.validationMessages.post_logout_redirect_uris += ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_PROTOCOL;
         } else {
           model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_PROTOCOL;
@@ -346,7 +346,7 @@ const validate = async (req, currentService, oldService) => {
 
   if (model.service.clientSecret != null && ((isAuthorisationCodeFlow || isHybridFlow) && model.service.clientSecret !== currentService.clientSecret)) {
     try {
-      const validateClientSecret = niceware.passphraseToBytes(model.service.clientSecret.split('-'));
+      const validateClientSecret = niceware.passphraseToBytes(model.service.clientSecret.split("-"));
       if (validateClientSecret.length < 8) {
         model.validationMessages.clientSecret = ERROR_MESSAGES.INVALID_CLIENT_SECRET;
       }
@@ -357,7 +357,7 @@ const validate = async (req, currentService, oldService) => {
 
   if (model.service.apiSecret && model.service.apiSecret !== currentService.apiSecret) {
     try {
-      const validateApiSecret = niceware.passphraseToBytes(model.service.apiSecret.split('-'));
+      const validateApiSecret = niceware.passphraseToBytes(model.service.apiSecret.split("-"));
       if (validateApiSecret.length !== 8) {
         model.validationMessages.apiSecret = ERROR_MESSAGES.INVALID_API_SECRET;
       }
@@ -378,7 +378,7 @@ const postServiceConfig = async (req, res) => {
 
     if (Object.keys(model.validationMessages).length > 0) {
       model.csrfToken = req.csrfToken();
-      return res.render('services/views/serviceConfig', model);
+      return res.render("services/views/serviceConfig", model);
     }
 
     const editedFields = Object.entries(serviceModels.oldServiceConfigModel)
@@ -391,11 +391,11 @@ const postServiceConfig = async (req, res) => {
         ) : oldValue !== newValue;
       })
       .map(([field, oldValue]) => {
-        const isSecret = field.toLowerCase().includes('secret');
+        const isSecret = field.toLowerCase().includes("secret");
         const editedField = {
           name: field,
-          oldValue: isSecret ? 'EXPUNGED' : oldValue,
-          newValue: isSecret ? 'EXPUNGED' : model.service[field],
+          oldValue: isSecret ? "EXPUNGED" : oldValue,
+          newValue: isSecret ? "EXPUNGED" : model.service[field],
           isSecret,
         };
         if (isSecret) {
@@ -409,7 +409,7 @@ const postServiceConfig = async (req, res) => {
     editedFields.map(({
       name, oldValue, newValue, isSecret, secretNewValue,
     }) => {
-      if (name === 'redirectUris' || name === 'postLogoutRedirectUris') {
+      if (name === "redirectUris" || name === "postLogoutRedirectUris") {
         if (!redirectUrlsChanges[name]) {
           redirectUrlsChanges[name] = {};
         }
@@ -442,7 +442,7 @@ const postServiceConfig = async (req, res) => {
       req.session.serviceConfigurationChanges.redirectUris.oldValue = model.service.redirectUris;
       req.session.serviceConfigurationChanges.redirectUris.newValue = undefined;
     }
-    return res.redirect('review-service-configuration#');
+    return res.redirect("review-service-configuration#");
   } catch (error) {
     throw new Error(error);
   }
