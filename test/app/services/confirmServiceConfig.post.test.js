@@ -255,8 +255,7 @@ describe('when confirming service config changes in the review page', () => {
     req.session.serviceConfigurationChanges.postLogoutRedirectUris.oldValue = ['https://google.com', 'https://yahoo.com'];
 
     await postConfirmServiceConfig(req, res);
-
-    expect(res.render.mock.calls).toHaveLength(0);
+    expect(res.redirect.mock.calls).toHaveLength(1);
   });
 
   it('then it should render view with validation if any of the redirect Urls are invalid', async () => {
