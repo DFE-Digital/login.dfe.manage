@@ -12,6 +12,7 @@
     "prettier/prettier": ["error"],
     "comma-dangle": 0,
     "max-len": 0,
+    "quotes": 0
   },
   "env": {
     "jest": true
