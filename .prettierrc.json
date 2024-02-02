@@ -1,0 +1,14 @@
+{
+    "semi": true,
+    "singleQuote": true,
+    "useTabs": false,
+    "printWidth": 230,
+    "trailingComma": "all",
+    "no-empty": ["error", { "allowEmptyCatch": true }],
+    "prefer-rest-params": "off",
+    "prefer-spread": "off",
+    "strict": "off",
+    "no-underscore-dangle": ["error", { "allowAfterThis": true }],
+    "endOfLine": "lf",
+    "indent_style": "space"
+  }

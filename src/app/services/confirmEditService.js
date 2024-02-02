@@ -28,8 +28,7 @@ const getModel = async (req) => {
 };
 
 const updateService = async (uid, sid, oid, selectedRoles, reqId) => {
-  const update = uid.startsWith('inv-') ? await updateInvitationService(uid.substr(4), sid, oid, selectedRoles, reqId)
-    : updateUserService(uid, sid, oid, selectedRoles, reqId);
+  const update = uid.startsWith('inv-') ? await updateInvitationService(uid.substr(4), sid, oid, selectedRoles, reqId) : updateUserService(uid, sid, oid, selectedRoles, reqId);
   return update;
 };
 
@@ -52,10 +51,12 @@ const post = async (req, res) => {
     userId: req.user.sub,
     userEmail: req.user.email,
     editedUser: model.user.id,
-    editedFields: [{
-      name: 'update_service',
-      newValue: selectedRoles,
-    }],
+    editedFields: [
+      {
+        name: 'update_service',
+        newValue: selectedRoles,
+      },
+    ],
   });
 
   res.flash('title', 'Success');
