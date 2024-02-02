@@ -10,9 +10,9 @@
   },
   "rules": {
     "prettier/prettier": ["error"],
+    "quotes": [2, "single", { "avoidEscape": true }],
     "comma-dangle": 0,
-    "max-len": 0,
-    "quotes": 0
+    "max-len": 0
   },
   "env": {
     "jest": true
