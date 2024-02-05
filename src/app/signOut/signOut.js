@@ -2,7 +2,7 @@
 
 const url = require('url');
 const passport = require('passport');
-const config = require('./../../infrastructure/config');
+const config = require('../../infrastructure/config');
 const logger = require('../../infrastructure/logger');
 
 const logout = (req, res) => {
@@ -10,6 +10,7 @@ const logout = (req, res) => {
     logger.info('user logged out.');
   });
   req.session = null; // Needed to clear session and completely logout
+  req.user = null;
 };
 
 const signUserOut = (req, res) => {
