@@ -49,13 +49,13 @@
                     <% if (e.removedValues && e.removedValues.length > 0) { %>
                       <p class="govuk-body govuk-!-font-weight-bold">Removed:</p>
                       <% e.removedValues.forEach((value) => { %>
-                        <p class="govuk-body"><%= value %></p>
+                        <p class="govuk-body"><%- value %></p>
                       <% }); %>
                     <% } %>
                     <% if (e.addedValues && e.addedValues.length > 0) { %>
                       <p class="govuk-body govuk-!-font-weight-bold">Added:</p>
                       <% e.addedValues.forEach((value) => { %>
-                        <p class="govuk-body"><%= value %></p>
+                        <p class="govuk-body"><%- value %></p>
                       <% }); %>
                     <% } %>
                   </dd>
