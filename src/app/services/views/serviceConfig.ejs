@@ -35,15 +35,15 @@
   <% function generateRedirectUrlsSection({ sectionId, headingText, hintText, dataValues, validationMessages }) { %>
     <div id="<%= sectionId %>-form-group" data-<%= sectionId %>-counter="<%= (dataValues.length > 0) ? (dataValues.length + 1) : 2 %>" class="govuk-form-group <%= (validationMessages !== undefined) ? 'govuk-form-group--error' : '' %>">
         <div id="<%= sectionId %>">
-            <h1 class="govuk-heading-m govuk-!-margin-bottom-2" id="<%= sectionId %>-heading"> <%= headingText %> </h1>
+            <h1 class="govuk-heading-m govuk-!-margin-bottom-2" id="<%= sectionId %>-heading"> <%- headingText %> </h1>
             <div id="<%= sectionId %>-hint" class="govuk-hint">
-                <%= hintText %>
+                <%- hintText %>
             </div>
             <% if (dataValues.length > 0) { %>
                 <% if (validationMessages !== undefined) { %>
                 <p id="<%= sectionId %>-validation" class="govuk-error-message">
                     <span class="govuk-visually-hidden">Error:</span>
-                    <%= validationMessages %>
+                    <%- validationMessages %>
                 </p>
                 <% } %>
                 <% for (let i = 0; i < dataValues.length; i++) { 
@@ -51,13 +51,13 @@
                 %>
                     <div class="govuk-body dfe-flex-container" id="<%= sectionId %>-input-group-<%= i+1 %>">
                         <label for="<%= sectionId %>-input-<%= i+1 %>" class="govuk-label govuk-label--s govuk-visually-hidden">
-                        <%= headingText %>
+                        <%- headingText %>
                         </label>
                         <input
                             class="form-control dfe-flex-input-grow govuk-input"
                             id="<%= sectionId %>-input-<%= i+1 %>"
                             name="<%= sectionId %>"
-                            value="<%= url %>" />
+                            value="<%- url %>" />
                         <a href="#" class="govuk-link govuk-link--no-visited-state remove-redirect" id="<%= sectionId %>-remove-<%= i+1 %>" data-group-id="<%= i+1 %>">Remove</a>
                     </div>
                 <% } %>
@@ -65,12 +65,12 @@
                 <% if (validationMessages !== undefined) { %>
                 <p id="<%= sectionId %>-validation" class="govuk-error-message">
                     <span class="govuk-visually-hidden">Error:</span>
-                    <%= validationMessages %>
+                    <%- validationMessages %>
                 </p>
                 <% } %>
                 <div class="govuk-body dfe-flex-container" id="<%= sectionId %>-input-group-1">
                     <label for="<%= sectionId %>-1" class="govuk-label govuk-label--s govuk-visually-hidden">
-                    <%= headingText %>
+                    <%- headingText %>
                     </label>
                     <input
                         class="form-control dfe-flex-input-grow govuk-input"
