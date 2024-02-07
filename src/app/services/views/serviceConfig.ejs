@@ -155,12 +155,12 @@
                         <% if (locals.validationMessages.serviceHome !== undefined){ %>
                         <p id="validation-homeUrl" class="govuk-error-message">
                         <span class="govuk-visually-hidden">Error:</span>
-                        <%=locals.validationMessages.serviceHome %>
+                        <%-locals.validationMessages.serviceHome %>
                         </p>
                         <% } %>
 
                         <input class="form-control  govuk-input" id="serviceHome" name="serviceHome" type="text"
-                            value="<%=locals.service.serviceHome%>">
+                            value="<%-locals.service.serviceHome%>">
                     </div>
 
                     <div class="govuk-form-group<%= (locals.validationMessages.postResetUrl !== undefined) ? ' govuk-form-group--error' : ''%>" id="postResetUrl-form-group">
@@ -176,12 +176,12 @@
                         <% if (locals.validationMessages.postResetUrl !== undefined){ %>
                         <p id="validation-postResetUrl" class="govuk-error-message">
                           <span class="govuk-visually-hidden">Error:</span>
-                          <%=locals.validationMessages.postResetUrl %>
+                          <%-locals.validationMessages.postResetUrl %>
                         </p>
                         <% } %>
 
                         <input class="form-control govuk-input" id="postResetUrl" name="postResetUrl" type="text"
-                            value="<%=locals.service.postResetUrl%>" />
+                            value="<%-locals.service.postResetUrl%>" />
                     </div>
                 </fieldset>
 
@@ -217,14 +217,14 @@
                         <% if (locals.validationMessages.clientId !== undefined){ %>
                             <p id="validation-clientId" class="govuk-error-message">
                             <span class="govuk-visually-hidden">Error:</span>
-                            <%=locals.validationMessages.clientId %>
+                            <%-locals.validationMessages.clientId %>
                             </p>
                             <% } %>
                         
                         <input class="form-control govuk-input govuk-!-width-one-half" id="clientId"
                             name="clientId"
                             type="text" 
-                            value="<%=locals.service.clientId%>"/>
+                            value="<%-locals.service.clientId%>"/>
                         
                         <div class="govuk-warning-text govuk-!-margin-top-3">
                             <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
