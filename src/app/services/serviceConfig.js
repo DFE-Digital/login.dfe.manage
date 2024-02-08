@@ -320,7 +320,7 @@ const validate = async (req, currentService, oldService) => {
   } else if (model.service.postLogoutRedirectUris.length > 0) {
     await Promise.all(model.service.postLogoutRedirectUris.map(async (x) => {
       unecodedurl = _unescape(x);
-      const postRedirecturlValidator = new UrlValidator(x);
+      const postRedirecturlValidator = new UrlValidator(unecodedurl);
       const isRDCorrectLength = await isCorrectLength(postRedirecturlValidator);
       const estCorrect = await isValidUrl(postRedirecturlValidator);
       if (!isRDCorrectLength) {
