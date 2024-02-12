@@ -1,5 +1,6 @@
+const { urlValidator } = require('login.dfe.validation/src/urlValidator');
 const mockUtils = require('../../utils');
-
+jest.mock('login.dfe.validation');
 jest.mock('./../../../src/infrastructure/config', () => mockUtils.configMockFactory());
 jest.mock('./../../../src/infrastructure/logger', () => mockUtils.loggerMockFactory());
 jest.mock('./../../../src/infrastructure/applications');
@@ -12,9 +13,17 @@ jest.mock('../../../src/app/services/utils', () => {
     getUserServiceRoles: jest.fn(actualUtilsFunctions.getUserServiceRoles),
     processConfigurationTypes: jest.fn(actualUtilsFunctions.processConfigurationTypes),
     isValidUrl: jest.fn(actualUtilsFunctions.isValidUrl),
+    isCorrectLength: jest.fn(actualUtilsFunctions.isCorrectLength),
+    isCorrectProtocol: jest.fn(actualUtilsFunctions.isCorrectProtocol),
     checkClientId: jest.fn(),
   };
 });
+
+jest.mock('login.dfe.validation', () => ({
+  urlValidator: jest.fn(),
+}));
+
+
 jest.mock('../../../src/infrastructure/utils/serviceConfigCache', () => ({
   retreiveRedirectUrlsFromStorage: jest.fn(),
   deleteFromLocalStorage: jest.fn(),
@@ -123,6 +132,7 @@ describe('when editing the service configuration', () => {
     checkClientId.mockReset();
 
     updateService.mockReset();
+    updateService.mockImplementation(() => Promise.resolve([]));
     getServiceById.mockReset();
     getServiceById.mockReturnValueOnce({ ...currentServiceInfo }).mockReturnValueOnce(null);
     res.mockResetAll();
@@ -146,7 +156,7 @@ describe('when editing the service configuration', () => {
       serviceId: 'service1',
       userRoles: [],
       validationMessages: {
-        serviceHome: `${ERROR_MESSAGES.INVALID_HOME_URL}`,
+        serviceHome: `${ERROR_MESSAGES.INVALID_HOME_PROTOCOL}`,
       },
     });
   });
@@ -192,7 +202,7 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        postResetUrl: `${ERROR_MESSAGES.INVALID_POST_PASSWORD_RESET_URL}`,
+        postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
       },
     }));
   });
@@ -286,7 +296,7 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        redirect_uris: `${ERROR_MESSAGES.INVALID_REDIRECT_URL}`,
+        redirect_uris: `${ERROR_MESSAGES.INVALID_REDIRECT_PROTOCOL}`,
       },
     }));
   });
@@ -308,7 +318,7 @@ describe('when editing the service configuration', () => {
     req.body.post_logout_redirect_uris = ['https://duplicate-url.com', 'https://duplicate-url.com'];
 
     await postServiceConfig(req, res);
-
+   
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
@@ -325,7 +335,7 @@ describe('when editing the service configuration', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        post_logout_redirect_uris: `${ERROR_MESSAGES.INVALID_POST_LOGOUT_URL}`,
+        post_logout_redirect_uris: `${ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_PROTOCOL}`,
       },
     }));
   });
