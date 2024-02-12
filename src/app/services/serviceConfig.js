@@ -195,12 +195,15 @@ const validate = async (req, currentService, oldService) => {
   let { serviceHome, postResetUrl, clientId } = model.service;
   let unecodedurl = _unescape(serviceHome);
   serviceHome = unecodedurl;
+  model.service.serviceHome = serviceHome;
   const urlValidator = new UrlValidator(serviceHome);
 
   const lengthResult = await isCorrectLength(urlValidator);
   if (serviceHome !== null && !lengthResult) {
     if (model.validationMessages.serviceHome !== "" && model.validationMessages.serviceHome !== undefined) {
-      model.validationMessages.serviceHome += "<br/>"+ ERROR_MESSAGES.INVALID_HOME_LENTGH;
+      if(!model.validationMessages.serviceHome.includes(ERROR_MESSAGES.INVALID_HOME_LENTGH)){
+           model.validationMessages.serviceHome += "<br/>"+ ERROR_MESSAGES.INVALID_HOME_LENTGH;
+      }
     } else {
       model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_LENTGH;
     }
@@ -209,7 +212,9 @@ const validate = async (req, currentService, oldService) => {
   if (serviceHome !== null && !validUrl) {
     if (serviceHome !== "") {
       if (model.validationMessages.serviceHome !== "" && model.validationMessages.serviceHome !== undefined) {
-        model.validationMessages.serviceHome += "<br/>"+ ERROR_MESSAGES.INVALID_HOME_CHARACTERS;
+        if(!model.validationMessages.serviceHome.includes(ERROR_MESSAGES.INVALID_HOME_CHARACTERS)){
+              model.validationMessages.serviceHome += "<br/>"+ ERROR_MESSAGES.INVALID_HOME_CHARACTERS;
+        }
       } else {
         model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_CHARACTERS;
       }
@@ -332,7 +337,7 @@ const validate = async (req, currentService, oldService) => {
       }
       if (estCorrect !== true) {
         if (model.validationMessages.post_logout_redirect_uris !== "" && model.validationMessages.post_logout_redirect_uris !== undefined) {
-          model.validationMessages.post_logout_redirect_uris += ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_CHARACTERS;
+          model.validationMessages.post_logout_redirect_uris +=  "<br/>"+ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_CHARACTERS;
         } else {
           model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_CHARACTERS;
         }
@@ -341,7 +346,7 @@ const validate = async (req, currentService, oldService) => {
       const testRDProtocol = await isCorrectProtocol(postRedirecturlValidator);
       if (!testRDProtocol) {
         if (model.validationMessages.post_logout_redirect_uris !== "" && model.validationMessages.post_logout_redirect_uris !== undefined) {
-          model.validationMessages.post_logout_redirect_uris += ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_PROTOCOL;
+          model.validationMessages.post_logout_redirect_uris +=  "<br/>"+ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_PROTOCOL;
         } else {
           model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_PROTOCOL;
         }
@@ -373,6 +378,7 @@ const validate = async (req, currentService, oldService) => {
       model.validationMessages.apiSecret = ERROR_MESSAGES.INVALID_API_SECRET;
     }
   }
+  ///break out and sort order
   return model;
 };
 
