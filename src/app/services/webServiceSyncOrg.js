@@ -25,7 +25,6 @@ const post = async (req, res) => {
 
   await wsSyncCall(req.params.oid);
 
-  res.flash('info', 'Organisation has been queued for sync');
   return res.redirect(`/services/${req.params.sid}/organisations/${organisation.id}/users`);
 };
 module.exports = {
