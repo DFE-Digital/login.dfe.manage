@@ -40,24 +40,24 @@ describe('when syncing user for sync', function () {
     expect(res.render.mock.calls[0][0]).toBe('services/views/webServiceSync');
   });
 
-  // it('then it should queue organisation for sync on confirmation', async () => {
-  //   await webServiceSync.post(req, res);
+  it('then it should queue organisation for sync on confirmation', async () => {
+    await webServiceSync.post(req, res);
 
-  //   expect(serviceNotificationsClient.notifyUserUpdated).toHaveBeenCalledTimes(1);
-  //   expect(serviceNotificationsClient.notifyUserUpdated).toHaveBeenCalledWith({ sub: 'user-1' });
-  // });
+    expect(serviceNotificationsClient.notifyUserUpdated).toHaveBeenCalledTimes(1);
+    expect(serviceNotificationsClient.notifyUserUpdated).toHaveBeenCalledWith({ sub: 'user-1' });
+  });
 
-  // it('then it should add flash message that organisation has been queued on confirmation', async () => {
-  //   await webServiceSync.post(req, res);
+  it('then it should add flash message that organisation has been queued on confirmation', async () => {
+    await webServiceSync.post(req, res);
 
-  //   expect(res.flash).toHaveBeenCalledTimes(1);
-  //   expect(res.flash).toHaveBeenCalledWith('info', 'User has been queued for sync');
-  // });
+    expect(res.flash).toHaveBeenCalledTimes(1);
+    expect(res.flash).toHaveBeenCalledWith('info', 'User has been queued for sync');
+  });
 
-  // it('then it should redirect to organisation details page on confirmation', async () => {
-  //   await webServiceSync.post(req, res);
+  it('then it should redirect to organisation details page on confirmation', async () => {
+    await webServiceSync.post(req, res);
 
-  //   expect(res.redirect).toHaveBeenCalledTimes(1);
-  //   expect(res.redirect).toHaveBeenCalledWith('/services/service-1/users/user-1/organisations');
-  // });
+    expect(res.redirect).toHaveBeenCalledTimes(1);
+    expect(res.redirect).toHaveBeenCalledWith('/services/service-1/users/user-1/organisations');
+  });
 });

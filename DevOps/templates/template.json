@@ -30,13 +30,6 @@
                 "description": "The App Service Plan name"
             }
         },
-        "wsorgsyncUrl" : {
-            "type": "string",
-            "defaultValue": "",
-            "metadata": {
-                "description": "On Demand Org sync URL"
-            }
-        },
         "appServicePlanRG": {
             "type": "string",
             "metadata": {
