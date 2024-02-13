@@ -466,6 +466,7 @@ const processRedirectUris = (uris) => {
 };
 const _unescape = (html) => {
   let returnText = html;
+  returnText = returnText.replace(/&#39;/gi, "'");
   returnText = returnText.replace(/&nbsp;/gi, " ");
   returnText = returnText.replace(/&amp;/gi, "&");
   returnText = returnText.replace(/&quot;/gi, '"');
