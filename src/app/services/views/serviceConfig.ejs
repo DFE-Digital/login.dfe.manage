@@ -1,4 +1,5 @@
 <%# Reusable functions to generate elements  %>
+
 <% const serviceConfigHelpLink = `${locals.urls.help}/manageConsole/${locals.serviceId}/how-to-edit-service-config`; %>
 
 <% function renderSecretInputSection({ sectionId, headingText, hintText, dataValues, validationMessages }) { %>
@@ -25,7 +26,7 @@
             name="<%=sectionId%>"
             type="password"
             readonly="readonly"
-            value="<%=dataValues%>" />
+            value="<%-dataValues%>" />
         </div>
         <a href="" class="govuk-link govuk-link--no-visited-state dfe-flex-regenerate-link" id="generate-<%= sectionId %>">Regenerate</a>
       </div>
@@ -57,7 +58,7 @@
                             class="form-control dfe-flex-input-grow govuk-input"
                             id="<%= sectionId %>-input-<%= i+1 %>"
                             name="<%= sectionId %>"
-                            value="<%- url %>" />
+                            value="<%- url %>" /> 
                         <a href="#" class="govuk-link govuk-link--no-visited-state remove-redirect" id="<%= sectionId %>-remove-<%= i+1 %>" data-group-id="<%= i+1 %>">Remove</a>
                     </div>
                 <% } %>
@@ -158,9 +159,8 @@
                         <%-locals.validationMessages.serviceHome %>
                         </p>
                         <% } %>
-
-                        <input class="form-control  govuk-input" id="serviceHome" name="serviceHome" type="text"
-                            value="<%-locals.service.serviceHome%>">
+                        <input type="url" class="form-control  govuk-input" id="serviceHome" name="serviceHome" pattern="https://.\<>*" value='<%- locals.service.serviceHome %>' />
+                    
                     </div>
 
                     <div class="govuk-form-group<%= (locals.validationMessages.postResetUrl !== undefined) ? ' govuk-form-group--error' : ''%>" id="postResetUrl-form-group">
@@ -395,7 +395,7 @@
                 <hr class="govuk-section-break govuk-section-break--visible">
 
                 <div class="govuk-button-group auto-scroll-dest govuk-!-margin-top-3">
-                    <button type="submit" class="govuk-button" data-module="govuk-button" id="continue-button">Continue</button>
+                    <button type="submit" onclick="sanitize()" class="govuk-button" data-module="govuk-button" id="continue-button">Continue</button>
                     <a href="<%= locals.backLink %>" class="govuk-button govuk-button--secondary">Cancel</a>
                 </div>
             </form>
@@ -403,4 +403,20 @@
     </div>
 </div>
 <script src="/assets/javascript/niceware.js" async></script>
+<script>
+
+    function sanitize(){
+        var index = 0;
+        var form = document.querySelector('form')
+        var inputArray =  form.getElementsByTagName('input');
+        for (index = 1; index < inputArray.length; ++index) {
+            let x = inputArray[index].value;
+            if(x !== undefined || x !== null){
+              inputArray[index].value = x.replace("<", "&lt;");
+            }else{
+                alert('detected null');
+            }
+        }
+    }
+  </script>
 
