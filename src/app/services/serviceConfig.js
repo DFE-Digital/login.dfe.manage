@@ -207,6 +207,10 @@ const validate = async (req, currentService, oldService) => {
     } else {
       model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_LENTGH;
     }
+  }else {
+    if(serviceHome === undefined || serviceHome === ""){
+    model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_URL;
+    }
   }
   const validUrl = await isValidUrl(urlValidator);
   if (serviceHome !== null && !validUrl) {
@@ -218,9 +222,7 @@ const validate = async (req, currentService, oldService) => {
       } else {
         model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_CHARACTERS;
       }
-    } else {
-      model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_URL;
-    }
+    } 
   }
 
   const validProtocol = await isCorrectProtocol(urlValidator);
@@ -240,25 +242,28 @@ const validate = async (req, currentService, oldService) => {
   //takeout encoding from server
   unecodedurl = _unescape(postResetUrl);
   postResetUrl = unecodedurl;
-  const postUrlValidator = new UrlValidator(postResetUrl);
-  const isPOstResetUrlToLength = await isCorrectLength(postUrlValidator);
-  if (!isPOstResetUrlToLength) {
-    if (model.validationMessages.postResetUrl !== "" && model.validationMessages.postResetUrl !== undefined) {
-      model.validationMessages.postResetUrl += "<br/>"+ ERROR_MESSAGES.INVALID_RESETPASS_LENTGH;
-    } else {
-      model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_RESETPASS_LENTGH;
-    }
-  }
-  const isPostResetUrlValid = await isValidUrl(postUrlValidator);
-  if (postResetUrl != null && !isPostResetUrlValid) {
-    if (postResetUrl !== "") {
+ 
+ 
+  if (postResetUrl !== '') {
+    const postUrlValidator = new UrlValidator(postResetUrl);
+    const isPOstResetUrlToLength = await isCorrectLength(postUrlValidator);
+    if (!isPOstResetUrlToLength) {
       if (model.validationMessages.postResetUrl !== "" && model.validationMessages.postResetUrl !== undefined) {
-        model.validationMessages.postResetUrl += "<br/>"+ERROR_MESSAGES.INVALID_RESETPASS_CHARACTERS;
+        model.validationMessages.postResetUrl += "<br/>"+ ERROR_MESSAGES.INVALID_RESETPASS_LENTGH;
       } else {
-        model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_RESETPASS_CHARACTERS;
+        model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_RESETPASS_LENTGH;
       }
     }
-  }
+    const isPostResetUrlValid = await isValidUrl(postUrlValidator);
+    if (postResetUrl != null && !isPostResetUrlValid) {
+      if (postResetUrl !== "") {
+        if (model.validationMessages.postResetUrl !== "" && model.validationMessages.postResetUrl !== undefined) {
+          model.validationMessages.postResetUrl += "<br/>"+ERROR_MESSAGES.INVALID_RESETPASS_CHARACTERS;
+        } else {
+          model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_RESETPASS_CHARACTERS;
+        }
+      }
+    }
   
   const isPostResetUrlProtocol = await isCorrectProtocol(postUrlValidator);
   if (!isPostResetUrlProtocol) {
@@ -268,6 +273,9 @@ const validate = async (req, currentService, oldService) => {
       model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL;
     }
   }
+}else {
+  model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_POST_PASSWORD_RESET_URL;
+}
 
   if (!clientId) {
     model.validationMessages.clientId = ERROR_MESSAGES.MISSING_CLIENT_ID;
@@ -305,7 +313,6 @@ const validate = async (req, currentService, oldService) => {
           model.validationMessages.redirect_uris = ERROR_MESSAGES.INVALID_REDIRECT_CHARACTERS;
         }
       }
-
       const isValidProtocol = await isCorrectProtocol(redirecturlValidator);
       if (!isValidProtocol) {
         if (model.validationMessages.redirect_uris !== "" && model.validationMessages.redirect_uris !== undefined) {
@@ -378,7 +385,6 @@ const validate = async (req, currentService, oldService) => {
       model.validationMessages.apiSecret = ERROR_MESSAGES.INVALID_API_SECRET;
     }
   }
-  ///break out and sort order
   return model;
 };
 

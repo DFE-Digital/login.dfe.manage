@@ -404,16 +404,18 @@
 </div>
 <script src="/assets/javascript/niceware.js" async></script>
 <script>
-   //this is to correct an encoding issue found with < charcter not sending full strings to server
-   //we basically have to sanitize the string to convert to &lt; 
-   //which will then pass the wholes string back to the server
+
     function sanitize(){
         var index = 0;
         var form = document.querySelector('form')
         var inputArray =  form.getElementsByTagName('input');
         for (index = 1; index < inputArray.length; ++index) {
             let x = inputArray[index].value;
-            inputArray[index].value = x.replace("<", "&lt;");
+            if(x !== undefined || x !== null){
+              inputArray[index].value = x.replace("<", "&lt;");
+            }else{
+                alert('detected null');
+            }
         }
     }
   </script>
