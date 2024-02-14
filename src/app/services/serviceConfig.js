@@ -196,42 +196,46 @@ const validate = async (req, currentService, oldService) => {
   let unecodedurl = _unescape(serviceHome);
   serviceHome = unecodedurl;
   model.service.serviceHome = serviceHome;
-  const urlValidator = new UrlValidator(serviceHome);
+  if(serviceHome !== ''){
+    const urlValidator = new UrlValidator(serviceHome);
 
-  const lengthResult = await isCorrectLength(urlValidator);
-  if (serviceHome !== null && !lengthResult) {
-    if (model.validationMessages.serviceHome !== "" && model.validationMessages.serviceHome !== undefined) {
-      if(!model.validationMessages.serviceHome.includes(ERROR_MESSAGES.INVALID_HOME_LENTGH)){
-           model.validationMessages.serviceHome += "<br/>"+ ERROR_MESSAGES.INVALID_HOME_LENTGH;
-      }
-    } else {
-      model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_LENTGH;
-    }
-  }else {
-    if(serviceHome === undefined || serviceHome === ""){
-    model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_URL;
-    }
-  }
-  const validUrl = await isValidUrl(urlValidator);
-  if (serviceHome !== null && !validUrl) {
-    if (serviceHome !== "") {
+    const lengthResult = await isCorrectLength(urlValidator);
+    if (serviceHome !== null && !lengthResult) {
       if (model.validationMessages.serviceHome !== "" && model.validationMessages.serviceHome !== undefined) {
-        if(!model.validationMessages.serviceHome.includes(ERROR_MESSAGES.INVALID_HOME_CHARACTERS)){
-              model.validationMessages.serviceHome += "<br/>"+ ERROR_MESSAGES.INVALID_HOME_CHARACTERS;
+        if(!model.validationMessages.serviceHome.includes(ERROR_MESSAGES.INVALID_HOME_LENTGH)){
+            model.validationMessages.serviceHome += "<br/>"+ ERROR_MESSAGES.INVALID_HOME_LENTGH;
         }
       } else {
-        model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_CHARACTERS;
+        model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_LENTGH;
       }
-    } 
-  }
-
-  const validProtocol = await isCorrectProtocol(urlValidator);
-  if (!validProtocol) {
-    if (model.validationMessages.serviceHome !== "" && model.validationMessages.serviceHome !== undefined) {
-      model.validationMessages.serviceHome += "<br/>"+ ERROR_MESSAGES.INVALID_HOME_PROTOCOL;
-    } else {
-      model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_PROTOCOL;
+    }else {
+      if(serviceHome === undefined || serviceHome === ""){
+      model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_URL;
+      }
     }
+    const validUrl = await isValidUrl(urlValidator);
+    if (serviceHome !== null && !validUrl) {
+      if (serviceHome !== "") {
+        if (model.validationMessages.serviceHome !== "" && model.validationMessages.serviceHome !== undefined) {
+          if(!model.validationMessages.serviceHome.includes(ERROR_MESSAGES.INVALID_HOME_CHARACTERS)){
+                model.validationMessages.serviceHome += "<br/>"+ ERROR_MESSAGES.INVALID_HOME_CHARACTERS;
+          }
+        } else {
+          model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_CHARACTERS;
+        }
+      } 
+    }
+
+    const validProtocol = await isCorrectProtocol(urlValidator);
+    if (!validProtocol) {
+      if (model.validationMessages.serviceHome !== "" && model.validationMessages.serviceHome !== undefined) {
+        model.validationMessages.serviceHome += "<br/>"+ ERROR_MESSAGES.INVALID_HOME_PROTOCOL;
+      } else {
+        model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_PROTOCOL;
+      }
+    }
+  }else{
+    model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_URL;
   }
 
   if (!model.service.responseTypes || model.service.responseTypes.length === 0) {
