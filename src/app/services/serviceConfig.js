@@ -234,8 +234,6 @@ const validate = async (req, currentService, oldService) => {
         model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_PROTOCOL;
       }
     }
-  }else{
-    model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_URL;
   }
 
   if (!model.service.responseTypes || model.service.responseTypes.length === 0) {
@@ -277,10 +275,7 @@ const validate = async (req, currentService, oldService) => {
       model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL;
     }
   }
-}else {
-  model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_POST_PASSWORD_RESET_URL;
 }
-
   if (!clientId) {
     model.validationMessages.clientId = ERROR_MESSAGES.MISSING_CLIENT_ID;
   } else if (!/^[A-Za-z0-9-]+$/.test(clientId)) {

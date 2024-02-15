@@ -146,7 +146,8 @@ describe("when editing the service configuration", () => {
     req.body.serviceHome = "";
 
     await postServiceConfig(req, res);
-    expect(res.render.mock.calls).toHaveLength(1);
+    /// this must return nothing inorder to fix an error in another journey in reset password
+    expect(res.render.mock.calls).toHaveLength(0);
   });
 
   it("then it should render view with validation if redirect urls are not unique", async () => {
@@ -259,8 +260,8 @@ describe("when editing the service configuration", () => {
     req.body.postResetUrl = "";
 
     await postServiceConfig(req, res);
-
-    expect(res.render.mock.calls).toHaveLength(1);
+    /// this must return nothing inorder to fix an error in another journey in reset password
+    expect(res.render.mock.calls).toHaveLength(0);
   });
 
   it("then it should render view with validation if no redirect Urls are specified", async () => {
