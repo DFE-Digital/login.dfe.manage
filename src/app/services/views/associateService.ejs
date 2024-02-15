@@ -1,42 +1,38 @@
 <div class="govuk-width-container govuk-main-wrapper">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-three-quarters">
-            <h1 class="govuk-heading-l text-break govuk-!-margin-bottom-3">
-                <span class="govuk-caption-l govuk-!-margin-bottom-3"><%= locals.service.name %></span>
+            <h1 class="govuk-heading-m govuk-!-margin-top-3">
                 Select a sub-service for: <%= locals.service.name %>
             </h1>
             <p class="govuk-body text-break govuk-!-margin-top-2">This service, and selected sub-services or roles, will be added to the user's account, assigned to organisation: <b><%= locals.organisation.name %></b> </p>
-   
             <form method="post">
                 <input type="hidden" name="_csrf" value="<%=csrfToken%>" />
-                
-                
                 <div class="govuk-form-group <%= (locals.validationMessages.roles !== undefined) ? 'govuk-form-group--error' : '' %>">
                     <fieldset class="govuk-fieldset" id="roles">
                     <% if (locals.serviceRoles.length > 0) { %>
                     <% if (locals.validationMessages.roles !== undefined) { %>
-                        <p id="validation-selected-role" class="govuk-error-message">
-                            <span class="govuk-visually-hidden">Error:</span>
+                        <span id="validation-selected-role" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">There is a problem</span>
                             <%-locals.validationMessages.roles%>
-                        </p>
+                        </span>
                     <% } %>
-
-
-                    <table class="govuk-table govuk-!-margin-top-3">
+                    <legend class="govuk-visually-hidden">'Select all required sub-services'</legend>
+                    <table class="govuk-table">
+                        <caption class="govuk-table__caption govuk-table__caption--m govuk-visually-hidden">Select all required sub-services</caption>
                         <thead class="govuk-table__head">
-                            <tr class="govuk-table__row extra-padding govuk-grid-row">
-                                <th scope="col" class="govuk-table__header width-10">Select</th>
-                                <th scope="col" class="govuk-table__header width-90">Sub-service</th>
+                            <tr class="govuk-table__row">
+                            <th scope="col" class="govuk-table__header">Select</th>
+                            <th scope="col" class="govuk-table__header govuk-!-width-full">Sub-service</th>
                             </tr>
                         </thead>
                         <tbody class="govuk-table__body">
                             <% for (let i = 0; i < locals.serviceRoles.length; i++) { %>
                                 <% const role = locals.serviceRoles[i]; %>
-                                <tr class="govuk-table__row">
-                                    <td class="govuk-table__cell govuk-!-padding-top-5 govuk-!-padding-bottom-5">
+                                <tr class="govuk-table__row extra-padding">
+                                    <td class="govuk-table__cell">
                                         <div class="govuk-checkboxes__item">
                                             <input class="govuk-checkboxes__input" id="<%=role.id%>" type="checkbox" name="role" value="<%=role.id%>"
-                                                    <% if (locals.selectedRoles.roles && locals.selectedRoles.roles.length > 0) {
+                                                <% if (locals.selectedRoles.roles && locals.selectedRoles.roles.length > 0) {
                                                     for(let i = 0; i < locals.selectedRoles.roles.length; i++) {
                                                         const selectedRole = locals.selectedRoles.roles[i];
                                                     %>
@@ -49,12 +45,16 @@
                                     </th>
                                 </tr>
                             <% } %>
-
                         </tbody>
                     </table>
                     <% } else { %>
-                        <legend class="govuk-fieldset__legend"><h2 class="heading-small">There are no available roles for <%=locals.service.name%></h2></legend>
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                            <h2 class="govuk-fieldset__legend__heading govuk-heading-s">
+                                There are no available sub-services.
+                            </h2>
+                        </legend>
                     <% } %>
+                </div>
             <div class="govuk-button-group">
                 <button type="submit" class="govuk-button" data-module="govuk-button">Continue</button>
                 <a href="<%= locals.cancelLink %>" class="govuk-button govuk-button--secondary">Cancel</a>
