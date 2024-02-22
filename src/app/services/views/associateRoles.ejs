@@ -30,21 +30,26 @@
                         </p>
                         <% } %> <% if (locals.serviceRoles.length > 0) { %>
                         <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-                           Select all required sub-services
+                           Select all required roles
                         </legend>
 
-                        <% for (let i = 0; i < locals.serviceRoles.length; i++) { %>
+                        <% for (let i = 0; i < locals.serviceRoles.length; i++) { %> 
                             <% const role = locals.serviceRoles[i]; %>
-                                <div class="govuk-checkboxes__item">
-                                    <input class="govuk-checkboxes__input" id="<%=role.id%>" type="checkbox" name="role" value="<%=role.id%>"
-                                        <% if (locals.selectedRoles.roles && locals.selectedRoles.roles.length > 0) {
-                                            for(let i = 0; i < locals.selectedRoles.roles.length; i++) {
-                                                const selectedRole = locals.selectedRoles.roles[i];
-                                            %>
-                                            <%= role.id === selectedRole ? 'checked': ''%><% } }%>>
-                                            <label class="govuk-label govuk-checkboxes__label" for="<%=role.id%>"></label>
-                                </div>
-                        <% } %>
+                        <div class="govuk-checkboxes__item">
+                            <input
+                                class="govuk-checkboxes__input"
+                                id="<%=role.id%>"
+                                type="checkbox"
+                                name="role"
+                                value="<%=role.id%>"
+                                <%
+                                if
+                                (locals.selectedRoles
+                                &&
+                                locals.selectedRoles.length > 0) { for (let i = 0; i < locals.selectedRoles.length; i++) { const selectedRole =locals.selectedRoles[i]; %> <%= role.id === selectedRole ? 'checked': ''%><% } }%>>
+                            <label class="govuk-label govuk-checkboxes__label" for="<%=role.id%>"><%=role.name%></label>
+                        </div>
+                        <% } %> 
                         <% } else { %>
                         <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                             <h2 class="govuk-fieldset__legend__heading govuk-heading-s">
