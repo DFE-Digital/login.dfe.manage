@@ -51,7 +51,7 @@ const getUserDetailsById = async (uid, correlationId) => {
   const ktsDetails = serviceDetails ? serviceDetails.find((c) => c.serviceId.toLowerCase() === config.serviceMapping.key2SuccessServiceId.toLowerCase()) : undefined;
   let externalIdentifier = "";
   if (ktsDetails && ktsDetails.identifiers) {
-    const key = ktsDetails.identifiers.find((a) => (a.key = "k2s-id"));
+    const key = ktsDetails.identifiers.find((a) => a.key === "k2s-id");
     if (key) {
       externalIdentifier = key.value;
     }
@@ -239,15 +239,21 @@ const getFriendlyOrganisationType = async (typeId) => {
 
 const getFriendlyFieldName = (fieldName) => {
   const conversions = [
-    { source: "id", friendly: "user" },
-    { source: "organisation.category.id", friendly: "category" },
-    { source: "organisation.id", friendly: "organisation" },
-    { source: "organisation.localAuthority.id", friendly: "local authority" },
-    { source: "organisation.phaseOfEducation.id", friendly: "phase of education" },
-    { source: "organisation.region.id", friendly: "region" },
-    { source: "organisation.status.id", friendly: "status" },
-    { source: "organisation.type.id", friendly: "type" },
-    { source: "role.id", friendly: "role" },
+    { source: "email", friendly: "User email" },
+    { source: "id", friendly: "User" },
+    { source: "organisation.category.id", friendly: "Organisation category" },
+    { source: "organisation.id", friendly: "Organisation" },
+    { source: "organisation.IsOnAPAR", friendly: "Organisation on APAR" },
+    { source: "organisation.localAuthority.id", friendly: "Organisation Local Authority number" },
+    { source: "organisation.name", friendly: "Organisation name" },
+    { source: "organisation.phaseOfEducation.id", friendly: "Organisation phase of education" },
+    { source: "organisation.region.id", friendly: "Organisation region" },
+    { source: "organisation.status.id", friendly: "Organisation status" },
+    { source: "organisation.type.id", friendly: "Organisation type" },
+    { source: "organisation.ukprn", friendly: "Organisation UKPRN" },
+    { source: "organisation.urn", friendly: "Organisation URN" },
+    { source: "role.id", friendly: "User role ID" },
+    { source: "role.name", friendly: "User role name" },
   ];
 
   const conversion = conversions.find((x) => x.source === fieldName);
