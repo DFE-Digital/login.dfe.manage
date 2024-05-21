@@ -1,14 +1,13 @@
 const config = require('./../config');
-const rp = require('login.dfe.request-promise-retry');
+const { fetchApi } = require('login.dfe.async-retry');
 const jwtStrategy = require('login.dfe.jwt-strategies');
 
 const getInvitation = async (invitationId, correlationId) => {
   const token = await jwtStrategy(config.directories.service).getBearerToken();
 
   try {
-    const invitation = await rp({
+    const invitation = await fetchApi(`${config.directories.service.url}/invitations/${invitationId}`,{
       method: 'GET',
-      uri: `${config.directories.service.url}/invitations/${invitationId}`,
       headers: {
         authorization: `bearer ${token}`,
         'x-correlation-id': correlationId,
