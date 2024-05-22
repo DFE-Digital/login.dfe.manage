@@ -12,7 +12,6 @@ const getInvitation = async (invitationId, correlationId) => {
         authorization: `bearer ${token}`,
         'x-correlation-id': correlationId,
       },
-      json: true,
     });
 
     return invitation;
@@ -28,17 +27,15 @@ const getInvitation = async (invitationId, correlationId) => {
 const getUsersByIdV2 = async (ids, correlationId) => {
   const token = await jwtStrategy(config.directories.service).getBearerToken();
   try {
-    return await rp({
+    return await fetchApi(`${config.directories.service.url}/users/by-ids`,{
       method: 'POST',
-      uri: `${config.directories.service.url}/users/by-ids`,
       headers: {
         authorization: `bearer ${token}`,
         'x-correlation-id': correlationId,
       },
       body: {
         ids: ids.toString(),
-      },
-      json: true,
+      }
     });
   } catch (e) {
     if (e.statusCode === 404) {
@@ -52,14 +49,12 @@ const getUserById = async (uid, correlationId) => {
   const token = await jwtStrategy(config.directories.service).getBearerToken();
 
   try {
-    return await rp({
+    return await fetchApi(`${config.directories.service.url}/users/${uid}`,{
       method: 'GET',
-      uri: `${config.directories.service.url}/users/${uid}`,
       headers: {
         authorization: `bearer ${token}`,
         'x-correlation-id': correlationId,
       },
-      json: true,
     });
   } catch (e) {
     const status = e.statusCode ? e.statusCode : 500;
@@ -74,14 +69,12 @@ const getInvitationByEmail = async (email, correlationId) => {
   const token = await jwtStrategy(config.directories.service).getBearerToken();
 
   try {
-    return await rp({
+    return await fetchApi(`${config.directories.service.url}/invitations/by-email/${email}`,{
       method: 'GET',
-      uri: `${config.directories.service.url}/invitations/by-email/${email}`,
       headers: {
         authorization: `bearer ${token}`,
         'x-correlation-id': correlationId,
       },
-      json: true,
     });
   } catch (e) {
     const status = e.statusCode ? e.statusCode : 500;
@@ -107,15 +100,13 @@ const createInvite = async (firstName, lastName, email, clientId, redirectUri, c
     },
   };
 
-  const invitation = await rp({
+  const invitation = await fetchApi(`${config.directories.service.url}/invitations`,{
     method: 'POST',
-    uri: `${config.directories.service.url}/invitations`,
     headers: {
       authorization: `bearer ${token}`,
       'x-correlation-id': correlationId,
     },
-    body,
-    json: true,
+    body
   });
 
   return invitation.id;
@@ -125,14 +116,12 @@ const resendInvitation = async (id, correlationId) => {
   const token = await jwtStrategy(config.directories.service).getBearerToken();
 
   try {
-    await rp({
+    await fetchApi(`${config.directories.service.url}/invitations/${id}/resend`,{
       method: 'POST',
-      uri: `${config.directories.service.url}/invitations/${id}/resend`,
       headers: {
         authorization: `bearer ${token}`,
         'x-correlation-id': correlationId,
-      },
-      json: true,
+      }
     });
     return true;
   } catch (e) {
@@ -146,9 +135,8 @@ const resendInvitation = async (id, correlationId) => {
 const updateInvite = async (id, email, correlationId) => {
   try {
     const token = await jwtStrategy(config.directories.service).getBearerToken();
-    await rp({
+    await fetchApi(`${config.directories.service.url}/invitations/${id}`,{
       method: 'PATCH',
-      uri: `${config.directories.service.url}/invitations/${id}`,
       headers: {
         authorization: `bearer ${token}`,
         'x-correlation-id': correlationId,
@@ -156,7 +144,6 @@ const updateInvite = async (id, email, correlationId) => {
       body: {
         email,
       },
-      json: true,
     })
   } catch (e) {
     if (e.statusCode === 404) {

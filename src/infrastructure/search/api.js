@@ -13,9 +13,7 @@ const callApi = async (endpoint, method, body, correlationId) => {
         authorization: `bearer ${token}`,
         'x-correlation-id': correlationId,
       },
-      body,
-      json: true,
-      strictSSL: config.hostingEnvironment.env.toLowerCase() !== 'dev',
+      body
     });
   } catch (e) {
     const status = e.statusCode ? e.statusCode : 500;

@@ -66,9 +66,7 @@ const callOrganisationsApi = async (endpoint, method, body, correlationId) => {
         authorization: `bearer ${token}`,
         'x-correlation-id': correlationId,
       },
-      body: body,
-      json: true,
-      strictSSL: config.hostingEnvironment.env.toLowerCase() !== 'dev',
+      body: body
     });
   } catch (e) {
     const status = e.statusCode ? e.statusCode : 500;
