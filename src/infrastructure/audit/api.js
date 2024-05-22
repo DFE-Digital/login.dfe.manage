@@ -3,8 +3,7 @@ const { fetchApi } = require('login.dfe.async-retry');
 const updateAuditLogs = async () => {
   try {
     await fetchApi(`${process.env.AUDIT_HTTP_TRIGGER_URL}`, {
-      method: 'POST',
-      json: true,
+      method: 'POST'
     });
 
     return true;

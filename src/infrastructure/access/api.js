@@ -13,8 +13,7 @@ const callApi = async (method, endpoint, correlationId, body) => {
         authorization: `bearer ${token}`,
         'x-correlation-id': correlationId,
       },
-      body: body,
-      json: true,
+      body: body
     });
   } catch (e) {
     const status = e.statusCode ? e.statusCode : 500;
