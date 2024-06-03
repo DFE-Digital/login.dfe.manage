@@ -42,7 +42,7 @@
 
                     <!-- Display condition selection -->
                     <div class="govuk-form-group <%= (locals.validationMessages.bannerDisplay !== undefined) ? 'govuk-form-group--error' : '' %>">
-                        <fieldset class="govuk-fieldset">
+                        <fieldset class="govuk-fieldset" aria-describedby="validation-selected-organisation">
                             <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                                 When do you want this banner to be displayed?
                             </legend>
@@ -79,7 +79,7 @@
 
                         <!-- From date -->
                         <div class="govuk-form-group <%= (locals.validationMessages.fromDate !== undefined) ? 'govuk-form-group--error' : '' %>">
-                            <fieldset class="govuk-fieldset">
+                            <fieldset class="govuk-fieldset" aria-describedby="validation-selected-organisation">
                                 <legend class="govuk-fieldset__legend govuk-fieldset__legend--s" id="fromDate">
                                     From date
                                 </legend>
@@ -143,7 +143,7 @@
 
                         <!-- To date -->
                         <div class="govuk-form-group <%= (locals.validationMessages.toDate !== undefined) ? 'govuk-form-group--error' : '' %>">
-                            <fieldset class="govuk-fieldset">
+                            <fieldset class="govuk-fieldset" aria-describedby="validation-selected-organisation">
                                 <legend class="govuk-fieldset__legend govuk-fieldset__legend--s" id="toDate">
                                     To date
                                 </legend>
