@@ -283,8 +283,8 @@ const getFriendlyValues = async (fieldName, values, correlationId) => {
 };
 
 const delay = async (milliseconds) => new Promise((resolve) => {
-    setTimeout(resolve, milliseconds);
-  });
+  setTimeout(resolve, milliseconds);
+});
 
 const waitForIndexToUpdate = async (uid, updatedCheck) => {
   const abandonTime = Date.now() + 10000;
@@ -429,16 +429,16 @@ const getValidPageNumber = (pageSource) => {
 };
 
 const objectToQueryString = (obj) => Object.entries(obj)
-    .flatMap(([key, value]) => {
-      if (Array.isArray(value)) {
-        return value.filter((v) => v !== undefined && v !== null && v !== "").map((v) => `${key}=${v}`);
-      }
-      if (value !== undefined && value !== null && value !== "") {
-        return `${key}=${value}`;
-      }
-      return [];
-    })
-    .join("&");
+  .flatMap(([key, value]) => {
+    if (Array.isArray(value)) {
+      return value.filter((v) => v !== undefined && v !== null && v !== "").map((v) => `${key}=${v}`);
+    }
+    if (value !== undefined && value !== null && value !== "") {
+      return `${key}=${value}`;
+    }
+    return [];
+  })
+  .join("&");
 
 const arraysEqual = (a, b) => {
   if (a.length !== b.length) return false;
@@ -498,6 +498,18 @@ const checkClientId = async (clientId, reqId) => {
   return !!service;
 };
 
+const getReturnOrgId = (requestQuery) => {
+  if (
+    requestQuery
+    && Object.prototype.hasOwnProperty.call(requestQuery, "returnOrg")
+    && typeof requestQuery.returnOrg === "string"
+    && requestQuery.returnOrg.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)
+  ) {
+    return requestQuery.returnOrg;
+  }
+  return null;
+};
+
 module.exports = {
   mapUserToSupportModel,
   getUserDetails,
@@ -522,4 +534,5 @@ module.exports = {
   mapLastLoginValuesToDateValues,
   checkClientId,
   _unescape,
+  getReturnOrgId,
 };
