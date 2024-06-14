@@ -1,50 +1,50 @@
-const { searchForUsers } = require('../../infrastructure/search');
-const { getOrganisationByIdV2 } = require('../../infrastructure/organisations');
-const { mapUserRole } = require('../../infrastructure/utils');
-const { getUserServiceRoles } = require('./utils');
-const { getServiceById } = require('../../infrastructure/applications');
+const { searchForUsers } = require("../../infrastructure/search");
+const { getOrganisationByIdV2 } = require("../../infrastructure/organisations");
+const { mapUserRole } = require("../../infrastructure/utils");
+const { getUserServiceRoles } = require("./utils");
+const { getServiceById } = require("../../infrastructure/applications");
 
 const search = async (req) => {
   const organisationId = req.params.oid;
-  const paramsSource = req.method === 'POST' ? req.body : req.query;
+  const paramsSource = req.method === "POST" ? req.body : req.query;
 
   let page = paramsSource.page ? parseInt(paramsSource.page, 10) : 1;
-  if (isNaN(page)) {
+  if (Number.isNaN(page)) {
     page = 1;
   }
 
-  const availableSortCriteria = ['name', 'email', 'lastlogin', 'status'];
+  const availableSortCriteria = ["name", "email", "lastlogin", "status"];
 
-  const sortBy = (paramsSource.sort && availableSortCriteria.includes(paramsSource.sort.toLowerCase())) ? paramsSource.sort.toLowerCase() : 'name';
-  const sortAsc = (paramsSource.sortDir ? paramsSource.sortDir : 'asc').toLowerCase() === 'asc';
+  const sortBy = paramsSource.sort && availableSortCriteria.includes(paramsSource.sort.toLowerCase()) ? paramsSource.sort.toLowerCase() : "name";
+  const sortAsc = (paramsSource.sortDir ? paramsSource.sortDir : "asc").toLowerCase() === "asc";
 
-  const results = await searchForUsers('*', page, sortBy, sortAsc ? 'asc' : 'desc', {
+  const results = await searchForUsers("*", page, sortBy, sortAsc ? "asc" : "desc", {
     organisations: [organisationId],
   });
 
   return {
     page,
     sortBy,
-    sortOrder: sortAsc ? 'asc' : 'desc',
+    sortOrder: sortAsc ? "asc" : "desc",
     numberOfPages: results.numberOfPages,
     totalNumberOfResults: results.totalNumberOfResults,
     users: results.users,
     sort: {
       name: {
-        nextDirection: sortBy === 'name' ? (sortAsc ? 'desc' : 'asc') : 'asc',
-        applied: sortBy === 'name',
+        nextDirection: sortBy === "name" ? (sortAsc ? "desc" : "asc") : "asc",
+        applied: sortBy === "name",
       },
       email: {
-        nextDirection: sortBy === 'email' ? (sortAsc ? 'desc' : 'asc') : 'asc',
-        applied: sortBy === 'email',
+        nextDirection: sortBy === "email" ? (sortAsc ? "desc" : "asc") : "asc",
+        applied: sortBy === "email",
       },
       lastLogin: {
-        nextDirection: sortBy === 'lastlogin' ? (sortAsc ? 'desc' : 'asc') : 'asc',
-        applied: sortBy === 'lastlogin',
+        nextDirection: sortBy === "lastlogin" ? (sortAsc ? "desc" : "asc") : "asc",
+        applied: sortBy === "lastlogin",
       },
       status: {
-        nextDirection: sortBy === 'status' ? (sortAsc ? 'desc' : 'asc') : 'asc',
-        applied: sortBy === 'status',
+        nextDirection: sortBy === "status" ? (sortAsc ? "desc" : "asc") : "asc",
+        applied: sortBy === "status",
       },
     },
   };
@@ -63,13 +63,12 @@ const render = async (req, res) => {
     return viewUser;
   });
 
-  return res.render('services/views/organisationUserList', {
+  return res.render("services/views/organisationUserList", {
     csrfToken: req.csrfToken(),
     serviceId: req.params.sid,
     service,
     backLink: `/services/${req.params.sid}/organisations`,
     organisation,
-    currentOrgId: req.params.oid,
     users,
     page: result.page,
     numberOfPages: result.numberOfPages,
@@ -78,7 +77,7 @@ const render = async (req, res) => {
     userRoles: manageRolesForService,
     sort: result.sort,
     sortBy: result.sortBy,
-    currentNavigation: 'organisations',
+    currentNavigation: "organisations",
   });
 };
 

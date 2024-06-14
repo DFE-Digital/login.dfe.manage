@@ -1,6 +1,6 @@
 const { getServiceById } = require("../../infrastructure/applications");
 const { listRolesOfService, updateUserService, updateInvitationService } = require("../../infrastructure/access");
-const { getUserDetails, getUserServiceRoles } = require("./utils");
+const { getUserDetails, getUserServiceRoles, getReturnOrgId } = require("./utils");
 const { getOrganisationByIdV2 } = require("../../infrastructure/organisations");
 const logger = require("../../infrastructure/logger");
 
@@ -13,10 +13,18 @@ const getModel = async (req) => {
   const user = await getUserDetails(req);
   const manageRolesForService = await getUserServiceRoles(req);
 
+  let backLink = `/services/${req.params.sid}/users/${req.params.uid}/organisations/${organisation.id}`;
+  let cancelLink = `/services/${req.params.sid}/users/${req.params.uid}/organisations`;
+  const returnOrgId = getReturnOrgId(req.query);
+  if (returnOrgId !== null) {
+    backLink += `?returnOrg=${returnOrgId}`;
+    cancelLink += `?returnOrg=${returnOrgId}`;
+  }
+
   return {
     csrfToken: req.csrfToken(),
-    backLink: true,
-    cancelLink: `/services/${req.params.sid}/users/${req.params.uid}/organisations`,
+    backLink,
+    cancelLink,
     service,
     roles: roleDetails,
     user,
@@ -63,7 +71,8 @@ const post = async (req, res) => {
   res.flash("heading", `Service updated: ${model.service.name}`);
   res.flash("message", "Approvers at the relevant organisation have been notified of this change.");
 
-  return res.redirect(`/services/${req.params.sid}/users/${req.params.uid}/organisations`);
+  const returnOrgId = getReturnOrgId(req.query);
+  return res.redirect(`/services/${req.params.sid}/users/${req.params.uid}/organisations${returnOrgId !== null ? `?returnOrg=${returnOrgId}` : ""}`);
 };
 
 module.exports = {
