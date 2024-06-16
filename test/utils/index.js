@@ -56,6 +56,7 @@ const getRequestMock = (customRequest = {}) => ({
       },
     ],
   },
+  query: {},
   session: {},
   ...customRequest,
 });
@@ -80,9 +81,25 @@ const getResponseMock = () => {
   return res;
 };
 
+const getPartialMock = (pathFromRoot = "", realMethods = []) => {
+  const realModule = jest.requireActual(`../../${pathFromRoot}`);
+  const mockedModule = Object.keys(realModule).reduce((module, methodName) => {
+    // eslint-disable-next-line no-param-reassign
+    module[methodName] = jest.fn();
+    return module;
+  }, {});
+
+  realMethods.forEach((method) => {
+    mockedModule[method] = realModule[method];
+  });
+
+  return mockedModule;
+};
+
 module.exports = {
   loggerMockFactory,
   configMockFactory,
   getRequestMock,
   getResponseMock,
+  getPartialMock,
 };

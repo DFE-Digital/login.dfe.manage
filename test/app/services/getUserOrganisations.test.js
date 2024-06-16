@@ -1,67 +1,65 @@
-jest.mock('./../../../src/infrastructure/config', () => require('../../utils').configMockFactory());
-jest.mock('./../../../src/infrastructure/logger', () => require('../../utils').loggerMockFactory());
-jest.mock('./../../../src/app/services/utils');
-jest.mock('./../../../src/infrastructure/organisations');
-jest.mock('./../../../src/infrastructure/directories');
-jest.mock('../../../src/infrastructure/access');
+/* eslint-disable global-require */
+jest.mock("./../../../src/infrastructure/config", () => require("../../utils").configMockFactory());
+jest.mock("./../../../src/infrastructure/logger", () => require("../../utils").loggerMockFactory());
+jest.mock("../../../src/app/services/utils", () => require("../../utils").getPartialMock("src/app/services/utils", ["getReturnOrgId"]));
+/* eslint-enable global-require */
+jest.mock("./../../../src/infrastructure/organisations");
+jest.mock("./../../../src/infrastructure/directories");
+jest.mock("../../../src/infrastructure/access");
 
-const logger = require('../../../src/infrastructure/logger');
-const { getRequestMock, getResponseMock } = require('../../utils');
-const getUserOrganisations = require('../../../src/app/services/getUserOrganisations');
-const { getAllUserOrganisations, getInvitationOrganisations } = require('../../../src/infrastructure/organisations');
-const { getUsersByIdV2 } = require('../../../src/infrastructure/directories');
-const { getUserDetails } = require('../../../src/app/services/utils');
+const logger = require("../../../src/infrastructure/logger");
+const { getRequestMock, getResponseMock } = require("../../utils");
+const getUserOrganisations = require("../../../src/app/services/getUserOrganisations");
+const { getAllUserOrganisations, getInvitationOrganisations } = require("../../../src/infrastructure/organisations");
+const { getUsersByIdV2 } = require("../../../src/infrastructure/directories");
+const { getUserDetails } = require("../../../src/app/services/utils");
 
 const res = getResponseMock();
 
-describe('when getting users organisation details', () => {
+describe("when getting users organisation details", () => {
   let req;
 
   beforeEach(() => {
     req = getRequestMock({
       user: {
-        sub: 'user1',
-        email: 'super.user@unit.test',
+        sub: "user1",
+        email: "super.user@unit.test",
       },
       params: {
-        uid: 'user1',
-        sid: 'service1',
+        uid: "user1",
+        sid: "service1",
       },
       session: {},
     });
 
     getUserDetails.mockReset();
     getUserDetails.mockReturnValue({
-      id: 'user1',
+      id: "user1",
     });
 
     getAllUserOrganisations.mockReset();
     getAllUserOrganisations.mockReturnValue([
       {
         organisation: {
-          id: '88a1ed39-5a98-43da-b66e-78e564ea72b0',
-          name: 'Great Big School',
+          id: "88a1ed39-5a98-43da-b66e-78e564ea72b0",
+          name: "Great Big School",
         },
-        approvers: [
-          'user1',
-        ],
+        approvers: ["user1"],
         services: [
           {
-            id: 'service1',
+            id: "service1",
           },
         ],
       },
       {
         organisation: {
-          id: 'fe68a9f4-a995-4d74-aa4b-e39e0e88c15d',
-          name: 'Little Tiny School',
+          id: "fe68a9f4-a995-4d74-aa4b-e39e0e88c15d",
+          name: "Little Tiny School",
         },
-        approvers: [
-          'user1',
-        ],
+        approvers: ["user1"],
         services: [
           {
-            id: 'service1',
+            id: "service1",
           },
         ],
       },
@@ -71,111 +69,164 @@ describe('when getting users organisation details', () => {
     getInvitationOrganisations.mockReturnValue([
       {
         organisation: {
-          id: '88a1ed39-5a98-43da-b66e-78e564ea72b0',
-          name: 'Great Big School',
+          id: "88a1ed39-5a98-43da-b66e-78e564ea72b0",
+          name: "Great Big School",
         },
-        approvers: [
-          'user1',
-        ],
+        approvers: ["user1"],
         services: [
           {
-            id: 'service1',
+            id: "service1",
           },
         ],
       },
       {
         organisation: {
-          id: 'fe68a9f4-a995-4d74-aa4b-e39e0e88c15d',
-          name: 'Little Tiny School',
+          id: "fe68a9f4-a995-4d74-aa4b-e39e0e88c15d",
+          name: "Little Tiny School",
         },
-        approvers: [
-          'user1',
-        ],
+        approvers: ["user1"],
         services: [
           {
-            id: 'service1',
+            id: "service1",
           },
         ],
       },
     ]);
 
     getUsersByIdV2.mockReset();
-    getUsersByIdV2.mockReturnValue(
-      [
-        {
-          sub: 'user1', given_name: 'User', family_name: 'One', email: 'user.one@unit.tests',
-        },
-        {
-          sub: 'user6', given_name: 'User', family_name: 'Six', email: 'user.six@unit.tests',
-        },
-        {
-          sub: 'user11', given_name: 'User', family_name: 'Eleven', email: 'user.eleven@unit.tests',
-        },
-      ],
-    );
+    getUsersByIdV2.mockReturnValue([
+      {
+        sub: "user1",
+        given_name: "User",
+        family_name: "One",
+        email: "user.one@unit.tests",
+      },
+      {
+        sub: "user6",
+        given_name: "User",
+        family_name: "Six",
+        email: "user.six@unit.tests",
+      },
+      {
+        sub: "user11",
+        given_name: "User",
+        family_name: "Eleven",
+        email: "user.eleven@unit.tests",
+      },
+    ]);
   });
 
-  it('then it should get user details', async () => {
+  it("then it should get user details", async () => {
     await getUserOrganisations(req, res);
 
     expect(getUserDetails.mock.calls).toHaveLength(1);
     expect(getUserDetails.mock.calls[0][0]).toBe(req);
     expect(res.render.mock.calls[0][1].user).toMatchObject({
-      id: 'user1',
+      id: "user1",
     });
   });
 
-  it('then it should get organisations mapping for user where they have the service', async () => {
+  it("then it should get organisations mapping for user where they have the service", async () => {
     await getUserOrganisations(req, res);
 
     expect(getAllUserOrganisations.mock.calls).toHaveLength(1);
-    expect(getAllUserOrganisations.mock.calls[0][0]).toBe('user1');
-    expect(getAllUserOrganisations.mock.calls[0][1]).toBe('correlationId');
+    expect(getAllUserOrganisations.mock.calls[0][0]).toBe("user1");
+    expect(getAllUserOrganisations.mock.calls[0][1]).toBe("correlationId");
 
     expect(res.render.mock.calls[0][1].organisations).toHaveLength(2);
     expect(res.render.mock.calls[0][1].organisations[0]).toMatchObject({
-      id: '88a1ed39-5a98-43da-b66e-78e564ea72b0',
-      name: 'Great Big School',
+      id: "88a1ed39-5a98-43da-b66e-78e564ea72b0",
+      name: "Great Big School",
     });
     expect(res.render.mock.calls[0][1].organisations[1]).toMatchObject({
-      id: 'fe68a9f4-a995-4d74-aa4b-e39e0e88c15d',
-      name: 'Little Tiny School',
+      id: "fe68a9f4-a995-4d74-aa4b-e39e0e88c15d",
+      name: "Little Tiny School",
     });
   });
 
-  it('then it should get organisations mapping for invitation where they have the service', async () => {
+  it("then it should get organisations mapping for invitation where they have the service", async () => {
     getUserDetails.mockReturnValue({
-      id: 'inv-invitation1',
+      id: "inv-invitation1",
     });
 
     await getUserOrganisations(req, res);
 
     expect(getInvitationOrganisations.mock.calls).toHaveLength(1);
-    expect(getInvitationOrganisations.mock.calls[0][0]).toBe('invitation1');
-    expect(getInvitationOrganisations.mock.calls[0][1]).toBe('correlationId');
+    expect(getInvitationOrganisations.mock.calls[0][0]).toBe("invitation1");
+    expect(getInvitationOrganisations.mock.calls[0][1]).toBe("correlationId");
 
     expect(res.render.mock.calls[0][1].organisations).toHaveLength(2);
     expect(res.render.mock.calls[0][1].organisations[0]).toMatchObject({
-      id: '88a1ed39-5a98-43da-b66e-78e564ea72b0',
-      name: 'Great Big School',
+      id: "88a1ed39-5a98-43da-b66e-78e564ea72b0",
+      name: "Great Big School",
     });
     expect(res.render.mock.calls[0][1].organisations[1]).toMatchObject({
-      id: 'fe68a9f4-a995-4d74-aa4b-e39e0e88c15d',
-      name: 'Little Tiny School',
+      id: "fe68a9f4-a995-4d74-aa4b-e39e0e88c15d",
+      name: "Little Tiny School",
     });
   });
 
-  it('then it should should audit user being viewed', async () => {
+  it("then it should should audit user being viewed", async () => {
     await getUserOrganisations(req, res);
 
     expect(logger.audit.mock.calls).toHaveLength(1);
-    expect(logger.audit.mock.calls[0][0]).toBe('super.user@unit.test (id: user1) viewed user undefined (id: user1)');
+    expect(logger.audit.mock.calls[0][0]).toBe("super.user@unit.test (id: user1) viewed user undefined (id: user1)");
     expect(logger.audit.mock.calls[0][1]).toMatchObject({
-      type: 'organisations',
-      subType: 'user-view',
-      userEmail: 'super.user@unit.test',
-      userId: 'user1',
-      viewedUser: 'user1',
+      type: "organisations",
+      subType: "user-view",
+      userEmail: "super.user@unit.test",
+      userId: "user1",
+      viewedUser: "user1",
+    });
+  });
+
+  it("then it should include the returnOrgId as null, if the returnOrg ID isn't set", async () => {
+    req.query.returnOrg = undefined;
+    await getUserOrganisations(req, res);
+    expect(res.render.mock.calls[0][1]).toMatchObject({
+      returnOrgId: null,
+    });
+  });
+
+  it("then it should include the returnOrgId as null, if the returnOrg ID is invalid", async () => {
+    req.query.returnOrg = "foo";
+    await getUserOrganisations(req, res);
+    expect(res.render.mock.calls[0][1]).toMatchObject({
+      returnOrgId: null,
+    });
+  });
+
+  it("then it should include the returnOrgId as an ID string, if the returnOrg ID is valid", async () => {
+    const orgId = "7bf1de6d-4799-46f7-ab50-32359f2566ac";
+    req.query.returnOrg = orgId;
+    await getUserOrganisations(req, res);
+    expect(res.render.mock.calls[0][1]).toMatchObject({
+      returnOrgId: orgId,
+    });
+  });
+
+  it("then it should include a back link to the user management tab, if the returnOrg ID isn't set", async () => {
+    req.query.returnOrg = undefined;
+    await getUserOrganisations(req, res);
+    expect(res.render.mock.calls[0][1]).toMatchObject({
+      backLink: `/services/${req.params.sid}/users`,
+    });
+  });
+
+  it("then it should include a back link to the user management tab, if the returnOrg ID is invalid", async () => {
+    req.query.returnOrg = "foo";
+    await getUserOrganisations(req, res);
+    expect(res.render.mock.calls[0][1]).toMatchObject({
+      backLink: `/services/${req.params.sid}/users`,
+    });
+  });
+
+  it("then it should include a back link to the organisation's user list, if a returnOrg ID is valid", async () => {
+    const orgId = "7bf1de6d-4799-46f7-ab50-32359f2566ac";
+    req.query.returnOrg = orgId;
+    await getUserOrganisations(req, res);
+    expect(res.render.mock.calls[0][1]).toMatchObject({
+      backLink: `/services/${req.params.sid}/organisations/${orgId}/users`,
     });
   });
 });
