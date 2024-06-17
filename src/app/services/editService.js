@@ -2,7 +2,9 @@ const PolicyEngine = require("login.dfe.policy-engine");
 const config = require("../../infrastructure/config");
 const { getSingleUserService, getSingleInvitationService } = require("../../infrastructure/access");
 const { getServiceById } = require("../../infrastructure/applications");
-const { getUserDetails, getUserServiceRoles, getReturnOrgId } = require("./utils");
+const {
+  getUserDetails, getUserServiceRoles, getReturnUrl, getReturnOrgId
+} = require("./utils");
 const { getOrganisationByIdV2 } = require("../../infrastructure/organisations");
 
 const policyEngine = new PolicyEngine(config);
@@ -25,12 +27,6 @@ const getViewModel = async (req) => {
   const serviceRoles = policyResult.rolesAvailableToUser;
   const manageRolesForService = await getUserServiceRoles(req);
 
-  let backLink = `/services/${req.params.sid}/users/${req.params.uid}/organisations`;
-  const returnOrgId = getReturnOrgId(req.query);
-  if (returnOrgId !== null) {
-    backLink += `?returnOrg=${returnOrgId}`;
-  }
-
   return {
     csrfToken: req.csrfToken(),
     service: {
@@ -40,8 +36,8 @@ const getViewModel = async (req) => {
     serviceRoles,
     selectedRoles: [],
     user,
-    backLink,
-    returnOrgId,
+    backLink: getReturnUrl(req.query, `/services/${req.params.sid}/users/${req.params.uid}/organisations`),
+    returnOrgId: getReturnOrgId(req.query),
     organisation,
     userService,
     validationMessages: {},
@@ -83,8 +79,8 @@ const post = async (req, res) => {
   req.session.service = {
     roles: selectedRoles,
   };
-  const returnOrgId = getReturnOrgId(req.query);
-  return res.redirect(`${req.params.oid}/confirm-edit-service${returnOrgId !== null ? `?returnOrg=${returnOrgId}` : ""}`);
+
+  return res.redirect(getReturnUrl(req.query, `${req.params.oid}/confirm-edit-service`));
 };
 
 module.exports = {

@@ -1,7 +1,7 @@
 const { removeServiceFromUser, removeServiceFromInvitation } = require("../../infrastructure/access");
 const { getServiceById } = require("../../infrastructure/applications");
 const {
-  getUserDetails, waitForIndexToUpdate, getUserServiceRoles, getReturnOrgId
+  getUserDetails, waitForIndexToUpdate, getUserServiceRoles, getReturnUrl
 } = require("./utils");
 const { getOrganisationByIdV2 } = require("../../infrastructure/organisations");
 const { getSearchDetailsForUserById, updateIndex } = require("../../infrastructure/search");
@@ -14,17 +14,9 @@ const getModel = async (req) => {
   const organisation = await getOrganisationByIdV2(req.params.oid, req.id);
   const manageRolesForService = await getUserServiceRoles(req);
 
-  let backLink = `/services/${req.params.sid}/users/${req.params.uid}/organisations/${organisation.id}`;
-  let cancelLink = `/services/${req.params.sid}/users/${req.params.uid}/organisations`;
-  const returnOrgId = getReturnOrgId(req.query);
-  if (returnOrgId !== null) {
-    backLink += `?returnOrg=${returnOrgId}`;
-    cancelLink += `?returnOrg=${returnOrgId}`;
-  }
-
   return {
-    backLink,
-    cancelLink,
+    backLink: getReturnUrl(req.query, `/services/${req.params.sid}/users/${req.params.uid}/organisations/${organisation.id}`),
+    cancelLink: getReturnUrl(req.query, `/services/${req.params.sid}/users/${req.params.uid}/organisations`),
     csrfToken: req.csrfToken(),
     organisation,
     user,
@@ -72,8 +64,8 @@ const post = async (req, res) => {
   });
 
   res.flash("info", `${model.user.firstName} ${model.user.lastName} removed from ${model.service.name}`);
-  const returnOrgId = getReturnOrgId(req.query);
-  return res.redirect(`/services/${req.params.sid}/users/${req.params.uid}/organisations${returnOrgId !== null ? `?returnOrg=${returnOrgId}` : ""}`);
+
+  return res.redirect(getReturnUrl(req.query, `/services/${req.params.sid}/users/${req.params.uid}/organisations`));
 };
 
 module.exports = {

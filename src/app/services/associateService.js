@@ -1,7 +1,7 @@
 const PolicyEngine = require("login.dfe.policy-engine");
 const config = require("../../infrastructure/config");
 const { getServiceById } = require("../../infrastructure/applications");
-const { getUserDetails, getUserServiceRoles, getReturnOrgId } = require("./utils");
+const { getUserDetails, getUserServiceRoles, getReturnUrl } = require("./utils");
 const { getOrganisationByIdV2 } = require("../../infrastructure/organisations");
 
 const policyEngine = new PolicyEngine(config);
@@ -14,19 +14,13 @@ const getViewModel = async (req) => {
   const serviceRoles = policyResult.rolesAvailableToUser;
   const manageRolesForService = await getUserServiceRoles(req);
 
-  let backLink = `/services/${req.params.sid}/users/${req.params.uid}/organisations`;
-  const returnOrgId = getReturnOrgId(req.query);
-  if (returnOrgId !== null) {
-    backLink += `?returnOrg=${returnOrgId}`;
-  }
-
   return {
     csrfToken: req.csrfToken(),
     service,
     serviceRoles,
     selectedRoles: [],
     user,
-    backLink,
+    backLink: getReturnUrl(req.query, `/services/${req.params.sid}/users/${req.params.uid}/organisations`),
     organisation,
     validationMessages: {},
     serviceId: req.params.sid,
@@ -63,8 +57,7 @@ const post = async (req, res) => {
     roles: selectedRoles,
   };
 
-  const returnOrgId = getReturnOrgId(req.query);
-  return res.redirect(`confirm-associate-service${returnOrgId !== null ? `?returnOrg=${returnOrgId}` : ""}`);
+  return res.redirect(getReturnUrl(req.query, "confirm-associate-service"));
 };
 
 module.exports = {

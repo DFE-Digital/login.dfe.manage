@@ -510,6 +510,14 @@ const getReturnOrgId = (requestQuery) => {
   return null;
 };
 
+const getReturnUrl = (requestQuery, url) => {
+  const returnOrgId = getReturnOrgId(requestQuery);
+  if (returnOrgId !== null) {
+    return `${url}?returnOrg=${returnOrgId}`;
+  }
+  return url;
+};
+
 module.exports = {
   mapUserToSupportModel,
   getUserDetails,
@@ -535,4 +543,5 @@ module.exports = {
   checkClientId,
   _unescape,
   getReturnOrgId,
+  getReturnUrl,
 };

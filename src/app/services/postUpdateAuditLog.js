@@ -1,10 +1,9 @@
 const { api } = require("../../infrastructure/audit");
-const { getReturnOrgId } = require("./utils");
+const { getReturnUrl } = require("./utils");
 
 const postUpdateAuditLog = async (req, res) => {
   await api.updateAuditLogs();
-  const returnOrgId = getReturnOrgId(req.query);
-  res.redirect(`/services/${req.params.sid}/users/${req.params.uid}/audit${returnOrgId !== null ? `?returnOrg=${returnOrgId}` : ""}`);
+  res.redirect(getReturnUrl(req.query, `/services/${req.params.sid}/users/${req.params.uid}/audit`));
 };
 
 module.exports = postUpdateAuditLog;

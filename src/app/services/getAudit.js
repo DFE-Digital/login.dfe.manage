@@ -1,5 +1,7 @@
 const { mapUserStatus } = require("../../infrastructure/utils");
-const { getUserDetailsById, getUserServiceRoles, getReturnOrgId } = require("./utils");
+const {
+  getUserDetailsById, getUserServiceRoles, getReturnOrgId, getReturnUrl
+} = require("./utils");
 const { getPageOfUserAudits } = require("../../infrastructure/audit");
 const logger = require("../../infrastructure/logger");
 const { getServiceIdForClientId } = require("../../infrastructure/serviceMapping");
@@ -181,19 +183,13 @@ const getAudit = async (req, res) => {
     });
   }
 
-  let backLink = `/services/${req.params.sid}/users/${user.id}/organisations`;
-  const returnOrgId = getReturnOrgId(req.query);
-  if (returnOrgId !== null) {
-    backLink += `?returnOrg=${returnOrgId}`;
-  }
-
   return res.render("services/views/audit", {
     csrfToken: req.csrfToken(),
     user,
     organisations: userOrganisations,
     audits,
-    backLink,
-    returnOrgId,
+    backLink: getReturnUrl(req.query, `/services/${req.params.sid}/users/${user.id}/organisations`),
+    returnOrgId: getReturnOrgId(req.query),
     numberOfPages: pageOfAudits.numberOfPages,
     page: pageNumber,
     totalNumberOfResults: pageOfAudits.numberOfRecords,
