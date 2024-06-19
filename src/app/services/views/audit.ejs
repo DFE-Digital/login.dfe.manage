@@ -17,6 +17,10 @@
                 numberOfResultsOnPage: locals.audits.length,
                 data: [],
             }
+
+            if (returnOrgId) {
+                paginationModel.data.push({ key: "returnOrg", value: returnOrgId });
+            }
             %>
 
             <%- include('../../layouts/pagination', paginationModel); %>

@@ -80,9 +80,9 @@
             <ul class="govuk-list">
                 <li>
                 <% if (area==='audit' ) { %>
-                    <a id="change-service" class="govuk-link-bold" href="/services/<%= locals.serviceId %>/users/<%=user.id%>/organisations">View user details</a>
+                    <a id="change-service" class="govuk-link-bold" href="/services/<%= locals.serviceId %>/users/<%=user.id%>/organisations<%= locals.returnOrgId ? `?returnOrg=${locals.returnOrgId}` : '' %>">View user details</a>
                 <% } else { %>
-                    <a id="change-service" class="govuk-link-bold" href="/services/<%= locals.serviceId %>/users/<%=user.id%>/audit">View user sign in audit</a>
+                    <a id="change-service" class="govuk-link-bold" href="/services/<%= locals.serviceId %>/users/<%=user.id%>/audit<%= locals.returnOrgId ? `?returnOrg=${locals.returnOrgId}` : '' %>">View user sign in audit</a>
                 <% } %>
                 </li>
             </ul>

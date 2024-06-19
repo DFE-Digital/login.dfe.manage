@@ -1,6 +1,6 @@
 const { getServiceById } = require("../../infrastructure/applications");
 const { listRolesOfService, updateUserService, updateInvitationService } = require("../../infrastructure/access");
-const { getUserDetails, getUserServiceRoles } = require("./utils");
+const { getUserDetails, getUserServiceRoles, getReturnUrl } = require("./utils");
 const { getOrganisationByIdV2 } = require("../../infrastructure/organisations");
 const logger = require("../../infrastructure/logger");
 
@@ -15,8 +15,8 @@ const getModel = async (req) => {
 
   return {
     csrfToken: req.csrfToken(),
-    backLink: true,
-    cancelLink: `/services/${req.params.sid}/users/${req.params.uid}/organisations`,
+    backLink: getReturnUrl(req.query, `/services/${req.params.sid}/users/${req.params.uid}/organisations/${organisation.id}`),
+    cancelLink: getReturnUrl(req.query, `/services/${req.params.sid}/users/${req.params.uid}/organisations`),
     service,
     roles: roleDetails,
     user,
@@ -63,7 +63,7 @@ const post = async (req, res) => {
   res.flash("heading", `Service updated: ${model.service.name}`);
   res.flash("message", "Approvers at the relevant organisation have been notified of this change.");
 
-  return res.redirect(`/services/${req.params.sid}/users/${req.params.uid}/organisations`);
+  return res.redirect(getReturnUrl(req.query, `/services/${req.params.sid}/users/${req.params.uid}/organisations`));
 };
 
 module.exports = {

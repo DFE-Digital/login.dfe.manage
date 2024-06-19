@@ -97,7 +97,7 @@
                                 <% } else {%> 
                                 <a 
                                     class="govuk-link breakable"
-                                    href="/services/<%= locals.serviceId %>/users/<%= users[i].id %>/organisations/<%=locals.organisation.id%>/userDetails">
+                                    href="/services/<%= locals.serviceId %>/users/<%= users[i].id %>/organisations/?returnOrg=<%=locals.organisation.id%>">
                                     <%= user.firstName %> <%= user.lastName %>
                                 </a>
                                 <%}%>
