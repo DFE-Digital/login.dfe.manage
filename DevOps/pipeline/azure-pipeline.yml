@@ -17,12 +17,13 @@ trigger:
   branches:
     include:
     - release/*
+    - main
     - feature/*
 
 pr:
   branches:
     include:
-    - develop
+    - main
 
 parameters:
 - name: location
@@ -79,7 +80,7 @@ variables:
   ${{ else }}:
     value: false
 - name: test
-  ${{ if or(eq(parameters.test, 'true'), contains(variables['Build.SourceBranch'],'develop')) }}:
+  ${{ if or(eq(parameters.test, 'true'), contains(variables['Build.SourceBranch'],'main')) }}:
     value: true
   ${{ else }}:
     value: false
