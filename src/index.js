@@ -48,48 +48,44 @@ const init = async () => {
   });
   const app = express();
 
+  logger.info('set helmet policy defaults');
+  
+  const self = "'self'";
+  const allowedOrigin = '*.signin.education.gov.uk';
+
   if (config.hostingEnvironment.hstsMaxAge) {
     app.use(helmet({
-      noCache: true,
-      frameguard: {
-        action: 'deny',
-      },
-      hsts: {
+      strictTransportSecurity: {
         maxAge: config.hostingEnvironment.hstsMaxAge,
         preload: true,
+        includeSubDomains: true,
       },
     }));
   }
-  logger.info('set helmet policy defaults');
-
-  const scriptSources = ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'localhost', '*.signin.education.gov.uk'];
-  const styleSources = ["'self'", "'unsafe-inline'", 'localhost', '*.signin.education.gov.uk'];
-  const imgSources = ["'self'", 'data:', 'blob:', 'localhost', '*.signin.education.gov.uk'];
-  const fontSources = ["'self'", 'data:', '*.signin.education.gov.uk'];
+  
+  // Setting helmet Content Security Policy
+  const scriptSources = [self, "'unsafe-inline'", "'unsafe-eval'", allowedOrigin];
+  const styleSources = [self, "'unsafe-inline'", allowedOrigin];
+  const imgSources = [self, 'data:', 'blob:', allowedOrigin];
+  const fontSources = [self, 'data:', allowedOrigin];
 
   if (config.hostingEnvironment.env === 'dev') {
-    scriptSources.push('https://localhost:3001');
-    styleSources.push('https://localhost:3001');
-    imgSources.push('https://localhost:3001');
-    fontSources.push('https://localhost:3001');
+    scriptSources.push('localhost');
+    styleSources.push('localhost');
+    imgSources.push('localhost');
+    fontSources.push('localhost');
   }
 
-  // Setting helmet Content Security Policy
 
   app.use(helmet.contentSecurityPolicy({
-    browserSniff: false,
-    setAllHeaders: false,
-    useDefaults: false,
     directives: {
-      defaultSrc: ["'self'"],
-      childSrc: ["'none'"],
-      objectSrc: ["'none'"],
+      defaultSrc: [self],
       scriptSrc: scriptSources,
       styleSrc: styleSources,
       imgSrc: imgSources,
       fontSrc: fontSources,
-      connectSrc: ["'self'"],
-      formAction: ["'self'", '*'],
+      connectSrc: [self],
+      formAction: [self, '*'],
     },
   }));
 
