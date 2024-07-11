@@ -156,9 +156,7 @@
                         "value": {
                             "WEBSITE_HEALTHCHECK_MAXPINGFAILURES": "4",
                             "AUDIT_HTTP_TRIGGER_URL": "[parameters('auditHttpTriggerInvokeUrl')]", 
-                            "WSORG_SYNC_URL":"[parameters('wsorgsyncUrl')]",
-                            "WEBSITE_LOCAL_CACHE_OPTION": "Always",
-                            "WEBSITE_LOCAL_CACHE_SIZEINMB": "2000"
+                            "WSORG_SYNC_URL":"[parameters('wsorgsyncUrl')]"
                         }
                     },
                      "healthCheckPath": {
