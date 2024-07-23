@@ -41,8 +41,8 @@
                 <fieldset class="govuk-fieldset" id="roles">
                     <% if (locals.validationMessages.roles !== undefined) { %>
                         <p id="validation-selected-role" class="govuk-error-message">
-                            <span class="govuk-visually-hidden">Error:</span>
-                            <%=locals.validationMessages.roles%>
+                            <span class="govuk-visually-hidden">There is a problem</span>
+                            <%-locals.validationMessages.roles%>
                         </p>
                     <% } %>
                     <% if (locals.serviceRoles.length > 0) { %>
@@ -69,7 +69,7 @@
 
             <div class="govuk-button-group">
                 <button type="submit" class="govuk-button" data-module="govuk-button">Save</button>
-                <a href="<%= locals.cancelLink %>" class="govuk-button govuk-button--secondary">Cancel</a>
+                <a href="<%= locals.backLink %>" class="govuk-button govuk-button--secondary">Cancel</a>
             </div>
 
         </form>
@@ -83,7 +83,7 @@
             <h2 class="govuk-heading-m">Related actions</h2>
             <ul class="govuk-list">
                 <li>
-                    <a class="govuk-link-bold" href="<%= locals.organisation.id %>/remove-service">Remove service</a>
+                    <a class="govuk-link-bold" href="<%= locals.organisation.id %>/remove-service<%= locals.returnOrgId ? `?returnOrg=${locals.returnOrgId}` : '' %>">Remove service</a>
                 </li>
             </ul>
         </aside>

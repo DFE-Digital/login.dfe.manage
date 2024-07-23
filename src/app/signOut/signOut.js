@@ -2,7 +2,16 @@
 
 const url = require('url');
 const passport = require('passport');
-const config = require('./../../infrastructure/config');
+const config = require('../../infrastructure/config');
+const logger = require('../../infrastructure/logger');
+
+const logout = (req, res) => {
+  req.logout(() => {
+    logger.info('user logged out.');
+  });
+  req.session = null; // Needed to clear session and completely logout
+  req.user = null;
+};
 
 const signUserOut = (req, res) => {
   const baseUrl = `${config.hostingEnvironment.protocol}://${config.hostingEnvironment.host}:${config.hostingEnvironment.port}`;
@@ -15,7 +24,7 @@ const signUserOut = (req, res) => {
       returnUrl = `${baseUrl}/signout/session-timeout`;
     }
 
-    req.logout();
+    logout(req, res);
     res.redirect(url.format(Object.assign(url.parse(issuer.end_session_endpoint), {
       search: null,
       query: {
@@ -25,11 +34,10 @@ const signUserOut = (req, res) => {
     })));
   } else {
     if (req.query.timeout === '1') {
-      req.logout();
-      req.session = null;
+      logout(req, res);
       return res.redirect(`${baseUrl}/signout/session-timeout`);
     }
-
+    logout(req, res);
     res.redirect('/');
   }
 };

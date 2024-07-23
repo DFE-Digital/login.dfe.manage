@@ -13,6 +13,24 @@
 <div class="govuk-width-container govuk-main-wrapper">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-three-quarters">
+            <% if (locals.flash.title && locals.flash.heading && locals.flash.message) { %>
+                <div id="notification-wrapper" class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+                    <div class="govuk-notification-banner__header">
+                        <span class="close-button">x</span>
+                        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                            <%= locals.flash.title %>
+                        </h2>
+                    </div>
+                    <div class="govuk-notification-banner__content">
+                        <h3 class="govuk-notification-banner__heading">
+                            <%= locals.flash.heading %>
+                        </h3>
+                        <p class="govuk-body">
+                            <%= locals.flash.message %>
+                        </p>
+                    </div>
+                </div>
+        <% } %>
             <h1 id="service-name" class="govuk-heading-xl govuk-!-margin-top-0">
                 <%=locals.serviceDetails.name%>
             </h1>
@@ -45,7 +63,7 @@
                                 >User management</a
                             >
                         </h3>
-                        <p class="govuk-body">Manage those who use your service and invite new users.</p>
+                        <p class="govuk-body">Manage and invite users to your service.</p>
                     </div>
     
                     <div class="manage-card">
@@ -134,6 +152,7 @@
                     </p>
                 </div>
                 <% } %>
+
             </div>
         </div>
     </div>

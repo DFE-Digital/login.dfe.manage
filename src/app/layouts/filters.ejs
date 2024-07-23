@@ -1,0 +1,144 @@
+<%# This partial template is designed to generate a filter interface and expects the following parameters:
+
+1) `filterCategories`: An array of objects, where each object represents a filter category with the following properties:
+    - `name` (String): The display name for the filter category. E.g., "Status".
+    - `inputName` (String): The name attribute for the input field, which will be used to capture user selections.
+    - `options` (Array): An array of objects that represent the available options for filtering within the category.
+        - Each object in `options` should contain:
+            - `id` (String/Number): A unique identifier for the option.
+            - `name` (String): The display name of the option.
+            - `isSelected` (Boolean): A flag indicating whether the option is currently selected.
+
+  Example of a `filterCategories` array:
+  [
+    {
+      name: 'Status',
+      inputName: 'organisationStatus',
+      options: [
+        {id: "2", name: "Closed", isSelected: false},
+        {id: "5", name: "Dissolved", isSelected: true}
+      ]
+    },
+    {
+      name: 'Organisation Category',
+      inputName: 'organisationType',
+      options: [
+        {id: "001", name: "School", isSelected: false},
+        {id: "002", name: "University", isSelected: true}
+      ]
+    }
+  ]
+
+2) `clearFiltersUri`: A URI string that, when clicked, will clear all active filters and refresh the list.
+  - This URI should include all necessary parameters to maintain the current state of the page while clearing filters.
+  
+  Example of a `clearFiltersUri` string:
+  `?page=${locals.page}&showOrganisations=${locals.serviceOrganisations}&criteria=${locals.criteria}&sort=${locals.sortBy}&sortDir=${locals.sortOrder}&showFilters=${locals.showFilters}`
+
+%>
+
+
+<% const toKebabCase = (str) => str.toLowerCase().replace(/\s+/g, '-'); %>
+
+<div class="dfe-filter-header">
+    <h2 class="govuk-heading-s govuk-!-margin-bottom-0">Filters</h2>
+</div>
+
+<div class="dfe-filter-scroll">
+    <div class="govuk-form-group dfe-filter-by-container">
+        <fieldset class="govuk-fieldset">
+            <div class="dfe-selected-filters-background">
+                <div class="govuk-form-group dfe-filter-search">
+                    <h2 class="govuk-heading-s govuk-!-display-inline-block govuk-!-margin-top-2 govuk-!-margin-bottom-2" for="filterByType">
+                        Selected filters
+                    </h2>
+                    <a href="<%= clearFiltersUri %>" class="govuk-link govuk-!-display-inline-block govuk-!-margin-top-2 govuk-!-margin-bottom-2 dfe-right-align">
+                        Clear filters
+                    </a>
+                    <div id="show-hide-selected-filters">
+                        <h3 class="govuk-hint govuk-!-font-weight-bold govuk-body govuk-!-font-size-16 govuk-!-margin-0">
+                            No filters selected
+                        </h3>
+                    </div>
+
+                    <div class="dfe-filters-selected">
+                        <div class="filter">
+                            <div class="filter__content">
+                                <div class="filter__selected">
+                                    <% filterCategories.forEach((category) => { 
+                                        const categoryNameKebabCase = toKebabCase(category.name); 
+                                    %>
+                                        <div class="dfe-hidden" id="<%= categoryNameKebabCase %>-text">
+                                            <h3 class="govuk-!-font-weight-bold govuk-body govuk-!-font-size-16 govuk-!-margin-0">
+                                                <%= category.name %>
+                                            </h3>
+                                        </div>
+                                        <ul class="filter-tags <%= categoryNameKebabCase %>-options-list">
+                                            <% category.options.forEach((option, i) => { %>
+                                                <li id="<%= categoryNameKebabCase %>-option-<%= i+1 %>" class="dfe-hidden <%= categoryNameKebabCase %>-option" onclick="hideMe('<%= categoryNameKebabCase %>-option-<%= i+1 %>', '<%= category.name %>', 'show-hide-<%=categoryNameKebabCase%>-<%= i+1 %>')">
+                                                    <a class="govuk-link filter__tag link">
+                                                        <span class="govuk-visually-hidden">Remove this filter</span>
+                                                        <%= option.name %>
+                                                    </a>
+                                                </li>
+                                            <% }) %>
+                                        </ul>
+                                    <% }) %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset class="govuk-fieldset">
+            <div class="govuk-form-group dfe-filter-search">
+                <button class="govuk-button govuk-!-margin-top-3 govuk-!-margin-bottom-3" data-module="govuk-button">
+                    Apply filters
+                </button>
+                <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-with-filter-sections">
+                    <% filterCategories.forEach((category, j) => { 
+                        const categoryNameKebabCase = toKebabCase(category.name); 
+                    %>
+                        <div class="govuk-accordion__section <%= categoryNameKebabCase %>">
+                            <div class="govuk-accordion__section-header">
+                                <h2 class="govuk-accordion__section-heading">
+                                    <span class="govuk-accordion__section-button govuk-body govuk-!-font-size-19" id="<%= categoryNameKebabCase %>-accordion-heading">
+                                        <span class="govuk-visually-hidden">Filter by</span>
+                                        <%= category.name %>
+                                    </span>
+                                </h2>
+                                <div class="govuk-accordion__section-summary govuk-body govuk-body-s" id="<%= categoryNameKebabCase %>-accordion-summary">
+                                    <span id="<%= categoryNameKebabCase %>-count">0</span> selected
+                                </div>
+                            </div>
+                            <div class="govuk-accordion__section-content">
+                                <fieldset class="govuk-fieldset">
+                                    <div class="govuk-checkboxes govuk-checkboxes--small dfe-filter-by-checkbox">
+                                        <% category.options.forEach((option, i) => { %>
+                                            <div class="govuk-checkboxes__item">
+                                                <input 
+                                                    class="govuk-checkboxes__input dfe-filter-input <%= categoryNameKebabCase %>-checkboxes-input"
+                                                    name="<%= category.inputName %>"
+                                                    id="show-hide-<%= categoryNameKebabCase %>-<%= i+1 %>"
+                                                    type="checkbox" 
+                                                    value="<%= option.id %>" 
+                                                    <%=(option.isSelected ? 'checked="checked"' : '' )%>
+                                                    onclick="updateCount('<%= category.name %>'); showMe('<%= categoryNameKebabCase %>-option-<%= i+1 %>', '<%= category.name %>', 'show-hide-<%=categoryNameKebabCase%>-<%= i+1 %>')"
+                                                >
+                                                <label class="govuk-label govuk-checkboxes__label" for="show-hide-<%=categoryNameKebabCase%>-<%= i+1 %>">
+                                                    <%= option.name %>
+                                                </label>
+                                            </div>
+                                        <% }) %>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+</div>

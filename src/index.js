@@ -1,22 +1,33 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const expressLayouts = require('express-ejs-layouts');
-const logger = require('./infrastructure/logger');
 const http = require('http');
 const https = require('https');
 const path = require('path');
-const config = require('./infrastructure/config');
-const configSchema = require('./infrastructure/config/schema');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const sanitization = require('login.dfe.sanitization');
 const csurf = require('csurf');
 const flash = require('login.dfe.express-flash-2');
-const oidc = require('./infrastructure/oidc');
-const session = require('cookie-session');
-const { setUserContext, isManageUser } = require('./infrastructure/utils');
+const session = require('express-session');
 const { getErrorHandler, ejsErrorPages } = require('login.dfe.express-error-handling');
 const moment = require('moment');
+const localStorage = require('node-persist');
+const Redis = require('ioredis');
+const RedisStore = require('connect-redis').default;
+const { setUserContext, isManageUser } = require('./infrastructure/utils');
+const oidc = require('./infrastructure/oidc');
+const configSchema = require('./infrastructure/config/schema');
+const config = require('./infrastructure/config');
+const logger = require('./infrastructure/logger');
+
+const redisClient = new Redis(config.serviceMapping.params.connectionString);
+
+// Initialize store.
+const redisStore = new RedisStore({
+  client: redisClient,
+  prefix: 'CookieSession:',
+});
 
 const registerRoutes = require('./routes');
 
@@ -24,8 +35,11 @@ configSchema.validate();
 
 https.globalAgent.maxSockets = http.globalAgent.maxSockets = config.hostingEnvironment.agentKeepAlive.maxSockets || 50;
 
-
 const init = async () => {
+  localStorage.init({
+    ttl: 60 * 60 * 1000,
+  });
+
   const csrf = csurf({
     cookie: {
       secure: true,
@@ -34,25 +48,54 @@ const init = async () => {
   });
   const app = express();
 
+  logger.info('set helmet policy defaults');
+  
+  const self = "'self'";
+  const allowedOrigin = '*.signin.education.gov.uk';
+
   if (config.hostingEnvironment.hstsMaxAge) {
     app.use(helmet({
-      noCache: true,
-      frameguard: {
-        action: 'deny',
-      },
-      hsts: {
+      strictTransportSecurity: {
         maxAge: config.hostingEnvironment.hstsMaxAge,
         preload: true,
-      }
-    }));
-  } else {
-    app.use(helmet({
-      noCache: true,
-      frameguard: {
-        action: 'deny',
-      }
+        includeSubDomains: true,
+      },
     }));
   }
+  
+  // Setting helmet Content Security Policy
+  const scriptSources = [self, "'unsafe-inline'", "'unsafe-eval'", allowedOrigin];
+  const styleSources = [self, "'unsafe-inline'", allowedOrigin];
+  const imgSources = [self, 'data:', 'blob:', allowedOrigin];
+  const fontSources = [self, 'data:', allowedOrigin];
+
+  if (config.hostingEnvironment.env === 'dev') {
+    scriptSources.push('localhost');
+    styleSources.push('localhost');
+    imgSources.push('localhost');
+    fontSources.push('localhost');
+  }
+
+
+  app.use(helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: [self],
+      scriptSrc: scriptSources,
+      styleSrc: styleSources,
+      imgSrc: imgSources,
+      fontSrc: fontSources,
+      connectSrc: [self],
+      formAction: [self, '*'],
+    },
+  }));
+
+  logger.info('Set helmet filters');
+
+  app.use(helmet.xssFilter());
+  app.use(helmet.frameguard('false'));
+  app.use(helmet.ieNoOpen());
+
+  logger.info('helmet setup complete');
 
   let assetsUrl = config.assets.url;
   assetsUrl = assetsUrl.endsWith('/') ? assetsUrl.substr(0, assetsUrl.length - 1) : assetsUrl;
@@ -87,11 +130,22 @@ const init = async () => {
     expiryInMinutes = sessionExpiry;
   }
   app.use(session({
+    name: 'session',
+    store: redisStore,
     keys: [config.hostingEnvironment.sessionSecret],
     maxAge: expiryInMinutes * 60000, // Expiry in milliseconds
     httpOnly: true,
     secure: true,
+    resave: true,
+    saveUninitialized: true,
+    secret: config.hostingEnvironment.sessionSecret,
+    cookie: {
+      httpOnly: true,
+      secure: true,
+      maxAge: expiryInMinutes * 60000, // Expiry in milliseconds
+    },
   }));
+
   app.use((req, res, next) => {
     req.session.now = Date.now();
     next();
@@ -103,9 +157,9 @@ const init = async () => {
   app.use(cookieParser());
   app.use(sanitization({
     sanitizer: (key, value) => {
-      //add exception for fields that we don't want to encode
+      // add exception for fields that we don't want to encode
       const fieldToNotSanitize = ['criteria'];
-      if (fieldToNotSanitize.find(x => x.toLowerCase() === key.toLowerCase())) {
+      if (fieldToNotSanitize.find((x) => x.toLowerCase() === key.toLowerCase())) {
         return value;
       }
       return sanitization.defaultSanitizer(key, value);

@@ -1,3 +1,11 @@
+<% function generateHiddenInputs(array, inputName) { %>
+    <% if (array && array.length > 0) { %>
+        <% array.forEach(option => { %>
+            <input type="hidden" name="<%= inputName %>" value="<%= option %>">
+        <% }) %>
+    <% } %>
+<% } %>
+
 <div class="govuk-width-container govuk-main-wrapper">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-three-quarters">
@@ -37,11 +45,27 @@
                     { key: 'showServices', value: locals.services === 'current' ? 'current' : 'all' }
                 ]
             }
+            const addToPaginationData = (array, key, paginationData) => {
+                if (array && array.length > 0) {
+                    array.forEach(item => {
+                        paginationData.push({ key, value: `${item}` });
+                    });
+                }
+            };
+
+            addToPaginationData(locals.selectedOrganisationCategories, 'organisationCategories', paginationModel.data);
+            addToPaginationData(locals.selectedLastLoginIntervals, 'lastLogin', paginationModel.data);
+            addToPaginationData(locals.selectedAccountStatuses, 'statusId', paginationModel.data);
             %>
 
             <form method="post" id="form-user-search">
                 <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
                 <input type="hidden" name="services" value="<%= locals.services %>" />
+                <input type="hidden" name="showFilters" value="<%= locals.showFilters %>"/>
+                <% generateHiddenInputs(locals.selectedOrganisationCategories, 'organisationCategories') %>
+                <% generateHiddenInputs(locals.selectedLastLoginIntervals, 'lastLogin') %>
+                <% generateHiddenInputs(locals.selectedAccountStatuses, 'statusId') %>
+
                 <fieldset class="govuk-fieldset">
                     <div class="govuk-form-group">
                         <h2 class="govuk-label-wrapper">
@@ -50,7 +74,7 @@
                             </label>
                         </h2>
                         <div id="event-name-hint" class="govuk-hint">
-                            Search by name, email, legacy ID or organisation
+                            Search by name, email, legacy ID or organisation name
                         </div>
                         <input
                             class="govuk-input govuk-!-width-three-quarters"
@@ -77,15 +101,87 @@
                     </div>
                 </fieldset>
             </form>
+            <form method="post" class="show-filters">
+                <% generateHiddenInputs(locals.selectedOrganisationCategories, 'organisationCategories') %>
+                <% generateHiddenInputs(locals.selectedLastLoginIntervals, 'lastLogin') %>
+                <% generateHiddenInputs(locals.selectedAccountStatuses, 'statusId') %>
+
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
+                <input type="hidden" name="criteria" value="<%= locals.criteria %>"/>
+                <input type="hidden" name="sort" value="<%= locals.sortBy %>"/>
+                <input type="hidden" name="sortDir" value="<%= locals.sortOrder %>"/>
+                <input type="hidden" name="showServices" value="<%= locals.services === 'current' ? 'current' : 'all' %>"/>
+                <input type="hidden" name="page" value="<%= locals.page %>"/>
+                <input type="hidden" name="showFilters" value="<%= !showFilters %>"/>
+                <input type="hidden" name="isFilterToggle" value="true"/>
+                <button type="submit" class="govuk-button govuk-button--secondary"><%= (showFilters ? 'Hide' : 'Show') %> filters</button>
+            </form>
         </div>
     </div>
 
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
+        <% if (showFilters) { %>
+            <div class="govuk-grid-column-one-third">
+                <% 
+                const filterCategories = [
+                    { name: 'Organisation category', inputName:'organisationCategories', options: organisationCategories },
+                    { name: 'Last login', inputName:'lastLogin', options: lastLoginIntervals },
+                    { name: 'Account status', inputName:'statusId', options: accountStatuses }       
+                ]
+                %>
+                
+                <% const clearFiltersUri = `?page=${locals.page}&criteria=${locals.criteria}&sort=${locals.sortBy}&sortDir${locals.sortOrder}&showFilters=${locals.showFilters}&showServices=${locals.services === 'current' ? 'current' : 'all' }`%>
+
+                <form method="POST">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
+                    <input type="hidden" name="criteria" value="<%= locals.criteria %>"/>
+                    <input type="hidden" name="sort" value="<%= locals.sortBy %>"/>
+                    <input type="hidden" name="sortDir" value="<%= locals.sortOrder %>"/>
+                    <input type="hidden" name="showServices" value="<%= locals.services === 'current' ? 'current' : 'all' %>"/>
+                    <input type="hidden" name="page" value="1"/>
+                    <input type="hidden" name="showFilters" value="<%= locals.showFilters %>"/>
+                
+                    <%- include('../../layouts/filters.ejs', { filterCategories: filterCategories, clearFiltersUri:clearFiltersUri }) %>
+                </form>
+            </div>
+        <% } %>
+        <div class="<%= showFilters ? 'govuk-grid-column-two-thirds govuk-!-padding-left-0 govuk-!-padding-right-0' : 'govuk-grid-column-full' %>">
             <%- include('../../layouts/pagination', paginationModel); %>
             <table class="govuk-table data">
                 <thead class="govuk-table__head">
-                    <% let baseSortUri = `?criteria=${criteria}&page=${page}&services=${services}`; %>
+
+                    <% 
+                    let orgCategoryParam = "";
+                    let lastLoginParam = "";
+                    let accountStatusParam = "";
+
+                    if (locals.selectedOrganisationCategories && locals.selectedOrganisationCategories.length > 0) {
+                        orgCategoryParam = locals.selectedOrganisationCategories.map(category => `organisationCategories=${category}`).join('&');
+                    }
+
+                    if (locals.selectedLastLoginIntervals && locals.selectedLastLoginIntervals.length > 0) {
+                        lastLoginParam = locals.selectedLastLoginIntervals.map(interval => `lastLogin=${interval}`).join('&');
+                    }
+                    
+
+                    if (locals.selectedAccountStatuses && locals.selectedAccountStatuses.length > 0) {
+                        accountStatusParam = locals.selectedAccountStatuses.map(status => `statusId=${status}`).join('&');
+                    }
+
+                    let baseSortUri = `?criteria=${criteria}&page=${page}&services=${services}&showFilters=${locals.showFilters}`
+
+                    if (orgCategoryParam) {
+                        baseSortUri += `&${orgCategoryParam}`;
+                    }
+
+                    if (lastLoginParam) {
+                        baseSortUri += `&${lastLoginParam}`;
+                    } 
+                    
+                    if (accountStatusParam) {
+                        baseSortUri += `&${accountStatusParam}`
+                    }
+                    %>
                     <tr class="govuk-table__row sortable">
                         <th scope="col" class="govuk-table__header width-18">
                             <a

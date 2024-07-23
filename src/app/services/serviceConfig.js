@@ -1,177 +1,470 @@
-'use strict';
+const niceware = require("niceware");
+const he = require("he");
+const { Utils } = require("sequelize");
+const UrlValidator = require("login.dfe.validation/src/urlValidator");
+const logger = require("../../infrastructure/logger/index");
+const {
+  AUTHENTICATION_FLOWS,
+  GRANT_TYPES,
+  ACTIONS,
+  TOKEN_ENDPOINT_AUTH_METHOD,
+  ERROR_MESSAGES,
+  REDIRECT_URLS_CHANGES,
+} = require("../../constants/serviceConfigConstants");
+const { getServiceById } = require("../../infrastructure/applications");
+const {
+  getUserServiceRoles,
+  determineAuthFlowByRespType,
+  processRedirectUris,
+  processConfigurationTypes,
+  isCorrectProtocol,
+  isCorrectLength,
+  isValidUrl,
+  checkClientId,
+  _unescape,
+} = require("./utils");
 
-const niceware = require('niceware');
-const { getServiceById, updateService } = require('../../infrastructure/applications');
-const logger = require('../../infrastructure/logger');
-const { getUserServiceRoles } = require('./utils');
+const {
+  saveRedirectUrlsToStorage,
+  deleteFromLocalStorage,
+  retreiveRedirectUrlsFromStorage,
+} = require("../../infrastructure/utils/serviceConfigCache");
 
-const getServiceConfig = async (req, res) => {
-  const service = await getServiceById(req.params.sid, req.id);
-  const manageRolesForService = await getUserServiceRoles(req);
+const buildServiceModelFromObject = (service, sessionService = {}) => {
+  let tokenEndpointAuthMethod = null;
+  const { CLIENT_SECRET_POST, CLIENT_SECRET_BASIC } = TOKEN_ENDPOINT_AUTH_METHOD;
+  const sessionValue = sessionService?.tokenEndpointAuthMethod?.newValue;
+  const fallbackValue = service.relyingParty.token_endpoint_auth_method === CLIENT_SECRET_POST ? CLIENT_SECRET_POST : CLIENT_SECRET_BASIC;
 
-  return res.render('services/views/serviceConfig', {
-    csrfToken: req.csrfToken(),
-    service: {
-      name: service.name || '',
-      description: service.description || '',
-      serviceHome: service.relyingParty.service_home || '',
-      postResetUrl: service.relyingParty.postResetUrl || '',
-      clientId: service.relyingParty.client_id || '',
-      clientSecret: service.relyingParty.client_secret || '',
-      redirectUris: service.relyingParty.redirect_uris,
-      postLogoutRedirectUris: service.relyingParty.post_logout_redirect_uris,
-      responseTypes: service.relyingParty.response_types || [],
-      grantTypes: service.relyingParty.grant_types || [],
-      apiSecret: service.relyingParty.api_secret || '',
-      tokenEndpointAuthMethod: service.relyingParty.token_endpoint_auth_method,
-    },
-    backLink: `/services/${req.params.sid}`,
-    validationMessages: {},
-    serviceId: req.params.sid,
-    userRoles: manageRolesForService,
-    currentNavigation: 'configuration',
-  });
+  const responseTypes = (sessionService?.responseTypes?.newValue || service.relyingParty.response_types) || [];
+  const authFlowType = determineAuthFlowByRespType(responseTypes);
+
+  tokenEndpointAuthMethod = (sessionValue && (authFlowType === AUTHENTICATION_FLOWS.HYBRID_FLOW || authFlowType === AUTHENTICATION_FLOWS.AUTHORISATION_CODE_FLOW)) ? sessionValue : fallbackValue;
+
+  let grantTypes = [];
+  if (sessionService?.grantTypes?.newValue && authFlowType !== AUTHENTICATION_FLOWS.IMPLICIT_FLOW) {
+    grantTypes = sessionService?.grantTypes?.newValue;
+  } else {
+    grantTypes = service.relyingParty?.grant_types || [];
+  }
+
+  const refreshToken = grantTypes.includes(GRANT_TYPES.REFRESH_TOKEN) ? GRANT_TYPES.REFRESH_TOKEN : null;
+
+  return {
+    name: service.name || "",
+    description: service.description || "",
+    clientId: (sessionService?.clientId?.newValue || service.relyingParty.client_id) || "",
+    clientSecret: (sessionService?.clientSecret?.secretNewValue || service.relyingParty.client_secret) || "",
+    serviceHome: (sessionService?.serviceHome?.newValue || service.relyingParty.service_home) || "",
+    postResetUrl: (sessionService?.postResetUrl?.newValue || service.relyingParty.postResetUrl) || "",
+    redirectUris: (sessionService?.redirectUris?.newValue || service.relyingParty.redirect_uris) || [],
+    postLogoutRedirectUris: (sessionService?.postLogoutRedirectUris?.newValue || service.relyingParty.post_logout_redirect_uris) || [],
+    grantTypes,
+    responseTypes,
+    apiSecret: (sessionService?.apiSecret?.secretNewValue || service.relyingParty.api_secret) || "",
+    refreshToken,
+    tokenEndpointAuthMethod,
+  };
 };
 
-const validate = async (req) => {
-  const service = await getServiceById(req.params.sid, req.id);
-  const urlValidation = new RegExp('^https?:\\/\\/(.*)');
+const getSessionServiceForAmendChanges = async (req) => {
+  if (req.query?.action === ACTIONS.AMEND_CHANGES) {
+    let sessionService = req.session.serviceConfigurationChanges;
+    try {
+      const serviceConfigChangesKey = `${REDIRECT_URLS_CHANGES}_${req.session.passport.user.sub}_${req.params.sid}`;
+      const redirectUrlsChanges = await retreiveRedirectUrlsFromStorage(serviceConfigChangesKey, req.params.sid);
+
+      if (redirectUrlsChanges) {
+        sessionService = { ...sessionService, ...redirectUrlsChanges };
+      }
+      return sessionService;
+    } catch (error) {
+      logger.error(`Error occurred while retrieving redirect URLs from local storage for service ID - ${req.params.sid}:`, error);
+      return sessionService;
+    }
+  }
+  return {};
+};
+
+const buildCurrentServiceModel = async (req) => {
+  try {
+    const sessionService = await getSessionServiceForAmendChanges(req);
+    const service = await getServiceById(req.params.sid, req.id);
+    const currentServiceModel = buildServiceModelFromObject(service, sessionService);
+    const oldServiceConfigModel = buildServiceModelFromObject(service);
+
+    return {
+      currentServiceModel,
+      oldServiceConfigModel,
+    };
+  } catch (error) {
+    throw new Error(`Could not build service model - ${error}`);
+  }
+};
+
+const getServiceConfig = async (req, res) => {
+  try {
+    if (req.query.action !== ACTIONS.AMEND_CHANGES) {
+      req.session.serviceConfigurationChanges = {};
+      const serviceConfigChangesKey = `${REDIRECT_URLS_CHANGES}_${req.session.passport.user.sub}_${req.params.sid}`;
+      await deleteFromLocalStorage(serviceConfigChangesKey);
+    }
+    const manageRolesForService = await getUserServiceRoles(req);
+    const serviceModel = await buildCurrentServiceModel(req);
+    return res.render("services/views/serviceConfig", {
+      csrfToken: req.csrfToken(),
+      service: serviceModel.currentServiceModel,
+      backLink: `/services/${req.params.sid}`,
+      validationMessages: {},
+      serviceId: req.params.sid,
+      userRoles: manageRolesForService,
+      currentNavigation: "configuration",
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+const validate = async (req, currentService, oldService) => {
   const manageRolesForService = await getUserServiceRoles(req);
 
-  let grantTypes = req.body.grant_types ? req.body.grant_types : [];
-  if (!(grantTypes instanceof Array)) {
-    grantTypes = [req.body.grant_types];
+  const responseTypes = processConfigurationTypes(req.body.response_types) || [];
+  const selectedRedirects = processRedirectUris(req.body.redirect_uris) || [];
+  const selectedLogout = processRedirectUris(req.body.post_logout_redirect_uris) || [];
+
+  const authFlowType = determineAuthFlowByRespType(responseTypes);
+
+  const isImplicitFlow = authFlowType === AUTHENTICATION_FLOWS.IMPLICIT_FLOW;
+  const isAuthorisationCodeFlow = authFlowType === AUTHENTICATION_FLOWS.AUTHORISATION_CODE_FLOW;
+  const isHybridFlow = authFlowType === AUTHENTICATION_FLOWS.HYBRID_FLOW;
+
+  const refreshToken = (req.body.refresh_token && (isAuthorisationCodeFlow || isHybridFlow)) ? req.body.refresh_token : null;
+
+  let grantTypes = [];
+
+  if (isHybridFlow || isAuthorisationCodeFlow) {
+    grantTypes = [GRANT_TYPES.AUTHORIZATION_CODE];
+    if (refreshToken) {
+      grantTypes.push(refreshToken);
+    }
+  } else if (isImplicitFlow) {
+    grantTypes = [GRANT_TYPES.IMPLICIT];
+  } else {
+    grantTypes = oldService?.grantTypes;
   }
 
-  let responseTypes = req.body.response_types ? req.body.response_types : [];
-  if (!(responseTypes instanceof Array)) {
-    responseTypes = [req.body.response_types];
-  }
+  let tokenEndpointAuthMethod;
+  const { CLIENT_SECRET_POST, CLIENT_SECRET_BASIC } = TOKEN_ENDPOINT_AUTH_METHOD;
 
-  let selectedRedirects = req.body.redirect_uris ? req.body.redirect_uris : [];
-  if (!(selectedRedirects instanceof Array)) {
-    selectedRedirects = [req.body.redirect_uris];
+  if (isHybridFlow || isAuthorisationCodeFlow) {
+    if (req.body.tokenEndpointAuthMethod === CLIENT_SECRET_POST) {
+      tokenEndpointAuthMethod = CLIENT_SECRET_POST;
+    } else {
+      tokenEndpointAuthMethod = CLIENT_SECRET_BASIC;
+    }
+  } else if (isImplicitFlow) {
+    tokenEndpointAuthMethod = CLIENT_SECRET_BASIC;
+  } else {
+    tokenEndpointAuthMethod = oldService?.tokenEndpointAuthMethod;
   }
-  selectedRedirects = selectedRedirects.filter((x) => x.trim() !== '');
-
-  let selectedLogout = req.body.post_logout_redirect_uris ? req.body.post_logout_redirect_uris : [];
-  if (!(selectedLogout instanceof Array)) {
-    selectedLogout = [req.body.post_logout_redirect_uris];
-  }
-  selectedLogout = selectedLogout.filter((x) => x.trim() !== '');
 
   const model = {
     service: {
-      name: req.body.name,
-      description: service.description || '', // field disabled in form so we don't pick it up from it but use current value
-      clientId: req.body.clientId,
-      clientSecret: req.body.clientSecret || '',
-      serviceHome: req.body.serviceHome || '',
-      postResetUrl: req.body.postResetUrl || '',
+      name: currentService.name,
+      description: currentService.description,
+      clientId: he.decode(req.body.clientId),
+      clientSecret: (isHybridFlow || isAuthorisationCodeFlow) ? req.body.clientSecret : oldService.clientSecret,
+      serviceHome: (req.body.serviceHome || "").trim(),
+      postResetUrl: (req.body.postResetUrl || "").trim(),
       redirectUris: selectedRedirects,
       postLogoutRedirectUris: selectedLogout,
-      grantTypes,
+      grantTypes: grantTypes || [],
       responseTypes,
       apiSecret: req.body.apiSecret,
-      tokenEndpointAuthMethod: req.body.tokenEndpointAuthMethod,
+      tokenEndpointAuthMethod,
+      refreshToken,
     },
+    authFlowType,
     backLink: `/services/${req.params.sid}`,
     validationMessages: {},
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
-    currentNavigation: 'configuration',
+    currentNavigation: "configuration",
   };
 
-  if (!model.service.name) {
-    model.validationMessages.name = 'Service name must be present';
-  }
+  let { serviceHome, postResetUrl, clientId } = model.service;
+  let unecodedurl = _unescape(serviceHome);
+  serviceHome = unecodedurl;
+  model.service.serviceHome = serviceHome;
+  if(serviceHome !== ''){
+    const urlValidator = new UrlValidator(serviceHome);
 
-  if (model.service.serviceHome && !urlValidation.test(model.service.serviceHome)) {
-    model.validationMessages.serviceHome = 'Please enter a valid home Url';
-  }
-
-  if (!model.service.clientId) {
-    model.validationMessages.clientId = 'Client Id must be present';
-  }
-
-  if (!urlValidation.test(model.service.postResetUrl) && model.service.postResetUrl.trim() !== '') {
-    model.validationMessages.postResetUrl = 'Please enter a valid Post-reset Url';
-  }
-
-  if (!model.service.redirectUris || !model.service.redirectUris.length > 0) {
-    model.validationMessages.redirect_uris = 'At least one redirect Url must be specified';
-  } else if (model.service.redirectUris.some((x) => !urlValidation.test(x))) {
-    model.validationMessages.redirect_uris = 'Invalid redirect Url';
-  } else if (model.service.redirectUris.some((value, i) => model.service.redirectUris.indexOf(value) !== i)) {
-    model.validationMessages.redirect_uris = 'Redirect Urls must be unique';
-  }
-
-  if (!model.service.postLogoutRedirectUris || !model.service.postLogoutRedirectUris.length > 0) {
-    model.validationMessages.post_logout_redirect_uris = 'At least one logout redirect Url must be specified';
-  } else if (model.service.postLogoutRedirectUris.some((x) => !urlValidation.test(x))) {
-    model.validationMessages.post_logout_redirect_uris = 'Invalid logout redirect Url';
-  } else if (model.service.postLogoutRedirectUris.some((value, i) => model.service.postLogoutRedirectUris.indexOf(value) !== i)) {
-    model.validationMessages.post_logout_redirect_uris = 'Logout redirect Urls must be unique';
-  }
-  if (model.service.clientSecret !== service.relyingParty.client_secret) {
-    try {
-      const validateClientSecret = niceware.passphraseToBytes(model.service.clientSecret.split('-'));
-      if (validateClientSecret.length < 8) {
-        model.validationMessages.clientSecret = 'Invalid client secret';
+    const lengthResult = await isCorrectLength(urlValidator);
+    if (serviceHome !== null && !lengthResult) {
+      if (model.validationMessages.serviceHome !== "" && model.validationMessages.serviceHome !== undefined) {
+        if(!model.validationMessages.serviceHome.includes(ERROR_MESSAGES.INVALID_HOME_LENTGH)){
+            model.validationMessages.serviceHome += "<br/>"+ ERROR_MESSAGES.INVALID_HOME_LENTGH;
+        }
+      } else {
+        model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_LENTGH;
       }
-    } catch (e) {
-      model.validationMessages.clientSecret = 'Invalid client secret';
+    }else {
+      if(serviceHome === undefined || serviceHome === ""){
+      model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_URL;
+      }
+    }
+    const validUrl = await isValidUrl(urlValidator);
+    if (serviceHome !== null && !validUrl) {
+      if (serviceHome !== "") {
+        if (model.validationMessages.serviceHome !== "" && model.validationMessages.serviceHome !== undefined) {
+          if(!model.validationMessages.serviceHome.includes(ERROR_MESSAGES.INVALID_HOME_CHARACTERS)){
+                model.validationMessages.serviceHome += "<br/>"+ ERROR_MESSAGES.INVALID_HOME_CHARACTERS;
+          }
+        } else {
+          model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_CHARACTERS;
+        }
+      } 
+    }
+
+    const validProtocol = await isCorrectProtocol(urlValidator);
+    if (!validProtocol) {
+      if (model.validationMessages.serviceHome !== "" && model.validationMessages.serviceHome !== undefined) {
+        model.validationMessages.serviceHome += "<br/>"+ ERROR_MESSAGES.INVALID_HOME_PROTOCOL;
+      } else {
+        model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_PROTOCOL;
+      }
     }
   }
 
-  if (model.service.apiSecret && model.service.apiSecret !== service.relyingParty.api_secret) {
+  if (!model.service.responseTypes || model.service.responseTypes.length === 0) {
+    model.validationMessages.responseTypes = ERROR_MESSAGES.MISSING_RESPONSE_TYPE;
+  } else if (model.service.responseTypes.length === 1 && model.service.responseTypes.includes("token")) {
+    model.validationMessages.responseTypes = ERROR_MESSAGES.RESPONSE_TYPE_TOKEN_ERROR;
+  }
+  //takeout encoding from server
+  unecodedurl = _unescape(postResetUrl);
+  postResetUrl = unecodedurl;
+ 
+ 
+  if (postResetUrl !== '') {
+    const postUrlValidator = new UrlValidator(postResetUrl);
+    const isPOstResetUrlToLength = await isCorrectLength(postUrlValidator);
+    if (!isPOstResetUrlToLength) {
+      if (model.validationMessages.postResetUrl !== "" && model.validationMessages.postResetUrl !== undefined) {
+        model.validationMessages.postResetUrl += "<br/>"+ ERROR_MESSAGES.INVALID_RESETPASS_LENTGH;
+      } else {
+        model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_RESETPASS_LENTGH;
+      }
+    }
+    const isPostResetUrlValid = await isValidUrl(postUrlValidator);
+    if (postResetUrl != null && !isPostResetUrlValid) {
+      if (postResetUrl !== "") {
+        if (model.validationMessages.postResetUrl !== "" && model.validationMessages.postResetUrl !== undefined) {
+          model.validationMessages.postResetUrl += "<br/>"+ERROR_MESSAGES.INVALID_RESETPASS_CHARACTERS;
+        } else {
+          model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_RESETPASS_CHARACTERS;
+        }
+      }
+    }
+  
+  const isPostResetUrlProtocol = await isCorrectProtocol(postUrlValidator);
+  if (!isPostResetUrlProtocol) {
+    if (model.validationMessages.postResetUrl !== "" && model.validationMessages.postResetUrl !== undefined) {
+      model.validationMessages.postResetUrl += "<br/>"+ ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL;
+    } else {
+      model.validationMessages.postResetUrl = ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL;
+    }
+  }
+}
+  if (!clientId) {
+    model.validationMessages.clientId = ERROR_MESSAGES.MISSING_CLIENT_ID;
+  } else if (!/^[A-Za-z0-9-]+$/.test(clientId)) {
+    model.validationMessages.clientId = ERROR_MESSAGES.INVALID_CLIENT_ID;
+  } else if (clientId.length > 50) {
+    model.validationMessages.clientId = ERROR_MESSAGES.INVALID_CLIENT_ID_LENGTH;
+  } else if (
+    clientId.toLowerCase() !== currentService.clientId.toLowerCase()
+    && await checkClientId(clientId, req.id)
+  ) {
+    // If getServiceById returns truthy, then that clientId is already in use.
+    model.validationMessages.clientId = ERROR_MESSAGES.CLIENT_ID_UNAVAILABLE;
+  }
+
+  if (!model.service.redirectUris || !model.service.redirectUris.length > 0) {
+    model.validationMessages.redirect_uris = ERROR_MESSAGES.MISSING_REDIRECT_URL;
+  } else if (model.service.redirectUris.length > 0) {
+    await Promise.all(model.service.redirectUris.map(async (x) => {
+      unecodedurl = _unescape(x);
+      const redirecturlValidator = new UrlValidator(unecodedurl);
+      const isRCorrectLength = await isCorrectLength(redirecturlValidator);
+      const isCorrectUtl = await isValidUrl(redirecturlValidator);
+      if (!isRCorrectLength) {
+        if (model.validationMessages.redirect_uris !== "" && model.validationMessages.redirect_uris !== undefined) {
+          model.validationMessages.redirect_uris += "<br/>"+ ERROR_MESSAGES.INVALID_REDIRECT_LENTGH;
+        } else {
+          model.validationMessages.redirect_uris = ERROR_MESSAGES.INVALID_REDIRECT_LENTGH;
+        }
+      }
+      if (!isCorrectUtl) {
+        if (model.validationMessages.redirect_uris !== "" && model.validationMessages.redirect_uris !== undefined) {
+          model.validationMessages.redirect_uris += "<br/>"+ ERROR_MESSAGES.INVALID_REDIRECT_CHARACTERS;
+        } else {
+          model.validationMessages.redirect_uris = ERROR_MESSAGES.INVALID_REDIRECT_CHARACTERS;
+        }
+      }
+      const isValidProtocol = await isCorrectProtocol(redirecturlValidator);
+      if (!isValidProtocol) {
+        if (model.validationMessages.redirect_uris !== "" && model.validationMessages.redirect_uris !== undefined) {
+          model.validationMessages.redirect_uris += "<br/>"+ ERROR_MESSAGES.INVALID_REDIRECT_PROTOCOL;
+        } else {
+          model.validationMessages.redirect_uris = ERROR_MESSAGES.INVALID_REDIRECT_PROTOCOL;
+        }
+      }
+    }));
+  }
+  if (model.service.redirectUris.some((value, i) => model.service.redirectUris.indexOf(value) !== i)) {
+    model.validationMessages.redirect_uris = ERROR_MESSAGES.REDIRECT_URLS_NOT_UNIQUE;
+  }
+
+  if (!model.service.postLogoutRedirectUris || !model.service.postLogoutRedirectUris.length > 0) {
+    model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.MISSING_POST_LOGOUT_URL;
+  } else if (model.service.postLogoutRedirectUris.length > 0) {
+    await Promise.all(model.service.postLogoutRedirectUris.map(async (x) => {
+      unecodedurl = _unescape(x);
+      const postRedirecturlValidator = new UrlValidator(unecodedurl);
+      const isRDCorrectLength = await isCorrectLength(postRedirecturlValidator);
+      const estCorrect = await isValidUrl(postRedirecturlValidator);
+      if (!isRDCorrectLength) {
+        if (model.validationMessages.post_logout_redirect_uris !== "" && model.validationMessages.post_logout_redirect_uris !== undefined) {
+          model.validationMessages.post_logout_redirect_uris += "<br/>"+ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_LENTGH;
+        } else {
+          model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_LENTGH;
+        }
+      }
+      if (estCorrect !== true) {
+        if (model.validationMessages.post_logout_redirect_uris !== "" && model.validationMessages.post_logout_redirect_uris !== undefined) {
+          model.validationMessages.post_logout_redirect_uris +=  "<br/>"+ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_CHARACTERS;
+        } else {
+          model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_CHARACTERS;
+        }
+      }
+
+      const testRDProtocol = await isCorrectProtocol(postRedirecturlValidator);
+      if (!testRDProtocol) {
+        if (model.validationMessages.post_logout_redirect_uris !== "" && model.validationMessages.post_logout_redirect_uris !== undefined) {
+          model.validationMessages.post_logout_redirect_uris +=  "<br/>"+ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_PROTOCOL;
+        } else {
+          model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_PROTOCOL;
+        }
+      }
+    }));
+    if (model.service.postLogoutRedirectUris.some((value, i) => model.service.postLogoutRedirectUris.indexOf(value) !== i)) {
+      model.validationMessages.post_logout_redirect_uris = ERROR_MESSAGES.POST_LOGOUT_URL_NOT_UNIQUE;
+    }
+  }
+
+  if (model.service.clientSecret != null && ((isAuthorisationCodeFlow || isHybridFlow) && model.service.clientSecret !== currentService.clientSecret)) {
     try {
-      const validateApiSecret = niceware.passphraseToBytes(model.service.apiSecret.split('-'));
-      if (validateApiSecret.length !== 8) {
-        model.validationMessages.apiSecret = 'Invalid api secret';
+      const validateClientSecret = niceware.passphraseToBytes(model.service.clientSecret.split("-"));
+      if (validateClientSecret.length < 8) {
+        model.validationMessages.clientSecret = ERROR_MESSAGES.INVALID_CLIENT_SECRET;
       }
     } catch (e) {
-      model.validationMessages.apiSecret = 'Invalid api secret';
+      model.validationMessages.clientSecret = ERROR_MESSAGES.INVALID_CLIENT_SECRET;
+    }
+  }
+
+  if (model.service.apiSecret && model.service.apiSecret !== currentService.apiSecret) {
+    try {
+      const validateApiSecret = niceware.passphraseToBytes(model.service.apiSecret.split("-"));
+      if (validateApiSecret.length !== 8) {
+        model.validationMessages.apiSecret = ERROR_MESSAGES.INVALID_API_SECRET;
+      }
+    } catch (e) {
+      model.validationMessages.apiSecret = ERROR_MESSAGES.INVALID_API_SECRET;
     }
   }
   return model;
 };
 
 const postServiceConfig = async (req, res) => {
-  const model = await validate(req);
+  try {
+    const serviceModels = await buildCurrentServiceModel(req);
 
-  if (Object.keys(model.validationMessages).length > 0) {
-    model.csrfToken = req.csrfToken();
-    return res.render('services/views/serviceConfig', model);
+    const currentService = serviceModels.currentServiceModel;
+    const { oldServiceConfigModel } = serviceModels;
+    const model = await validate(req, currentService, serviceModels.oldServiceConfigModel);
+
+    if (Object.keys(model.validationMessages).length > 0) {
+      model.csrfToken = req.csrfToken();
+      return res.render("services/views/serviceConfig", model);
+    }
+
+    const editedFields = Object.entries(serviceModels.oldServiceConfigModel)
+      .filter(([field, oldValue]) => {
+        const newValue = Array.isArray(model.service[field]) ? model.service[field].sort() : model.service[field];
+        return Array.isArray(oldValue) ? !(
+          Array.isArray(newValue)
+    && oldValue.length === newValue.length
+    && oldValue.sort().every((value, index) => value === newValue[index])
+        ) : oldValue !== newValue;
+      })
+      .map(([field, oldValue]) => {
+        const isSecret = field.toLowerCase().includes("secret");
+        const editedField = {
+          name: field,
+          oldValue: isSecret ? "EXPUNGED" : oldValue,
+          newValue: isSecret ? "EXPUNGED" : model.service[field],
+          isSecret,
+        };
+        if (isSecret) {
+          editedField.secretNewValue = model.service[field];
+        }
+        return editedField;
+      });
+
+    req.session.serviceConfigurationChanges = {};
+    const redirectUrlsChanges = {};
+    editedFields.map(({
+      name, oldValue, newValue, isSecret, secretNewValue,
+    }) => {
+      if (name === "redirectUris" || name === "postLogoutRedirectUris") {
+        if (!redirectUrlsChanges[name]) {
+          redirectUrlsChanges[name] = {};
+        }
+        redirectUrlsChanges[name].oldValue = oldValue;
+        redirectUrlsChanges[name].newValue = newValue;
+      } else {
+        if (!req.session.serviceConfigurationChanges[name]) {
+          req.session.serviceConfigurationChanges[name] = {};
+        }
+        req.session.serviceConfigurationChanges[name].oldValue = oldValue;
+        req.session.serviceConfigurationChanges[name].newValue = newValue;
+        if (isSecret) {
+          req.session.serviceConfigurationChanges[name].secretNewValue = secretNewValue;
+        }
+      }
+    });
+
+    if (Object.keys(redirectUrlsChanges).length > 0) {
+      const serviceConfigChangesKey = `${REDIRECT_URLS_CHANGES}_${req.session.passport.user.sub}_${req.params.sid}`;
+      await saveRedirectUrlsToStorage(serviceConfigChangesKey, redirectUrlsChanges, req.params.sid);
+    }
+    req.session.serviceConfigurationChanges.authFlowType = model.authFlowType;
+    if (req.session.serviceConfigurationChanges.postLogoutRedirectUris === undefined) {
+      req.session.serviceConfigurationChanges.postLogoutRedirectUris = {};
+      req.session.serviceConfigurationChanges.postLogoutRedirectUris.oldValue = model.service.postLogoutRedirectUris;
+      req.session.serviceConfigurationChanges.postLogoutRedirectUris.newValue = undefined;
+    }
+    if (req.session.serviceConfigurationChanges.redirectUris === undefined) {
+      req.session.serviceConfigurationChanges.redirectUris = {};
+      req.session.serviceConfigurationChanges.redirectUris.oldValue = model.service.redirectUris;
+      req.session.serviceConfigurationChanges.redirectUris.newValue = undefined;
+    }
+    return res.redirect("review-service-configuration#");
+  } catch (error) {
+    throw new Error(error);
   }
-
-  const updatedService = {
-    name: model.service.name,
-    description: model.service.description,
-    clientId: model.service.clientId,
-    clientSecret: model.service.clientSecret,
-    serviceHome: model.service.serviceHome,
-    postResetUrl: model.service.postResetUrl,
-    redirect_uris: model.service.redirectUris,
-    post_logout_redirect_uris: model.service.postLogoutRedirectUris,
-    grant_types: model.service.grantTypes,
-    response_types: model.service.responseTypes,
-    apiSecret: model.service.apiSecret,
-    tokenEndpointAuthMethod: model.service.tokenEndpointAuthMethod === 'client_secret_post' ? 'client_secret_post' : null,
-  };
-
-  logger.audit(`${req.user.email} (id: ${req.user.sub}) updated service configuration for service ${model.service.name} (id: ${req.params.sid})`, {
-    type: 'manage',
-    subType: 'service-config-updated',
-    userId: req.user.sub,
-    userEmail: req.user.email,
-    editedService: req.params.sid,
-  });
-
-  await updateService(req.params.sid, updatedService, req.id);
-
-  res.flash('info', 'Service configuration updated successfully');
-  return res.redirect('service-configuration');
 };
 
 module.exports = {

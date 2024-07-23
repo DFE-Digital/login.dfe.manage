@@ -1,0 +1,6 @@
+{
+    "name": "login.dfe.manage",
+    "script": "src/index.js",
+    "instances": "max",
+    "exec_mode": "cluster"
+  }

@@ -1,8 +1,8 @@
-const PolicyEngine = require('login.dfe.policy-engine');
-const config = require('../../infrastructure/config');
-const { getServiceById } = require('../../infrastructure/applications');
-const { getUserDetails, getUserServiceRoles } = require('./utils');
-const { getOrganisationByIdV2 } = require('../../infrastructure/organisations');
+const PolicyEngine = require("login.dfe.policy-engine");
+const config = require("../../infrastructure/config");
+const { getServiceById } = require("../../infrastructure/applications");
+const { getUserDetails, getUserServiceRoles, getReturnUrl } = require("./utils");
+const { getOrganisationByIdV2 } = require("../../infrastructure/organisations");
 
 const policyEngine = new PolicyEngine(config);
 
@@ -10,29 +10,28 @@ const getViewModel = async (req) => {
   const user = await getUserDetails(req);
   const organisation = await getOrganisationByIdV2(req.params.oid, req.id);
   const service = await getServiceById(req.params.sid);
-  const policyResult = await policyEngine.getPolicyApplicationResultsForUser(req.params.uid.startsWith('inv-') ? undefined : req.params.uid, req.params.oid, req.params.sid, req.id);
+  const policyResult = await policyEngine.getPolicyApplicationResultsForUser(req.params.uid.startsWith("inv-") ? undefined : req.params.uid, req.params.oid, req.params.sid, req.id);
   const serviceRoles = policyResult.rolesAvailableToUser;
   const manageRolesForService = await getUserServiceRoles(req);
 
   return {
     csrfToken: req.csrfToken(),
-    cancelLink: `/services/${req.params.sid}/users/${req.params.uid}/organisations`,
     service,
     serviceRoles,
     selectedRoles: [],
     user,
-    backLink: `/services/${req.params.sid}/users/${req.params.uid}/organisations`,
+    backLink: getReturnUrl(req.query, `/services/${req.params.sid}/users/${req.params.uid}/organisations`),
     organisation,
     validationMessages: {},
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
-    currentNavigation: 'users',
+    currentNavigation: "users",
   };
 };
 
 const get = async (req, res) => {
   const model = await getViewModel(req);
-  return res.render('services/views/associateService', model);
+  return res.render("services/views/associateService", model);
 };
 
 const post = async (req, res) => {
@@ -41,7 +40,7 @@ const post = async (req, res) => {
     selectedRoles = [req.body.role];
   }
 
-  const uid = req.params.uid && !req.params.uid.startsWith('inv-') ? req.params.uid : undefined;
+  const uid = req.params.uid && !req.params.uid.startsWith("inv-") ? req.params.uid : undefined;
   const policyValidationResult = await policyEngine.validate(uid, req.params.oid, req.params.sid, selectedRoles, req.id);
   if (policyValidationResult.length > 0) {
     const model = await getViewModel(req);
@@ -51,14 +50,14 @@ const post = async (req, res) => {
       return roles;
     });
     model.validationMessages.roles = policyValidationResult.map((x) => x.message);
-    return res.render('services/views/associateService', model);
+    return res.render("services/views/associateService", model);
   }
 
   req.session.service = {
     roles: selectedRoles,
   };
 
-  return res.redirect('confirm-associate-service');
+  return res.redirect(getReturnUrl(req.query, "confirm-associate-service"));
 };
 
 module.exports = {

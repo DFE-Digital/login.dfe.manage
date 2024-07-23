@@ -1,5 +1,5 @@
-const config = require('./infrastructure/config');
 const healthCheck = require('login.dfe.healthcheck');
+const config = require('./infrastructure/config');
 const services = require('./app/services');
 const signOut = require('./app/signOut');
 
