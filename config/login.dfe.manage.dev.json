@@ -1,0 +1,158 @@
+{
+  "loggerSettings": {
+    "logLevel": "debug",
+    "applicationName": "Manage",
+    "auditDb": {
+      "host": "{{platformGlobalServerName}}",
+      "username":"{{svcSigninAdt}}",
+      "password":"{{svcSigninAdtPassword}}",
+      "dialect": "mssql",
+      "name": "{{platformGlobalAuditDatabaseName}}",
+      "encrypt": true,
+      "schema": "dbo",
+      "pool": {
+        "max": 20,
+        "min": 0,
+        "acquire": 30000,
+        "idle": 10000
+      }
+    }
+  },
+  "hostingEnvironment": {
+    "useDevViews": true,
+    "env": "azure",
+    "host": "{{standaloneManageHostName}}",
+    "port": 443,
+    "protocol": "https",
+    "hstsMaxAge": 86400,
+    "applicationInsights": "{{appInsightsInstrumentationKey}}",
+    "sessionSecret": "upstream-crossing-truckle-humph",
+    "sessionCookieExpiryInMinutes": 20,
+    "gaTrackingId": "{{googleAnalyticsID}}",
+    "interactionsUrl": "https://{{standaloneInteractionsHostName}}",
+    "helpUrl": "https://{{standaloneHelpHostName}}",
+    "servicesUrl": "https://{{standaloneServicesHostName}}",
+    "profileUrl": "https://{{standaloneProfileHostName}}",
+    "surveyUrl": "{{platformGlobalUserFeedbackUrl}}",
+    "serviceNowUrl": "{{SNContactUrl}}",
+    "agentKeepAlive" : {
+      "maxSockets":30,
+      "maxFreeSockets":10,
+      "timeout":60000,
+      "keepAliveTimeout":30000
+    }
+  },
+  "identifyingParty": {
+    "url": "https://{{standaloneOidcHostName}}",
+    "clientId": "manage",
+    "clientSecret": "manage",
+    "clockTolerance": 300
+  },
+  "access": {
+    "type": "api",
+    "service": {
+      "url": "https://{{standaloneAccessHostName}}",
+      "auth": {
+        "type": "aad",
+        "tenant": "{{platformGlobalTenantDomain}}",
+        "authorityHostUrl": "{{tenantUrl}}",
+        "clientId": "{{aadshdclientid}}",
+        "clientSecret": "{{aadshdclientsecret}}",
+        "resource": "{{aadshdappid}}"
+      }
+    },
+    "identifiers": {
+      "service": "b1f190aa-729a-45fc-a695-4ea209dc79d4",
+      "organisation": "{{identifierOrgId}}"
+    }
+  },
+  "applications": {
+    "type": "api",
+    "service": {
+      "url": "https://{{standaloneApplicationsHostName}}",
+      "auth": {
+        "type": "aad",
+        "tenant": "{{platformGlobalTenantDomain}}",
+        "authorityHostUrl": "{{tenantUrl}}",
+        "clientId": "{{aadshdclientid}}",
+        "clientSecret": "{{aadshdclientsecret}}",
+        "resource": "{{aadshdappid}}"
+      }
+    }
+  },
+  "directories": {
+    "type": "api",
+    "service": {
+      "url": "https://{{standaloneDirectoriesHostName}}",
+      "auth": {
+        "type": "aad",
+        "tenant": "{{platformGlobalTenantDomain}}",
+        "authorityHostUrl": "{{tenantUrl}}",
+        "clientId": "{{aadshdclientid}}",
+        "clientSecret": "{{aadshdclientsecret}}",
+        "resource": "{{aadshdappid}}"
+      }
+    }
+  },
+  "organisations": {
+    "type": "api",
+    "service": {
+      "url": "https://{{standaloneOrganisationsHostName}}",
+      "auth": {
+        "type": "aad",
+        "tenant": "{{platformGlobalTenantDomain}}",
+        "authorityHostUrl": "{{tenantUrl}}",
+        "clientId": "{{aadshdclientid}}",
+        "clientSecret": "{{aadshdclientsecret}}",
+        "resource": "{{aadshdappid}}"
+      }
+    }
+  },
+  "audit": {
+    "type": "sequelize",
+    "params": {
+      "host": "{{platformGlobalServerName}}",
+      "username":"{{svcSigninAdt}}",
+      "password":"{{svcSigninAdtPassword}}",
+      "dialect": "mssql",
+      "name": "{{platformGlobalAuditDatabaseName}}",
+      "encrypt": true,
+      "schema": "dbo",
+      "pool": {
+        "max": 15,
+        "min": 0,
+        "acquire": 30000,
+        "idle": 10000
+      }
+    },
+    "cacheConnectionString": "{{redisConn}}/7?tls=true"
+  },
+  "serviceMapping": {
+    "type": "redis",
+    "params": {
+      "connectionString": "{{redisConn}}/3?tls=true"
+    },
+    "key2SuccessServiceId": "3BFDE961-F061-4786-B618-618DEAF96E44"
+  },
+  "search": {
+    "type": "api",
+    "service": {
+      "url": "https://{{standaloneSearchHostName}}",
+      "auth": {
+        "type": "aad",
+        "tenant": "{{platformGlobalTenantDomain}}",
+        "authorityHostUrl": "{{tenantUrl}}",
+        "clientId": "{{aadshdclientid}}",
+        "clientSecret": "{{aadshdclientsecret}}",
+        "resource": "{{aadshdappid}}"
+      }
+    }
+  },
+  "notifications": {
+    "connectionString": "{{redisConn}}/4?tls=true"
+  },
+  "assets": {
+    "url": "{{cdnHostName}}",
+    "version": "{{cdnAssetsVersion}}"
+  }
+}
