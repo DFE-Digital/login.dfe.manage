@@ -438,7 +438,7 @@ describe("when editing the service configuration", () => {
     expect(req.session.serviceConfigurationChanges.authFlowType).toEqual("authorisationCodeFlow");
     expect(req.session.serviceConfigurationChanges.grantTypes).toEqual({
       newValue: ["authorization_code"],
-      oldValue: ["implicit", "authorization_code"],
+      oldValue: ["authorization_code", "implicit"],
     });
   });
 
@@ -490,7 +490,7 @@ describe("when editing the service configuration", () => {
     expect(req.session.serviceConfigurationChanges.authFlowType).toEqual("implicitFlow");
     expect(req.session.serviceConfigurationChanges.grantTypes).toEqual({
       newValue: ["implicit"],
-      oldValue: ["implicit", "authorization_code"],
+      oldValue: ["authorization_code", "implicit"],
     });
   });
 
@@ -503,7 +503,7 @@ describe("when editing the service configuration", () => {
     expect(req.session.serviceConfigurationChanges.authFlowType).toEqual("implicitFlow");
     expect(req.session.serviceConfigurationChanges.grantTypes).toEqual({
       newValue: ["implicit"],
-      oldValue: ["implicit", "authorization_code"],
+      oldValue: ["authorization_code", "implicit"],
     });
   });
 
