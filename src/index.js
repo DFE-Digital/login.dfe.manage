@@ -60,6 +60,7 @@ const init = async () => {
         preload: true,
         includeSubDomains: true,
       },
+      crossOriginOpenerPolicy: false, // disabled as this blocks other sites from opening DSi in a new tab
     }));
   }
   
