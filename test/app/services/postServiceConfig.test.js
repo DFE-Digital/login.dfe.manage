@@ -1,4 +1,4 @@
-const { urlValidator } = require("login.dfe.validation/src/urlValidator");
+//const { urlValidator } = require("login.dfe.validation/src/urlValidator");
 const mockUtils = require("../../utils");
 
 jest.mock("login.dfe.validation");
@@ -72,21 +72,21 @@ const requestAuthCodeServiceInfo = {
   tokenEndpointAuthMethod: "client_secret_post",
 };
 
-const updatedAuthCodeServiceModel = {
-  name: currentAuthServiceInfo.name || "",
-  clientId: requestAuthCodeServiceInfo.clientId,
-  description: currentAuthServiceInfo.description,
-  clientSecret: requestAuthCodeServiceInfo.clientSecret,
-  serviceHome: requestAuthCodeServiceInfo.serviceHome,
-  postResetUrl: requestAuthCodeServiceInfo.postResetUrl,
-  redirectUris: requestAuthCodeServiceInfo.redirect_uris,
-  postLogoutRedirectUris: requestAuthCodeServiceInfo.post_logout_redirect_uris,
-  grantTypes: requestAuthCodeServiceInfo.grant_types,
-  responseTypes: requestAuthCodeServiceInfo.response_types,
-  apiSecret: requestAuthCodeServiceInfo.apiSecret,
-  tokenEndpointAuthMethod: requestAuthCodeServiceInfo.tokenEndpointAuthMethod,
-  refreshToken: null,
-};
+// const updatedAuthCodeServiceModel = {
+//   name: currentAuthServiceInfo.name || "",
+//   clientId: requestAuthCodeServiceInfo.clientId,
+//   description: currentAuthServiceInfo.description,
+//   clientSecret: requestAuthCodeServiceInfo.clientSecret,
+//   serviceHome: requestAuthCodeServiceInfo.serviceHome,
+//   postResetUrl: requestAuthCodeServiceInfo.postResetUrl,
+//   redirectUris: requestAuthCodeServiceInfo.redirect_uris,
+//   postLogoutRedirectUris: requestAuthCodeServiceInfo.post_logout_redirect_uris,
+//   grantTypes: requestAuthCodeServiceInfo.grant_types,
+//   responseTypes: requestAuthCodeServiceInfo.response_types,
+//   apiSecret: requestAuthCodeServiceInfo.apiSecret,
+//   tokenEndpointAuthMethod: requestAuthCodeServiceInfo.tokenEndpointAuthMethod,
+//   refreshToken: null,
+// };
 
 // Represents the request body and the updateService info for the hybrid flow.
 const currentHybridServiceInfo = {
@@ -167,21 +167,21 @@ const requestImplicitServiceInfo = {
   tokenEndpointAuthMethod: "client_secret_post",
 };
 
-const updatedImplicitServiceModel = {
-  name: currentImplicitServiceInfo.name || "",
-  clientId: requestImplicitServiceInfo.clientId,
-  description: currentImplicitServiceInfo.description,
-  serviceHome: requestImplicitServiceInfo.serviceHome,
-  clientSecret: requestImplicitServiceInfo.clientSecret,
-  postResetUrl: requestImplicitServiceInfo.postResetUrl,
-  redirectUris: requestImplicitServiceInfo.redirect_uris,
-  postLogoutRedirectUris: requestImplicitServiceInfo.post_logout_redirect_uris,
-  grantTypes: requestImplicitServiceInfo.grant_types,
-  responseTypes: requestImplicitServiceInfo.response_types,
-  apiSecret: requestImplicitServiceInfo.apiSecret,
-  tokenEndpointAuthMethod: requestImplicitServiceInfo.tokenEndpointAuthMethod,
-  refreshToken: null,
-};
+// const updatedImplicitServiceModel = {
+//   name: currentImplicitServiceInfo.name || "",
+//   clientId: requestImplicitServiceInfo.clientId,
+//   description: currentImplicitServiceInfo.description,
+//   serviceHome: requestImplicitServiceInfo.serviceHome,
+//   clientSecret: requestImplicitServiceInfo.clientSecret,
+//   postResetUrl: requestImplicitServiceInfo.postResetUrl,
+//   redirectUris: requestImplicitServiceInfo.redirect_uris,
+//   postLogoutRedirectUris: requestImplicitServiceInfo.post_logout_redirect_uris,
+//   grantTypes: requestImplicitServiceInfo.grant_types,
+//   responseTypes: requestImplicitServiceInfo.response_types,
+//   apiSecret: requestImplicitServiceInfo.apiSecret,
+//   tokenEndpointAuthMethod: requestImplicitServiceInfo.tokenEndpointAuthMethod,
+//   refreshToken: null,
+// };
 
 // Represents the model used for validation and the view.
 
