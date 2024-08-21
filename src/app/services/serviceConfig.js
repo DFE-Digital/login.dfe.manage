@@ -138,19 +138,22 @@ const validate = async (req, currentService, oldService) => {
 
   const refreshToken = req.body.refresh_token && (isAuthorisationCodeFlow || isHybridFlow) ? req.body.refresh_token : null;
 
-  const grantTypes = getGrantTypes({ isHybridFlow, isAuthorisationCodeFlow, isImplicitFlow, oldService, refreshToken });
-  // let grantTypes = [];
+  //const grantTypes = getGrantTypes({ isHybridFlow, isAuthorisationCodeFlow, isImplicitFlow, oldService, refreshToken });
+  let grantTypes = [];
 
-  // if (isHybridFlow || isAuthorisationCodeFlow) {
-  //   grantTypes = [GRANT_TYPES.AUTHORIZATION_CODE];
-  //   if (refreshToken) {
-  //     grantTypes.push(refreshToken);
-  //   }
-  // } else if (isImplicitFlow) {
-  //   grantTypes = [GRANT_TYPES.IMPLICIT];
-  // } else {
-  //   grantTypes = oldService?.grantTypes;
-  // }
+  if (isHybridFlow || isAuthorisationCodeFlow) {
+    grantTypes = [GRANT_TYPES.AUTHORIZATION_CODE];
+    if (isHybridFlow) {
+      grantTypes.push(GRANT_TYPES.IMPLICIT);
+    };
+    if (refreshToken) {
+      grantTypes.push(refreshToken);
+    };
+  } else if (isImplicitFlow) {
+    grantTypes = [GRANT_TYPES.IMPLICIT];
+  } else {
+    grantTypes = oldService?.grantTypes;
+  }
 
   let tokenEndpointAuthMethod;
   const { CLIENT_SECRET_POST, CLIENT_SECRET_BASIC } = TOKEN_ENDPOINT_AUTH_METHOD;
@@ -390,9 +393,13 @@ const postServiceConfig = async (req, res) => {
   try {
     const serviceModels = await buildCurrentServiceModel(req);
 
+    // const currentService = serviceModels.currentServiceModel;
+    // const { oldServiceConfigModel } = serviceModels;
+    // const model = await validate(req, currentService, serviceModels.oldServiceConfigModel);
+
     const currentService = serviceModels.currentServiceModel;
-    const { oldServiceConfigModel } = serviceModels;
-    const model = await validate(req, currentService, serviceModels.oldServiceConfigModel);
+    const oldService = serviceModels.oldServiceConfigModel;
+    const model = await validate(req, currentService, oldService);
 
     if (Object.keys(model.validationMessages).length > 0) {
       model.csrfToken = req.csrfToken();
@@ -444,6 +451,16 @@ const postServiceConfig = async (req, res) => {
       await saveRedirectUrlsToStorage(serviceConfigChangesKey, redirectUrlsChanges, req.params.sid);
     }
     req.session.serviceConfigurationChanges.authFlowType = model.authFlowType;
+
+    
+    //req.session.serviceConfigurationChanges.grantTypes = model.service.grantTypes;
+    // if (req.session.serviceConfigurationChanges.grantTypes === undefined) {
+    //   req.session.serviceConfigurationChanges.grantTypes = {};
+    //   req.session.serviceConfigurationChanges.grantTypes.oldValue = model.service.grantTypes;
+    //   req.session.serviceConfigurationChanges.grantTypes.newValue = undefined;
+    // }
+
+
     if (req.session.serviceConfigurationChanges.postLogoutRedirectUris === undefined) {
       req.session.serviceConfigurationChanges.postLogoutRedirectUris = {};
       req.session.serviceConfigurationChanges.postLogoutRedirectUris.oldValue = model.service.postLogoutRedirectUris;
