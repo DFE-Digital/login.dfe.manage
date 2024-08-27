@@ -452,7 +452,7 @@ const postServiceConfig = async (req, res) => {
     }
     req.session.serviceConfigurationChanges.authFlowType = model.authFlowType;
 
-    
+
     //req.session.serviceConfigurationChanges.grantTypes = model.service.grantTypes;
     // if (req.session.serviceConfigurationChanges.grantTypes === undefined) {
     //   req.session.serviceConfigurationChanges.grantTypes = {};

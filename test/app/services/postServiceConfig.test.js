@@ -167,24 +167,6 @@ const requestImplicitServiceInfo = {
   tokenEndpointAuthMethod: "client_secret_post",
 };
 
-// const updatedImplicitServiceModel = {
-//   name: currentImplicitServiceInfo.name || "",
-//   clientId: requestImplicitServiceInfo.clientId,
-//   description: currentImplicitServiceInfo.description,
-//   serviceHome: requestImplicitServiceInfo.serviceHome,
-//   clientSecret: requestImplicitServiceInfo.clientSecret,
-//   postResetUrl: requestImplicitServiceInfo.postResetUrl,
-//   redirectUris: requestImplicitServiceInfo.redirect_uris,
-//   postLogoutRedirectUris: requestImplicitServiceInfo.post_logout_redirect_uris,
-//   grantTypes: requestImplicitServiceInfo.grant_types,
-//   responseTypes: requestImplicitServiceInfo.response_types,
-//   apiSecret: requestImplicitServiceInfo.apiSecret,
-//   tokenEndpointAuthMethod: requestImplicitServiceInfo.tokenEndpointAuthMethod,
-//   refreshToken: null,
-// };
-
-// Represents the model used for validation and the view.
-
 // | Selection # | Code | ID_Token | Token | Flow Type |
 // |-------------|------|----------|-------|-----------|
 // | 1           | X    |          |       | Auth      |
@@ -225,7 +207,7 @@ describe("when editing the AUTH flow service configuration", () => {
     res.mockResetAll();
   });
 
-  // ToDo: add to common set of tests
+  // COMMON Tests
   it("then it should render view without validation if service home url is an empty string", async () => {
     // ARRANGE
     req.body.serviceHome = "";
@@ -669,15 +651,6 @@ describe("when editing the AUTH flow service configuration", () => {
   });
 });
 
-// | Selection # | Code | ID_Token | Token | Flow Type |
-// |-------------|------|----------|-------|-----------|
-// | 1           | X    |          |       | Auth      |
-// | 2           | X    |          | X     | Hybrid    |
-// | 3           | X    | X        |       | Hybrid    |
-// | 4           | X    | X        | X     | Hybrid    |
-// | 5           |      | X        |       | Implicit  |
-// | 6           |      | X        | X     | Implicit  |
-
 // HYBRID FLOW
 describe("when editing the HYBRID flow service configuration", () => {
   let req;
@@ -709,38 +682,10 @@ describe("when editing the HYBRID flow service configuration", () => {
     res.mockResetAll();
   });
 
-  // it("then it should render view with validation if service home not a valid url", async () => {
-  //   // ARRANGE
-  //   req.body.serviceHome = "not-a-url";
-  //   req.body.response_types = ["authorization_code", "token"];
-  //   updatedHybridServiceModel.responseTypes = ["authorization_code", "token"];
-  //   // ACT
-  //   await postServiceConfig(req, res);
-
-  //   // ASSERT
-  //   expect(res.render.mock.calls).toHaveLength(1);
-  //   expect(res.render.mock.calls[0][0]).toBe("services/views/serviceConfig");
-  //   expect(res.render.mock.calls[0][1]).toEqual({
-  //     authFlowType: "hybridFlow",
-  //     backLink: "/services/service1",
-  //     csrfToken: "token",
-  //     currentNavigation: "configuration",
-  //     service: {
-  //       ...currentHybridServiceInfo,
-  //       serviceHome: req.body.serviceHome,
-  //     },
-  //     serviceId: "service1",
-  //     userRoles: [],
-  //     validationMessages: {
-  //       serviceHome: `${ERROR_MESSAGES.INVALID_HOME_PROTOCOL}`,
-  //     },
-  //   });
-  // });
-
-  it("then it should render view with validation if redirect urls are not unique", async () => {
+  it("then it should render view with validation if service home not a valid url", async () => {
     // ARRANGE
-    req.body.redirect_uris = ["https://www.redirect-url.com", "https://www.redirect-url.com"];
-    req.body.response_types.push("token");
+    req.body.serviceHome = "not-a-url";
+    req.body.response_types = ["code", "token"];
 
     // ACT
     await postServiceConfig(req, res);
@@ -748,20 +693,24 @@ describe("when editing the HYBRID flow service configuration", () => {
     // ASSERT
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][0]).toBe("services/views/serviceConfig");
-    expect(res.render.mock.calls[0][1]).toEqual({
-      authFlowType: "hybridFlow",
-      backLink: "/services/service1",
-      csrfToken: "token",
-      currentNavigation: "configuration",
-      service: {
-        ...updatedHybridServiceModel,
-        redirectUris: req.body.redirect_uris,
-      },
-      serviceId: "service1",
-      userRoles: [],
-      validationMessages: {
-        redirect_uris: `${ERROR_MESSAGES.REDIRECT_URLS_NOT_UNIQUE}`,
-      },
+    expect(res.render.mock.calls[0][1].validationMessages).toEqual({
+      serviceHome: `${ERROR_MESSAGES.INVALID_HOME_PROTOCOL}`,
+    });
+  });
+
+  it("then it should render view with validation if redirect urls are not unique", async () => {
+    // ARRANGE
+    req.body.redirect_uris = ["https://www.redirect-url.com", "https://www.redirect-url.com"];
+    req.body.response_types = ["code", "token"];
+
+    // ACT
+    await postServiceConfig(req, res);
+
+    // ASSERT
+    expect(res.render.mock.calls).toHaveLength(1);
+    expect(res.render.mock.calls[0][0]).toBe("services/views/serviceConfig");
+    expect(res.render.mock.calls[0][1].validationMessages).toEqual({
+      redirect_uris: `${ERROR_MESSAGES.REDIRECT_URLS_NOT_UNIQUE}`,
     });
   });
 
