@@ -378,6 +378,10 @@ const postServiceConfig = async (req, res) => {
   try {
     const serviceModels = await buildCurrentServiceModel(req);
 
+    // const currentService = serviceModels.currentServiceModel;
+    // const { oldServiceConfigModel } = serviceModels;
+    // const model = await validate(req, currentService, serviceModels.oldServiceConfigModel);
+
     const currentService = serviceModels.currentServiceModel;
     const oldService = serviceModels.oldServiceConfigModel;
     const model = await validate(req, currentService, oldService);
