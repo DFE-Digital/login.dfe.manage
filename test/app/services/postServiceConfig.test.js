@@ -1,4 +1,3 @@
-//const { urlValidator } = require("login.dfe.validation/src/urlValidator");
 const mockUtils = require("../../utils");
 
 jest.mock("login.dfe.validation");
@@ -71,22 +70,6 @@ const requestAuthCodeServiceInfo = {
   apiSecret: "outshine-wringing-imparting-submitted",
   tokenEndpointAuthMethod: "client_secret_post",
 };
-
-// const updatedAuthCodeServiceModel = {
-//   name: currentAuthServiceInfo.name || "",
-//   clientId: requestAuthCodeServiceInfo.clientId,
-//   description: currentAuthServiceInfo.description,
-//   clientSecret: requestAuthCodeServiceInfo.clientSecret,
-//   serviceHome: requestAuthCodeServiceInfo.serviceHome,
-//   postResetUrl: requestAuthCodeServiceInfo.postResetUrl,
-//   redirectUris: requestAuthCodeServiceInfo.redirect_uris,
-//   postLogoutRedirectUris: requestAuthCodeServiceInfo.post_logout_redirect_uris,
-//   grantTypes: requestAuthCodeServiceInfo.grant_types,
-//   responseTypes: requestAuthCodeServiceInfo.response_types,
-//   apiSecret: requestAuthCodeServiceInfo.apiSecret,
-//   tokenEndpointAuthMethod: requestAuthCodeServiceInfo.tokenEndpointAuthMethod,
-//   refreshToken: null,
-// };
 
 // Represents the request body and the updateService info for the hybrid flow.
 const currentHybridServiceInfo = {
@@ -215,8 +198,7 @@ describe("when editing the AUTH flow service configuration", () => {
     // ACT
     await postServiceConfig(req, res);
 
-    // ACT
-    /// this must return nothing inorder to fix an error in another journey in reset password
+    // ASSERT
     expect(res.render.mock.calls).toHaveLength(0);
   });
 

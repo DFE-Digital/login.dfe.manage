@@ -1,6 +1,5 @@
 const niceware = require("niceware");
 const he = require("he");
-const { Utils } = require("sequelize");
 const UrlValidator = require("login.dfe.validation/src/urlValidator");
 const logger = require("../../infrastructure/logger/index");
 const { AUTHENTICATION_FLOWS, GRANT_TYPES, ACTIONS, TOKEN_ENDPOINT_AUTH_METHOD, ERROR_MESSAGES, REDIRECT_URLS_CHANGES } = require("../../constants/serviceConfigConstants");
@@ -18,7 +17,8 @@ const buildServiceModelFromObject = (service, sessionService = {}) => {
   const responseTypes = sessionService?.responseTypes?.newValue || service.relyingParty.response_types || [];
   const authFlowType = determineAuthFlowByRespType(responseTypes);
 
-  tokenEndpointAuthMethod = sessionValue && (authFlowType === AUTHENTICATION_FLOWS.HYBRID_FLOW || authFlowType === AUTHENTICATION_FLOWS.AUTHORISATION_CODE_FLOW) ? sessionValue : fallbackValue;
+  const isValidSessionAuthFlow = sessionValue && (authFlowType === AUTHENTICATION_FLOWS.HYBRID_FLOW || authFlowType === AUTHENTICATION_FLOWS.AUTHORISATION_CODE_FLOW);
+  tokenEndpointAuthMethod = isValidSessionAuthFlow ? sessionValue : fallbackValue;
 
   let grantTypes = [];
   if (sessionService?.grantTypes?.newValue && authFlowType !== AUTHENTICATION_FLOWS.IMPLICIT_FLOW) {
@@ -111,10 +111,10 @@ const getGrantTypes = ({ isHybridFlow, isAuthorisationCodeFlow, isImplicitFlow, 
     grantTypes = [GRANT_TYPES.AUTHORIZATION_CODE];
     if (isHybridFlow) {
       grantTypes.push(GRANT_TYPES.IMPLICIT);
-    };
+    }
     if (refreshToken) {
       grantTypes.push(refreshToken);
-    };
+    }
   } else if (isImplicitFlow) {
     grantTypes = [GRANT_TYPES.IMPLICIT];
   } else {
@@ -137,7 +137,6 @@ const validate = async (req, currentService, oldService) => {
   const isHybridFlow = authFlowType === AUTHENTICATION_FLOWS.HYBRID_FLOW;
 
   const refreshToken = req.body.refresh_token && (isAuthorisationCodeFlow || isHybridFlow) ? req.body.refresh_token : null;
-
   const grantTypes = getGrantTypes({ isHybridFlow, isAuthorisationCodeFlow, isImplicitFlow, oldService, refreshToken });
 
   let tokenEndpointAuthMethod;
@@ -228,7 +227,7 @@ const validate = async (req, currentService, oldService) => {
   } else if (model.service.responseTypes.length === 1 && model.service.responseTypes.includes("token")) {
     model.validationMessages.responseTypes = ERROR_MESSAGES.RESPONSE_TYPE_TOKEN_ERROR;
   }
-  //takeout encoding from server
+  // takeout encoding from server
   unecodedurl = _unescape(postResetUrl);
   postResetUrl = unecodedurl;
 

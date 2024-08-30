@@ -13,8 +13,6 @@ describe('when determining the grant types to set', () => {
             refreshToken: 'refresh_token',
             oldService: null,
         });
-        // expect(result).toEqual(['authorization_code', 'refresh_token']);
-        //? is refresh token separate? 
         expect(result).toEqual(['authorization_code', 'implicit', 'refresh_token']);
     });
     it('should return authorization code grant type without refresh token for hybrid or authorization code flow', () => {
@@ -25,7 +23,6 @@ describe('when determining the grant types to set', () => {
             refreshToken: null,
             oldService: null,
         });
-        // expect(result).toEqual(['authorization_code']);
         expect(result).toEqual(['authorization_code', 'implicit']);
     });
     it('should return implicit grant type for implicit flow', () => {
