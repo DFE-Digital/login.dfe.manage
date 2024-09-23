@@ -49,7 +49,7 @@ const init = async () => {
   const app = express();
 
   logger.info('set helmet policy defaults');
-  
+
   const self = "'self'";
   const allowedOrigin = '*.signin.education.gov.uk';
 
@@ -62,7 +62,7 @@ const init = async () => {
       },
     }));
   }
-  
+
   // Setting helmet Content Security Policy
   const scriptSources = [self, "'unsafe-inline'", "'unsafe-eval'", allowedOrigin];
   const styleSources = [self, "'unsafe-inline'", allowedOrigin];
@@ -158,7 +158,7 @@ const init = async () => {
   app.use(sanitization({
     sanitizer: (key, value) => {
       // add exception for fields that we don't want to encode
-      const fieldToNotSanitize = ['criteria'];
+      const fieldToNotSanitize = ['criteria', 'bannerMesssage'];
       if (fieldToNotSanitize.find((x) => x.toLowerCase() === key.toLowerCase())) {
         return value;
       }
