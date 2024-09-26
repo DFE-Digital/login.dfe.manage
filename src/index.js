@@ -62,7 +62,6 @@ const init = async () => {
       },
     }));
   }
-
   // Setting helmet Content Security Policy
   const scriptSources = [self, "'unsafe-inline'", "'unsafe-eval'", allowedOrigin];
   const styleSources = [self, "'unsafe-inline'", allowedOrigin];
@@ -90,7 +89,6 @@ const init = async () => {
   }));
 
   logger.info('Set helmet filters');
-
   app.use(helmet.xssFilter());
   app.use(helmet.frameguard('false'));
   app.use(helmet.ieNoOpen());
@@ -158,7 +156,7 @@ const init = async () => {
   app.use(sanitization({
     sanitizer: (key, value) => {
       // add exception for fields that we don't want to encode
-      const fieldToNotSanitize = ['criteria', 'bannerMesssage'];
+      const fieldToNotSanitize = ['criteria', 'bannerMessage'];
       if (fieldToNotSanitize.find((x) => x.toLowerCase() === key.toLowerCase())) {
         return value;
       }

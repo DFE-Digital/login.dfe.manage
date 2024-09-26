@@ -30,14 +30,14 @@
                         <input type="text" id="bannerTitle" name="bannerTitle" value="<%=locals.bannerTitle%>" class="govuk-input govuk-!-width-three-quarters" maxlength="80"<% if (locals.validationMessages.bannerTitle) { %> aria-invalid="true" aria-describedby="validation-bannerTitle" <% } %>>
                     </div>
 
-                    <div class="govuk-form-group <%= (locals.validationMessages.bannerMesssage !== undefined) ? 'govuk-form-group--error' : '' %>">
-                        <label class="govuk-label govuk-label--s" for="bannerMesssage">Message</label>
-                    <% if (locals.validationMessages.bannerMesssage !== undefined) { %>
-                        <p id="validation-bannerMesssage" class="govuk-error-message">
-                            <span class="govuk-visually-hidden">Error:</span> <%=locals.validationMessages.bannerMesssage %>
+                    <div class="govuk-form-group <%= (locals.validationMessages.bannerMessage !== undefined) ? 'govuk-form-group--error' : '' %>">
+                        <label class="govuk-label govuk-label--s" for="bannerMessage">Message</label>
+                    <% if (locals.validationMessages.bannerMessage !== undefined) { %>
+                        <p id="validation-bannerMessage" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span> <%=locals.validationMessages.bannerMessage %>
                         </p>
                     <% } %>
-                        <textarea type="text" id="bannerMesssage" name="bannerMesssage" value="<%=locals.message%>" class="govuk-textarea govuk-!-width-three-quarters" rows="4" maxlength="400"<% if (locals.validationMessages.bannerMesssage) { %> aria-invalid="true" aria-describedby="validation-bannerMesssage" <% } %>><%=locals.message%></textarea>
+                        <textarea type="text" id="bannerMessage" name="bannerMessage" value="<%=locals.message%>" class="govuk-textarea govuk-!-width-three-quarters" rows="4" maxlength="400"<% if (locals.validationMessages.bannerMessage) { %> aria-invalid="true" aria-describedby="validation-bannerMessage" <% } %>><%=locals.message%></textarea>
                     </div>
 
                     <!-- Display condition selection -->

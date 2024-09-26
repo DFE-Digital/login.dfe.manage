@@ -82,7 +82,7 @@ const validate = async (req) => {
   const model = {
     name: req.body.bannerName || '',
     bannerTitle: req.body.bannerTitle || '',
-    message: req.body.bannerMesssage || '',
+    message: req.body.bannerMessage || '',
     bannerDisplay: req.body.bannerDisplay || '',
     fromDay: req.body.fromDay,
     fromMonth: req.body.fromMonth,
@@ -113,7 +113,7 @@ const validate = async (req) => {
     model.validationMessages.bannerTitle = 'Please enter a banner title';
   }
   if (!model.message) {
-    model.validationMessages.bannerMesssage = 'Please enter a banner message';
+    model.validationMessages.bannerMessage = 'Please enter a banner message';
   }
   if (!model.bannerDisplay) {
     model.validationMessages.bannerDisplay = 'Please select when you want the banner to be displayed';
