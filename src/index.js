@@ -62,6 +62,7 @@ const init = async () => {
       },
     }));
   }
+
   // Setting helmet Content Security Policy
   const scriptSources = [self, "'unsafe-inline'", "'unsafe-eval'", allowedOrigin];
   const styleSources = [self, "'unsafe-inline'", allowedOrigin];
@@ -89,6 +90,7 @@ const init = async () => {
   }));
 
   logger.info('Set helmet filters');
+
   app.use(helmet.xssFilter());
   app.use(helmet.frameguard('false'));
   app.use(helmet.ieNoOpen());
