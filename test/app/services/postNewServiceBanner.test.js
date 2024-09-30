@@ -20,7 +20,7 @@ describe('when creating a new service banner', () => {
       body: {
         bannerName: 'banner name',
         bannerTitle: 'banner title',
-        bannerMesssage: 'banner message',
+        bannerMessage: 'banner message',
         bannerDisplay: 'isActive',
         fromDay: '12',
         fromMonth: '12',
@@ -130,7 +130,7 @@ describe('when creating a new service banner', () => {
   });
 
   it('then it should render view if banner message not entered', async () => {
-    req.body.bannerMesssage = undefined;
+    req.body.bannerMessage = undefined;
 
     await postNewServiceBanner(req, res);
 
@@ -160,7 +160,7 @@ describe('when creating a new service banner', () => {
       userRoles: [],
       bannerId: 'bannerId',
       validationMessages: {
-        bannerMesssage: 'Please enter a banner message',
+        bannerMessage: 'Please enter a banner message',
       },
     });
   });
