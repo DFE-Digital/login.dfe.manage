@@ -23,18 +23,11 @@ jest.mock("login.dfe.validation", () => ({
   urlValidator: jest.fn(),
 }));
 
-jest.mock("../../../src/infrastructure/utils/serviceConfigCache", () => ({
-  retreiveRedirectUrlsFromStorage: jest.fn(),
-  deleteFromLocalStorage: jest.fn(),
-  saveRedirectUrlsToStorage: jest.fn(),
-}));
-
 const { getRequestMock, getResponseMock } = require("../../utils");
 const { postServiceConfig } = require("../../../src/app/services/serviceConfig");
 const { getServiceById, updateService } = require("../../../src/infrastructure/applications");
 const { getUserServiceRoles, checkClientId } = require("../../../src/app/services/utils");
-const { saveRedirectUrlsToStorage } = require("../../../src/infrastructure/utils/serviceConfigCache");
-const { REDIRECT_URLS_CHANGES, ERROR_MESSAGES } = require("../../../src/constants/serviceConfigConstants");
+const { ERROR_MESSAGES } = require("../../../src/constants/serviceConfigConstants");
 
 const res = getResponseMock();
 
@@ -597,29 +590,6 @@ describe("when editing the AUTH flow service configuration", () => {
     expect(res.redirect.mock.calls).toHaveLength(1);
     expect(req.session.serviceConfigurationChanges.authFlowType).toEqual("hybridFlow");
     expect(req.session.serviceConfigurationChanges.tokenEndpointAuthMethod).toEqual({ newValue: "client_secret_post", oldValue: "client_secret_basic" });
-  });
-
-  it("should save the redirect and postRedirect urls into the app cache memory", async () => {
-    // ARRANGE
-    req.body.redirect_uris = ["https://www.new-redirect.com"];
-    req.body.post_logout_redirect_uris = ["http://new-logout-url-1.com", "http://new-logout-url-2.com"];
-
-    // ACT
-    await postServiceConfig(req, res);
-
-    // ASSERT
-    expect(saveRedirectUrlsToStorage).toHaveBeenCalledTimes(1);
-    expect(saveRedirectUrlsToStorage.mock.calls[0][0]).toBe(`${REDIRECT_URLS_CHANGES}_${req.session.passport.user.sub}_${req.params.sid}`);
-    expect(saveRedirectUrlsToStorage.mock.calls[0][1]).toEqual({
-      postLogoutRedirectUris: {
-        newValue: ["http://new-logout-url-1.com", "http://new-logout-url-2.com"],
-        oldValue: ["https://www.logout.com"],
-      },
-      redirectUris: {
-        newValue: ["https://www.new-redirect.com"],
-        oldValue: ["https://www.redirect.com"],
-      },
-    });
   });
 
   it("should redirect to Review service configuration changes when no validation messages and Continue button is pressed", async () => {

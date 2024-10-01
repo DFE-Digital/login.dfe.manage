@@ -16,13 +16,7 @@ const {
   ERROR_MESSAGES,
   SERVICE_CONFIG_CHANGES_SUMMARY_DETAILS,
   TOKEN_ENDPOINT_AUTH_METHOD,
-  REDIRECT_URLS_CHANGES,
 } = require('../../constants/serviceConfigConstants');
-
-const {
-  deleteFromLocalStorage,
-  retreiveRedirectUrlsFromStorage,
-} = require('../../infrastructure/utils/serviceConfigCache');
 
 const getServiceConfigMapping = (key, sid) => {
   const mapping = { ...SERVICE_CONFIG_CHANGES_SUMMARY_DETAILS[key] };
@@ -88,12 +82,7 @@ const validate = async (req, currentService) => {
   try {
     const manageRolesForService = await getUserServiceRoles(req);
 
-    let { serviceConfigurationChanges } = req.session;
-    const serviceConfigChangesKey = `${REDIRECT_URLS_CHANGES}_${req.session.passport.user.sub}_${req.params.sid}`;
-    const redirectUrlsChanges = await retreiveRedirectUrlsFromStorage(serviceConfigChangesKey, req.params.sid);
-
-    // adding redirectUrlsChanges if they exist
-    serviceConfigurationChanges = redirectUrlsChanges ? { ...serviceConfigurationChanges, ...redirectUrlsChanges } : serviceConfigurationChanges;
+    const { serviceConfigurationChanges } = req.session;
 
     const grantTypes = processConfigurationTypes(serviceConfigurationChanges.grantTypes?.newValue);
     const responseTypes = processConfigurationTypes(serviceConfigurationChanges.responseTypes?.newValue);
@@ -132,8 +121,9 @@ const validate = async (req, currentService) => {
       currentNavigation: 'configuration',
     };
 
-    if (Object.keys(serviceConfigurationChanges).length === 1 && 'authFlowType' in serviceConfigurationChanges) {
+    if (!serviceConfigurationChanges || Object.keys(serviceConfigurationChanges).length === 0) {
       model.validationMessages.noChangesMade = ERROR_MESSAGES.NO_CHANGES_MADE;
+      return model;
     }
 
     const { serviceHome, postResetUrl, clientId } = model.service;
@@ -320,16 +310,11 @@ const getConfirmServiceConfig = async (req, res) => {
     return res.redirect(`/services/${sid}/service-configuration`);
   }
   try {
-    const serviceConfigChangesKey = `${REDIRECT_URLS_CHANGES}_${req.session.passport.user.sub}_${req.params.sid}`;
     const manageRolesForService = await getUserServiceRoles(req);
     const currentService = await buildCurrentServiceModel(req);
 
     const authFlowTypeValue = req.session.serviceConfigurationChanges?.authFlowType;
-    let serviceConfigChanges = req.session.serviceConfigurationChanges;
-
-    const redirectUrlsChanges = await retreiveRedirectUrlsFromStorage(serviceConfigChangesKey, req.params.sid);
-
-    serviceConfigChanges = redirectUrlsChanges ? { ...serviceConfigChanges, ...redirectUrlsChanges } : serviceConfigChanges;
+    const serviceConfigChanges = req.session.serviceConfigurationChanges;
 
     const { authFlowType, ...changedServiceParams } = serviceConfigChanges;
 
@@ -373,7 +358,6 @@ const postConfirmServiceConfig = async (req, res) => {
       return res.redirect(`/services/${req.params.sid}/service-configuration`);
     }
 
-    const serviceConfigChangesKey = `${REDIRECT_URLS_CHANGES}_${req.session.passport.user.sub}_${req.params.sid}`;
     const currentService = await buildCurrentServiceModel(req);
     const model = await validate(req, currentService);
 
@@ -385,11 +369,7 @@ const postConfirmServiceConfig = async (req, res) => {
     // excluding the authFlowType from the req.session.serviceConfigurationChanges object
     const { authFlowType, ...serviceConfigChanges } = req.session.serviceConfigurationChanges;
 
-    const redirectUrlsChanges = await retreiveRedirectUrlsFromStorage(serviceConfigChangesKey, req.params.sid);
-
-    const serviceConfigurationChanges = redirectUrlsChanges ? { ...serviceConfigChanges, ...redirectUrlsChanges } : serviceConfigChanges;
-
-    const editedFields = Object.entries(serviceConfigurationChanges)
+    const editedFields = Object.entries(serviceConfigChanges)
       .filter(([field, oldValue]) => {
         const newValue = Array.isArray(model.service[field])
           ? model.service[field].sort()
@@ -435,8 +415,6 @@ const postConfirmServiceConfig = async (req, res) => {
       editedService: req.params.sid,
       editedFields,
     });
-
-    await deleteFromLocalStorage(serviceConfigChangesKey);
 
     res.flash('title', 'Success');
     res.flash('heading', 'Service configuration changed');
