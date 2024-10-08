@@ -1,12 +1,9 @@
 const niceware = require("niceware");
 const he = require("he");
 const UrlValidator = require("login.dfe.validation/src/urlValidator");
-const logger = require("../../infrastructure/logger/index");
-const { AUTHENTICATION_FLOWS, GRANT_TYPES, ACTIONS, TOKEN_ENDPOINT_AUTH_METHOD, ERROR_MESSAGES, REDIRECT_URLS_CHANGES } = require("../../constants/serviceConfigConstants");
+const { AUTHENTICATION_FLOWS, GRANT_TYPES, ACTIONS, TOKEN_ENDPOINT_AUTH_METHOD, ERROR_MESSAGES } = require("../../constants/serviceConfigConstants");
 const { getServiceById } = require("../../infrastructure/applications");
 const { getUserServiceRoles, determineAuthFlowByRespType, processRedirectUris, processConfigurationTypes, isCorrectProtocol, isCorrectLength, isValidUrl, checkClientId, _unescape } = require("./utils");
-
-const { saveRedirectUrlsToStorage, deleteFromLocalStorage, retreiveRedirectUrlsFromStorage } = require("../../infrastructure/utils/serviceConfigCache");
 
 const buildServiceModelFromObject = (service, sessionService = {}) => {
   let tokenEndpointAuthMethod = null;
@@ -46,28 +43,9 @@ const buildServiceModelFromObject = (service, sessionService = {}) => {
   };
 };
 
-const getSessionServiceForAmendChanges = async (req) => {
-  if (req.query?.action === ACTIONS.AMEND_CHANGES) {
-    let sessionService = req.session.serviceConfigurationChanges;
-    try {
-      const serviceConfigChangesKey = `${REDIRECT_URLS_CHANGES}_${req.session.passport.user.sub}_${req.params.sid}`;
-      const redirectUrlsChanges = await retreiveRedirectUrlsFromStorage(serviceConfigChangesKey, req.params.sid);
-
-      if (redirectUrlsChanges) {
-        sessionService = { ...sessionService, ...redirectUrlsChanges };
-      }
-      return sessionService;
-    } catch (error) {
-      logger.error(`Error occurred while retrieving redirect URLs from local storage for service ID - ${req.params.sid}:`, error);
-      return sessionService;
-    }
-  }
-  return {};
-};
-
 const buildCurrentServiceModel = async (req) => {
   try {
-    const sessionService = await getSessionServiceForAmendChanges(req);
+    const sessionService = req.query?.action === ACTIONS.AMEND_CHANGES ? req.session.serviceConfigurationChanges : {};
     const service = await getServiceById(req.params.sid, req.id);
     const currentServiceModel = buildServiceModelFromObject(service, sessionService);
     const oldServiceConfigModel = buildServiceModelFromObject(service);
@@ -85,8 +63,6 @@ const getServiceConfig = async (req, res) => {
   try {
     if (req.query.action !== ACTIONS.AMEND_CHANGES) {
       req.session.serviceConfigurationChanges = {};
-      const serviceConfigChangesKey = `${REDIRECT_URLS_CHANGES}_${req.session.passport.user.sub}_${req.params.sid}`;
-      await deleteFromLocalStorage(serviceConfigChangesKey);
     }
     const manageRolesForService = await getUserServiceRoles(req);
     const serviceModel = await buildCurrentServiceModel(req);
@@ -406,15 +382,8 @@ const postServiceConfig = async (req, res) => {
       });
 
     req.session.serviceConfigurationChanges = {};
-    const redirectUrlsChanges = {};
-    editedFields.map(({ name, oldValue, newValue, isSecret, secretNewValue }) => {
-      if (name === "redirectUris" || name === "postLogoutRedirectUris") {
-        if (!redirectUrlsChanges[name]) {
-          redirectUrlsChanges[name] = {};
-        }
-        redirectUrlsChanges[name].oldValue = oldValue;
-        redirectUrlsChanges[name].newValue = newValue;
-      } else {
+    if (editedFields && editedFields.length > 0) {
+      editedFields.map(({ name, oldValue, newValue, isSecret, secretNewValue }) => {
         if (!req.session.serviceConfigurationChanges[name]) {
           req.session.serviceConfigurationChanges[name] = {};
         }
@@ -423,24 +392,20 @@ const postServiceConfig = async (req, res) => {
         if (isSecret) {
           req.session.serviceConfigurationChanges[name].secretNewValue = secretNewValue;
         }
+      });
+
+      req.session.serviceConfigurationChanges.authFlowType = model.authFlowType;
+
+      if (req.session.serviceConfigurationChanges.postLogoutRedirectUris === undefined) {
+        req.session.serviceConfigurationChanges.postLogoutRedirectUris = {};
+        req.session.serviceConfigurationChanges.postLogoutRedirectUris.oldValue = model.service.postLogoutRedirectUris;
+        req.session.serviceConfigurationChanges.postLogoutRedirectUris.newValue = undefined;
       }
-    });
-
-    if (Object.keys(redirectUrlsChanges).length > 0) {
-      const serviceConfigChangesKey = `${REDIRECT_URLS_CHANGES}_${req.session.passport.user.sub}_${req.params.sid}`;
-      await saveRedirectUrlsToStorage(serviceConfigChangesKey, redirectUrlsChanges, req.params.sid);
-    }
-    req.session.serviceConfigurationChanges.authFlowType = model.authFlowType;
-
-    if (req.session.serviceConfigurationChanges.postLogoutRedirectUris === undefined) {
-      req.session.serviceConfigurationChanges.postLogoutRedirectUris = {};
-      req.session.serviceConfigurationChanges.postLogoutRedirectUris.oldValue = model.service.postLogoutRedirectUris;
-      req.session.serviceConfigurationChanges.postLogoutRedirectUris.newValue = undefined;
-    }
-    if (req.session.serviceConfigurationChanges.redirectUris === undefined) {
-      req.session.serviceConfigurationChanges.redirectUris = {};
-      req.session.serviceConfigurationChanges.redirectUris.oldValue = model.service.redirectUris;
-      req.session.serviceConfigurationChanges.redirectUris.newValue = undefined;
+      if (req.session.serviceConfigurationChanges.redirectUris === undefined) {
+        req.session.serviceConfigurationChanges.redirectUris = {};
+        req.session.serviceConfigurationChanges.redirectUris.oldValue = model.service.redirectUris;
+        req.session.serviceConfigurationChanges.redirectUris.newValue = undefined;
+      }
     }
     return res.redirect("review-service-configuration#");
   } catch (error) {

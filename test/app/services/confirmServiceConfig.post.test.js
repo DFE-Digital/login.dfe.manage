@@ -1,4 +1,3 @@
-const { urlValidator } = require('login.dfe.validation/src/urlValidator');
 const mockUtils = require('../../utils');
 
 jest.mock('login.dfe.validation');
@@ -21,22 +20,12 @@ jest.mock('../../../src/app/services/utils', () => {
   };
 });
 
-jest.mock('../../../src/infrastructure/utils/serviceConfigCache', () => ({
-  retreiveRedirectUrlsFromStorage: jest.fn(),
-  deleteFromLocalStorage: jest.fn(),
-
-}));
-
 const { getRequestMock, getResponseMock } = require('../../utils');
 const { postConfirmServiceConfig } = require('../../../src/app/services/confirmServiceConfig');
 const { getServiceById, updateService } = require('../../../src/infrastructure/applications');
 const { getUserServiceRoles, checkClientId } = require('../../../src/app/services/utils');
 const logger = require('../../../src/infrastructure/logger');
-const { REDIRECT_URLS_CHANGES, ERROR_MESSAGES } = require('../../../src/constants/serviceConfigConstants');
-const {
-  retreiveRedirectUrlsFromStorage,
-  deleteFromLocalStorage,
-} = require('../../../src/infrastructure/utils/serviceConfigCache');
+const { ERROR_MESSAGES } = require('../../../src/constants/serviceConfigConstants');
 
 const res = getResponseMock();
 
@@ -101,8 +90,6 @@ describe('when confirming service config changes in the review page', () => {
     getServiceById.mockReturnValueOnce({ ...currentServiceInfo }).mockReturnValueOnce(null);
 
     res.mockResetAll();
-
-    retreiveRedirectUrlsFromStorage.mockReset();
 
     req.session.serviceConfigurationChanges = {
       authFlowType: 'authorisationCodeFlow',
@@ -259,13 +246,10 @@ describe('when confirming service config changes in the review page', () => {
   });
 
   it('then it should render view with validation if any of the redirect Urls are invalid', async () => {
-    retreiveRedirectUrlsFromStorage.mockReturnValue({
-      redirectUris: {
-        oldValue: ['https://www.redirect.com'],
-        newValue: ['https://valid-url.com', 'invalid-url'],
-      },
-    });
-
+    req.session.serviceConfigurationChanges.redirectUris = {
+      oldValue: ['https://www.redirect.com'],
+      newValue: ['https://valid-url.com', 'invalid-url'],
+    };
     req.session.serviceConfigurationChanges.postLogoutRedirectUris = {};
     req.session.serviceConfigurationChanges.postLogoutRedirectUris.oldValue = ['https://google.com', 'https://yahoo.com'];
 
@@ -280,12 +264,10 @@ describe('when confirming service config changes in the review page', () => {
   });
 
   it('then it should render view with validation if redirect Urls are not unique', async () => {
-    retreiveRedirectUrlsFromStorage.mockReturnValue({
-      redirectUris: {
-        oldValue: ['https://www.redirect.com'],
-        newValue: ['https://valid-url.com', 'https://valid-url.com'],
-      },
-    });
+    req.session.serviceConfigurationChanges.redirectUris = {
+      oldValue: ['https://www.redirect.com'],
+      newValue: ['https://valid-url.com', 'https://valid-url.com'],
+    };
     req.session.serviceConfigurationChanges.postLogoutRedirectUris = {};
     req.session.serviceConfigurationChanges.postLogoutRedirectUris.oldValue = ['https://google.com', 'https://yahoo.com'];
     await postConfirmServiceConfig(req, res);
@@ -299,12 +281,10 @@ describe('when confirming service config changes in the review page', () => {
   });
 
   it('then it should render view with validation if logout redirect Urls are not unique', async () => {
-    retreiveRedirectUrlsFromStorage.mockReturnValue({
-      postLogoutRedirectUris: {
-        oldValue: ['https://www.redirect.com'],
-        newValue: ['https://duplicate-url.com', 'https://duplicate-url.com'],
-      },
-    });
+    req.session.serviceConfigurationChanges.postLogoutRedirectUris = {
+      oldValue: ['https://www.redirect.com'],
+      newValue: ['https://duplicate-url.com', 'https://duplicate-url.com'],
+    };
     req.session.serviceConfigurationChanges.redirectUris = {};
     req.session.serviceConfigurationChanges.redirectUris.oldValue = ['https://google.com', 'https://yahoo.com'];
 
@@ -324,12 +304,10 @@ describe('when confirming service config changes in the review page', () => {
   });
 
   it('then it should render view with validation if any of the logout redirect Urls are invalid', async () => {
-    retreiveRedirectUrlsFromStorage.mockReturnValue({
-      postLogoutRedirectUris: {
-        oldValue: ['https://www.redirect.com'],
-        newValue: ['https://valid-url.com', 'invalid'],
-      },
-    });
+    req.session.serviceConfigurationChanges.postLogoutRedirectUris = {
+      oldValue: ['https://www.redirect.com'],
+      newValue: ['https://valid-url.com', 'invalid'],
+    };
     req.session.serviceConfigurationChanges.redirectUris = {};
     req.session.serviceConfigurationChanges.redirectUris.oldValue = ['https://google.com', 'https://yahoo.com'];
 
@@ -338,10 +316,7 @@ describe('when confirming service config changes in the review page', () => {
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({
       validationMessages: {
-        post_logout_redirect_uris: `${ERROR_MESSAGES.INVALID_POST_LOGOUT_URL}`,
-        // postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
         post_logout_redirect_uris: `${ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_PROTOCOL}`,
-        // redirect_uris: `${ERROR_MESSAGES.MISSING_REDIRECT_URL}`,
       },
     }));
   });
@@ -380,7 +355,12 @@ describe('when confirming service config changes in the review page', () => {
   });
 
   it('then it should update the service if no errors are displayed', async () => {
-    retreiveRedirectUrlsFromStorage.mockReturnValue({
+    req.session.serviceConfigurationChanges = {
+      authFlowType: 'authorisationCodeFlow',
+      serviceHome: {
+        newValue: 'https://newservicehome.com',
+        oldValue: 'http://old-service-home.com',
+      },
       redirectUris: {
         oldValue: ['https://www.redirect.com'],
         newValue: ['https://www.redirected.com'],
@@ -394,16 +374,7 @@ describe('when confirming service config changes in the review page', () => {
           'http://newlogouturl2.com',
         ],
       },
-    });
-    req.session.serviceConfigurationChanges = {
-      authFlowType: 'authorisationCodeFlow',
-      serviceHome: {
-        newValue: 'https://newservicehome.com',
-        oldValue: 'http://old-service-home.com',
-      },
-      redirectUris: { oldValue: 'https://www.postredirect.com', newValue: 'https://newpostredirect.com' },
       postResetUrl: { oldValue: 'https://www.postreset.com', newValue: 'https://newpostreseturl.com' },
-      postLogoutRedirectUris: { oldValue: 'https://www.postlogoutreset.com', newValue: 'https://newpostlogoutreseturl.com' },
       responseTypes: {
         oldValue: ['code', 'id_token'],
         newValue: ['token', 'id_token'],
@@ -469,7 +440,12 @@ describe('when confirming service config changes in the review page', () => {
   });
 
   it('then it should audit the service being edited and it should return a mix of explicit/expunged elements in the audit editedFields array, if a mix of secret/non-secret fields have been updated', async () => {
-    retreiveRedirectUrlsFromStorage.mockReturnValue({
+    req.session.serviceConfigurationChanges = {
+      authFlowType: 'authorisationCodeFlow',
+      serviceHome: {
+        newValue: 'https://newservicehome.com',
+        oldValue: 'http://old-service-home.com',
+      },
       redirectUris: {
         oldValue: ['https://www.redirect.com'],
         newValue: ['https://www.newredirect.com'],
@@ -483,16 +459,7 @@ describe('when confirming service config changes in the review page', () => {
           'http://newlogouturl-2.com',
         ],
       },
-    });
-    req.session.serviceConfigurationChanges = {
-      authFlowType: 'authorisationCodeFlow',
-      serviceHome: {
-        newValue: 'https://newservicehome.com',
-        oldValue: 'http://old-service-home.com',
-      },
-      redirectUris: { oldValue: 'https://www.postredirect.com', newValue: 'https://newpostredirect.com' },
       postResetUrl: { oldValue: 'https://www.postreset.com', newValue: 'https://newpostreseturl.com' },
-      postLogoutRedirectUris: { oldValue: 'https://www.postlogoutreset.com', newValue: 'https://newpostlogoutreseturl.com' },
       responseTypes: {
         oldValue: ['code', 'id_token'],
         newValue: ['token', 'id_token'],
@@ -673,53 +640,6 @@ describe('when confirming service config changes in the review page', () => {
       oldValue: 'https://www.postlogoutreset.com',
     },
     ]); */
-  });
-
-  it('should then remove the redirect urls stored in app cache', async () => {
-    req.session.serviceConfigurationChanges = {
-      authFlowType: 'authorisationCodeFlow',
-      serviceHome: {
-        newValue: 'https://newservicehome.com',
-        oldValue: 'http://old-service-home.com',
-      },
-      redirectUris: { oldValue: 'https://www.postredirect.com', newValue: 'https://newpostredirect.com' },
-      postResetUrl: { oldValue: 'https://www.postreset.com', newValue: 'https://newpostreseturl.com' },
-      postLogoutRedirectUris: { oldValue: 'https://www.postlogoutreset.com', newValue: 'https://newpostlogoutreseturl.com' },
-      responseTypes: {
-        oldValue: ['code', 'id_token'],
-        newValue: ['token', 'id_token'],
-      },
-      grantTypes: {
-        newValue: ['authorisation_code', 'refresh_token'],
-        oldValue: ['implicit', 'authorization_code'],
-        serviceHome: {
-          oldValue: 'http://old-service-home.com',
-          newValue: 'http://new-service-home.com',
-        },
-      },
-      apiSecret: {
-        oldValue: 'EXPUNGED',
-        newValue: 'EXPUNGED',
-        secretNewValue: 'outshine-wringing-imparting-submitted',
-      },
-      clientSecret: {
-        oldValue: 'EXPUNGED',
-        newValue: 'EXPUNGED',
-        secretNewValue: 'outshine-wringing-imparting-submitted',
-      },
-      tokenEndpointAuthMethod: {
-        oldValue: null,
-        newValue: 'client_secret_post',
-      },
-      clientId: {
-        newValue: 'new-client-id',
-        oldValue: 'clientid',
-      },
-    };
-    await postConfirmServiceConfig(req, res);
-
-    expect(deleteFromLocalStorage).toHaveBeenCalledTimes(1);
-    expect(deleteFromLocalStorage.mock.calls[0][0]).toBe(`${REDIRECT_URLS_CHANGES}_${req.session.passport.user.sub}_${req.params.sid}`);
   });
 
   it('should redirect to Dashboard page and display success banner if service successfuly updated', async () => {

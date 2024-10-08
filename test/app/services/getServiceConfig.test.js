@@ -14,20 +14,12 @@ jest.mock('../../../src/app/services/utils', () => {
     isValidUrl: jest.fn(actualUtilsFunctions.isValidUrl),
   };
 });
-jest.mock('../../../src/infrastructure/utils/serviceConfigCache', () => ({
-  retreiveRedirectUrlsFromStorage: jest.fn(),
-  deleteFromLocalStorage: jest.fn(),
-
-}));
 
 const { getRequestMock, getResponseMock } = require('../../utils');
 const { getServiceConfig } = require('../../../src/app/services/serviceConfig');
 const { getServiceById } = require('../../../src/infrastructure/applications');
 const { getUserServiceRoles } = require('../../../src/app/services/utils');
-const { ACTIONS, REDIRECT_URLS_CHANGES } = require('../../../src/constants/serviceConfigConstants');
-const {
-  retreiveRedirectUrlsFromStorage,
-} = require('../../../src/infrastructure/utils/serviceConfigCache');
+const { ACTIONS } = require('../../../src/constants/serviceConfigConstants');
 
 const res = getResponseMock();
 
@@ -84,11 +76,6 @@ describe('when getting the service config page', () => {
     });
     getUserServiceRoles.mockReset();
     getUserServiceRoles.mockImplementation(() => Promise.resolve([]));
-    retreiveRedirectUrlsFromStorage.mockReset();
-    retreiveRedirectUrlsFromStorage.mockReturnValue({
-      redirectUris: { newValue: ['https://new.redirect.com'], oldValue: ['https://old.redirect.com'] },
-      postLogoutRedirectUris: { newValue: ['https://new.logout.com'], oldValue: ['https://old.logout.com'] },
-    });
     res.mockResetAll();
   });
 
@@ -181,14 +168,14 @@ describe('when getting the service config page', () => {
       clientSecret: { secretNewValue: 'new-secret', newValue: 'EXPUNGED', oldValue: 'EXPUNGED' },
       serviceHome: { newValue: 'https://new.servicehome.com', oldValue: 'https://old.servicehome.com' },
       postResetUrl: { newValue: 'https://new.postreset.com', oldValue: 'https://old.postreset.com' },
+      redirectUris: { newValue: 'https://new.redirect.com', oldValue: 'https://old.redirect.com' },
+      postLogoutRedirectUris: { newValue: 'https://new.logout.com', oldValue: 'https://old.logout.com' },
       grantTypes: { newValue: ['refresh_token', 'authorization_code'], oldValue: ['implicit'] },
       responseTypes: { newValue: ['code', 'id_token'], oldValue: ['code'] },
       apiSecret: { secretNewValue: 'new-api-secret', oldValue: 'old-api-secret' },
     };
 
     await getServiceConfig(req, res);
-    expect(retreiveRedirectUrlsFromStorage).toHaveBeenCalledTimes(1);
-    expect(retreiveRedirectUrlsFromStorage.mock.calls[0][0]).toBe(`${REDIRECT_URLS_CHANGES}_${req.session.passport.user.sub}_${req.params.sid}`);
 
     expect(res.render.mock.calls[0][1].service).toEqual({
       apiSecret: 'new-api-secret',
@@ -197,9 +184,9 @@ describe('when getting the service config page', () => {
       description: 'service description',
       grantTypes: ['refresh_token', 'authorization_code'],
       name: 'service one',
-      postLogoutRedirectUris: ['https://new.logout.com'],
+      postLogoutRedirectUris: 'https://new.logout.com',
       postResetUrl: 'https://new.postreset.com',
-      redirectUris: ['https://new.redirect.com'],
+      redirectUris: 'https://new.redirect.com',
       responseTypes: ['code', 'id_token'],
       serviceHome: 'https://new.servicehome.com',
       tokenEndpointAuthMethod: 'client_secret_basic',

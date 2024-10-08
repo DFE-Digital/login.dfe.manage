@@ -12,7 +12,6 @@ const flash = require('login.dfe.express-flash-2');
 const session = require('express-session');
 const { getErrorHandler, ejsErrorPages } = require('login.dfe.express-error-handling');
 const moment = require('moment');
-const localStorage = require('node-persist');
 const Redis = require('ioredis');
 const RedisStore = require('connect-redis').default;
 const { setUserContext, isManageUser } = require('./infrastructure/utils');
@@ -36,10 +35,6 @@ configSchema.validate();
 https.globalAgent.maxSockets = http.globalAgent.maxSockets = config.hostingEnvironment.agentKeepAlive.maxSockets || 50;
 
 const init = async () => {
-  localStorage.init({
-    ttl: 60 * 60 * 1000,
-  });
-
   const csrf = csurf({
     cookie: {
       secure: true,
@@ -49,7 +44,6 @@ const init = async () => {
   const app = express();
 
   logger.info('set helmet policy defaults');
-
   const self = "'self'";
   const allowedOrigin = '*.signin.education.gov.uk';
 
@@ -62,7 +56,6 @@ const init = async () => {
       },
     }));
   }
-
   // Setting helmet Content Security Policy
   const scriptSources = [self, "'unsafe-inline'", "'unsafe-eval'", allowedOrigin];
   const styleSources = [self, "'unsafe-inline'", allowedOrigin];

@@ -4,20 +4,11 @@ jest.mock('./../../../src/infrastructure/config', () => require('../../utils').c
 jest.mock('./../../../src/infrastructure/logger', () => require('../../utils').loggerMockFactory());
 jest.mock('./../../../src/infrastructure/applications');
 jest.mock('../../../src/app/services/utils');
-jest.mock('../../../src/infrastructure/utils/serviceConfigCache', () => ({
-  retreiveRedirectUrlsFromStorage: jest.fn(),
-  deleteFromLocalStorage: jest.fn(),
-
-}));
 
 const { getRequestMock, getResponseMock } = require('../../utils');
 const { getConfirmServiceConfig } = require('../../../src/app/services/confirmServiceConfig');
 const { getServiceById } = require('../../../src/infrastructure/applications');
 const { getUserServiceRoles } = require('../../../src/app/services/utils');
-
-const {
-  retreiveRedirectUrlsFromStorage,
-} = require('../../../src/infrastructure/utils/serviceConfigCache');
 
 const res = getResponseMock();
 
@@ -72,22 +63,6 @@ describe('when getting the Review service config changes page', () => {
     });
     getUserServiceRoles.mockReset();
     getUserServiceRoles.mockImplementation(() => Promise.resolve([]));
-    retreiveRedirectUrlsFromStorage.mockReset();
-    retreiveRedirectUrlsFromStorage.mockReturnValue({
-      redirectUris: {
-        oldValue: ['https://www.redirect.com'],
-        newValue: ['https://www.new-redirect.com'],
-      },
-      postLogoutRedirectUris: {
-        oldValue: [
-          'http://old-logout-url-1.com',
-        ],
-        newValue: [
-          'http://new-logout-url-1.com',
-          'http://new-logout-url-2.com',
-        ],
-      },
-    });
 
     res.mockResetAll();
     req.session.serviceConfigurationChanges = {
@@ -126,6 +101,19 @@ describe('when getting the Review service config changes page', () => {
       tokenEndpointAuthMethod: {
         oldValue: null,
         newValue: 'client_secret_post',
+      },
+      redirectUris: {
+        oldValue: ['https://www.redirect.com'],
+        newValue: ['https://www.new-redirect.com'],
+      },
+      postLogoutRedirectUris: {
+        oldValue: [
+          'http://old-logout-url-1.com',
+        ],
+        newValue: [
+          'http://new-logout-url-1.com',
+          'http://new-logout-url-2.com',
+        ],
       },
     };
   });
