@@ -68,16 +68,9 @@ const serviceMappingSchema = new SimpleSchema({
   key2SuccessServiceId: patterns.uuid,
 });
 
-const hostingEnvironmentSchema = new SimpleSchema({
-  csrfSecret: {
-    type: String,
-    optional: true,
-  },
-});
-
 const schema = new SimpleSchema({
   loggerSettings: schemas.loggerSettings,
-  hostingEnvironment: schemas.hostingEnvironment.extend(hostingEnvironmentSchema),
+  hostingEnvironment: schemas.hostingEnvironment,
   applications: schemas.apiClient,
   search: schemas.apiClient,
   access: accessIdentifiers,
