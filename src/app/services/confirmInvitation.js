@@ -1,4 +1,4 @@
-const NotificationClient = require('login.dfe.notifications.client');
+const { NotificationClient } = require('login.dfe.jobs-client');
 const config = require('../../infrastructure/config');
 const logger = require('../../infrastructure/logger');
 

@@ -1,4 +1,4 @@
-const ServiceNotificationsClient = require('login.dfe.service-notifications.jobs.client');
+const { ServiceNotificationsClient } = require('login.dfe.jobs-client');
 const config = require('../../infrastructure/config');
 const { getUserDetails, getUserServiceRoles } = require('./utils');
 
