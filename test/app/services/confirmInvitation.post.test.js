@@ -29,9 +29,9 @@ jest.mock('./../../../src/infrastructure/search', () => {
     createIndex: jest.fn(),
   };
 });
-jest.mock('login.dfe.notifications.client');
+jest.mock('login.dfe.jobs-client');
 
-const NotificationClient = require('login.dfe.notifications.client');
+const { NotificationClient } = require('login.dfe.jobs-client');
 const sendServiceAdded = jest.fn();
 const sendServiceRequestApproved = jest.fn();
 NotificationClient.mockImplementation(() => {

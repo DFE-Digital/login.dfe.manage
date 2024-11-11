@@ -7,7 +7,7 @@ const path = require('path');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const sanitization = require('login.dfe.sanitization');
-const csurf = require('csurf');
+const { doubleCsrf } = require('csrf-csrf');
 const flash = require('login.dfe.express-flash-2');
 const session = require('express-session');
 const { getErrorHandler, ejsErrorPages } = require('login.dfe.express-error-handling');
@@ -35,12 +35,6 @@ configSchema.validate();
 https.globalAgent.maxSockets = http.globalAgent.maxSockets = config.hostingEnvironment.agentKeepAlive.maxSockets || 50;
 
 const init = async () => {
-  const csrf = csurf({
-    cookie: {
-      secure: true,
-      httpOnly: true,
-    },
-  });
   const app = express();
 
   logger.info('set helmet policy defaults');
@@ -148,10 +142,26 @@ const init = async () => {
     next();
   });
 
-  app.use(flash());
+  app.use(cookieParser(config.hostingEnvironment.sessionSecret));
 
+  const { doubleCsrfProtection: csrf } = doubleCsrf({
+    getSecret: (req) => req.secret,
+    // eslint-disable-next-line no-underscore-dangle
+    getTokenFromRequest: (req) => req.body._csrf,
+    secret: config.hostingEnvironment.csrfSecret,
+    cookieName: '__host-csrf',
+    cookieOptions: {
+      sameSite: 'strict',
+      secure: true,
+      signed: true,
+    },
+    path: '/',
+    size: 64,
+    ignoredMethods: ['GET', 'HEAD', 'OPTIONS'],
+  });
+
+  app.use(flash());
   app.use(bodyParser.urlencoded({ extended: true }));
-  app.use(cookieParser());
   app.use(sanitization({
     sanitizer: (key, value) => {
       // add exception for fields that we don't want to encode

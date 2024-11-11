@@ -1,12 +1,14 @@
 jest.mock('./../../../src/infrastructure/config', () => require('./../../utils').configMockFactory());
 jest.mock('./../../../src/infrastructure/logger', () => require('./../../utils').loggerMockFactory());
-jest.mock('login.dfe.service-notifications.jobs.client');
+jest.mock('login.dfe.jobs-client', () => ({
+  ServiceNotificationsClient: jest.fn(),
+}));
 jest.mock('./../../../src/app/services/utils');
 
 const { getRequestMock, getResponseMock } = require('./../../utils');
 const { getUserDetails } = require('./../../../src/app/services/utils');
 const res = getResponseMock();
-const ServiceNotificationsClient = require('login.dfe.service-notifications.jobs.client');
+const { ServiceNotificationsClient } = require('login.dfe.jobs-client');
 const webServiceSync = require('./../../../src/app/services/webServiceSync');
 
 const user = { id: 'user-1', name: 'user one' };

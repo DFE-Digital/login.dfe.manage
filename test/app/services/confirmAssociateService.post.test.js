@@ -9,13 +9,16 @@ jest.mock("./../../../src/infrastructure/access", () => ({
   listRolesOfService: jest.fn(),
 }));
 
-jest.mock("login.dfe.notifications.client");
+jest.mock("login.dfe.jobs-client", () => ({
+  NotificationClient: jest.fn(),
+}));
+
 jest.mock("./../../../src/infrastructure/applications", () => ({
   getServiceById: jest.fn(),
 }));
 jest.mock("./../../../src/infrastructure/organisations");
 
-const notificationClient = require("login.dfe.notifications.client");
+const { NotificationClient } = require("login.dfe.jobs-client");
 const { getOrganisationByIdV2, getUserOrganisations, getInvitationOrganisations } = require("../../../src/infrastructure/organisations");
 
 const logger = require("../../../src/infrastructure/logger");
@@ -26,7 +29,7 @@ const { getUserDetails } = require("../../../src/app/services/utils");
 const { getServiceById } = require("../../../src/infrastructure/applications");
 const postConfirmAssociateService = require("../../../src/app/services/confirmAssociateService").post;
 
-jest.mock("login.dfe.notifications.client");
+jest.mock("login.dfe.jobs-client");
 
 const res = getResponseMock();
 
@@ -150,7 +153,7 @@ describe("when confirm associating a service to user", () => {
     sendServiceAddedStub = jest.fn();
     sendServiceRequestApprovedStub = jest.fn();
 
-    notificationClient.mockReset().mockImplementation(() => ({
+    NotificationClient.mockReset().mockImplementation(() => ({
       sendServiceRequestApproved: sendServiceRequestApprovedStub,
       sendServiceAdded: sendServiceAddedStub,
     }));
