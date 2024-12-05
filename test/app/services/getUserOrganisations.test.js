@@ -51,6 +51,9 @@ describe("when getting users organisation details", () => {
           {
             name: "A role",
           },
+          {
+            name: "G role",
+          },
         ],
       },
       {
@@ -63,6 +66,25 @@ describe("when getting users organisation details", () => {
           },
           {
             name: "A role",
+          },
+          {
+            name: "G role",
+          },
+        ],
+      },
+      {
+        userId: "user1",
+        serviceId: "service3",
+        organisationId: "88a1ed39-5a98-43da-b66e-78e564ea72b0",
+        roles: [
+          {
+            name: "Z role",
+          },
+          {
+            name: "A role",
+          },
+          {
+            name: "G role",
           },
         ],
       },
@@ -85,6 +107,11 @@ describe("when getting users organisation details", () => {
           {
             id: "service2",
             name: "A service",
+            serviceRoles: [],
+          },
+          {
+            id: "service3",
+            name: "G service",
             serviceRoles: [],
           },
         ],
@@ -282,6 +309,24 @@ describe("when getting users organisation details", () => {
               name: "A role",
             },
             {
+              name: "G role",
+            },
+            {
+              name: "Z role",
+            },
+          ],
+        },
+        {
+          id: "service3",
+          name: "G service",
+          serviceRoles: [
+            {
+              name: "A role",
+            },
+            {
+              name: "G role",
+            },
+            {
               name: "Z role",
             },
           ],
@@ -292,6 +337,9 @@ describe("when getting users organisation details", () => {
           serviceRoles: [
             {
               name: "A role",
+            },
+            {
+              name: "G role",
             },
             {
               name: "Z role",
