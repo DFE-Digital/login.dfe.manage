@@ -13,6 +13,7 @@ const getUserOrganisations = require("../../../src/app/services/getUserOrganisat
 const { getAllUserOrganisations, getInvitationOrganisations } = require("../../../src/infrastructure/organisations");
 const { getUsersByIdV2 } = require("../../../src/infrastructure/directories");
 const { getUserDetails } = require("../../../src/app/services/utils");
+const { getServicesForUser } = require("../../../src/infrastructure/access");
 
 const res = getResponseMock();
 
@@ -37,6 +38,58 @@ describe("when getting users organisation details", () => {
       id: "user1",
     });
 
+    getServicesForUser.mockReset();
+    getServicesForUser.mockReturnValue([
+      {
+        userId: "user1",
+        serviceId: "service1",
+        organisationId: "88a1ed39-5a98-43da-b66e-78e564ea72b0",
+        roles: [
+          {
+            name: "Z role",
+          },
+          {
+            name: "A role",
+          },
+          {
+            name: "G role",
+          },
+        ],
+      },
+      {
+        userId: "user1",
+        serviceId: "service2",
+        organisationId: "88a1ed39-5a98-43da-b66e-78e564ea72b0",
+        roles: [
+          {
+            name: "Z role",
+          },
+          {
+            name: "A role",
+          },
+          {
+            name: "G role",
+          },
+        ],
+      },
+      {
+        userId: "user1",
+        serviceId: "service3",
+        organisationId: "88a1ed39-5a98-43da-b66e-78e564ea72b0",
+        roles: [
+          {
+            name: "Z role",
+          },
+          {
+            name: "A role",
+          },
+          {
+            name: "G role",
+          },
+        ],
+      },
+    ]);
+
     getAllUserOrganisations.mockReset();
     getAllUserOrganisations.mockReturnValue([
       {
@@ -48,6 +101,18 @@ describe("when getting users organisation details", () => {
         services: [
           {
             id: "service1",
+            name: "Z service",
+            serviceRoles: [],
+          },
+          {
+            id: "service2",
+            name: "A service",
+            serviceRoles: [],
+          },
+          {
+            id: "service3",
+            name: "G service",
+            serviceRoles: [],
           },
         ],
       },
@@ -227,6 +292,61 @@ describe("when getting users organisation details", () => {
     await getUserOrganisations(req, res);
     expect(res.render.mock.calls[0][1]).toMatchObject({
       backLink: `/services/${req.params.sid}/organisations/${orgId}/users`,
+    });
+  });
+
+  it("should return the list of the users services in alphabetical order", async () => {
+    await getUserOrganisations(req, res);
+    expect(res.render.mock.calls[0][1].organisations[0]).toMatchObject({
+      id: "88a1ed39-5a98-43da-b66e-78e564ea72b0",
+      name: "Great Big School",
+      services: [
+        {
+          id: "service2",
+          name: "A service",
+          serviceRoles: [
+            {
+              name: "A role",
+            },
+            {
+              name: "G role",
+            },
+            {
+              name: "Z role",
+            },
+          ],
+        },
+        {
+          id: "service3",
+          name: "G service",
+          serviceRoles: [
+            {
+              name: "A role",
+            },
+            {
+              name: "G role",
+            },
+            {
+              name: "Z role",
+            },
+          ],
+        },
+        {
+          id: "service1",
+          name: "Z service",
+          serviceRoles: [
+            {
+              name: "A role",
+            },
+            {
+              name: "G role",
+            },
+            {
+              name: "Z role",
+            },
+          ],
+        },
+      ],
     });
   });
 });

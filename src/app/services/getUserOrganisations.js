@@ -48,8 +48,10 @@ const getOrganisations = async (userId, correlationId) => {
         if (userServiceRole) {
           service.serviceRoles.push(...userServiceRole.roles);
         }
+        service.serviceRoles.sort((a, b) => a.name.localeCompare(b.name));
         return service;
       });
+
       return {
         id: invitation.organisation.id,
         name: invitation.organisation.name,
@@ -72,7 +74,17 @@ const getUserOrganisations = async (req, res) => {
   const user = await getUserDetails(req);
 
   const organisations = await getOrganisations(user.id, req.id);
-  const visibleOrganisations = organisations.filter((o) => o.status?.id !== 0);
+  const visibleOrganisations = organisations
+    .filter((o) => o.status?.id !== 0)
+    .map((org) => {
+      const sortedOrg = { ...org };
+
+      if (sortedOrg.services && sortedOrg.services.length > 0) {
+        sortedOrg.services.sort((a, b) => a.name.localeCompare(b.name));
+      }
+
+      return sortedOrg;
+    });
 
   const manageRolesForService = await getUserServiceRoles(req);
   const currentService = await getServiceById(req.params.sid, req.id);
