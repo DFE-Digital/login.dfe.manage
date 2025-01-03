@@ -1,7 +1,6 @@
 const { mapUserStatus } = require("../../infrastructure/utils");
-const {
-  getUserDetailsById, getUserServiceRoles, getReturnOrgId, getReturnUrl
-} = require("./utils");
+const { getUserDetailsById, getUserServiceRoles, getReturnOrgId, getReturnUrl } = require("./utils");
+const { dateFormat } = require("../helpers/dateFormatterHelper");
 const { getPageOfUserAudits } = require("../../infrastructure/audit");
 const logger = require("../../infrastructure/logger");
 const { getServiceIdForClientId } = require("../../infrastructure/serviceMapping");
@@ -171,6 +170,7 @@ const getAudit = async (req, res) => {
 
     audits.push({
       timestamp: new Date(audit.timestamp),
+      formattedTimestamp: audit.timestamp ? dateFormat(audit.timestamp, "longDateFormat") : "",
       event: {
         type: audit.type,
         subType: audit.subType,

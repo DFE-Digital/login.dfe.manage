@@ -11,6 +11,7 @@ const {
   objectToQueryString,
   mapLastLoginValuesToDateValues,
 } = require('./utils');
+const { dateFormat } = require("../helpers/dateFormatterHelper");
 const { getOrganisationCategories } = require('../../infrastructure/organisations');
 
 const clearNewUserSessionData = (req) => {
@@ -163,7 +164,9 @@ const viewModel = async (req) => {
 
   // remove hidden organisations from displaying
   const users = result.users.map((u) => ({
-    ...u, organisations: u.organisations.filter((o) => (o.statusId && (o.statusId !== 0))),
+    ...u,
+    organisations: u.organisations.filter((o) => (o.statusId && (o.statusId !== 0))),
+    formattedLastLogin: u.lastLogin ? dateFormat(u.lastLogin, "shortDateFormat") : "",
   }));
   const filtersModel = await getFiltersModel(req);
   return {

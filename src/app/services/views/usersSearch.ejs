@@ -258,8 +258,7 @@
                                 <%= users[i].status.description %>
                             </td>
                             <td class="govuk-table__cell govuk-!-font-size-16 govuk-table__cell--numeric"<% if (numberOfOrgs > 1) { %> rowspan="<%= numberOfOrgs %>"<% } %>>
-                                <% if(locals.users[i].lastLogin) { %> <%= locals.moment(locals.users[i].lastLogin).format('DD MMM YYYY');
-                                %> <% } else { %> Never <% } %>
+                                <%= users[i].formattedLastLogin ? users[i].formattedLastLogin : 'Never' %>
                             </td>
                         </tr>
                         <%

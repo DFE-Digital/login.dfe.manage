@@ -67,8 +67,7 @@
             <dd class="govuk-label"><%= user.email %></dd>
             <dt class="govuk-label">Last login:</dt>
             <dd class="govuk-label">
-                <%= user.lastLogin ? moment(user.lastLogin).format('DD MMM YYYY hh:mma') :
-                'Never' %>
+                <%= user.lastLogin ? user.lastLogin : 'Never' %>
             </dd>
         </dl>
     </div>

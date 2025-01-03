@@ -69,7 +69,7 @@
                 %>
                     <tr class="govuk-table__row">
                         <td class="govuk-table__cell"><a class="govuk-link" href="service-banners/<%=banner.id%>"><%= banner.name %></a></td>
-                        <td class="govuk-table__cell"><%= banner.updatedAt ? locals.moment(banner.updatedAt).format('DD MMM YYYY') : 'Never' %></td>
+                        <td class="govuk-table__cell"><%= banner.formattedUpdateAt ? banner.formattedUpdateAt : 'Never' %></td>
                         <td class="govuk-table__cell govuk-table__cell--numeric"><%= i === locals.activeBannerIndex ? 'Yes' : ''%></td>
                     </tr>
                 <% } %>

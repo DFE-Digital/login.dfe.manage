@@ -2,6 +2,7 @@ const { searchForUsers } = require("../../infrastructure/search");
 const { getOrganisationByIdV2 } = require("../../infrastructure/organisations");
 const { mapUserRole } = require("../../infrastructure/utils");
 const { getUserServiceRoles } = require("./utils");
+const { dateFormat } = require("../helpers/dateFormatterHelper");
 const { getServiceById } = require("../../infrastructure/applications");
 
 const search = async (req) => {
@@ -60,6 +61,7 @@ const render = async (req, res) => {
     const viewUser = { ...user };
     viewUser.organisation = { ...user.organisations.find((o) => o.id.toUpperCase() === organisation.id.toUpperCase()) };
     viewUser.organisation.role = mapUserRole(viewUser.organisation.roleId);
+    viewUser.formattedLastLogin = viewUser.lastLogin ? dateFormat(viewUser.lastLogin, "shortDateFormat") : "";
     return viewUser;
   });
 
