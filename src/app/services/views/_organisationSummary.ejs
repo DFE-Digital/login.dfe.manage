@@ -18,6 +18,14 @@
     <%= organisation.name %>
 </h1>
 <dl class="inline">
+    <dt class="govuk-label">Organisation Status:</dt>
+    <dd class="govuk-label">
+        <span class="govuk-tag govuk-tag--<%= organisation.status.tagColor %>">
+            <%=organisation.status.name%>
+        </span>
+    </dd>
+</dl>
+<dl class="inline">
     <% if (organisation.LegalName) { %>
     <dt class="govuk-label">LegalName:</dt>
     <dd class="govuk-label"><%= organisation.LegalName || 'Not Recorded' %></dd>
@@ -74,7 +82,4 @@
     <dt class="govuk-label">Legacy ID:</dt>
     <dd class="govuk-label"><%= organisation.legacyId || 'Unknown' %></dd>
     <% } %>
-
-    <dt class="govuk-label">Status:</dt>
-    <dd class="govuk-label"><%= organisation.status.name  || 'Unknown' %></dd>
 </dl>  
