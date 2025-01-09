@@ -65,17 +65,25 @@ const setUserContext = async (req, res, next) => {
   next();
 };
 
+// Note: Any changes to user statuses here require corresponding
+// updates in login.dfe.services (src/infrastructure/utils/index.js)
+// as functionality is duplicated. Ensure consistency across both implementations.
 const userStatusMap = [
-  { id: -2, name: 'Deactivated Invitation', tagColor: 'orange' },
-  { id: -1, name: 'Invited', tagColor: 'blue' },
-  { id: 0, name: 'Deactivated', tagColor: 'red' },
-  { id: 1, name: 'Active', tagColor: 'green' },
+  { id: -2, name: "Deactivated Invitation", tagColor: "orange" },
+  { id: -1, name: "Invited", tagColor: "blue" },
+  { id: 0, name: "Deactivated", tagColor: "red" },
+  { id: 1, name: "Active", tagColor: "green" },
 ];
 
-const mapUserStatus = (status, changedOn = null) => {
-  const statusObj = userStatusMap.find((s) => s.id === status);
+const mapUserStatus = (statusId, changedOn = null) => {
+  const statusObj = userStatusMap.find((s) => s.id === statusId);
   if (!statusObj) {
-    return null;
+    return {
+      id: statusId,
+      description: "Unknown",
+      tagColor: "grey",
+      changedOn,
+    };
   }
   return {
     id: statusObj.id,
