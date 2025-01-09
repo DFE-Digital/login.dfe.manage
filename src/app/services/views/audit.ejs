@@ -63,7 +63,7 @@
                     %>
                         <tr class="govuk-table__row">
                             <td class="govuk-table__cell govuk-!-font-size-16">
-                                <%= locals.moment(audit.timestamp).format('DD MMM YYYY HH:mm') %>
+                                <%= audit.formattedTimestamp %>
                             </td>
                             <td class="govuk-table__cell govuk-!-font-size-16">
                                 <%= audit.event.description %>

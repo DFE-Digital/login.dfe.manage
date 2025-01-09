@@ -119,7 +119,7 @@
                         </td>
 
                         <td class="govuk-table__cell govuk-body govuk-!-font-size-16 govuk-table__cell--numeric">
-                            <%=user.lastLogin ? locals.moment(user.lastLogin).format('DD MMM YYYY') : 'Never'%>
+                            <%= user.formattedLastLogin ? user.formattedLastLogin : 'Never' %>
                         </td>
                     </tr>
                     <% } %>

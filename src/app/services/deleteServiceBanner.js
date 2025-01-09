@@ -3,9 +3,12 @@
 const logger = require('../../infrastructure/logger');
 const { removeBanner, getBannerById } = require('../../infrastructure/applications');
 const { getUserServiceRoles } = require('./utils');
+const { dateFormat } = require('../helpers/dateFormatterHelper');
 
 const get = async (req, res) => {
   const serviceBanners = await getBannerById(req.params.sid, req.params.bid, req.id);
+  serviceBanners.formattedValidFrom = serviceBanners.validFrom ? dateFormat(serviceBanners.validFrom, 'longDateFormat') : '';
+  serviceBanners.formattedValidTo = serviceBanners.validTo ? dateFormat(serviceBanners.validTo, 'longDateFormat') : '';
   const manageRolesForService = await getUserServiceRoles(req);
 
   return res.render('services/views/deleteServiceBanner', {

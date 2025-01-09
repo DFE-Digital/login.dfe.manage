@@ -2,7 +2,7 @@
 
 const { listBannersForService, getServiceById } = require('../../infrastructure/applications');
 const { getUserServiceRoles } = require('./utils');
-const moment = require('moment');
+const { dateFormat, findActiveBannerIndex } = require("../helpers/dateFormatterHelper");
 
 const get = async (req, res) => {
   const paramsSource = req.method === 'POST' ? req.body : req.query;
@@ -11,10 +11,13 @@ const get = async (req, res) => {
     page = 1;
   }
   const serviceBanners = await listBannersForService(req.params.sid, 10, page, req.id);
+  serviceBanners.banners = serviceBanners.banners.map((banner) => ({
+    ...banner,
+    formattedUpdateAt: banner.updatedAt ? dateFormat(banner.updatedAt, "shortDateFormat") : "",
+  }));
   const serviceDetails = await getServiceById(req.params.sid, req.id);
   const manageRolesForService = await getUserServiceRoles(req);
-  const now = moment();
-  let activeBannerIndex = serviceBanners.banners.findIndex((banner) => moment(now).isBetween(banner.validFrom, banner.validTo) === true);
+  let activeBannerIndex = findActiveBannerIndex(serviceBanners.banners);
   if (activeBannerIndex === -1) {
     activeBannerIndex = serviceBanners.banners.findIndex((banner) => banner.isActive === true);
   }

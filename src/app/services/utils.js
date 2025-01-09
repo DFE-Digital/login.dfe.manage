@@ -7,6 +7,7 @@ const { getOrganisationByIdV2 } = require("../../infrastructure/organisations");
 const { mapAsync } = require("../../utils/asyncHelpers");
 const config = require("../../infrastructure/config");
 const { getServiceById } = require("../../infrastructure/applications/api");
+const { dateFormat } = require("../helpers/dateFormatterHelper");
 
 const mapUserToSupportModel = (user, userFromSearch) => ({
   id: user.sub,
@@ -63,7 +64,7 @@ const getUserDetailsById = async (uid, correlationId) => {
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
-    lastLogin: user.lastLogin,
+    lastLogin: user.lastLogin ? dateFormat(user.lastLogin, "longDateFormat") : "",
     status: user.status,
     loginsInPast12Months: {
       successful: user.successfulLoginsInPast12Months,

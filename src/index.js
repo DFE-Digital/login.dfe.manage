@@ -11,7 +11,6 @@ const { doubleCsrf } = require('csrf-csrf');
 const flash = require('login.dfe.express-flash-2');
 const session = require('express-session');
 const { getErrorHandler, ejsErrorPages } = require('login.dfe.express-error-handling');
-const moment = require('moment');
 const Redis = require('ioredis');
 const RedisStore = require('connect-redis').default;
 const { setUserContext, isManageUser } = require('./infrastructure/utils');
@@ -91,7 +90,6 @@ const init = async () => {
   let assetsUrl = config.assets.url;
   assetsUrl = assetsUrl.endsWith('/') ? assetsUrl.substr(0, assetsUrl.length - 1) : assetsUrl;
   Object.assign(app.locals, {
-    moment,
     urls: {
       profile: config.hostingEnvironment.profileUrl,
       services: config.hostingEnvironment.servicesUrl,
