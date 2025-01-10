@@ -1,5 +1,3 @@
-"use strict";
-
 const url = require("url");
 const passport = require("passport");
 const config = require("../../infrastructure/config");

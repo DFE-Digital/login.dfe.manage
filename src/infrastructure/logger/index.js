@@ -1,5 +1,3 @@
-"use strict";
-
 const { createLogger, format, transports, addColors } = require("winston");
 const WinstonSequelizeTransport = require("login.dfe.audit.winston-sequelize-transport");
 const appInsights = require("applicationinsights");

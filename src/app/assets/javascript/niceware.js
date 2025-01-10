@@ -40,7 +40,6 @@
     1: [
       function (require, module, exports) {
         (function (Buffer) {
-          "use strict";
           // @flow
           /**
            * A module for converting cryptographic keys into human-readable phrases.
@@ -65709,8 +65708,6 @@
     ],
     3: [
       function (require, module, exports) {
-        "use strict";
-
         exports.byteLength = byteLength;
         exports.toByteArray = toByteArray;
         exports.fromByteArray = fromByteArray;
@@ -65902,8 +65899,6 @@
          * @license  MIT
          */
         /* eslint-disable no-proto */
-
-        "use strict";
 
         var base64 = require("base64-js");
         var ieee754 = require("ieee754");
@@ -68191,8 +68186,6 @@
     8: [
       function (require, module, exports) {
         (function (process, global) {
-          "use strict";
-
           function oldBrowser() {
             throw new Error(
               "Secure random number generation is not supported by this browser.\nUse Chrome, Firefox or Internet Explorer 11",
