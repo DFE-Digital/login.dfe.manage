@@ -116,22 +116,6 @@ const requestHybridServiceInfo = {
   tokenEndpointAuthMethod: "client_secret_post",
 };
 
-const updatedHybridServiceModel = {
-  name: currentHybridServiceInfo.name || "",
-  clientId: requestHybridServiceInfo.clientId,
-  description: currentHybridServiceInfo.description,
-  serviceHome: requestHybridServiceInfo.serviceHome,
-  clientSecret: requestHybridServiceInfo.clientSecret,
-  postResetUrl: requestHybridServiceInfo.postResetUrl,
-  redirectUris: requestHybridServiceInfo.redirect_uris,
-  postLogoutRedirectUris: requestHybridServiceInfo.post_logout_redirect_uris,
-  grantTypes: requestHybridServiceInfo.grant_types,
-  responseTypes: requestHybridServiceInfo.response_types,
-  apiSecret: requestHybridServiceInfo.apiSecret,
-  tokenEndpointAuthMethod: requestHybridServiceInfo.tokenEndpointAuthMethod,
-  refreshToken: null,
-};
-
 const currentImplicitServiceInfo = {
   id: "service1",
   name: "service one",

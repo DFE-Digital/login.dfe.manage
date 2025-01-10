@@ -14,20 +14,18 @@ const services = [
     ],
   },
 ];
-const getServicesForUser = (id, correlationId) => {
+const getServicesForUser = (id) => {
   const userServices = services.find(
     (x) => x.userId.toLowerCase() === id.toLowerCase(),
   );
   return Promise.resolve(userServices);
 };
 
-const getSingleUserService = (id, sid, oid, correlationId) =>
-  Promise.resolve([]);
+const getSingleUserService = () => Promise.resolve([]);
 
-const getSingleInvitationService = (iid, sid, oid, correlationId) =>
-  Promise.resolve([]);
+const getSingleInvitationService = () => Promise.resolve([]);
 
-const getAllInvitationServices = (iid, corellationId) =>
+const getAllInvitationServices = () =>
   Promise.resolve([
     {
       invitationId: "D212N-12312-31231-312-56465",
@@ -47,26 +45,17 @@ const getAllInvitationServices = (iid, corellationId) =>
     },
   ]);
 
-const listRolesOfService = async (sid, correlationId) => Promise.resolve([]);
+const listRolesOfService = async () => Promise.resolve([]);
 
-const updateUserService = async (uid, sid, oid, role, correlationId) =>
-  Promise.resolve(null);
+const updateUserService = async () => Promise.resolve(null);
 
-const updateInvitationService = async (iid, sid, oid, role, correlationId) =>
-  Promise.resolve(null);
+const updateInvitationService = async () => Promise.resolve(null);
 
-const removeServiceFromUser = async (uid, sid, oid, correlationId) =>
-  Promise.resolve();
+const removeServiceFromUser = async () => Promise.resolve();
 
-const removeServiceFromInvitation = async (iid, sid, oid, correlationId) =>
-  Promise.resolve();
+const removeServiceFromInvitation = async () => Promise.resolve();
 
-const getPageOfPoliciesForService = async (
-  sid,
-  page,
-  pageSize,
-  correlationId,
-) =>
+const getPageOfPoliciesForService = async (sid, page) =>
   Promise.resolve({
     policies: {
       id: "policyId",
@@ -83,13 +72,11 @@ const getPageOfPoliciesForService = async (
     totalNumberOfRecords: 1,
   });
 
-const getPolicyById = async (sid, pid, correlationId) => Promise.resolve();
+const getPolicyById = async () => Promise.resolve();
 
-const addUserService = async (uid, sid, oid, role, correlationId) =>
-  Promise.resolve(null);
+const addUserService = async () => Promise.resolve(null);
 
-const addInvitationService = async (iid, sid, oid, role, correlationId) =>
-  Promise.resolve(null);
+const addInvitationService = async () => Promise.resolve(null);
 
 module.exports = {
   getServicesForUser,

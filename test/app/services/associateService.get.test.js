@@ -1,4 +1,3 @@
-/* eslint-disable global-require */
 jest.mock("../../../src/infrastructure/config", () =>
   require("../../utils").configMockFactory(),
 );
@@ -11,7 +10,6 @@ jest.mock("../../../src/app/services/utils", () =>
     "getReturnUrl",
   ]),
 );
-/* eslint-enable global-require */
 jest.mock("login.dfe.policy-engine");
 jest.mock("../../../src/infrastructure/organisations");
 jest.mock("../../../src/infrastructure/applications", () => ({
@@ -76,7 +74,6 @@ describe("when displaying the associate service view", () => {
     PolicyEngine.mockReset().mockImplementation(() => policyEngine);
 
     // Require needed on beforeEach as Policy Engine is instantiated outside of route action.
-    // eslint-disable-next-line global-require
     getAssociateService =
       require("../../../src/app/services/associateService").get;
   });

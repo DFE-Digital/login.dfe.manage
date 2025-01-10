@@ -1,4 +1,4 @@
-const getInvitation = async (invitationId, correlationId) => {
+const getInvitation = async (invitationId) => {
   return {
     firstName: "Some",
     lastName: "User",
@@ -9,11 +9,11 @@ const getInvitation = async (invitationId, correlationId) => {
   };
 };
 
-const getUsersByIdV2 = async (userIds, correlationId) => {
+const getUsersByIdV2 = async () => {
   return Promise.resolve([]);
 };
 
-const getUserById = async (uid, correlationId) => {
+const getUserById = async () => {
   return {
     sub: "7a1b077a-d7d4-4b60-83e8-1a1b49849510",
     given_name: "Test",
@@ -25,15 +25,8 @@ const getUserById = async (uid, correlationId) => {
   };
 };
 
-const createInvite = async (
-  firstName,
-  lastName,
-  email,
-  clientId,
-  redirectUri,
-  correlationId,
-) => {
-  return Promise.resolve(uuid());
+const createInvite = async () => {
+  return Promise.resolve();
 };
 
 module.exports = {

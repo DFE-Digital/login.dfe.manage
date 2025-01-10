@@ -3,7 +3,7 @@ const passport = require("passport");
 const config = require("../../infrastructure/config");
 const logger = require("../../infrastructure/logger");
 
-const logout = (req, res) => {
+const logout = (req) => {
   req.logout(() => {
     logger.info("user logged out.");
   });
@@ -22,7 +22,7 @@ const signUserOut = (req, res) => {
       returnUrl = `${baseUrl}/signout/session-timeout`;
     }
 
-    logout(req, res);
+    logout(req);
     res.redirect(
       url.format(
         Object.assign(url.parse(issuer.end_session_endpoint), {
@@ -36,10 +36,10 @@ const signUserOut = (req, res) => {
     );
   } else {
     if (req.query.timeout === "1") {
-      logout(req, res);
+      logout(req);
       return res.redirect(`${baseUrl}/signout/session-timeout`);
     }
-    logout(req, res);
+    logout(req);
     res.redirect("/");
   }
 };

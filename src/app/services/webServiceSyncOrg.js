@@ -1,4 +1,3 @@
-const config = require("../../infrastructure/config");
 const { getOrganisationByIdV2 } = require("../../infrastructure/organisations");
 const { getUserServiceRoles } = require("./utils");
 const { wsSyncCall } = require("./wsSynchFunCall");
@@ -19,7 +18,6 @@ const get = async (req, res) => {
 const post = async (req, res) => {
   await wsSyncCall(req.params.oid);
 
-  // res.flash('info', 'Organisation has been queued for sync');
   return res.redirect(
     `/services/${req.params.sid}/organisations/${req.params.oid}/users`,
   );

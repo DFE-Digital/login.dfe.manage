@@ -1,4 +1,3 @@
-/* eslint-disable global-require */
 jest.mock("./../../../src/infrastructure/config", () =>
   require("../../utils").configMockFactory(),
 );
@@ -11,7 +10,7 @@ jest.mock("../../../src/app/services/utils", () =>
     "getReturnUrl",
   ]),
 );
-/* eslint-enable global-require */
+
 jest.mock("./../../../src/infrastructure/access");
 jest.mock("./../../../src/infrastructure/applications");
 jest.mock("./../../../src/infrastructure/organisations");
@@ -98,7 +97,7 @@ describe("when selecting the roles for a service", () => {
     PolicyEngine.mockReset().mockImplementation(() => policyEngine);
 
     // Require needed on beforeEach as Policy Engine is instantiated outside of route action.
-    // eslint-disable-next-line global-require
+
     postEditService = require("../../../src/app/services/editService").post;
   });
 

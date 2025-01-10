@@ -454,7 +454,8 @@ const getConfirmServiceConfig = async (req, res) => {
       req.session.serviceConfigurationChanges?.authFlowType;
     const serviceConfigChanges = req.session.serviceConfigurationChanges;
 
-    const { authFlowType, ...changedServiceParams } = serviceConfigChanges;
+    const changedServiceParams = { ...serviceConfigChanges };
+    delete changedServiceParams.authFlowType;
 
     const serviceChanges = createFlattenedMappedServiceConfigChanges(
       changedServiceParams,
@@ -505,8 +506,8 @@ const postConfirmServiceConfig = async (req, res) => {
     }
 
     // excluding the authFlowType from the req.session.serviceConfigurationChanges object
-    const { authFlowType, ...serviceConfigChanges } =
-      req.session.serviceConfigurationChanges;
+    const serviceConfigChanges = { ...req.session.serviceConfigurationChanges };
+    delete serviceConfigChanges.authFlowType;
 
     const editedFields = Object.entries(serviceConfigChanges)
       .filter(([field, oldValue]) => {

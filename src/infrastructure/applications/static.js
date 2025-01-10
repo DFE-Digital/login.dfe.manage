@@ -54,7 +54,7 @@ const mapServiceFieldsToAttributes = (fields) =>
     return mappedField;
   });
 
-const getServiceById = async (idOrClientId, correlationId) =>
+const getServiceById = async (idOrClientId) =>
   applications.find(
     (a) =>
       a.id.toLowerCase() === idOrClientId.toLowerCase() ||
@@ -62,7 +62,7 @@ const getServiceById = async (idOrClientId, correlationId) =>
         a.relyingParty.clientId.toLowerCase() === idOrClientId.toLowerCase()),
   );
 
-const getServiceSummaries = async (ids, fields, correlationId) => {
+const getServiceSummaries = async (ids, fields) => {
   const lowercaseIds = ids.map((id) => id.toLowerCase());
   const foundApps = applications.filter(
     (a) =>
@@ -93,11 +93,11 @@ const getServiceSummaries = async (ids, fields, correlationId) => {
   ];
 };
 
-const updateService = async (id, body, correlationId) => Promise.resolve(null);
+const updateService = async () => Promise.resolve(null);
 
-const listAllServices = async (correlationId) => Promise.resolve(null);
+const listAllServices = async () => Promise.resolve(null);
 
-const listBannersForService = async (id, pageSize, page, correlationId) =>
+const listBannersForService = async (page) =>
   Promise.resolve({
     banners: {
       id: "bannerId",
@@ -111,12 +111,11 @@ const listBannersForService = async (id, pageSize, page, correlationId) =>
     totalNumberOfRecords: 1,
   });
 
-const getBannerById = async (id, bid, correlationId) => Promise.resolve(null);
+const getBannerById = async () => Promise.resolve(null);
 
-const upsertBanner = async (sid, banner, correlationId) =>
-  Promise.resolve(null);
+const upsertBanner = async () => Promise.resolve(null);
 
-const removeBanner = async (sid, bid, correlationId) => Promise.resolve(null);
+const removeBanner = async () => Promise.resolve(null);
 
 const listAllBannersForService = async (id, correlationId) =>
   listBannersForService(id, 25, 1, correlationId).banners.find(

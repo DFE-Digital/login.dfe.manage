@@ -211,10 +211,7 @@ describe("when confirming service config changes in the review page", () => {
     expect(res.render.mock.calls[0][1]).toEqual(
       expect.objectContaining({
         validationMessages: {
-          postResetUrl: `${ERROR_MESSAGES.INVALID_POST_PASSWORD_RESET_URL}`,
           postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
-          // post_logout_redirect_uris: `${ERROR_MESSAGES.MISSING_POST_LOGOUT_URL}`,
-          // redirect_uris: `${ERROR_MESSAGES.MISSING_REDIRECT_URL}`,
         },
       }),
     );

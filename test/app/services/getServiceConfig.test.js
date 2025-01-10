@@ -1,8 +1,7 @@
-// eslint-disable-next-line global-require
 jest.mock("./../../../src/infrastructure/config", () =>
   require("../../utils").configMockFactory(),
 );
-// eslint-disable-next-line global-require
+
 jest.mock("./../../../src/infrastructure/logger", () =>
   require("../../utils").loggerMockFactory(),
 );

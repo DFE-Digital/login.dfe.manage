@@ -84,7 +84,6 @@ const getResponseMock = () => {
 const getPartialMock = (pathFromRoot = "", realMethods = []) => {
   const realModule = jest.requireActual(`../../${pathFromRoot}`);
   const mockedModule = Object.keys(realModule).reduce((module, methodName) => {
-    // eslint-disable-next-line no-param-reassign
     module[methodName] = jest.fn();
     return module;
   }, {});

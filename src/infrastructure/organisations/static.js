@@ -4,7 +4,7 @@ const getOrganisationById = async (id) => {
   );
 };
 
-const getUserOrganisations = async (userId) => {
+const getUserOrganisations = async () => {
   return Promise.resolve([
     {
       id: "83f00ace-f1a0-4338-8784-fa14f5943e5a",
@@ -26,7 +26,7 @@ const getUserOrganisations = async (userId) => {
   ]);
 };
 
-const getAllUserOrganisations = async (userId) => {
+const getAllUserOrganisations = async () => {
   return Promise.resolve([
     {
       id: "83f00ace-f1a0-4338-8784-fa14f5943e5a",
@@ -48,7 +48,7 @@ const getAllUserOrganisations = async (userId) => {
   ]);
 };
 
-const getInvitationOrganisations = async (invitationId, correlationId) => {
+const getInvitationOrganisations = async (invitationId) => {
   return Promise.resolve([
     {
       invitationId: invitationId,
@@ -91,40 +91,23 @@ const getOrganisationByIdV2 = async (id) => {
   );
 };
 
-const getOrganisationForUserV2 = async (userId, correlationId) => {
+const getOrganisationForUserV2 = async () => {
   return Promise.resolve([]);
 };
 
-const putInvitationInOrganisation = async (
-  invitationId,
-  organisationId,
-  role,
-  correlationId,
-) => {
+const putInvitationInOrganisation = async () => {
   return Promise.resolve();
 };
 
-const putUserInOrganisation = async (
-  userId,
-  organisationId,
-  role,
-  correlationId,
-) => {
+const putUserInOrganisation = async () => {
   return Promise.resolve();
 };
 
-const getPendingRequestsAssociatedWithUser = async (userId, correlationId) => {
+const getPendingRequestsAssociatedWithUser = async () => {
   return Promise.resolve();
 };
 
-const updateRequestById = async (
-  requestId,
-  status,
-  actionedBy,
-  actionedReason,
-  actionedAt,
-  correlationId,
-) => {
+const updateRequestById = async () => {
   return Promise.resolve();
 };
 

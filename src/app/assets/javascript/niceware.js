@@ -1,3 +1,8 @@
+// this is a script to use niceware in the browser
+// https://www.npmjs.com/package/niceware#usage-in-browser
+
+/* eslint-disable */
+
 (function () {
   function r(e, n, t) {
     function o(i, f) {
@@ -65898,7 +65903,6 @@
          * @author   Feross Aboukhadijeh <https://feross.org>
          * @license  MIT
          */
-        /* eslint-disable no-proto */
 
         var base64 = require("base64-js");
         var ieee754 = require("ieee754");
@@ -66206,7 +66210,6 @@
 
         function SlowBuffer(length) {
           if (+length != length) {
-            // eslint-disable-line eqeqeq
             length = 0;
           }
           return Buffer.alloc(+length);
@@ -67876,7 +67879,7 @@
         }
 
         function numberIsNaN(obj) {
-          return obj !== obj; // eslint-disable-line no-self-compare
+          return obj !== obj;
         }
       },
       { "base64-js": 3, ieee754: 6 },
@@ -68242,7 +68245,6 @@
     ],
     9: [
       function (require, module, exports) {
-        /* eslint-disable node/no-deprecated-api */
         var buffer = require("buffer");
         var Buffer = buffer.Buffer;
 

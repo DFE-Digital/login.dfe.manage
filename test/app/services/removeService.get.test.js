@@ -1,4 +1,3 @@
-/* eslint-disable global-require */
 jest.mock("./../../../src/infrastructure/config", () =>
   require("../../utils").configMockFactory(),
 );
@@ -11,7 +10,7 @@ jest.mock("../../../src/app/services/utils", () =>
     "getReturnUrl",
   ]),
 );
-/* eslint-enable global-require */
+
 jest.mock("./../../../src/infrastructure/applications");
 jest.mock("./../../../src/infrastructure/organisations");
 jest.mock("./../../../src/app/services/utils");

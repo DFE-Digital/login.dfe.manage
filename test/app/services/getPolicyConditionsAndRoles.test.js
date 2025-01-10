@@ -1,11 +1,10 @@
-/* eslint-disable global-require */
 jest.mock("../../../src/infrastructure/config", () =>
   require("../../utils").configMockFactory(),
 );
 jest.mock("../../../src/infrastructure/logger", () =>
   require("../../utils").loggerMockFactory(),
 );
-/* eslint-enable global-require */
+
 jest.mock("../../../src/infrastructure/applications");
 jest.mock("../../../src/infrastructure/access");
 
