@@ -1,7 +1,16 @@
 /* eslint-disable global-require */
-jest.mock("./../../../src/infrastructure/config", () => require("../../utils").configMockFactory());
-jest.mock("./../../../src/infrastructure/logger", () => require("../../utils").loggerMockFactory());
-jest.mock("../../../src/app/services/utils", () => require("../../utils").getPartialMock("src/app/services/utils", ["getReturnOrgId", "getReturnUrl"]));
+jest.mock("./../../../src/infrastructure/config", () =>
+  require("../../utils").configMockFactory(),
+);
+jest.mock("./../../../src/infrastructure/logger", () =>
+  require("../../utils").loggerMockFactory(),
+);
+jest.mock("../../../src/app/services/utils", () =>
+  require("../../utils").getPartialMock("src/app/services/utils", [
+    "getReturnOrgId",
+    "getReturnUrl",
+  ]),
+);
 /* eslint-enable global-require */
 jest.mock("./../../../src/infrastructure/applications");
 jest.mock("./../../../src/infrastructure/organisations");
@@ -14,11 +23,20 @@ jest.mock("./../../../src/infrastructure/search", () => ({
 
 const { getRequestMock, getResponseMock } = require("../../utils");
 const { getUserDetails } = require("../../../src/app/services/utils");
-const { getOrganisationByIdV2 } = require("../../../src/infrastructure/organisations");
+const {
+  getOrganisationByIdV2,
+} = require("../../../src/infrastructure/organisations");
 const { getServiceById } = require("../../../src/infrastructure/applications");
-const { getSearchDetailsForUserById, updateIndex } = require("../../../src/infrastructure/search");
-const { removeServiceFromInvitation, removeServiceFromUser } = require("../../../src/infrastructure/access");
-const postRemoveService = require("../../../src/app/services/removeService").post;
+const {
+  getSearchDetailsForUserById,
+  updateIndex,
+} = require("../../../src/infrastructure/search");
+const {
+  removeServiceFromInvitation,
+  removeServiceFromUser,
+} = require("../../../src/infrastructure/access");
+const postRemoveService =
+  require("../../../src/app/services/removeService").post;
 
 const res = getResponseMock();
 
@@ -97,21 +115,28 @@ describe("when displaying the remove service access view", () => {
     await postRemoveService(req, res);
 
     expect(res.flash.mock.calls).toHaveLength(1);
-    expect(res.flash).toHaveBeenCalledWith("info", "John Doe removed from service name");
+    expect(res.flash).toHaveBeenCalledWith(
+      "info",
+      "John Doe removed from service name",
+    );
   });
 
   it("then it should redirect to user details without a returnOrg query string, if the returnOrg ID isn't set", async () => {
     req.query.returnOrg = undefined;
     await postRemoveService(req, res);
     expect(res.redirect.mock.calls).toHaveLength(1);
-    expect(res.redirect.mock.calls[0][0]).toBe(`/services/${req.params.sid}/users/${req.params.uid}/organisations`);
+    expect(res.redirect.mock.calls[0][0]).toBe(
+      `/services/${req.params.sid}/users/${req.params.uid}/organisations`,
+    );
   });
 
   it("then it should redirect to user details without a returnOrg query string, if the returnOrg ID is invalid", async () => {
     req.query.returnOrg = "foo";
     await postRemoveService(req, res);
     expect(res.redirect.mock.calls).toHaveLength(1);
-    expect(res.redirect.mock.calls[0][0]).toBe(`/services/${req.params.sid}/users/${req.params.uid}/organisations`);
+    expect(res.redirect.mock.calls[0][0]).toBe(
+      `/services/${req.params.sid}/users/${req.params.uid}/organisations`,
+    );
   });
 
   it("then it should redirect to user details with a returnOrg query string, if the returnOrg ID is valid", async () => {
@@ -119,6 +144,8 @@ describe("when displaying the remove service access view", () => {
     req.query.returnOrg = orgId;
     await postRemoveService(req, res);
     expect(res.redirect.mock.calls).toHaveLength(1);
-    expect(res.redirect.mock.calls[0][0]).toBe(`/services/${req.params.sid}/users/${req.params.uid}/organisations?returnOrg=${orgId}`);
+    expect(res.redirect.mock.calls[0][0]).toBe(
+      `/services/${req.params.sid}/users/${req.params.uid}/organisations?returnOrg=${orgId}`,
+    );
   });
 });

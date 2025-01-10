@@ -1,7 +1,15 @@
 /* eslint-disable global-require */
-jest.mock("./../../../src/infrastructure/config", () => require("../../utils").configMockFactory());
-jest.mock("./../../../src/infrastructure/logger", () => require("../../utils").loggerMockFactory());
-jest.mock("../../../src/app/services/utils", () => require("../../utils").getPartialMock("src/app/services/utils", ["getReturnOrgId"]));
+jest.mock("./../../../src/infrastructure/config", () =>
+  require("../../utils").configMockFactory(),
+);
+jest.mock("./../../../src/infrastructure/logger", () =>
+  require("../../utils").loggerMockFactory(),
+);
+jest.mock("../../../src/app/services/utils", () =>
+  require("../../utils").getPartialMock("src/app/services/utils", [
+    "getReturnOrgId",
+  ]),
+);
 /* eslint-enable global-require */
 jest.mock("./../../../src/infrastructure/organisations");
 jest.mock("./../../../src/infrastructure/directories");
@@ -10,7 +18,10 @@ jest.mock("../../../src/infrastructure/access");
 const logger = require("../../../src/infrastructure/logger");
 const { getRequestMock, getResponseMock } = require("../../utils");
 const getUserOrganisations = require("../../../src/app/services/getUserOrganisations");
-const { getAllUserOrganisations, getInvitationOrganisations } = require("../../../src/infrastructure/organisations");
+const {
+  getAllUserOrganisations,
+  getInvitationOrganisations,
+} = require("../../../src/infrastructure/organisations");
 const { getUsersByIdV2 } = require("../../../src/infrastructure/directories");
 const { getUserDetails } = require("../../../src/app/services/utils");
 const { getServicesForUser } = require("../../../src/infrastructure/access");
@@ -235,7 +246,9 @@ describe("when getting users organisation details", () => {
     await getUserOrganisations(req, res);
 
     expect(logger.audit.mock.calls).toHaveLength(1);
-    expect(logger.audit.mock.calls[0][0]).toBe("super.user@unit.test (id: user1) viewed user undefined (id: user1)");
+    expect(logger.audit.mock.calls[0][0]).toBe(
+      "super.user@unit.test (id: user1) viewed user undefined (id: user1)",
+    );
     expect(logger.audit.mock.calls[0][1]).toMatchObject({
       type: "organisations",
       subType: "user-view",

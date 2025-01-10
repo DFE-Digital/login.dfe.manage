@@ -1,6 +1,12 @@
-const { AUTHENTICATION_FLOWS, AUTHENTICATION_FLOWS_PATTERNS } = require("../../constants/serviceConfigConstants");
+const {
+  AUTHENTICATION_FLOWS,
+  AUTHENTICATION_FLOWS_PATTERNS,
+} = require("../../constants/serviceConfigConstants");
 const { getSearchDetailsForUserById } = require("../../infrastructure/search");
-const { getInvitation, getUserById } = require("../../infrastructure/directories");
+const {
+  getInvitation,
+  getUserById,
+} = require("../../infrastructure/directories");
 const { getServicesForUser } = require("../../infrastructure/access");
 const { mapUserStatus } = require("../../infrastructure/utils");
 const { getOrganisationByIdV2 } = require("../../infrastructure/organisations");
@@ -17,13 +23,19 @@ const mapUserToSupportModel = (user, userFromSearch) => ({
   email: user.email,
   organisation: userFromSearch.primaryOrganisation
     ? {
-      name: userFromSearch.primaryOrganisation,
-    }
+        name: userFromSearch.primaryOrganisation,
+      }
     : null,
   organisations: userFromSearch.organisations,
-  lastLogin: userFromSearch.lastLogin ? new Date(userFromSearch.lastLogin) : null,
-  successfulLoginsInPast12Months: userFromSearch.numberOfSuccessfulLoginsInPast12Months,
-  status: mapUserStatus(userFromSearch.status.id, userFromSearch.statusLastChangedOn),
+  lastLogin: userFromSearch.lastLogin
+    ? new Date(userFromSearch.lastLogin)
+    : null,
+  successfulLoginsInPast12Months:
+    userFromSearch.numberOfSuccessfulLoginsInPast12Months,
+  status: mapUserStatus(
+    userFromSearch.status.id,
+    userFromSearch.statusLastChangedOn,
+  ),
   pendingEmail: userFromSearch.pendingEmail,
 });
 
@@ -49,7 +61,13 @@ const getUserDetailsById = async (uid, correlationId) => {
   const user = mapUserToSupportModel(rawUser, userSearch);
   const serviceDetails = await getServicesForUser(uid, correlationId);
 
-  const ktsDetails = serviceDetails ? serviceDetails.find((c) => c.serviceId.toLowerCase() === config.serviceMapping.key2SuccessServiceId.toLowerCase()) : undefined;
+  const ktsDetails = serviceDetails
+    ? serviceDetails.find(
+        (c) =>
+          c.serviceId.toLowerCase() ===
+          config.serviceMapping.key2SuccessServiceId.toLowerCase(),
+      )
+    : undefined;
   let externalIdentifier = "";
   if (ktsDetails && ktsDetails.identifiers) {
     const key = ktsDetails.identifiers.find((a) => a.key === "k2s-id");
@@ -64,7 +82,9 @@ const getUserDetailsById = async (uid, correlationId) => {
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
-    lastLogin: user.lastLogin ? dateFormat(user.lastLogin, "longDateFormat") : "",
+    lastLogin: user.lastLogin
+      ? dateFormat(user.lastLogin, "longDateFormat")
+      : "",
     status: user.status,
     loginsInPast12Months: {
       successful: user.successfulLoginsInPast12Months,
@@ -76,7 +96,8 @@ const getUserDetailsById = async (uid, correlationId) => {
   };
 };
 
-const getUserDetails = async (req) => getUserDetailsById(req.params.uid, req.id);
+const getUserDetails = async (req) =>
+  getUserDetailsById(req.params.uid, req.id);
 
 const getFriendlyUser = async (userId, correlationId) => {
   const user = await getUserById(userId, correlationId);
@@ -88,7 +109,10 @@ const getFriendlyUser = async (userId, correlationId) => {
 };
 
 const getFriendlyOrganisation = async (organisationId, correlationId) => {
-  const organisation = await getOrganisationByIdV2(organisationId, correlationId);
+  const organisation = await getOrganisationByIdV2(
+    organisationId,
+    correlationId,
+  );
   if (!organisation) {
     return organisationId;
   }
@@ -140,7 +164,9 @@ const getFriendlyOrganisationPhaseOfEducation = async (phaseOfEducationId) => {
     { id: "7", name: "All through" },
   ];
 
-  const phaseOfEducation = phasesOfEducation.find((x) => x.id === phaseOfEducationId);
+  const phaseOfEducation = phasesOfEducation.find(
+    (x) => x.id === phaseOfEducationId,
+  );
   if (phaseOfEducation) {
     return phaseOfEducation.name;
   }
@@ -245,9 +271,15 @@ const getFriendlyFieldName = (fieldName) => {
     { source: "organisation.category.id", friendly: "Organisation category" },
     { source: "organisation.id", friendly: "Organisation" },
     { source: "organisation.IsOnAPAR", friendly: "Organisation on APAR" },
-    { source: "organisation.localAuthority.id", friendly: "Organisation Local Authority number" },
+    {
+      source: "organisation.localAuthority.id",
+      friendly: "Organisation Local Authority number",
+    },
     { source: "organisation.name", friendly: "Organisation name" },
-    { source: "organisation.phaseOfEducation.id", friendly: "Organisation phase of education" },
+    {
+      source: "organisation.phaseOfEducation.id",
+      friendly: "Organisation phase of education",
+    },
     { source: "organisation.region.id", friendly: "Organisation region" },
     { source: "organisation.status.id", friendly: "Organisation status" },
     { source: "organisation.type.id", friendly: "Organisation type" },
@@ -267,25 +299,43 @@ const getFriendlyFieldName = (fieldName) => {
 const getFriendlyValues = async (fieldName, values, correlationId) => {
   const conversions = [
     { source: "id", valueConverter: getFriendlyUser },
-    { source: "organisation.category.id", valueConverter: getFriendlyOrganisationCategory },
+    {
+      source: "organisation.category.id",
+      valueConverter: getFriendlyOrganisationCategory,
+    },
     { source: "organisation.id", valueConverter: getFriendlyOrganisation },
-    { source: "organisation.phaseOfEducation.id", valueConverter: getFriendlyOrganisationPhaseOfEducation },
-    { source: "organisation.region.id", valueConverter: getFriendlyOrganisationRegion },
-    { source: "organisation.status.id", valueConverter: getFriendlyOrganisationStatus },
-    { source: "organisation.type.id", valueConverter: getFriendlyOrganisationType },
+    {
+      source: "organisation.phaseOfEducation.id",
+      valueConverter: getFriendlyOrganisationPhaseOfEducation,
+    },
+    {
+      source: "organisation.region.id",
+      valueConverter: getFriendlyOrganisationRegion,
+    },
+    {
+      source: "organisation.status.id",
+      valueConverter: getFriendlyOrganisationStatus,
+    },
+    {
+      source: "organisation.type.id",
+      valueConverter: getFriendlyOrganisationType,
+    },
   ];
 
   const conversion = conversions.find((x) => x.source === fieldName);
   if (conversion) {
-    const convertedValues = await mapAsync(values, (value) => conversion.valueConverter(value, correlationId));
+    const convertedValues = await mapAsync(values, (value) =>
+      conversion.valueConverter(value, correlationId),
+    );
     return convertedValues;
   }
   return values;
 };
 
-const delay = async (milliseconds) => new Promise((resolve) => {
-  setTimeout(resolve, milliseconds);
-});
+const delay = async (milliseconds) =>
+  new Promise((resolve) => {
+    setTimeout(resolve, milliseconds);
+  });
 
 const waitForIndexToUpdate = async (uid, updatedCheck) => {
   const abandonTime = Date.now() + 10000;
@@ -308,7 +358,9 @@ const getUserServiceRoles = async (req) => {
     serviceId: role.code.substr(0, role.code.indexOf("_")),
     role: role.code.substr(role.code.lastIndexOf("_") + 1),
   }));
-  const userRolesForService = allUserRoles.filter((x) => x.serviceId === req.params.sid);
+  const userRolesForService = allUserRoles.filter(
+    (x) => x.serviceId === req.params.sid,
+  );
   return userRolesForService.map((x) => x.role);
 };
 
@@ -322,9 +374,11 @@ const unpackMultiSelect = (parameter) => {
   return parameter;
 };
 
-const isSelected = (source, target) => source.some((x) => x.toLowerCase() === target.toLowerCase());
+const isSelected = (source, target) =>
+  source.some((x) => x.toLowerCase() === target.toLowerCase());
 
-const getParamsSource = (reqMethod, reqBody, reqQuery) => (reqMethod.toUpperCase() === "POST" ? reqBody : reqQuery);
+const getParamsSource = (reqMethod, reqBody, reqQuery) =>
+  reqMethod.toUpperCase() === "POST" ? reqBody : reqQuery;
 
 const buildFilters = (paramsSource, ...filterParams) => {
   const filters = {};
@@ -429,17 +483,20 @@ const getValidPageNumber = (pageSource) => {
   return Number.isNaN(pageNumber) ? 1 : pageNumber;
 };
 
-const objectToQueryString = (obj) => Object.entries(obj)
-  .flatMap(([key, value]) => {
-    if (Array.isArray(value)) {
-      return value.filter((v) => v !== undefined && v !== null && v !== "").map((v) => `${key}=${v}`);
-    }
-    if (value !== undefined && value !== null && value !== "") {
-      return `${key}=${value}`;
-    }
-    return [];
-  })
-  .join("&");
+const objectToQueryString = (obj) =>
+  Object.entries(obj)
+    .flatMap(([key, value]) => {
+      if (Array.isArray(value)) {
+        return value
+          .filter((v) => v !== undefined && v !== null && v !== "")
+          .map((v) => `${key}=${v}`);
+      }
+      if (value !== undefined && value !== null && value !== "") {
+        return `${key}=${value}`;
+      }
+      return [];
+    })
+    .join("&");
 
 const arraysEqual = (a, b) => {
   if (a.length !== b.length) return false;
@@ -451,7 +508,9 @@ const determineAuthFlowByRespType = (responseTypes) => {
 
   const sortedResponseTypes = [...responseTypes].sort();
 
-  const foundPattern = AUTHENTICATION_FLOWS_PATTERNS.find((pattern) => arraysEqual(pattern.types.sort(), sortedResponseTypes));
+  const foundPattern = AUTHENTICATION_FLOWS_PATTERNS.find((pattern) =>
+    arraysEqual(pattern.types.sort(), sortedResponseTypes),
+  );
 
   return foundPattern ? foundPattern.flow : AUTHENTICATION_FLOWS.UNKNOWN_FLOW;
 };
@@ -460,13 +519,17 @@ const processConfigurationTypes = (configurationTypes) => {
   if (configurationTypes === undefined) {
     return undefined;
   }
-  return Array.isArray(configurationTypes) ? configurationTypes : [configurationTypes];
+  return Array.isArray(configurationTypes)
+    ? configurationTypes
+    : [configurationTypes];
 };
 
 const processRedirectUris = (uris) => {
   let processedUris = uris;
   if (processedUris) {
-    processedUris = Array.isArray(processedUris) ? processedUris : [processedUris];
+    processedUris = Array.isArray(processedUris)
+      ? processedUris
+      : [processedUris];
     processedUris = processedUris.map((x) => x.trim()).filter((x) => x !== "");
   }
   return processedUris;
@@ -481,15 +544,18 @@ const _unescape = (html) => {
   returnText = returnText.replace(/&gt;/gi, ">");
   return returnText;
 };
-const isCorrectProtocol = async (urlValidator) => urlValidator
+const isCorrectProtocol = async (urlValidator) =>
+  urlValidator
     .isValidProtocal()
     .then((result) => result)
     .catch((err) => err);
-const isCorrectLength = async (urlValidator) => urlValidator
+const isCorrectLength = async (urlValidator) =>
+  urlValidator
     .isCorrectLength(200)
     .then((result) => result)
     .catch((err) => err);
-const isValidUrl = async (urlValidator) => urlValidator
+const isValidUrl = async (urlValidator) =>
+  urlValidator
     .IsValidUrl()
     .then((result) => result)
     .catch((err) => err);
@@ -501,10 +567,12 @@ const checkClientId = async (clientId, reqId) => {
 
 const getReturnOrgId = (requestQuery) => {
   if (
-    requestQuery
-    && Object.prototype.hasOwnProperty.call(requestQuery, "returnOrg")
-    && typeof requestQuery.returnOrg === "string"
-    && requestQuery.returnOrg.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)
+    requestQuery &&
+    Object.prototype.hasOwnProperty.call(requestQuery, "returnOrg") &&
+    typeof requestQuery.returnOrg === "string" &&
+    requestQuery.returnOrg.match(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+    )
   ) {
     return requestQuery.returnOrg;
   }

@@ -1,23 +1,26 @@
-const healthCheck = require('login.dfe.healthcheck');
-const config = require('./infrastructure/config');
-const services = require('./app/services');
-const signOut = require('./app/signOut');
+const healthCheck = require("login.dfe.healthcheck");
+const config = require("./infrastructure/config");
+const services = require("./app/services");
+const signOut = require("./app/signOut");
 
 const routes = (app, csrf) => {
-  app.use('/healthcheck', healthCheck({
-    config,
-  }));
+  app.use(
+    "/healthcheck",
+    healthCheck({
+      config,
+    }),
+  );
 
-  app.use('/services', services(csrf));
+  app.use("/services", services(csrf));
 
-  app.get('/', (req, res) => {
-    res.redirect('/services');
+  app.get("/", (req, res) => {
+    res.redirect("/services");
   });
 
-  app.use('/signout', signOut(csrf));
+  app.use("/signout", signOut(csrf));
 
-  app.get('*', (req, res) => {
-    res.status(404).render('errors/views/notFound');
+  app.get("*", (req, res) => {
+    res.status(404).render("errors/views/notFound");
   });
 };
 

@@ -1,4 +1,6 @@
-jest.mock("./../../../src/infrastructure/config", () => require("../../utils").configMockFactory());
+jest.mock("./../../../src/infrastructure/config", () =>
+  require("../../utils").configMockFactory(),
+);
 const { mapUserStatus } = require("../../../src/infrastructure/utils");
 
 describe("mapUserStatus helper function", () => {
@@ -38,16 +40,35 @@ describe("mapUserStatus helper function", () => {
         changedOn: null,
       },
     ],
-    [-1, null, { id: -1, description: "Invited", tagColor: "blue", changedOn: null }],
-    [0, null, { id: 0, description: "Deactivated", tagColor: "red", changedOn: null }],
-    [1, null, { id: 1, description: "Active", tagColor: "green", changedOn: null }],
-    [99, null, { id: 99, description: "Unknown", tagColor: "grey", changedOn: null }],
+    [
+      -1,
+      null,
+      { id: -1, description: "Invited", tagColor: "blue", changedOn: null },
+    ],
+    [
+      0,
+      null,
+      { id: 0, description: "Deactivated", tagColor: "red", changedOn: null },
+    ],
+    [
+      1,
+      null,
+      { id: 1, description: "Active", tagColor: "green", changedOn: null },
+    ],
+    [
+      99,
+      null,
+      { id: 99, description: "Unknown", tagColor: "grey", changedOn: null },
+    ],
   ];
 
-  it.each(testCases)("should return the correct status object for statusId %d", (statusId, changedOn, expected) => {
-    const result = mapUserStatus(statusId, changedOn);
-    expect(result).toEqual(expected);
-  });
+  it.each(testCases)(
+    "should return the correct status object for statusId %d",
+    (statusId, changedOn, expected) => {
+      const result = mapUserStatus(statusId, changedOn);
+      expect(result).toEqual(expected);
+    },
+  );
 
   it("should include the changedOn date when provided", () => {
     const status = 1;

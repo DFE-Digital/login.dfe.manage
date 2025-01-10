@@ -1,8 +1,7 @@
-'use strict';
-
+"use strict";
 
 const complete = (req, res) => {
-  res.redirect('/auth');
+  res.redirect("/auth");
 };
 
 module.exports = complete;

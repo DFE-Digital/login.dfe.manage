@@ -1,6 +1,10 @@
 /* eslint-disable global-require */
-jest.mock("../../../src/infrastructure/config", () => require("../../utils").configMockFactory());
-jest.mock("../../../src/infrastructure/logger", () => require("../../utils").loggerMockFactory());
+jest.mock("../../../src/infrastructure/config", () =>
+  require("../../utils").configMockFactory(),
+);
+jest.mock("../../../src/infrastructure/logger", () =>
+  require("../../utils").loggerMockFactory(),
+);
 /* eslint-enable global-require */
 jest.mock("../../../src/infrastructure/applications");
 jest.mock("../../../src/infrastructure/access");
@@ -64,7 +68,9 @@ describe("When displaying the selected policy's conditions and roles", () => {
     await getPolicyConditions(req, res);
 
     expect(res.render.mock.calls.length).toBe(1);
-    expect(res.render.mock.calls[0][0]).toBe("services/views/policyConditionsAndRoles");
+    expect(res.render.mock.calls[0][0]).toBe(
+      "services/views/policyConditionsAndRoles",
+    );
   });
 
   it("then it should include csrf token", async () => {
@@ -173,10 +179,18 @@ describe("When displaying the selected policy's conditions and roles", () => {
     });
 
     await getPolicyConditions(req, res);
-    expect(res.render.mock.calls[0][1].policy.conditions[0].field).toBe("Condition A");
-    expect(res.render.mock.calls[0][1].policy.conditions[1].field).toBe("Condition B");
-    expect(res.render.mock.calls[0][1].policy.conditions[2].field).toBe("Condition C");
-    expect(res.render.mock.calls[0][1].policy.conditions[3].field).toBe("Condition D");
+    expect(res.render.mock.calls[0][1].policy.conditions[0].field).toBe(
+      "Condition A",
+    );
+    expect(res.render.mock.calls[0][1].policy.conditions[1].field).toBe(
+      "Condition B",
+    );
+    expect(res.render.mock.calls[0][1].policy.conditions[2].field).toBe(
+      "Condition C",
+    );
+    expect(res.render.mock.calls[0][1].policy.conditions[3].field).toBe(
+      "Condition D",
+    );
   });
 
   it("then it should return the values for a numeric condition sorted numerically", async () => {
@@ -195,12 +209,20 @@ describe("When displaying the selected policy's conditions and roles", () => {
 
     await getPolicyConditions(req, res);
     // Will sort the values parsed as numbers, so 02 === 2, and 010 === 10.
-    expect(res.render.mock.calls[0][1].policy.conditions[0].value[0]).toBe("0.1");
-    expect(res.render.mock.calls[0][1].policy.conditions[0].value[1]).toBe("01");
+    expect(res.render.mock.calls[0][1].policy.conditions[0].value[0]).toBe(
+      "0.1",
+    );
+    expect(res.render.mock.calls[0][1].policy.conditions[0].value[1]).toBe(
+      "01",
+    );
     expect(res.render.mock.calls[0][1].policy.conditions[0].value[2]).toBe("1");
     expect(res.render.mock.calls[0][1].policy.conditions[0].value[3]).toBe("2");
-    expect(res.render.mock.calls[0][1].policy.conditions[0].value[4]).toBe("02");
-    expect(res.render.mock.calls[0][1].policy.conditions[0].value[5]).toBe("010");
+    expect(res.render.mock.calls[0][1].policy.conditions[0].value[4]).toBe(
+      "02",
+    );
+    expect(res.render.mock.calls[0][1].policy.conditions[0].value[5]).toBe(
+      "010",
+    );
   });
 
   it("then it should return the values for an alphanumeric condition values sorted lexicographically", async () => {

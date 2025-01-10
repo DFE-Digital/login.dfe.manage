@@ -1,7 +1,16 @@
 /* eslint-disable global-require */
-jest.mock("../../../src/infrastructure/config", () => require("../../utils").configMockFactory());
-jest.mock("../../../src/infrastructure/logger", () => require("../../utils").loggerMockFactory());
-jest.mock("../../../src/app/services/utils", () => require("../../utils").getPartialMock("src/app/services/utils", ["getReturnOrgId", "getReturnUrl"]));
+jest.mock("../../../src/infrastructure/config", () =>
+  require("../../utils").configMockFactory(),
+);
+jest.mock("../../../src/infrastructure/logger", () =>
+  require("../../utils").loggerMockFactory(),
+);
+jest.mock("../../../src/app/services/utils", () =>
+  require("../../utils").getPartialMock("src/app/services/utils", [
+    "getReturnOrgId",
+    "getReturnUrl",
+  ]),
+);
 /* eslint-enable global-require */
 jest.mock("login.dfe.policy-engine");
 jest.mock("../../../src/infrastructure/organisations");
@@ -12,7 +21,9 @@ jest.mock("../../../src/infrastructure/applications", () => ({
 const PolicyEngine = require("login.dfe.policy-engine");
 const { getRequestMock, getResponseMock } = require("../../utils");
 const { getUserDetails } = require("../../../src/app/services/utils");
-const { getOrganisationByIdV2 } = require("../../../src/infrastructure/organisations");
+const {
+  getOrganisationByIdV2,
+} = require("../../../src/infrastructure/organisations");
 const { getServiceById } = require("../../../src/infrastructure/applications");
 
 const policyEngine = {
@@ -57,14 +68,17 @@ describe("when displaying the associate service view", () => {
 
     res = getResponseMock();
 
-    policyEngine.getPolicyApplicationResultsForUser.mockReset().mockReturnValue({
-      rolesAvailableToUser: ["role1", "role2"],
-    });
+    policyEngine.getPolicyApplicationResultsForUser
+      .mockReset()
+      .mockReturnValue({
+        rolesAvailableToUser: ["role1", "role2"],
+      });
     PolicyEngine.mockReset().mockImplementation(() => policyEngine);
 
     // Require needed on beforeEach as Policy Engine is instantiated outside of route action.
     // eslint-disable-next-line global-require
-    getAssociateService = require("../../../src/app/services/associateService").get;
+    getAssociateService =
+      require("../../../src/app/services/associateService").get;
   });
 
   it("then it should get the user details", async () => {

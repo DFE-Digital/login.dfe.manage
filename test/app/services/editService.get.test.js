@@ -1,7 +1,16 @@
 /* eslint-disable global-require */
-jest.mock("./../../../src/infrastructure/config", () => require("../../utils").configMockFactory());
-jest.mock("./../../../src/infrastructure/logger", () => require("../../utils").loggerMockFactory());
-jest.mock("../../../src/app/services/utils", () => require("../../utils").getPartialMock("src/app/services/utils", ["getReturnOrgId", "getReturnUrl"]));
+jest.mock("./../../../src/infrastructure/config", () =>
+  require("../../utils").configMockFactory(),
+);
+jest.mock("./../../../src/infrastructure/logger", () =>
+  require("../../utils").loggerMockFactory(),
+);
+jest.mock("../../../src/app/services/utils", () =>
+  require("../../utils").getPartialMock("src/app/services/utils", [
+    "getReturnOrgId",
+    "getReturnUrl",
+  ]),
+);
 /* eslint-enable global-require */
 jest.mock("login.dfe.policy-engine");
 jest.mock("./../../../src/infrastructure/access");
@@ -10,10 +19,15 @@ jest.mock("./../../../src/infrastructure/organisations");
 
 const PolicyEngine = require("login.dfe.policy-engine");
 const { getRequestMock, getResponseMock } = require("../../utils");
-const { getSingleUserService, getSingleInvitationService } = require("../../../src/infrastructure/access");
+const {
+  getSingleUserService,
+  getSingleInvitationService,
+} = require("../../../src/infrastructure/access");
 const { getServiceById } = require("../../../src/infrastructure/applications");
 const { getUserDetails } = require("../../../src/app/services/utils");
-const { getOrganisationByIdV2 } = require("../../../src/infrastructure/organisations");
+const {
+  getOrganisationByIdV2,
+} = require("../../../src/infrastructure/organisations");
 
 const policyEngine = {
   getPolicyApplicationResultsForUser: jest.fn(),
@@ -34,9 +48,11 @@ describe("when displaying the edit service view", () => {
     };
     res = getResponseMock();
 
-    policyEngine.getPolicyApplicationResultsForUser.mockReset().mockReturnValue({
-      rolesAvailableToUser: [],
-    });
+    policyEngine.getPolicyApplicationResultsForUser
+      .mockReset()
+      .mockReturnValue({
+        rolesAvailableToUser: [],
+      });
     PolicyEngine.mockReset().mockImplementation(() => policyEngine);
 
     getSingleUserService.mockReset();

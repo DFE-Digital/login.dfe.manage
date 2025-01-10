@@ -1,26 +1,32 @@
-jest.mock('./../../../src/infrastructure/config', () => require('../../utils').configMockFactory());
-jest.mock('./../../../src/infrastructure/logger', () => require('../../utils').loggerMockFactory());
-jest.mock('./../../../src/infrastructure/organisations');
-jest.mock('./../../../src/infrastructure/search');
+jest.mock("./../../../src/infrastructure/config", () =>
+  require("../../utils").configMockFactory(),
+);
+jest.mock("./../../../src/infrastructure/logger", () =>
+  require("../../utils").loggerMockFactory(),
+);
+jest.mock("./../../../src/infrastructure/organisations");
+jest.mock("./../../../src/infrastructure/search");
 
-const { getOrganisationByIdV2 } = require('../../../src/infrastructure/organisations');
-const { searchForUsers } = require('../../../src/infrastructure/search');
-const { getRequestMock, getResponseMock } = require('../../utils');
-const organisationUserList = require('../../../src/app/services/organisationUserList');
+const {
+  getOrganisationByIdV2,
+} = require("../../../src/infrastructure/organisations");
+const { searchForUsers } = require("../../../src/infrastructure/search");
+const { getRequestMock, getResponseMock } = require("../../utils");
+const organisationUserList = require("../../../src/app/services/organisationUserList");
 
 const res = getResponseMock();
-const orgResult = { id: 'org-1', name: 'organisation one' };
+const orgResult = { id: "org-1", name: "organisation one" };
 const usersResult = {
   users: [
     {
-      id: 'user-1',
+      id: "user-1",
       organisations: [
         {
-          id: 'org-0',
+          id: "org-0",
           roleId: 10000,
         },
         {
-          id: 'org-1',
+          id: "org-1",
           roleId: 1,
         },
       ],
@@ -30,7 +36,7 @@ const usersResult = {
   totalNumberOfResults: 10,
 };
 
-describe('when displaying organisation users', () => {
+describe("when displaying organisation users", () => {
   beforeEach(() => {
     getOrganisationByIdV2.mockReset().mockReturnValue(orgResult);
 
@@ -38,20 +44,21 @@ describe('when displaying organisation users', () => {
   });
 
   [
-    { method: 'POST', dataLocation: 'body', action: organisationUserList.post },
-    { method: 'GET', dataLocation: 'query', action: organisationUserList.get },
+    { method: "POST", dataLocation: "body", action: organisationUserList.post },
+    { method: "GET", dataLocation: "query", action: organisationUserList.get },
   ].forEach(({ method, dataLocation, action }) => {
     it(`then it should send page of organisation users (${method} / ${dataLocation})`, async () => {
       const req = getRequestMock({
         method,
         params: {
           id: orgResult.id,
-
         },
         userServices: {
-          roles: [{
-            code: 'serviceid_serviceconfiguration',
-          }],
+          roles: [
+            {
+              code: "serviceid_serviceconfiguration",
+            },
+          ],
         },
       });
       req[dataLocation] = {
@@ -67,23 +74,23 @@ describe('when displaying organisation users', () => {
         page: 2,
         users: [
           {
-            id: 'user-1',
+            id: "user-1",
             organisations: [
               {
-                id: 'org-0',
+                id: "org-0",
                 roleId: 10000,
               },
               {
-                id: 'org-1',
+                id: "org-1",
                 roleId: 1,
               },
             ],
             organisation: {
-              id: 'org-1',
+              id: "org-1",
               roleId: 1,
               role: {
                 id: 0,
-                description: 'End user',
+                description: "End user",
               },
             },
           },
@@ -98,12 +105,14 @@ describe('when displaying organisation users', () => {
         method,
         params: {
           oid: orgResult.id,
-          sid: 'service-1',
+          sid: "service-1",
         },
         userServices: {
-          roles: [{
-            code: 'serviceid_serviceconfiguration',
-          }],
+          roles: [
+            {
+              code: "serviceid_serviceconfiguration",
+            },
+          ],
         },
       });
       req[dataLocation] = {
@@ -113,8 +122,8 @@ describe('when displaying organisation users', () => {
       await action(req, res);
 
       expect(searchForUsers).toHaveBeenCalledTimes(1);
-      expect(searchForUsers).toHaveBeenCalledWith('*', 2, 'name', 'asc', {
-        organisations: ['org-1'],
+      expect(searchForUsers).toHaveBeenCalledWith("*", 2, "name", "asc", {
+        organisations: ["org-1"],
       });
     });
 
@@ -125,9 +134,11 @@ describe('when displaying organisation users', () => {
           oid: orgResult.id,
         },
         userServices: {
-          roles: [{
-            code: 'serviceid_serviceconfiguration',
-          }],
+          roles: [
+            {
+              code: "serviceid_serviceconfiguration",
+            },
+          ],
         },
       });
       req[dataLocation] = {
@@ -137,8 +148,8 @@ describe('when displaying organisation users', () => {
       await action(req, res);
 
       expect(searchForUsers).toHaveBeenCalledTimes(1);
-      expect(searchForUsers).toHaveBeenCalledWith('*', 1, 'name', 'asc', {
-        organisations: ['org-1'],
+      expect(searchForUsers).toHaveBeenCalledWith("*", 1, "name", "asc", {
+        organisations: ["org-1"],
       });
     });
 
@@ -149,22 +160,24 @@ describe('when displaying organisation users', () => {
           oid: orgResult.id,
         },
         userServices: {
-          roles: [{
-            code: 'serviceid_serviceconfiguration',
-          }],
+          roles: [
+            {
+              code: "serviceid_serviceconfiguration",
+            },
+          ],
         },
       });
       req[dataLocation] = {
         page: 3,
-        sort: 'name',
-        sortDir: 'asc',
+        sort: "name",
+        sortDir: "asc",
       };
 
       await action(req, res);
 
       expect(searchForUsers).toHaveBeenCalledTimes(1);
-      expect(searchForUsers).toHaveBeenCalledWith('*', 3, 'name', 'asc', {
-        organisations: ['org-1'],
+      expect(searchForUsers).toHaveBeenCalledWith("*", 3, "name", "asc", {
+        organisations: ["org-1"],
       });
     });
 
@@ -175,22 +188,24 @@ describe('when displaying organisation users', () => {
           oid: orgResult.id,
         },
         userServices: {
-          roles: [{
-            code: 'serviceid_serviceconfiguration',
-          }],
+          roles: [
+            {
+              code: "serviceid_serviceconfiguration",
+            },
+          ],
         },
       });
       req[dataLocation] = {
         page: 3,
-        sort: 'name',
-        sortDir: 'desc',
+        sort: "name",
+        sortDir: "desc",
       };
 
       await action(req, res);
 
       expect(searchForUsers).toHaveBeenCalledTimes(1);
-      expect(searchForUsers).toHaveBeenCalledWith('*', 3, 'name', 'desc', {
-        organisations: ['org-1'],
+      expect(searchForUsers).toHaveBeenCalledWith("*", 3, "name", "desc", {
+        organisations: ["org-1"],
       });
     });
 
@@ -201,22 +216,24 @@ describe('when displaying organisation users', () => {
           oid: orgResult.id,
         },
         userServices: {
-          roles: [{
-            code: 'serviceid_serviceconfiguration',
-          }],
+          roles: [
+            {
+              code: "serviceid_serviceconfiguration",
+            },
+          ],
         },
       });
       req[dataLocation] = {
         page: 3,
-        sort: 'email',
-        sortDir: 'asc',
+        sort: "email",
+        sortDir: "asc",
       };
 
       await action(req, res);
 
       expect(searchForUsers).toHaveBeenCalledTimes(1);
-      expect(searchForUsers).toHaveBeenCalledWith('*', 3, 'email', 'asc', {
-        organisations: ['org-1'],
+      expect(searchForUsers).toHaveBeenCalledWith("*", 3, "email", "asc", {
+        organisations: ["org-1"],
       });
     });
 
@@ -227,22 +244,24 @@ describe('when displaying organisation users', () => {
           oid: orgResult.id,
         },
         userServices: {
-          roles: [{
-            code: 'serviceid_serviceconfiguration',
-          }],
+          roles: [
+            {
+              code: "serviceid_serviceconfiguration",
+            },
+          ],
         },
       });
       req[dataLocation] = {
         page: 3,
-        sort: 'email',
-        sortDir: 'desc',
+        sort: "email",
+        sortDir: "desc",
       };
 
       await action(req, res);
 
       expect(searchForUsers).toHaveBeenCalledTimes(1);
-      expect(searchForUsers).toHaveBeenCalledWith('*', 3, 'email', 'desc', {
-        organisations: ['org-1'],
+      expect(searchForUsers).toHaveBeenCalledWith("*", 3, "email", "desc", {
+        organisations: ["org-1"],
       });
     });
 
@@ -253,22 +272,24 @@ describe('when displaying organisation users', () => {
           oid: orgResult.id,
         },
         userServices: {
-          roles: [{
-            code: 'serviceid_serviceconfiguration',
-          }],
+          roles: [
+            {
+              code: "serviceid_serviceconfiguration",
+            },
+          ],
         },
       });
       req[dataLocation] = {
         page: 3,
-        sort: 'status',
-        sortDir: 'asc',
+        sort: "status",
+        sortDir: "asc",
       };
 
       await action(req, res);
 
       expect(searchForUsers).toHaveBeenCalledTimes(1);
-      expect(searchForUsers).toHaveBeenCalledWith('*', 3, 'status', 'asc', {
-        organisations: ['org-1'],
+      expect(searchForUsers).toHaveBeenCalledWith("*", 3, "status", "asc", {
+        organisations: ["org-1"],
       });
     });
 
@@ -279,22 +300,24 @@ describe('when displaying organisation users', () => {
           oid: orgResult.id,
         },
         userServices: {
-          roles: [{
-            code: 'serviceid_serviceconfiguration',
-          }],
+          roles: [
+            {
+              code: "serviceid_serviceconfiguration",
+            },
+          ],
         },
       });
       req[dataLocation] = {
         page: 3,
-        sort: 'status',
-        sortDir: 'desc',
+        sort: "status",
+        sortDir: "desc",
       };
 
       await action(req, res);
 
       expect(searchForUsers).toHaveBeenCalledTimes(1);
-      expect(searchForUsers).toHaveBeenCalledWith('*', 3, 'status', 'desc', {
-        organisations: ['org-1'],
+      expect(searchForUsers).toHaveBeenCalledWith("*", 3, "status", "desc", {
+        organisations: ["org-1"],
       });
     });
 
@@ -305,22 +328,24 @@ describe('when displaying organisation users', () => {
           oid: orgResult.id,
         },
         userServices: {
-          roles: [{
-            code: 'serviceid_serviceconfiguration',
-          }],
+          roles: [
+            {
+              code: "serviceid_serviceconfiguration",
+            },
+          ],
         },
       });
       req[dataLocation] = {
         page: 3,
-        sort: 'lastlogin',
-        sortDir: 'asc',
+        sort: "lastlogin",
+        sortDir: "asc",
       };
 
       await action(req, res);
 
       expect(searchForUsers).toHaveBeenCalledTimes(1);
-      expect(searchForUsers).toHaveBeenCalledWith('*', 3, 'lastlogin', 'asc', {
-        organisations: ['org-1'],
+      expect(searchForUsers).toHaveBeenCalledWith("*", 3, "lastlogin", "asc", {
+        organisations: ["org-1"],
       });
     });
 
@@ -331,22 +356,24 @@ describe('when displaying organisation users', () => {
           oid: orgResult.id,
         },
         userServices: {
-          roles: [{
-            code: 'serviceid_serviceconfiguration',
-          }],
+          roles: [
+            {
+              code: "serviceid_serviceconfiguration",
+            },
+          ],
         },
       });
       req[dataLocation] = {
         page: 3,
-        sort: 'lastlogin',
-        sortDir: 'desc',
+        sort: "lastlogin",
+        sortDir: "desc",
       };
 
       await action(req, res);
 
       expect(searchForUsers).toHaveBeenCalledTimes(1);
-      expect(searchForUsers).toHaveBeenCalledWith('*', 3, 'lastlogin', 'desc', {
-        organisations: ['org-1'],
+      expect(searchForUsers).toHaveBeenCalledWith("*", 3, "lastlogin", "desc", {
+        organisations: ["org-1"],
       });
     });
 
@@ -357,9 +384,11 @@ describe('when displaying organisation users', () => {
           oid: orgResult.id,
         },
         userServices: {
-          roles: [{
-            code: 'serviceid_serviceconfiguration',
-          }],
+          roles: [
+            {
+              code: "serviceid_serviceconfiguration",
+            },
+          ],
         },
       });
       req[dataLocation] = {
@@ -369,8 +398,8 @@ describe('when displaying organisation users', () => {
       await action(req, res);
 
       expect(searchForUsers).toHaveBeenCalledTimes(1);
-      expect(searchForUsers).toHaveBeenCalledWith('*', 3, 'name', 'asc', {
-        organisations: ['org-1'],
+      expect(searchForUsers).toHaveBeenCalledWith("*", 3, "name", "asc", {
+        organisations: ["org-1"],
       });
     });
 
@@ -382,9 +411,11 @@ describe('when displaying organisation users', () => {
           oid: orgResult.id,
         },
         userServices: {
-          roles: [{
-            code: 'serviceid_serviceconfiguration',
-          }],
+          roles: [
+            {
+              code: "serviceid_serviceconfiguration",
+            },
+          ],
         },
       });
       req[dataLocation] = {

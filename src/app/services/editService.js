@@ -1,16 +1,39 @@
 const PolicyEngine = require("login.dfe.policy-engine");
 const config = require("../../infrastructure/config");
-const { getSingleUserService, getSingleInvitationService } = require("../../infrastructure/access");
+const {
+  getSingleUserService,
+  getSingleInvitationService,
+} = require("../../infrastructure/access");
 const { getServiceById } = require("../../infrastructure/applications");
 const {
-  getUserDetails, getUserServiceRoles, getReturnUrl, getReturnOrgId
+  getUserDetails,
+  getUserServiceRoles,
+  getReturnUrl,
+  getReturnOrgId,
 } = require("./utils");
 const { getOrganisationByIdV2 } = require("../../infrastructure/organisations");
 
 const policyEngine = new PolicyEngine(config);
 
-const getSingleServiceForUser = async (userId, organisationId, serviceId, correlationId) => {
-  const userService = userId.startsWith("inv-") ? await getSingleInvitationService(userId.substr(4), serviceId, organisationId, correlationId) : await getSingleUserService(userId, serviceId, organisationId, correlationId);
+const getSingleServiceForUser = async (
+  userId,
+  organisationId,
+  serviceId,
+  correlationId,
+) => {
+  const userService = userId.startsWith("inv-")
+    ? await getSingleInvitationService(
+        userId.substr(4),
+        serviceId,
+        organisationId,
+        correlationId,
+      )
+    : await getSingleUserService(
+        userId,
+        serviceId,
+        organisationId,
+        correlationId,
+      );
   const application = await getServiceById(userService.serviceId);
   return {
     id: userService.serviceId,
@@ -22,8 +45,18 @@ const getSingleServiceForUser = async (userId, organisationId, serviceId, correl
 const getViewModel = async (req) => {
   const user = await getUserDetails(req);
   const organisation = await getOrganisationByIdV2(req.params.oid, req.id);
-  const userService = await getSingleServiceForUser(req.params.uid, req.params.oid, req.params.sid, req.id);
-  const policyResult = await policyEngine.getPolicyApplicationResultsForUser(req.params.uid.startsWith("inv-") ? undefined : req.params.uid, req.params.oid, req.params.sid, req.id);
+  const userService = await getSingleServiceForUser(
+    req.params.uid,
+    req.params.oid,
+    req.params.sid,
+    req.id,
+  );
+  const policyResult = await policyEngine.getPolicyApplicationResultsForUser(
+    req.params.uid.startsWith("inv-") ? undefined : req.params.uid,
+    req.params.oid,
+    req.params.sid,
+    req.id,
+  );
   const serviceRoles = policyResult.rolesAvailableToUser;
   const manageRolesForService = await getUserServiceRoles(req);
 
@@ -36,7 +69,10 @@ const getViewModel = async (req) => {
     serviceRoles,
     selectedRoles: [],
     user,
-    backLink: getReturnUrl(req.query, `/services/${req.params.sid}/users/${req.params.uid}/organisations`),
+    backLink: getReturnUrl(
+      req.query,
+      `/services/${req.params.sid}/users/${req.params.uid}/organisations`,
+    ),
     returnOrgId: getReturnOrgId(req.query),
     organisation,
     userService,
@@ -63,8 +99,17 @@ const post = async (req, res) => {
     selectedRoles = [req.body.role];
   }
 
-  const uid = req.params.uid && !req.params.uid.startsWith("inv-") ? req.params.uid : undefined;
-  const policyValidationResult = await policyEngine.validate(uid, req.params.oid, req.params.sid, selectedRoles, req.id);
+  const uid =
+    req.params.uid && !req.params.uid.startsWith("inv-")
+      ? req.params.uid
+      : undefined;
+  const policyValidationResult = await policyEngine.validate(
+    uid,
+    req.params.oid,
+    req.params.sid,
+    selectedRoles,
+    req.id,
+  );
   if (policyValidationResult.length > 0) {
     const model = await getViewModel(req);
     const roles = {};
@@ -72,7 +117,9 @@ const post = async (req, res) => {
       roles[x] = { id: x };
       return roles;
     });
-    model.validationMessages.roles = policyValidationResult.map((x) => x.message);
+    model.validationMessages.roles = policyValidationResult.map(
+      (x) => x.message,
+    );
     return res.render("services/views/editService", model);
   }
 
@@ -80,7 +127,9 @@ const post = async (req, res) => {
     roles: selectedRoles,
   };
 
-  return res.redirect(getReturnUrl(req.query, `${req.params.oid}/confirm-edit-service`));
+  return res.redirect(
+    getReturnUrl(req.query, `${req.params.oid}/confirm-edit-service`),
+  );
 };
 
 module.exports = {

@@ -1,9 +1,13 @@
-'use strict';
+"use strict";
 
-const moment = require('moment');
-const { getBannerById, upsertBanner, listAllBannersForService } = require('../../infrastructure/applications');
-const logger = require('../../infrastructure/logger');
-const { getUserServiceRoles } = require('./utils');
+const moment = require("moment");
+const {
+  getBannerById,
+  upsertBanner,
+  listAllBannersForService,
+} = require("../../infrastructure/applications");
+const logger = require("../../infrastructure/logger");
+const { getUserServiceRoles } = require("./utils");
 
 const get = async (req, res) => {
   const manageRolesForService = await getUserServiceRoles(req);
@@ -12,31 +16,35 @@ const get = async (req, res) => {
     csrfToken: req.csrfToken(),
     backLink: `/services/${req.params.sid}/service-banners`,
     cancelLink: `/services/${req.params.sid}/service-banners`,
-    name: '',
-    bannerTitle: '',
-    message: '',
-    bannerDisplay: '',
-    fromDay: '',
-    fromMonth: '',
-    fromYear: '',
-    fromHour: '',
-    fromMinute: '',
-    toDay: '',
-    toMonth: '',
-    toYear: '',
-    toHour: '',
-    toMinute: '',
-    isActive: '',
+    name: "",
+    bannerTitle: "",
+    message: "",
+    bannerDisplay: "",
+    fromDay: "",
+    fromMonth: "",
+    fromYear: "",
+    fromHour: "",
+    fromMinute: "",
+    toDay: "",
+    toMonth: "",
+    toYear: "",
+    toHour: "",
+    toMinute: "",
+    isActive: "",
     isEditExisting: false,
     bannerId: req.params.bid,
     validationMessages: {},
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
-    currentNavigation: 'banners',
+    currentNavigation: "banners",
   };
 
   if (req.params.bid) {
-    const existingBanner = await getBannerById(req.params.sid, req.params.bid, req.id);
+    const existingBanner = await getBannerById(
+      req.params.sid,
+      req.params.bid,
+      req.id,
+    );
     if (existingBanner) {
       model.isEditExisting = true;
       model.name = existingBanner.name;
@@ -45,9 +53,9 @@ const get = async (req, res) => {
       model.isActive = existingBanner.isActive;
 
       if (existingBanner.isActive) {
-        model.bannerDisplay = 'isActive';
+        model.bannerDisplay = "isActive";
       } else if (existingBanner.validFrom && existingBanner.validTo) {
-        model.bannerDisplay = 'date';
+        model.bannerDisplay = "date";
         // get existing dates if editing
         const { validFrom } = existingBanner;
         const { validTo } = existingBanner;
@@ -62,28 +70,42 @@ const get = async (req, res) => {
         model.toHour = validTo.substr(11, 2);
         model.toMinute = validTo.substr(14, 2);
       } else {
-        model.bannerDisplay = 'notActive';
+        model.bannerDisplay = "notActive";
       }
     }
   }
-  return res.render('services/views/newServiceBanner', model);
+  return res.render("services/views/newServiceBanner", model);
 };
 
 const validate = async (req) => {
   const manageRolesForService = await getUserServiceRoles(req);
   let fromDate;
   let toDate;
-  if (req.body.bannerDisplay === 'date' && req.body.fromYear && req.body.fromMonth && req.body.fromDay && req.body.fromHour && req.body.fromMinute) {
+  if (
+    req.body.bannerDisplay === "date" &&
+    req.body.fromYear &&
+    req.body.fromMonth &&
+    req.body.fromDay &&
+    req.body.fromHour &&
+    req.body.fromMinute
+  ) {
     fromDate = `${req.body.fromYear}-${req.body.fromMonth}-${req.body.fromDay} ${req.body.fromHour}:${req.body.fromMinute}`;
   }
-  if (req.body.bannerDisplay === 'date' && req.body.toYear && req.body.toMonth && req.body.toDay && req.body.toHour && req.body.toMinute) {
+  if (
+    req.body.bannerDisplay === "date" &&
+    req.body.toYear &&
+    req.body.toMonth &&
+    req.body.toDay &&
+    req.body.toHour &&
+    req.body.toMinute
+  ) {
     toDate = `${req.body.toYear}-${req.body.toMonth}-${req.body.toDay} ${req.body.toHour}:${req.body.toMinute}`;
   }
   const model = {
-    name: req.body.bannerName || '',
-    bannerTitle: req.body.bannerTitle || '',
-    message: req.body.bannerMessage || '',
-    bannerDisplay: req.body.bannerDisplay || '',
+    name: req.body.bannerName || "",
+    bannerTitle: req.body.bannerTitle || "",
+    message: req.body.bannerMessage || "",
+    bannerDisplay: req.body.bannerDisplay || "",
     fromDay: req.body.fromDay,
     fromMonth: req.body.fromMonth,
     fromYear: req.body.fromYear,
@@ -103,67 +125,90 @@ const validate = async (req) => {
     cancelLink: `/services/${req.params.sid}/service-banners`,
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
-    currentNavigation: 'banners',
+    currentNavigation: "banners",
   };
 
   if (!model.name) {
-    model.validationMessages.bannerName = 'Please enter a banner name';
+    model.validationMessages.bannerName = "Please enter a banner name";
   }
   if (!model.bannerTitle) {
-    model.validationMessages.bannerTitle = 'Please enter a banner title';
+    model.validationMessages.bannerTitle = "Please enter a banner title";
   }
   if (!model.message) {
-    model.validationMessages.bannerMessage = 'Please enter a banner message';
+    model.validationMessages.bannerMessage = "Please enter a banner message";
   }
   if (!model.bannerDisplay) {
-    model.validationMessages.bannerDisplay = 'Please select when you want the banner to be displayed';
+    model.validationMessages.bannerDisplay =
+      "Please select when you want the banner to be displayed";
   }
-  if (model.bannerDisplay === 'date') {
+  if (model.bannerDisplay === "date") {
     let validToDate = true;
     let validFromDate = true;
 
     if (!model.fromDate) {
       validFromDate = false;
-      model.validationMessages.fromDate = 'Please enter a from date';
+      model.validationMessages.fromDate = "Please enter a from date";
     } else if (!moment(new Date(model.fromDate)).isValid()) {
       validFromDate = false;
-      model.validationMessages.fromDate = 'From date must be a valid date. For example, 31 03 1980 14:30';
+      model.validationMessages.fromDate =
+        "From date must be a valid date. For example, 31 03 1980 14:30";
     } else {
-      const allCurrentServiceBanners = await listAllBannersForService(req.params.sid, req.id);
-      const isInRange = allCurrentServiceBanners.find((x) => moment(fromDate).isBetween(x.validFrom, x.validTo) === true && x.id !== req.params.bid);
+      const allCurrentServiceBanners = await listAllBannersForService(
+        req.params.sid,
+        req.id,
+      );
+      const isInRange = allCurrentServiceBanners.find(
+        (x) =>
+          moment(fromDate).isBetween(x.validFrom, x.validTo) === true &&
+          x.id !== req.params.bid,
+      );
       if (isInRange) {
         // TODO: link to the banner that exists
         validFromDate = false;
-        model.validationMessages.fromDate = `Another banner exists between ${moment(isInRange.validFrom).format('DD MM YYYY HH:mm')} and ${moment(isInRange.validTo).format('DD MM YYYY HH:mm')}`;
+        model.validationMessages.fromDate = `Another banner exists between ${moment(isInRange.validFrom).format("DD MM YYYY HH:mm")} and ${moment(isInRange.validTo).format("DD MM YYYY HH:mm")}`;
       }
     }
     if (!model.toDate) {
       validToDate = false;
-      model.validationMessages.toDate = 'Please enter a to date';
+      model.validationMessages.toDate = "Please enter a to date";
     } else if (!moment(new Date(model.toDate)).isValid()) {
       validToDate = false;
-      model.validationMessages.toDate = 'To date must be a valid date. For example, 31 03 1980 14:30';
+      model.validationMessages.toDate =
+        "To date must be a valid date. For example, 31 03 1980 14:30";
     } else {
-      const allCurrentServiceBanners = await listAllBannersForService(req.params.sid, req.id);
-      const isInRange = allCurrentServiceBanners.find((x) => moment(toDate).isBetween(x.validFrom, x.validTo) === true && x.id !== req.params.bid);
+      const allCurrentServiceBanners = await listAllBannersForService(
+        req.params.sid,
+        req.id,
+      );
+      const isInRange = allCurrentServiceBanners.find(
+        (x) =>
+          moment(toDate).isBetween(x.validFrom, x.validTo) === true &&
+          x.id !== req.params.bid,
+      );
       if (isInRange) {
         // TODO: link to the banner that exists
         validToDate = false;
-        model.validationMessages.toDate = `Another banner exists between ${moment(isInRange.validFrom).format('DD MM YYYY HH:mm')} and ${moment(isInRange.validTo).format('DD MM YYYY HH:mm')}`;
+        model.validationMessages.toDate = `Another banner exists between ${moment(isInRange.validFrom).format("DD MM YYYY HH:mm")} and ${moment(isInRange.validTo).format("DD MM YYYY HH:mm")}`;
       }
     }
 
-    if (validToDate && validFromDate && !(moment(toDate).isAfter(fromDate))) {
-      model.validationMessages.toDate = 'To date must be after from date';
+    if (validToDate && validFromDate && !moment(toDate).isAfter(fromDate)) {
+      model.validationMessages.toDate = "To date must be after from date";
     }
   }
 
-  if (model.bannerDisplay === 'isActive') {
+  if (model.bannerDisplay === "isActive") {
     // TODO: link to the existing banner that is always display
-    const allCurrentServiceBanners = await listAllBannersForService(req.params.sid, req.id);
-    const isAlwaysOnBanner = allCurrentServiceBanners.find((x) => x.isActive === true && x.id !== req.params.bid);
+    const allCurrentServiceBanners = await listAllBannersForService(
+      req.params.sid,
+      req.id,
+    );
+    const isAlwaysOnBanner = allCurrentServiceBanners.find(
+      (x) => x.isActive === true && x.id !== req.params.bid,
+    );
     if (isAlwaysOnBanner) {
-      model.validationMessages.bannerDisplay = 'A banner is already set to always display';
+      model.validationMessages.bannerDisplay =
+        "A banner is already set to always display";
     } else {
       model.isActive = true;
     }
@@ -177,10 +222,13 @@ const post = async (req, res) => {
 
   if (Object.keys(model.validationMessages).length > 0) {
     model.csrfToken = req.csrfToken();
-    return res.render('services/views/newServiceBanner', model);
+    return res.render("services/views/newServiceBanner", model);
   }
 
-  if (model.bannerDisplay === 'isActive' || model.bannerDisplay === 'notActive') {
+  if (
+    model.bannerDisplay === "isActive" ||
+    model.bannerDisplay === "notActive"
+  ) {
     model.fromDate = null;
     model.toDate = null;
   }
@@ -196,24 +244,32 @@ const post = async (req, res) => {
   };
 
   if (req.params.bid) {
-    logger.audit(`${req.user.email} (id: ${req.user.sub}) updated banner ${model.name} (${model.bannerId}) for service ${req.params.sid}`, {
-      type: 'manage',
-      subType: 'service-banner-updated',
-      userId: req.user.sub,
-      userEmail: req.user.email,
-      editedBanner: req.params.bid,
-    });
+    logger.audit(
+      `${req.user.email} (id: ${req.user.sub}) updated banner ${model.name} (${model.bannerId}) for service ${req.params.sid}`,
+      {
+        type: "manage",
+        subType: "service-banner-updated",
+        userId: req.user.sub,
+        userEmail: req.user.email,
+        editedBanner: req.params.bid,
+      },
+    );
   } else {
-    logger.audit(`${req.user.email} (id: ${req.user.sub}) created banner ${model.name} for service ${req.params.sid}`, {
-      type: 'manage',
-      subType: 'service-banner-created',
-      userId: req.user.sub,
-      userEmail: req.user.email,
-    });
+    logger.audit(
+      `${req.user.email} (id: ${req.user.sub}) created banner ${model.name} for service ${req.params.sid}`,
+      {
+        type: "manage",
+        subType: "service-banner-created",
+        userId: req.user.sub,
+        userEmail: req.user.email,
+      },
+    );
   }
   await upsertBanner(req.params.sid, body, req.id);
 
-  req.params.bid ? res.flash('info', 'Service banner updated successfully') : res.flash('info', 'Service banner created successfully');
+  req.params.bid
+    ? res.flash("info", "Service banner updated successfully")
+    : res.flash("info", "Service banner created successfully");
   return res.redirect(`/services/${req.params.sid}/service-banners`);
 };
 

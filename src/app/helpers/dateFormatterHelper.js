@@ -33,7 +33,9 @@ function dateFormat(date, formatKey) {
  * @returns {number} The index of the active banner, or -1 if no active banner is found.
  */
 function findActiveBannerIndex(banners, now = moment()) {
-  return banners.findIndex((banner) => moment(now).isBetween(banner.validFrom, banner.validTo));
+  return banners.findIndex((banner) =>
+    moment(now).isBetween(banner.validFrom, banner.validTo),
+  );
 }
 
 module.exports = {

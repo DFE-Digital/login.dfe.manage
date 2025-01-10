@@ -1,7 +1,16 @@
 /* eslint-disable global-require */
-jest.mock("../../../src/infrastructure/config", () => require("../../utils").configMockFactory());
-jest.mock("../../../src/infrastructure/logger", () => require("../../utils").loggerMockFactory());
-jest.mock("../../../src/app/services/utils", () => require("../../utils").getPartialMock("src/app/services/utils", ["getReturnOrgId", "getReturnUrl"]));
+jest.mock("../../../src/infrastructure/config", () =>
+  require("../../utils").configMockFactory(),
+);
+jest.mock("../../../src/infrastructure/logger", () =>
+  require("../../utils").loggerMockFactory(),
+);
+jest.mock("../../../src/app/services/utils", () =>
+  require("../../utils").getPartialMock("src/app/services/utils", [
+    "getReturnOrgId",
+    "getReturnUrl",
+  ]),
+);
 /* eslint-enable global-require */
 jest.mock("../../../src/infrastructure/access", () => ({
   listRolesOfService: jest.fn(),
@@ -15,10 +24,13 @@ jest.mock("../../../src/infrastructure/organisations", () => ({
 
 const { getRequestMock, getResponseMock } = require("../../utils");
 const { listRolesOfService } = require("../../../src/infrastructure/access");
-const { getOrganisationByIdV2 } = require("../../../src/infrastructure/organisations");
+const {
+  getOrganisationByIdV2,
+} = require("../../../src/infrastructure/organisations");
 const { getUserDetails } = require("../../../src/app/services/utils");
 const { getServiceById } = require("../../../src/infrastructure/applications");
-const getConfirmAssociateService = require("../../../src/app/services/confirmAssociateService").get;
+const getConfirmAssociateService =
+  require("../../../src/app/services/confirmAssociateService").get;
 
 const res = getResponseMock();
 
@@ -100,7 +112,9 @@ describe("when displaying the confirm associate service view", () => {
     await getConfirmAssociateService(req, res);
 
     expect(res.render.mock.calls.length).toBe(1);
-    expect(res.render.mock.calls[0][0]).toBe("services/views/confirmAssociateService");
+    expect(res.render.mock.calls[0][0]).toBe(
+      "services/views/confirmAssociateService",
+    );
   });
 
   it("then it should include csrf token", async () => {
