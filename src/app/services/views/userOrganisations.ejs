@@ -52,6 +52,16 @@
 								</div>
 								<div class="meta js-hidden">
 									<div class="approvers">
+                                        <% if (org.status && org.status.name) { %>
+                                            <dl class="inline condensed small-dt govuk-summary-list govuk-summary-list--no-border">
+                                        <dt class="govuk-label">Organisation Status:</dt>
+                                        <dd>
+                                            <span class="govuk-tag govuk-tag--<%= org.status.tagColor %>">
+                                                <%=org.status.name%>
+                                            </span>
+                                        </dd>
+                                        </dl>
+                                        <% } %>
 										<dl class="inline condensed small-dt govuk-summary-list govuk-summary-list--no-border">
 											<% if (org.LegalName) { %>
 											<dt class="govuk-label"><abbr title="Registered legal name">Legal name: </abbr></dt>
@@ -78,12 +88,6 @@
 											<dd><%=org.upin%></dd>
 											<% } %>
 
-											<% if (org.status && org.status.name) { %>
-											<dt class="govuk-label"><abbr title="Status">Status: </abbr></dt>
-											<dd><%=org.status.name%></dd>
-											<% } %>
-											
-											
 											<% if (org.approvers && org.approvers.length > 0) { %>
 												<dt class="govuk-label">Approvers:</dt>
 												<dd>

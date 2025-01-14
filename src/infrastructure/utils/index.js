@@ -65,25 +65,32 @@ const setUserContext = async (req, res, next) => {
   next();
 };
 
+// Note: Any changes to user statuses here require corresponding
+// updates in login.dfe.services (src/infrastructure/utils/index.js)
+// as functionality is duplicated. Ensure consistency across both implementations.
 const userStatusMap = [
-  { id: -2, name: 'Deactivated Invitation' },
-  { id: -1, name: 'Invited' },
-  { id: 0, name: 'Deactivated' },
-  { id: 1, name: 'Active' },
+  { id: -2, name: "Deactivated Invitation", tagColor: "orange" },
+  { id: -1, name: "Invited", tagColor: "blue" },
+  { id: 0, name: "Deactivated", tagColor: "red" },
+  { id: 1, name: "Active", tagColor: "green" },
 ];
 
-const mapUserStatus = (status, changedOn = null) => {
-  // TODO: use userStatusMap
-  if (status === -2) {
-    return { id: -2, description: 'Deactivated Invitation', changedOn };
+const mapUserStatus = (statusId, changedOn = null) => {
+  const statusObj = userStatusMap.find((s) => s.id === statusId);
+  if (!statusObj) {
+    return {
+      id: statusId,
+      description: "Unknown",
+      tagColor: "grey",
+      changedOn,
+    };
   }
-  if (status === -1) {
-    return { id: -1, description: 'Invited', changedOn };
-  }
-  if (status === 0) {
-    return { id: 0, description: 'Deactivated', changedOn };
-  }
-  return { id: 1, description: 'Active', changedOn };
+  return {
+    id: statusObj.id,
+    description: statusObj.name,
+    tagColor: statusObj.tagColor,
+    changedOn,
+  };
 };
 
 const lastLoginIntervalsMap = [
