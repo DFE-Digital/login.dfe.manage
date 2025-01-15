@@ -1,8 +1,16 @@
-/* eslint-disable global-require */
-jest.mock("../../../src/infrastructure/config", () => require("../../utils").configMockFactory());
-jest.mock("../../../src/infrastructure/logger", () => require("../../utils").loggerMockFactory());
-jest.mock("../../../src/app/services/utils", () => require("../../utils").getPartialMock("src/app/services/utils", ["getReturnOrgId", "getReturnUrl"]));
-/* eslint-enable global-require */
+jest.mock("../../../src/infrastructure/config", () =>
+  require("../../utils").configMockFactory(),
+);
+jest.mock("../../../src/infrastructure/logger", () =>
+  require("../../utils").loggerMockFactory(),
+);
+jest.mock("../../../src/app/services/utils", () =>
+  require("../../utils").getPartialMock("src/app/services/utils", [
+    "getReturnOrgId",
+    "getReturnUrl",
+  ]),
+);
+
 jest.mock("login.dfe.policy-engine");
 jest.mock("../../../src/infrastructure/applications");
 
@@ -36,18 +44,23 @@ describe("when associating a service with user", () => {
 
     res = getResponseMock();
 
-    policyEngine.getPolicyApplicationResultsForUser.mockReset().mockReturnValue({
-      rolesAvailableToUser: ["role1", "role2"],
-    });
+    policyEngine.getPolicyApplicationResultsForUser
+      .mockReset()
+      .mockReturnValue({
+        rolesAvailableToUser: ["role1", "role2"],
+      });
     PolicyEngine.mockReset().mockImplementation(() => policyEngine);
 
     // Require needed on beforeEach as Policy Engine is instantiated outside of route action.
-    // eslint-disable-next-line global-require
-    postAssociateService = require("../../../src/app/services/associateService").post;
+
+    postAssociateService =
+      require("../../../src/app/services/associateService").post;
   });
 
   it("then it should render a view with error if selection is not valid", async () => {
-    policyEngine.validate.mockReturnValue([{ message: "selections not valid" }]);
+    policyEngine.validate.mockReturnValue([
+      { message: "selections not valid" },
+    ]);
 
     await postAssociateService(req, res);
 
@@ -62,7 +75,9 @@ describe("when associating a service with user", () => {
   });
 
   it("then it should include a back link to the user's organisation list without a query string, if a returnOrg ID isn't set and there validation errors", async () => {
-    policyEngine.validate.mockReturnValue([{ message: "selections not valid" }]);
+    policyEngine.validate.mockReturnValue([
+      { message: "selections not valid" },
+    ]);
     req.query.returnOrg = undefined;
     await postAssociateService(req, res);
     expect(res.render.mock.calls[0][1]).toMatchObject({
@@ -71,7 +86,9 @@ describe("when associating a service with user", () => {
   });
 
   it("then it should include a back link to the user's organisation list without a query string, if a returnOrg ID is invalid and there validation errors", async () => {
-    policyEngine.validate.mockReturnValue([{ message: "selections not valid" }]);
+    policyEngine.validate.mockReturnValue([
+      { message: "selections not valid" },
+    ]);
     req.query.returnOrg = "foo";
     await postAssociateService(req, res);
     expect(res.render.mock.calls[0][1]).toMatchObject({
@@ -80,7 +97,9 @@ describe("when associating a service with user", () => {
   });
 
   it("then it should include a back link to the user's organisation list with a returnOrg query string, if a returnOrg ID is valid and there are validation errors", async () => {
-    policyEngine.validate.mockReturnValue([{ message: "selections not valid" }]);
+    policyEngine.validate.mockReturnValue([
+      { message: "selections not valid" },
+    ]);
     const orgId = "7bf1de6d-4799-46f7-ab50-32359f2566ac";
     req.query.returnOrg = orgId;
     await postAssociateService(req, res);
@@ -111,6 +130,8 @@ describe("when associating a service with user", () => {
     req.query.returnOrg = orgId;
     await postAssociateService(req, res);
     expect(res.redirect.mock.calls).toHaveLength(1);
-    expect(res.redirect.mock.calls[0][0]).toBe(`confirm-associate-service?returnOrg=${orgId}`);
+    expect(res.redirect.mock.calls[0][0]).toBe(
+      `confirm-associate-service?returnOrg=${orgId}`,
+    );
   });
 });

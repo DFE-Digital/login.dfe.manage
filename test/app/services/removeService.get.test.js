@@ -1,15 +1,25 @@
-/* eslint-disable global-require */
-jest.mock("./../../../src/infrastructure/config", () => require("../../utils").configMockFactory());
-jest.mock("./../../../src/infrastructure/logger", () => require("../../utils").loggerMockFactory());
-jest.mock("../../../src/app/services/utils", () => require("../../utils").getPartialMock("src/app/services/utils", ["getReturnOrgId", "getReturnUrl"]));
-/* eslint-enable global-require */
+jest.mock("./../../../src/infrastructure/config", () =>
+  require("../../utils").configMockFactory(),
+);
+jest.mock("./../../../src/infrastructure/logger", () =>
+  require("../../utils").loggerMockFactory(),
+);
+jest.mock("../../../src/app/services/utils", () =>
+  require("../../utils").getPartialMock("src/app/services/utils", [
+    "getReturnOrgId",
+    "getReturnUrl",
+  ]),
+);
+
 jest.mock("./../../../src/infrastructure/applications");
 jest.mock("./../../../src/infrastructure/organisations");
 jest.mock("./../../../src/app/services/utils");
 
 const { getRequestMock, getResponseMock } = require("../../utils");
 const { getUserDetails } = require("../../../src/app/services/utils");
-const { getOrganisationByIdV2 } = require("../../../src/infrastructure/organisations");
+const {
+  getOrganisationByIdV2,
+} = require("../../../src/infrastructure/organisations");
 const { getServiceById } = require("../../../src/infrastructure/applications");
 const getRemoveService = require("../../../src/app/services/removeService").get;
 

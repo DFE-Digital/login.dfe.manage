@@ -1,45 +1,51 @@
-jest.mock('./../../../src/infrastructure/config', () => require('./../../utils').configMockFactory());
-jest.mock('./../../../src/infrastructure/logger', () => require('./../../utils').loggerMockFactory());
-jest.mock('login.dfe.jobs-client', () => ({
+jest.mock("./../../../src/infrastructure/config", () =>
+  require("./../../utils").configMockFactory(),
+);
+jest.mock("./../../../src/infrastructure/logger", () =>
+  require("./../../utils").loggerMockFactory(),
+);
+jest.mock("login.dfe.jobs-client", () => ({
   ServiceNotificationsClient: jest.fn(),
 }));
-jest.mock('./../../../src/app/services/utils');
+jest.mock("./../../../src/app/services/utils");
 
-const { getRequestMock, getResponseMock } = require('./../../utils');
-const { getUserDetails } = require('./../../../src/app/services/utils');
+const { getRequestMock, getResponseMock } = require("./../../utils");
+const { getUserDetails } = require("./../../../src/app/services/utils");
 const res = getResponseMock();
-const { ServiceNotificationsClient } = require('login.dfe.jobs-client');
-const webServiceSync = require('./../../../src/app/services/webServiceSync');
+const { ServiceNotificationsClient } = require("login.dfe.jobs-client");
+const webServiceSync = require("./../../../src/app/services/webServiceSync");
 
-const user = { id: 'user-1', name: 'user one' };
+const user = { id: "user-1", name: "user one" };
 const serviceNotificationsClient = {
   notifyUserUpdated: jest.fn(),
 };
 
-describe('when syncing user for sync', function () {
+describe("when syncing user for sync", function () {
   let req;
 
   beforeEach(() => {
     getUserDetails.mockReset().mockReturnValue(user);
 
     serviceNotificationsClient.notifyUserUpdated.mockReset();
-    ServiceNotificationsClient.mockReset().mockImplementation(() => serviceNotificationsClient);
+    ServiceNotificationsClient.mockReset().mockImplementation(
+      () => serviceNotificationsClient,
+    );
 
     req = getRequestMock({
       params: {
-        uid: 'user-1',
-        sid: 'service-1'
+        uid: "user-1",
+        sid: "service-1",
       },
     });
 
     res.mockResetAll();
   });
 
-  it('then it should prompt for confirmation with organisation details', async () => {
+  it("then it should prompt for confirmation with organisation details", async () => {
     await webServiceSync.get(req, res);
 
     expect(res.render.mock.calls).toHaveLength(1);
-    expect(res.render.mock.calls[0][0]).toBe('services/views/webServiceSync');
+    expect(res.render.mock.calls[0][0]).toBe("services/views/webServiceSync");
   });
 
   // it('then it should queue organisation for sync on confirmation', async () => {

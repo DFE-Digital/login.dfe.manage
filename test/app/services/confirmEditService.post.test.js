@@ -1,8 +1,16 @@
-/* eslint-disable global-require */
-jest.mock("./../../../src/infrastructure/config", () => require("../../utils").configMockFactory());
-jest.mock("./../../../src/infrastructure/logger", () => require("../../utils").loggerMockFactory());
-jest.mock("../../../src/app/services/utils", () => require("../../utils").getPartialMock("src/app/services/utils", ["getReturnOrgId", "getReturnUrl"]));
-/* eslint-enable global-require */
+jest.mock("./../../../src/infrastructure/config", () =>
+  require("../../utils").configMockFactory(),
+);
+jest.mock("./../../../src/infrastructure/logger", () =>
+  require("../../utils").loggerMockFactory(),
+);
+jest.mock("../../../src/app/services/utils", () =>
+  require("../../utils").getPartialMock("src/app/services/utils", [
+    "getReturnOrgId",
+    "getReturnUrl",
+  ]),
+);
+
 jest.mock("./../../../src/infrastructure/access", () => ({
   updateUserService: jest.fn(),
   updateInvitationService: jest.fn(),
@@ -18,12 +26,18 @@ jest.mock("./../../../src/infrastructure/organisations", () => ({
 
 const logger = require("../../../src/infrastructure/logger");
 const { getRequestMock, getResponseMock } = require("../../utils");
-const { updateInvitationService, updateUserService } = require("../../../src/infrastructure/access");
+const {
+  updateInvitationService,
+  updateUserService,
+} = require("../../../src/infrastructure/access");
 const { listRolesOfService } = require("../../../src/infrastructure/access");
-const { getOrganisationByIdV2 } = require("../../../src/infrastructure/organisations");
+const {
+  getOrganisationByIdV2,
+} = require("../../../src/infrastructure/organisations");
 const { getUserDetails } = require("../../../src/app/services/utils");
 const { getServiceById } = require("../../../src/infrastructure/applications");
-const postConfirmEditService = require("../../../src/app/services/confirmEditService").post;
+const postConfirmEditService =
+  require("../../../src/app/services/confirmEditService").post;
 
 const res = getResponseMock();
 
@@ -109,7 +123,9 @@ describe("when editing a service for a user", () => {
     await postConfirmEditService(req, res);
 
     expect(logger.audit.mock.calls).toHaveLength(1);
-    expect(logger.audit.mock.calls[0][0]).toBe("user@unit.test (id: user1) updated service service name for organisation org name (id: org1) for user undefined (id: user1)");
+    expect(logger.audit.mock.calls[0][0]).toBe(
+      "user@unit.test (id: user1) updated service service name for organisation org name (id: org1) for user undefined (id: user1)",
+    );
     expect(logger.audit.mock.calls[0][1]).toMatchObject({
       type: "manage",
       subType: "user-service-updated",
@@ -134,21 +150,27 @@ describe("when editing a service for a user", () => {
     expect(res.flash.mock.calls[1][0]).toBe("heading");
     expect(res.flash.mock.calls[1][1]).toBe("Service updated: service name");
     expect(res.flash.mock.calls[2][0]).toBe("message");
-    expect(res.flash.mock.calls[2][1]).toBe("Approvers at the relevant organisation have been notified of this change.");
+    expect(res.flash.mock.calls[2][1]).toBe(
+      "Approvers at the relevant organisation have been notified of this change.",
+    );
   });
 
   it("then it should redirect to user details without a returnOrg query string, if the returnOrg ID isn't set", async () => {
     req.query.returnOrg = undefined;
     await postConfirmEditService(req, res);
     expect(res.redirect.mock.calls).toHaveLength(1);
-    expect(res.redirect.mock.calls[0][0]).toBe(`/services/${req.params.sid}/users/${req.params.uid}/organisations`);
+    expect(res.redirect.mock.calls[0][0]).toBe(
+      `/services/${req.params.sid}/users/${req.params.uid}/organisations`,
+    );
   });
 
   it("then it should redirect to user details without a returnOrg query string, if the returnOrg ID is invalid", async () => {
     req.query.returnOrg = "foo";
     await postConfirmEditService(req, res);
     expect(res.redirect.mock.calls).toHaveLength(1);
-    expect(res.redirect.mock.calls[0][0]).toBe(`/services/${req.params.sid}/users/${req.params.uid}/organisations`);
+    expect(res.redirect.mock.calls[0][0]).toBe(
+      `/services/${req.params.sid}/users/${req.params.uid}/organisations`,
+    );
   });
 
   it("then it should redirect to user details with a returnOrg query string, if the returnOrg ID is valid", async () => {
@@ -156,6 +178,8 @@ describe("when editing a service for a user", () => {
     req.query.returnOrg = orgId;
     await postConfirmEditService(req, res);
     expect(res.redirect.mock.calls).toHaveLength(1);
-    expect(res.redirect.mock.calls[0][0]).toBe(`/services/${req.params.sid}/users/${req.params.uid}/organisations?returnOrg=${orgId}`);
+    expect(res.redirect.mock.calls[0][0]).toBe(
+      `/services/${req.params.sid}/users/${req.params.uid}/organisations?returnOrg=${orgId}`,
+    );
   });
 });

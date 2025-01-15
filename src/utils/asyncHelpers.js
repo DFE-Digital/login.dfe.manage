@@ -17,8 +17,11 @@ const mapAsync = async (col, iteratee, chunkSize = 50) => {
 
   for (let chunk = 0; chunk < chunks.length; chunk += 1) {
     // Await in loop required to chunk up requests to avoid overloading our APIs.
-    // eslint-disable-next-line no-await-in-loop
-    const chunkResult = await Promise.all(chunks[chunk].map((value, index) => iteratee(value, chunk * chunkSize + index)));
+    const chunkResult = await Promise.all(
+      chunks[chunk].map((value, index) =>
+        iteratee(value, chunk * chunkSize + index),
+      ),
+    );
     result.push(...chunkResult);
   }
 
@@ -32,7 +35,6 @@ const forEachAsync = async (col, iteratee) => {
 
   for (let i = 0; i < col.length; i += 1) {
     // We want this to run in order, so await in for is needed.
-    // eslint-disable-next-line no-await-in-loop
     await iteratee(col[i], i);
   }
 };

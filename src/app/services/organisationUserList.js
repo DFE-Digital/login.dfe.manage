@@ -16,12 +16,24 @@ const search = async (req) => {
 
   const availableSortCriteria = ["name", "email", "lastlogin", "status"];
 
-  const sortBy = paramsSource.sort && availableSortCriteria.includes(paramsSource.sort.toLowerCase()) ? paramsSource.sort.toLowerCase() : "name";
-  const sortAsc = (paramsSource.sortDir ? paramsSource.sortDir : "asc").toLowerCase() === "asc";
+  const sortBy =
+    paramsSource.sort &&
+    availableSortCriteria.includes(paramsSource.sort.toLowerCase())
+      ? paramsSource.sort.toLowerCase()
+      : "name";
+  const sortAsc =
+    (paramsSource.sortDir ? paramsSource.sortDir : "asc").toLowerCase() ===
+    "asc";
 
-  const results = await searchForUsers("*", page, sortBy, sortAsc ? "asc" : "desc", {
-    organisations: [organisationId],
-  });
+  const results = await searchForUsers(
+    "*",
+    page,
+    sortBy,
+    sortAsc ? "asc" : "desc",
+    {
+      organisations: [organisationId],
+    },
+  );
 
   return {
     page,
@@ -40,7 +52,8 @@ const search = async (req) => {
         applied: sortBy === "email",
       },
       lastLogin: {
-        nextDirection: sortBy === "lastlogin" ? (sortAsc ? "desc" : "asc") : "asc",
+        nextDirection:
+          sortBy === "lastlogin" ? (sortAsc ? "desc" : "asc") : "asc",
         applied: sortBy === "lastlogin",
       },
       status: {
@@ -59,9 +72,15 @@ const render = async (req, res) => {
 
   const users = result.users.map((user) => {
     const viewUser = { ...user };
-    viewUser.organisation = { ...user.organisations.find((o) => o.id.toUpperCase() === organisation.id.toUpperCase()) };
+    viewUser.organisation = {
+      ...user.organisations.find(
+        (o) => o.id.toUpperCase() === organisation.id.toUpperCase(),
+      ),
+    };
     viewUser.organisation.role = mapUserRole(viewUser.organisation.roleId);
-    viewUser.formattedLastLogin = viewUser.lastLogin ? dateFormat(viewUser.lastLogin, "shortDateFormat") : "";
+    viewUser.formattedLastLogin = viewUser.lastLogin
+      ? dateFormat(viewUser.lastLogin, "shortDateFormat")
+      : "";
     return viewUser;
   });
 

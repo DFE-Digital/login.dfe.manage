@@ -23,12 +23,30 @@ const GRANT_TYPES = {
 
 // Patterns for determining authentication flows based on response types
 const AUTHENTICATION_FLOWS_PATTERNS = [
-  { types: [RESPONSE_TYPES.CODE], flow: AUTHENTICATION_FLOWS.AUTHORISATION_CODE_FLOW },
-  { types: [RESPONSE_TYPES.ID_TOKEN], flow: AUTHENTICATION_FLOWS.IMPLICIT_FLOW },
-  { types: [RESPONSE_TYPES.ID_TOKEN, RESPONSE_TYPES.TOKEN], flow: AUTHENTICATION_FLOWS.IMPLICIT_FLOW },
-  { types: [RESPONSE_TYPES.CODE, RESPONSE_TYPES.ID_TOKEN], flow: AUTHENTICATION_FLOWS.HYBRID_FLOW },
-  { types: [RESPONSE_TYPES.CODE, RESPONSE_TYPES.TOKEN], flow: AUTHENTICATION_FLOWS.HYBRID_FLOW },
-  { types: [RESPONSE_TYPES.CODE, RESPONSE_TYPES.ID_TOKEN, RESPONSE_TYPES.TOKEN], flow: AUTHENTICATION_FLOWS.HYBRID_FLOW },
+  {
+    types: [RESPONSE_TYPES.CODE],
+    flow: AUTHENTICATION_FLOWS.AUTHORISATION_CODE_FLOW,
+  },
+  {
+    types: [RESPONSE_TYPES.ID_TOKEN],
+    flow: AUTHENTICATION_FLOWS.IMPLICIT_FLOW,
+  },
+  {
+    types: [RESPONSE_TYPES.ID_TOKEN, RESPONSE_TYPES.TOKEN],
+    flow: AUTHENTICATION_FLOWS.IMPLICIT_FLOW,
+  },
+  {
+    types: [RESPONSE_TYPES.CODE, RESPONSE_TYPES.ID_TOKEN],
+    flow: AUTHENTICATION_FLOWS.HYBRID_FLOW,
+  },
+  {
+    types: [RESPONSE_TYPES.CODE, RESPONSE_TYPES.TOKEN],
+    flow: AUTHENTICATION_FLOWS.HYBRID_FLOW,
+  },
+  {
+    types: [RESPONSE_TYPES.CODE, RESPONSE_TYPES.ID_TOKEN, RESPONSE_TYPES.TOKEN],
+    flow: AUTHENTICATION_FLOWS.HYBRID_FLOW,
+  },
 ];
 
 // Token endpoint authentication method
@@ -40,9 +58,11 @@ const TOKEN_ENDPOINT_AUTH_METHOD = {
 // Error messages for Service config form validation
 const ERROR_MESSAGES = {
   INVALID_HOME_URL: "Enter a home URL in the correct format",
-  INVALID_POST_PASSWORD_RESET_URL: "Enter a post password-reset URL in the correct format",
+  INVALID_POST_PASSWORD_RESET_URL:
+    "Enter a post password-reset URL in the correct format",
   MISSING_CLIENT_ID: "Enter the client ID",
-  INVALID_CLIENT_ID: "Client ID must only contain letters a to z, hyphens and numbers",
+  INVALID_CLIENT_ID:
+    "Client ID must only contain letters a to z, hyphens and numbers",
   INVALID_CLIENT_ID_LENGTH: "Client ID must be 50 characters or less",
   CLIENT_ID_UNAVAILABLE: "Client ID must be unique",
   MISSING_REDIRECT_URL: "Enter at least 1 redirect URL",
@@ -51,23 +71,35 @@ const ERROR_MESSAGES = {
   MISSING_POST_LOGOUT_URL: "Enter at least 1 logout redirect URL",
   INVALID_POST_LOGOUT_URL: "Enter a logout redirect URL in the correct format",
   POST_LOGOUT_URL_NOT_UNIQUE: "Logout redirect URL must be unique",
-  INVALID_CLIENT_SECRET: "Client secret cannot be validated. Click ‘regenerate’",
+  INVALID_CLIENT_SECRET:
+    "Client secret cannot be validated. Click ‘regenerate’",
   INVALID_API_SECRET: "API secret cannot be validated. Click ‘regenerate’",
   MISSING_RESPONSE_TYPE: "Select at least 1 response type",
-  RESPONSE_TYPE_TOKEN_ERROR: "Select more than 1 response type when ‘token’ is selected as a response type",
+  RESPONSE_TYPE_TOKEN_ERROR:
+    "Select more than 1 response type when ‘token’ is selected as a response type",
   NO_CHANGES_MADE: "No changes have been made",
-  INVALID_HOME_PROTOCOL: "Enter a home URL in the correct format. The URL must follow http or https protocols only ",
+  INVALID_HOME_PROTOCOL:
+    "Enter a home URL in the correct format. The URL must follow http or https protocols only ",
   INVALID_HOME_LENTGH: "Home URL must be 200 characters or less ",
-  INVALID_HOME_CHARACTERS: "Enter a home URL in the correct format. The URL must not include spaces or the following characters  < > # % { } | \\ ^ ~ [ ] ` ",
-  INVALID_REDIRECT_PROTOCOL: "Enter a redirect URL in the correct format. The URL must follow http or https protocols only ",
+  INVALID_HOME_CHARACTERS:
+    "Enter a home URL in the correct format. The URL must not include spaces or the following characters  < > # % { } | \\ ^ ~ [ ] ` ",
+  INVALID_REDIRECT_PROTOCOL:
+    "Enter a redirect URL in the correct format. The URL must follow http or https protocols only ",
   INVALID_REDIRECT_LENTGH: "Redirect URL must be 200 characters or less ",
-  INVALID_REDIRECT_CHARACTERS: "Enter a redirect URL in the correct format. The URL must not include spaces or the following characters  < > # % { } | \\ ^ ~ [ ] ` ",
-  INVALID_RESETPASS_PROTOCOL: "Enter a post password-reset URL in the correct format. The URL must follow http or https protocols only ",
-  INVALID_RESETPASS_LENTGH: "Post password-reset URL must be 200 characters or less ",
-  INVALID_RESETPASS_CHARACTERS: "Enter a post password-reset URL in the correct format. The URL must not include spaces or the following characters  < > # % { } | \\ ^ ~ [ ] ` ",
-  INVALID_LOGOUT_REDIRECT_PROTOCOL: "Enter a logout redirect URL in the correct format. The URL must follow http or https protocols only ",
-  INVALID_LOGOUT_REDIRECT_LENTGH: "Logout redirect URL must be 200 characters or less ",
-  INVALID_LOGOUT_REDIRECT_CHARACTERS: "Enter a logout redirect URL in the correct format. The URL must not include spaces or the following characters  < > # % { } | \\ ^ ~ [ ] ` ",
+  INVALID_REDIRECT_CHARACTERS:
+    "Enter a redirect URL in the correct format. The URL must not include spaces or the following characters  < > # % { } | \\ ^ ~ [ ] ` ",
+  INVALID_RESETPASS_PROTOCOL:
+    "Enter a post password-reset URL in the correct format. The URL must follow http or https protocols only ",
+  INVALID_RESETPASS_LENTGH:
+    "Post password-reset URL must be 200 characters or less ",
+  INVALID_RESETPASS_CHARACTERS:
+    "Enter a post password-reset URL in the correct format. The URL must not include spaces or the following characters  < > # % { } | \\ ^ ~ [ ] ` ",
+  INVALID_LOGOUT_REDIRECT_PROTOCOL:
+    "Enter a logout redirect URL in the correct format. The URL must follow http or https protocols only ",
+  INVALID_LOGOUT_REDIRECT_LENTGH:
+    "Logout redirect URL must be 200 characters or less ",
+  INVALID_LOGOUT_REDIRECT_CHARACTERS:
+    "Enter a logout redirect URL in the correct format. The URL must not include spaces or the following characters  < > # % { } | \\ ^ ~ [ ] ` ",
 };
 
 // Query parameter actions
@@ -82,31 +114,36 @@ const amendChangesBaseUrl = `service-configuration?action=${ACTIONS.AMEND_CHANGE
 const SERVICE_CONFIG_CHANGES_SUMMARY_DETAILS = {
   serviceHome: {
     title: "Home URL",
-    description: "The home page of the service you want to configure. It is usually the service landing page from DfE Sign-in.",
+    description:
+      "The home page of the service you want to configure. It is usually the service landing page from DfE Sign-in.",
     changeLink: `${amendChangesBaseUrl}#serviceHome-form-group`,
     displayOrder: 1,
   },
   postResetUrl: {
     title: "Post password-reset URL",
-    description: "Where you want to redirect users after they have reset their password. It is usually the DfE Sign-in home page.",
+    description:
+      "Where you want to redirect users after they have reset their password. It is usually the DfE Sign-in home page.",
     changeLink: `${amendChangesBaseUrl}#postResetUrl-form-group`,
     displayOrder: 2,
   },
   clientId: {
     title: "Client ID",
-    description: "A unique identifier of the service that is created manually by the DfE Sign-in team.",
+    description:
+      "A unique identifier of the service that is created manually by the DfE Sign-in team.",
     changeLink: `${amendChangesBaseUrl}#clientId-form-group`,
     displayOrder: 3,
   },
   redirectUris: {
     title: "Redirect URL",
-    description: "Where you want to redirect users after they have authenticated.",
+    description:
+      "Where you want to redirect users after they have authenticated.",
     changeLink: `${amendChangesBaseUrl}#redirect_uris-form-group`,
     displayOrder: 4,
   },
   postLogoutRedirectUris: {
     title: "Logout redirect URL",
-    description: "Where you want to redirect users after they log out of a service.",
+    description:
+      "Where you want to redirect users after they log out of a service.",
     changeLink: `${amendChangesBaseUrl}#post_logout_redirect_uris-form-group`,
     displayOrder: 5,
   },
@@ -118,26 +155,30 @@ const SERVICE_CONFIG_CHANGES_SUMMARY_DETAILS = {
   },
   refreshToken: {
     title: "Refresh token",
-    description: "Select this field if you want to get new access tokens when they have expired without interaction with the user.",
+    description:
+      "Select this field if you want to get new access tokens when they have expired without interaction with the user.",
     changeLink: `${amendChangesBaseUrl}#refresh_token-form-group`,
     displayOrder: 7,
   },
   clientSecret: {
     title: "Client secret",
-    description: "A value that is created automatically by the system and acts as a password for the service.",
+    description:
+      "A value that is created automatically by the system and acts as a password for the service.",
     changeLink: `${amendChangesBaseUrl}#clientSecret-form-group`,
     displayOrder: 8,
   },
   tokenEndpointAuthMethod: {
     title: "Token endpoint authentication method",
-    description: "The way your service authenticates to the DfE Sign-in token endpoint. Select the method that applies.",
+    description:
+      "The way your service authenticates to the DfE Sign-in token endpoint. Select the method that applies.",
     changeLink: `${amendChangesBaseUrl}#tokenEndpointAuthMethod-form-group`,
     displayOrder: 9,
   },
 
   apiSecret: {
     title: "API secret",
-    description: "A value that is created automatically by the system and acts as a password for the DfE Sign-in public API.",
+    description:
+      "A value that is created automatically by the system and acts as a password for the DfE Sign-in public API.",
     changeLink: `${amendChangesBaseUrl}#apiSecret-form-group`,
     displayOrder: 10,
   },

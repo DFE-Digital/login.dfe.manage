@@ -1,4 +1,8 @@
-const { getFormattedDate, dateFormat, findActiveBannerIndex } = require("../../../src/app/helpers/dateFormatterHelper");
+const {
+  getFormattedDate,
+  dateFormat,
+  findActiveBannerIndex,
+} = require("../../../src/app/helpers/dateFormatterHelper");
 
 describe("Date Formatter Functions", () => {
   const testDate = new Date("2024-12-13 12:00:00.447"); // Example date
@@ -14,7 +18,9 @@ describe("Date Formatter Functions", () => {
   });
 
   it("Should throw TypeError for invalid date", () => {
-    expect(() => getFormattedDate("invalid date", "DD MMM YYYY")).toThrow(TypeError);
+    expect(() => getFormattedDate("invalid date", "DD MMM YYYY")).toThrow(
+      TypeError,
+    );
   });
 
   it("Should format date correctly in short format", () => {

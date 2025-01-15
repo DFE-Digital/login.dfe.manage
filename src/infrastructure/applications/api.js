@@ -1,18 +1,18 @@
-const { fetchApi } = require('login.dfe.async-retry');
-const jwtStrategy = require('login.dfe.jwt-strategies');
-const config = require('../config');
+const { fetchApi } = require("login.dfe.async-retry");
+const jwtStrategy = require("login.dfe.jwt-strategies");
+const config = require("../config");
 
 const callApi = async (endpoint, method, body, correlationId) => {
   const token = await jwtStrategy(config.applications.service).getBearerToken();
 
   try {
-    return await fetchApi(`${config.applications.service.url}/${endpoint}`,{
+    return await fetchApi(`${config.applications.service.url}/${endpoint}`, {
       method,
       headers: {
         authorization: `bearer ${token}`,
-        'x-correlation-id': correlationId,
+        "x-correlation-id": correlationId,
       },
-      body
+      body,
     });
   } catch (e) {
     const status = e.statusCode ? e.statusCode : 500;
@@ -26,16 +26,19 @@ const callApi = async (endpoint, method, body, correlationId) => {
   }
 };
 
-const getServiceById = async (id, correlationId) => callApi(`services/${id}`, 'GET', undefined, correlationId);
+const getServiceById = async (id, correlationId) =>
+  callApi(`services/${id}`, "GET", undefined, correlationId);
 
-const getServiceSummaries = async (ids, fields, correlationId) => callApi(
-  `service-summaries/${ids.join()}?fields=${fields.join()}`,
-  'GET',
-  undefined,
-  correlationId,
-);
+const getServiceSummaries = async (ids, fields, correlationId) =>
+  callApi(
+    `service-summaries/${ids.join()}?fields=${fields.join()}`,
+    "GET",
+    undefined,
+    correlationId,
+  );
 
-const listAllServices = async (correlationId) => callApi('services', 'GET', undefined, correlationId);
+const listAllServices = async (correlationId) =>
+  callApi("services", "GET", undefined, correlationId);
 
 const updateService = async (id, serviceDetails, correlationId) => {
   const body = {};
@@ -43,7 +46,8 @@ const updateService = async (id, serviceDetails, correlationId) => {
     body.name = serviceDetails.name;
   }
   if (serviceDetails.serviceHome !== undefined) {
-    body.serviceHome = serviceDetails.serviceHome === '' ? null : serviceDetails.serviceHome;
+    body.serviceHome =
+      serviceDetails.serviceHome === "" ? null : serviceDetails.serviceHome;
   }
   if (serviceDetails.clientId) {
     body.clientId = serviceDetails.clientId;
@@ -70,20 +74,22 @@ const updateService = async (id, serviceDetails, correlationId) => {
     body.description = serviceDetails.description;
   }
   if (serviceDetails.postResetUrl !== undefined) {
-    body.postResetUrl = serviceDetails.postResetUrl === '' ? null : serviceDetails.postResetUrl;
+    body.postResetUrl =
+      serviceDetails.postResetUrl === "" ? null : serviceDetails.postResetUrl;
   }
   if (serviceDetails.tokenEndpointAuthMethod !== undefined) {
     body.tokenEndpointAuthMethod = serviceDetails.tokenEndpointAuthMethod;
   }
-  return callApi(`services/${id}`, 'PATCH', body, correlationId);
+  return callApi(`services/${id}`, "PATCH", body, correlationId);
 };
 
-const listBannersForService = async (id, pageSize, page, correlationId) => callApi(
-  `services/${id}/banners?pageSize=${pageSize}?&page=${page}`,
-  'GET',
-  undefined,
-  correlationId,
-);
+const listBannersForService = async (id, pageSize, page, correlationId) =>
+  callApi(
+    `services/${id}/banners?pageSize=${pageSize}?&page=${page}`,
+    "GET",
+    undefined,
+    correlationId,
+  );
 
 const listAllBannersForService = async (id, correlationId) => {
   const allBanners = [];
@@ -101,26 +107,14 @@ const listAllBannersForService = async (id, correlationId) => {
   return allBanners;
 };
 
-const getBannerById = async (id, bid, correlationId) => callApi(
-  `services/${id}/banners/${bid}`,
-  'GET',
-  undefined,
-  correlationId,
-);
+const getBannerById = async (id, bid, correlationId) =>
+  callApi(`services/${id}/banners/${bid}`, "GET", undefined, correlationId);
 
-const upsertBanner = async (sid, banner, correlationId) => callApi(
-  `services/${sid}/banners`,
-  'POST',
-  banner,
-  correlationId,
-);
+const upsertBanner = async (sid, banner, correlationId) =>
+  callApi(`services/${sid}/banners`, "POST", banner, correlationId);
 
-const removeBanner = async (sid, bid, correlationId) => callApi(
-  `services/${sid}/banners/${bid}`,
-  'DELETE',
-  undefined,
-  correlationId,
-);
+const removeBanner = async (sid, bid, correlationId) =>
+  callApi(`services/${sid}/banners/${bid}`, "DELETE", undefined, correlationId);
 
 module.exports = {
   getServiceById,

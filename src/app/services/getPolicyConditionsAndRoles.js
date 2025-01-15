@@ -1,12 +1,20 @@
 const { getPolicyById } = require("../../infrastructure/access");
 const { getServiceById } = require("../../infrastructure/applications");
-const { getFriendlyFieldName, getFriendlyValues, getUserServiceRoles } = require("./utils");
+const {
+  getFriendlyFieldName,
+  getFriendlyValues,
+  getUserServiceRoles,
+} = require("./utils");
 const { forEachAsync } = require("../../utils/asyncHelpers");
 
 const mapPolicyConstraints = async (policy, correlationId) => {
   await forEachAsync(policy.conditions, async (condition) => {
     const currentCondition = condition;
-    currentCondition.value = await getFriendlyValues(condition.field, condition.value, correlationId);
+    currentCondition.value = await getFriendlyValues(
+      condition.field,
+      condition.value,
+      correlationId,
+    );
     currentCondition.field = getFriendlyFieldName(condition.field);
   });
 };
@@ -20,8 +28,11 @@ const getPolicyConditions = async (req, res) => {
   policy.roles.sort((a, b) => a.name.localeCompare(b.name));
   policy.conditions.sort((a, b) => a.field.localeCompare(b.field));
   policy.conditions.forEach((conditionType) => {
-    const isNumeric = conditionType.value.length > 1 && /^[0-9]+$/.test(conditionType.value[0]);
-    conditionType.value.sort((a, b) => a.localeCompare(b, undefined, { numeric: isNumeric }));
+    const isNumeric =
+      conditionType.value.length > 1 && /^[0-9]+$/.test(conditionType.value[0]);
+    conditionType.value.sort((a, b) =>
+      a.localeCompare(b, undefined, { numeric: isNumeric }),
+    );
   });
 
   return res.render("services/views/policyConditionsAndRoles", {

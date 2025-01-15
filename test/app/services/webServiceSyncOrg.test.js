@@ -1,46 +1,56 @@
-jest.mock('./../../../src/infrastructure/config', () => require('./../../utils').configMockFactory());
-jest.mock('./../../../src/infrastructure/logger', () => require('./../../utils').loggerMockFactory());
-jest.mock('login.dfe.jobs-client', () => ({
+jest.mock("./../../../src/infrastructure/config", () =>
+  require("./../../utils").configMockFactory(),
+);
+jest.mock("./../../../src/infrastructure/logger", () =>
+  require("./../../utils").loggerMockFactory(),
+);
+jest.mock("login.dfe.jobs-client", () => ({
   ServiceNotificationsClient: jest.fn(),
 }));
-jest.mock('./../../../src/app/services/utils');
-jest.mock('./../../../src/infrastructure/organisations');
+jest.mock("./../../../src/app/services/utils");
+jest.mock("./../../../src/infrastructure/organisations");
 
-const { getRequestMock, getResponseMock } = require('./../../utils');
-const { getOrganisationByIdV2 } = require('./../../../src/infrastructure/organisations');
-const { ServiceNotificationsClient } = require('login.dfe.jobs-client');
-const webServiceSyncOrg = require('./../../../src/app/services/webServiceSyncOrg');
+const { getRequestMock, getResponseMock } = require("./../../utils");
+const {
+  getOrganisationByIdV2,
+} = require("./../../../src/infrastructure/organisations");
+const { ServiceNotificationsClient } = require("login.dfe.jobs-client");
+const webServiceSyncOrg = require("./../../../src/app/services/webServiceSyncOrg");
 
 const res = getResponseMock();
-const orgResult = { id: 'org-1', name: 'organisation one' };
+const orgResult = { id: "org-1", name: "organisation one" };
 const serviceNotificationsClient = {
   notifyOrganisationUpdated: jest.fn(),
 };
 
-describe('when syncing organisation for sync', function () {
+describe("when syncing organisation for sync", function () {
   let req;
 
   beforeEach(() => {
     getOrganisationByIdV2.mockReset().mockReturnValue(orgResult);
 
     serviceNotificationsClient.notifyOrganisationUpdated.mockReset();
-    ServiceNotificationsClient.mockReset().mockImplementation(() => serviceNotificationsClient);
+    ServiceNotificationsClient.mockReset().mockImplementation(
+      () => serviceNotificationsClient,
+    );
 
     req = getRequestMock({
       params: {
-        oid: 'org-1',
-        sid: 'service-1',
+        oid: "org-1",
+        sid: "service-1",
       },
     });
 
     res.mockResetAll();
   });
 
-  it('then it should prompt for confirmation with organisation details', async () => {
+  it("then it should prompt for confirmation with organisation details", async () => {
     await webServiceSyncOrg.get(req, res);
 
     expect(res.render.mock.calls).toHaveLength(1);
-    expect(res.render.mock.calls[0][0]).toBe('services/views/webServiceSyncOrg');
+    expect(res.render.mock.calls[0][0]).toBe(
+      "services/views/webServiceSyncOrg",
+    );
   });
 
   // it('then it should queue organisation for sync on confirmation', async () => {

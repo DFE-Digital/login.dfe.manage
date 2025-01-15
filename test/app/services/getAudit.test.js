@@ -1,7 +1,13 @@
-/* eslint-disable global-require */
-jest.mock("./../../../src/infrastructure/config", () => require("../../utils").configMockFactory());
-jest.mock("../../../src/app/services/utils", () => require("../../utils").getPartialMock("src/app/services/utils", ["getReturnOrgId", "getReturnUrl"]));
-/* eslint-emable global-require */
+jest.mock("./../../../src/infrastructure/config", () =>
+  require("../../utils").configMockFactory(),
+);
+jest.mock("../../../src/app/services/utils", () =>
+  require("../../utils").getPartialMock("src/app/services/utils", [
+    "getReturnOrgId",
+    "getReturnUrl",
+  ]),
+);
+
 jest.mock("./../../../src/infrastructure/utils");
 jest.mock("./../../../src/infrastructure/organisations");
 jest.mock("./../../../src/infrastructure/applications");
@@ -9,9 +15,17 @@ jest.mock("./../../../src/infrastructure/serviceMapping");
 jest.mock("./../../../src/infrastructure/audit");
 jest.mock("ioredis");
 
-const { getUserDetails, getUserDetailsById } = require("../../../src/app/services/utils");
-const { getPageOfUserAudits, getUserChangeHistory } = require("../../../src/infrastructure/audit");
-const { getServiceIdForClientId } = require("../../../src/infrastructure/serviceMapping");
+const {
+  getUserDetails,
+  getUserDetailsById,
+} = require("../../../src/app/services/utils");
+const {
+  getPageOfUserAudits,
+  getUserChangeHistory,
+} = require("../../../src/infrastructure/audit");
+const {
+  getServiceIdForClientId,
+} = require("../../../src/infrastructure/serviceMapping");
 const { getServiceById } = require("../../../src/infrastructure/applications");
 const getAudit = require("../../../src/app/services/getAudit");
 
@@ -62,7 +76,8 @@ describe("when getting users audit details", () => {
           userId: "user1",
           userEmail: "some.user@test.tester",
           level: "audit",
-          message: "Successful login attempt for some.user@test.tester (id: user1)",
+          message:
+            "Successful login attempt for some.user@test.tester (id: user1)",
           timestamp: "2018-01-30T10:31:00.000Z",
           client: "client-1",
         },
@@ -73,7 +88,8 @@ describe("when getting users audit details", () => {
           userId: "user1",
           userEmail: "some.user@test.tester",
           level: "audit",
-          message: "Successful login attempt for some.user@test.tester (id: user1)",
+          message:
+            "Successful login attempt for some.user@test.tester (id: user1)",
           timestamp: "2018-01-30T10:30:53.987Z",
           client: "client-2",
         },
