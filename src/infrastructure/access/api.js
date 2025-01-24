@@ -118,6 +118,15 @@ const getPolicyById = async (sid, pid, correlationId) => {
   );
 };
 
+const updatePolicyById = async (sid, pid, policyBody, correlationId) => {
+  return callApi(
+    "PATCH",
+    `services/${sid}/policies/${pid}`,
+    correlationId,
+    policyBody,
+  );
+};
+
 const addUserService = async (uid, sid, oid, roles, correlationId) => {
   const body = {
     roles,
@@ -153,6 +162,7 @@ module.exports = {
   removeServiceFromInvitation,
   getPageOfPoliciesForService,
   getPolicyById,
+  updatePolicyById,
   addUserService,
   addInvitationService,
   getAllInvitationServices,

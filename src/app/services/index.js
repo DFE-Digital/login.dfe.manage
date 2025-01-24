@@ -71,6 +71,10 @@ const {
   post: postListPolicies,
 } = require("./listPolicies");
 const getPolicyConditions = require("./getPolicyConditionsAndRoles");
+const getCreatePolicyCondition = require("./getCreatePolicyCondition");
+const postCreatePolicyCondition = require("./postCreatePolicyCondition");
+const getConfirmCreatePolicyCondition = require("./getConfirmCreatePolicyCondition");
+const postConfirmCreatePolicyCondition = require("./postConfirmCreatePolicyCondition");
 
 const {
   get: getAssociateRoles,
@@ -452,6 +456,38 @@ const services = (csrf) => {
     isManageUserForService,
     hasRole("accessManage"),
     asyncWrapper(getPolicyConditions),
+  );
+
+  router.get(
+    "/:sid/policies/:pid/create-policy-condition",
+    csrf,
+    isManageUserForService,
+    hasRole("accessManage"),
+    asyncWrapper(getCreatePolicyCondition),
+  );
+
+  router.post(
+    "/:sid/policies/:pid/create-policy-condition",
+    csrf,
+    isManageUserForService,
+    hasRole("accessManage"),
+    asyncWrapper(postCreatePolicyCondition),
+  );
+
+  router.get(
+    "/:sid/policies/:pid/confirm-create-policy-condition",
+    csrf,
+    isManageUserForService,
+    hasRole("accessManage"),
+    asyncWrapper(getConfirmCreatePolicyCondition),
+  );
+
+  router.post(
+    "/:sid/policies/:pid/confirm-create-policy-condition",
+    csrf,
+    isManageUserForService,
+    hasRole("accessManage"),
+    asyncWrapper(postConfirmCreatePolicyCondition),
   );
 
   return router;

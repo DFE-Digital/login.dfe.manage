@@ -1,8 +1,26 @@
 <div class="govuk-width-container govuk-main-wrapper">
+    <% if (locals.flash.info) { %>
+        <div id="notification-wrapper" class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+            <div class="govuk-notification-banner__header">
+                <span class="close-button">x</span>
+                <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                    Success
+                </h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+                <p class="govuk-body">
+                    <%=locals.flash.info%>
+                </p>
+            </div>
+        </div>
+    <% } %>
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-three-quarters">
             <%- include('policySummary'); %>
         </div>
+        <a class="govuk-link" href="create-policy-condition">
+            Create Policy Condition
+        </a>
     </div>
     <div class="govuk-grid-row govuk-!-margin-top-6">
         <div class="govuk-grid-column-full">
