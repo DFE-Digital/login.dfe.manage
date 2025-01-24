@@ -1,0 +1,72 @@
+<div class="govuk-width-container govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <h1 class="govuk-heading-l">
+                Create policy condition for <%= locals.policy.name %>
+            </h1>
+            <form method="post" class="prevent-form-double-submission" id="form-new-policy-condition">
+                <input type="hidden" name="_csrf" value="<%=csrfToken%>" />
+            
+                <fieldset class="govuk-fieldset" id="fieldset-new-policy-condition">
+                    <legend class="govuk-visually-hidden">Create policy condition for <%= locals.policy.name %></legend>
+                
+                    <div class="govuk-form-group <%= (locals.validationMessages.condition !== undefined) ? 'govuk-form-group--error' : '' %>">
+                        <label class="govuk-label govuk-label--s" for="condition">Condition</label>
+                    <% if (locals.validationMessages.condition !== undefined) { %>
+                        <p id="validation-condition" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span> <%=locals.validationMessages.condition %>
+                        </p>
+                    <% } %>
+                        <select class="govuk-select" id="condition" name="condition">
+                            <option value="organisations.urn">organisations.urn</option>
+                            <option value="organisations.id" selected>organisations.id</option>
+                            <option value="organisations.type" selected>organisations.type</option>
+                            <option value="organisations.urn" selected>organisations.status</option>
+                            <option value="updated" selected>organisations.category</option>
+                        </select>
+                    </div>
+
+                    <div class="govuk-form-group <%= (locals.validationMessages.bannerTitle !== undefined) ? 'govuk-form-group--error' : '' %>">
+                        <label class="govuk-label govuk-label--s" for="bannerTitle">Operator</label>
+                        <% if (locals.validationMessages.bannerTitle !== undefined) { %>
+                        <p id="validation-bannerTitle" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span> <%=locals.validationMessages.bannerTitle %>
+                        </p>
+                        <% } %>
+                        <select class="govuk-select" id="operator" name="operator">
+                            <option value="is">is</option>
+                            <option value="is not" selected>is not</option>
+                        </select>
+                    </div>
+
+                    <div class="govuk-form-group <%= (locals.validationMessages.value !== undefined) ? 'govuk-form-group--error' : '' %>">
+                        <label class="govuk-label govuk-label--s" for="value">Value</label>
+                    <% if (locals.validationMessages.value !== undefined) { %>
+                        <p id="validation-value" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span> <%=locals.validationMessages.value %>
+                        </p>
+                    <% } %>
+                        <input type="text" id="value" name="value" value="<%=locals.value%>" class="govuk-textarea govuk-!-width-three-quarters" rows="4" maxlength="400"<% if (locals.validationMessages.value) { %> aria-invalid="true" aria-describedby="validation-value" <% } %>>
+                    </div>
+
+                    <div class="govuk-button-group">
+                        <button type="submit" class="govuk-button" data-module="govuk-button">Save</button>
+                        <a href="<%=locals.cancelLink%>" class="govuk-button govuk-button--secondary">Cancel</a>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    <% if (locals.isEditExisting) { %>
+        <div class="govuk-grid-column-one-quarter">
+            <aside id="related-actions" class="govuk-!-margin-top-0">
+                <h2 class="govuk-heading-m">Actions</h2>
+                <ul class="govuk-list">
+                    <li>
+                        <a class="govuk-link-bold" href="<%=locals.bannerId%>/delete-banner">Delete banner</a>
+                    </li>
+                </ul>
+            </aside>
+        </div>
+    <% } %>
+    </div>
+</div>

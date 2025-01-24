@@ -1,0 +1,55 @@
+<div class="govuk-width-container govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <h1 class="govuk-heading-l text-break">
+                Review new policy condition for <%= locals.policy.name %>
+            </h1>
+            <p class="govuk-body">Review these details before confirming.</p>
+
+            <dl class="govuk-summary-list">
+
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Review summary
+                    </dt>
+                    <dd class="app-check-your-answers__answer">
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Condition
+                    </dt>
+                    <dd class="app-check-your-answers__answer">
+                        <%=locals.condition%>
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Operation
+                    </dt>
+                    <dd class="app-check-your-answers__answer">
+                        <%= locals.operation %> 
+                    </dd>
+                </div>
+
+                <div class="app-check-your-answers__contents">
+                    <dt class="govuk-summary-list__key">
+                        Value
+                    </dt>
+                    <dd class="app-check-your-answers__answer">
+                        <%=locals.value%>
+                    </dd>
+                </div>
+            </dl>
+
+            <form method="post">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
+                <div class="govuk-button-group">
+                    <button type="submit" class="govuk-button" data-module="govuk-button">Edit service</button>
+                    <a href="<%= locals.cancelLink %>" class="govuk-button govuk-button--secondary">Cancel</a>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
