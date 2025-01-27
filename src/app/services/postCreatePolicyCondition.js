@@ -3,7 +3,7 @@ const { getServiceById } = require("../../infrastructure/applications");
 const { validate: validateUUID } = require("uuid");
 //const logger = require("./infrastructure/logger");
 
-const validate = async (req) => {
+const validate = async (req, currentPolicyConditions) => {
   const model = {
     condition: req.body.condition || "",
     operator: req.body.operator || "",
@@ -37,42 +37,68 @@ const validate = async (req) => {
           "organisation.id needs to be a valid uuid";
       }
     }
-    if (model.condition === "organisation.type") {
+    if (model.condition === "organisation.type.id") {
       const typeRegex = /^\d{2}$/i;
       if (!typeRegex.test(model.value)) {
         model.validationMessages.value =
-          "organisation.type can only be a 2 digit number";
+          "organisation.type.id can only be a 2 digit number";
       }
     }
-    if (model.condition === "organisation.status") {
+    if (model.condition === "organisation.status.id") {
       const statusRegex = /^\d{1,2}$/i;
       if (!statusRegex.test(model.value)) {
         model.validationMessages.value =
-          "organisation.status can only be a 1 or 2 digit number";
+          "organisation.status.id can only be a 1 or 2 digit number";
       }
     }
-    if (model.condition === "organisation.category") {
+    if (model.condition === "organisation.category.id") {
       const categoryRegex = /^\d{3}$/i;
       if (!categoryRegex.test(model.value)) {
         model.validationMessages.value =
-          "organisation.category can only be a 3 digit number";
+          "organisation.category.id can only be a 3 digit number";
       }
     }
   }
 
-  // TODO Look at current policy and ensure added policy isn't a duplicate
-  // TODO check added policy doesn't contradict current policy (e.g., adding is and is not for same condition and value)
+  // TODO Do exit function now if there's an error already?
+
+  for (const condition of currentPolicyConditions) {
+    // Find if new value matches any existing values. If the result isn't empty, we have a match.
+    const matchingValues = condition.value.filter(
+      (value) => value === model.value,
+    );
+
+    // All 3 have to match for it to be a duplicate
+    if (
+      model.condition === condition.field &&
+      model.operator === condition.operator &&
+      matchingValues.length > 0
+    ) {
+      model.validationMessages.value = "Duplicate existing policy found";
+    }
+
+    // If condition AND value match, but operator is different, then we have a contradiction (can't have is AND is_not)
+    if (
+      model.condition === condition.field &&
+      model.operator !== condition.operator &&
+      matchingValues.length > 0
+    ) {
+      model.validationMessages.value = "Contradicting policy found";
+    }
+  }
+
   // TODO? If condition is id then check that organisation exists
 
   return model;
 };
 
 const postCreatePolicyCondition = async (req, res) => {
-  const model = await validate(req);
   const service = await getServiceById(req.params.sid, req.id);
   const policy = await getPolicyById(req.params.sid, req.params.pid, req.id);
+  const model = await validate(req, policy.conditions);
 
   if (Object.keys(model.validationMessages).length > 0) {
+    // TODO back link broken
     return res.render("services/views/createPolicyCondition", {
       ...model,
       csrfToken: req.csrfToken(),

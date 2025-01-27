@@ -1,30 +1,28 @@
-const { getPolicyById } = require("../../infrastructure/access");
-const { getServiceById } = require("../../infrastructure/applications");
+const {
+  getPolicyById,
+  updatePolicyById,
+} = require("../../infrastructure/access");
 
 const postConfirmCreatePolicyCondition = async (req, res) => {
-  const model = {};
-  const service = await getServiceById(req.params.sid, req.id);
+  const model = req.session.createPolicyConditionData;
   const policy = await getPolicyById(req.params.sid, req.params.pid, req.id);
 
-  if (Object.keys(model.validationMessages).length > 0) {
-    model.csrfToken = req.csrfToken();
+  policy.conditions.push({
+    field: model.condition,
+    operator: model.operator,
+    value: [model.value],
+  });
+  // console.log(policy)
+  // console.log(policy.conditions)
 
-    return res.render("services/views/createPolicyCondition", {
-      validationMessages: {},
-      csrfToken: req.csrfToken(),
-      policy,
-      service,
-      backLink: `/services/${req.params.sid}/policies`,
-      serviceId: req.params.sid,
-      policyId: policy.id,
-      currentNavigation: "policies",
-    });
-  }
+  // push new condition to condition list (either new row if new, or modify existing if condition already exists)
 
-  // TODO save it
+  // call function that calls services/id/policies/id api endpoint in access
+  // await updatePolicyById(req.params.sid, req.params.pid, policy, req.id);
+  req.session.createPolicyConditionData = undefined;
   // Clean session data
 
-  return res.redirect("confirm-create-policy-condition");
+  return res.redirect("conditionsAndRoles");
 };
 
 module.exports = postConfirmCreatePolicyCondition;
