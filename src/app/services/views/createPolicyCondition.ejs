@@ -17,13 +17,13 @@
                             <span class="govuk-visually-hidden">Error:</span> <%=locals.validationMessages.condition%>
                         </p>
                     <% } %>
-                        <select class="govuk-select" id="condition" name="condition">
-                            <option value="" selected>Select condition</option>
-                            <option value="organisations.urn">organisations.urn</option>
-                            <option value="organisations.id">organisations.id</option>
-                            <option value="organisations.type">organisations.type</option>
-                            <option value="organisations.urn">organisations.status</option>
-                            <option value="updated">organisations.category</option>
+                        <select class="govuk-select <%= (locals.validationMessages.condition !== undefined) ? 'govuk-select--error' : '' %>" id="condition" name="condition">
+                            <option value="" <%= (locals.condition === undefined) ? 'selected' : '' %>>Select condition</option>
+                            <option value="organisation.urn" <%= (locals.condition === "organisation.urn") ? 'selected' : '' %>>organisation.urn</option>
+                            <option value="organisation.id" <%= (locals.condition === "organisation.id") ? 'selected' : '' %>>organisation.id</option>
+                            <option value="organisation.type" <%= (locals.condition === "organisation.type") ? 'selected' : '' %>>organisation.type</option>
+                            <option value="organisation.status" <%= (locals.condition === "organisation.status") ? 'selected' : '' %>>organisation.status</option>
+                            <option value="organisation.category" <%= (locals.condition === "organisation.category") ? 'selected' : '' %>>organisation.category</option>
                         </select>
                     </div>
 
@@ -34,10 +34,10 @@
                             <span class="govuk-visually-hidden">Error:</span> <%=locals.validationMessages.operator%>
                         </p>
                         <% } %>
-                        <select class="govuk-select" id="operator" name="operator">
-                            <option value="" selected>Select operator</option>
-                            <option value="is">is</option>
-                            <option value="is not">is not</option>
+                        <select class="govuk-select <%= (locals.validationMessages.operator !== undefined) ? 'govuk-select--error' : '' %>" id="operator" name="operator">
+                            <option value="" <%= (locals.operator === undefined) ? 'selected' : '' %>>Select operator</option>
+                            <option value="is" <%= (locals.operator === "is") ? 'selected' : '' %>>is</option>
+                            <option value="is not" <%= (locals.operator === "is not") ? 'selected' : '' %>>is not</option>
                         </select>
                     </div>
 
