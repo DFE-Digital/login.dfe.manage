@@ -16,7 +16,7 @@ const validate = async (req, currentPolicyConditions) => {
   }
 
   if (!model.operator) {
-    model.validationMessages.operator = "Please enter a operator";
+    model.validationMessages.operator = "Please enter an operator";
   }
 
   if (!model.value) {
@@ -35,7 +35,7 @@ const validate = async (req, currentPolicyConditions) => {
       const ukprnRegex = /^\d{8}$/i;
       if (!ukprnRegex.test(model.value)) {
         model.validationMessages.value =
-          "organisation.ukprn can only be a 8 digit number";
+          "organisation.ukprn can only be an 8 digit number";
       }
     }
     if (model.condition === "organisation.id") {
