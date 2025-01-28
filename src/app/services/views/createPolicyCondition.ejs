@@ -20,6 +20,7 @@
                         <select class="govuk-select <%= (locals.validationMessages.condition !== undefined) ? 'govuk-select--error' : '' %>" id="condition" name="condition">
                             <option value="" <%= (locals.condition === undefined) ? 'selected' : '' %>>Select condition</option>
                             <option value="organisation.urn" <%= (locals.condition === "organisation.urn") ? 'selected' : '' %>>organisation.urn</option>
+                            <option value="organisation.ukprn" <%= (locals.condition === "organisation.ukprn") ? 'selected' : '' %>>organisation.ukprn</option>
                             <option value="organisation.id" <%= (locals.condition === "organisation.id") ? 'selected' : '' %>>organisation.id</option>
                             <option value="organisation.type.id" <%= (locals.condition === "organisation.type.id") ? 'selected' : '' %>>organisation.type.id</option>
                             <option value="organisation.status.id" <%= (locals.condition === "organisation.status.id") ? 'selected' : '' %>>organisation.status.id</option>
@@ -37,7 +38,7 @@
                         <select class="govuk-select <%= (locals.validationMessages.operator !== undefined) ? 'govuk-select--error' : '' %>" id="operator" name="operator">
                             <option value="" <%= (locals.operator === undefined) ? 'selected' : '' %>>Select operator</option>
                             <option value="is" <%= (locals.operator === "is") ? 'selected' : '' %>>is</option>
-                            <option value="is not" <%= (locals.operator === "is not") ? 'selected' : '' %>>is not</option>
+                            <option value="is_not" <%= (locals.operator === "is_not") ? 'selected' : '' %>>is_not</option>
                         </select>
                     </div>
 
@@ -52,23 +53,11 @@
                     </div>
 
                     <div class="govuk-button-group">
-                        <button type="submit" class="govuk-button" data-module="govuk-button">Save</button>
+                        <button type="submit" class="govuk-button" data-module="govuk-button">Continue</button>
                         <a href="<%=locals.cancelLink%>" class="govuk-button govuk-button--secondary">Cancel</a>
                     </div>
                 </fieldset>
             </form>
         </div>
-    <% if (locals.isEditExisting) { %>
-        <div class="govuk-grid-column-one-quarter">
-            <aside id="related-actions" class="govuk-!-margin-top-0">
-                <h2 class="govuk-heading-m">Actions</h2>
-                <ul class="govuk-list">
-                    <li>
-                        <a class="govuk-link-bold" href="<%=locals.bannerId%>/delete-banner">Delete banner</a>
-                    </li>
-                </ul>
-            </aside>
-        </div>
-    <% } %>
     </div>
 </div>

@@ -1,15 +1,14 @@
 const { getPolicyById } = require("../../infrastructure/access");
-const { getServiceById } = require("../../infrastructure/applications");
+const { getUserServiceRoles } = require("./utils");
 
 const getConfirmCreatePolicyCondition = async (req, res) => {
-  // Get values out of session
-  // if (!req.session.createOrgData) {
-  //   return res.redirect('/organisations');
-  // }
+  if (!req.session.createPolicyConditionData) {
+    return res.redirect("conditionsAndRoles");
+  }
 
   const model = req.session.createPolicyConditionData;
-  const service = await getServiceById(req.params.sid, req.id);
   const policy = await getPolicyById(req.params.sid, req.params.pid, req.id);
+  const manageRolesForService = await getUserServiceRoles(req);
 
   return res.render("services/views/confirmCreatePolicyCondition", {
     csrfToken: req.csrfToken(),
@@ -17,9 +16,10 @@ const getConfirmCreatePolicyCondition = async (req, res) => {
     operator: model.operator,
     value: model.value,
     policy,
-    service,
-    backLink: `/services/${req.params.sid}/policies`,
+    cancelLink: `/services/${req.params.sid}/policies/${req.params.pid}/create-policy-condition`,
+    backLink: `/services/${req.params.sid}/policies/${req.params.pid}/create-policy-condition`,
     currentNavigation: "policies",
+    userRoles: manageRolesForService,
   });
 };
 

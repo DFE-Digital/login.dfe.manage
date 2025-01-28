@@ -1,19 +1,18 @@
 const { getPolicyById } = require("../../infrastructure/access");
-const { getServiceById } = require("../../infrastructure/applications");
+const { getUserServiceRoles } = require("./utils");
 
 const getCreatePolicyCondition = async (req, res) => {
-  const service = await getServiceById(req.params.sid, req.id);
   const policy = await getPolicyById(req.params.sid, req.params.pid, req.id);
+  const manageRolesForService = await getUserServiceRoles(req);
 
   return res.render("services/views/createPolicyCondition", {
     validationMessages: {},
     csrfToken: req.csrfToken(),
     policy,
-    service,
-    backLink: `/services/${req.params.sid}/policies`,
-    serviceId: req.params.sid,
-    policyId: policy.id,
+    cancelLink: `/services/${req.params.sid}/policies/${req.params.pid}/conditionsAndRoles`,
+    backLink: `/services/${req.params.sid}/policies/${req.params.pid}/conditionsAndRoles`,
     currentNavigation: "policies",
+    userRoles: manageRolesForService,
   });
 };
 

@@ -1,7 +1,7 @@
 const { getPolicyById } = require("../../infrastructure/access");
-const { getServiceById } = require("../../infrastructure/applications");
+const { getOrganisationById } = require("../../infrastructure/organisations");
+const { getUserServiceRoles } = require("./utils");
 const { validate: validateUUID } = require("uuid");
-//const logger = require("./infrastructure/logger");
 
 const validate = async (req, currentPolicyConditions) => {
   const model = {
@@ -29,6 +29,13 @@ const validate = async (req, currentPolicyConditions) => {
       if (!urnRegex.test(model.value)) {
         model.validationMessages.value =
           "organisation.urn can only be a 6 digit number";
+      }
+    }
+    if (model.condition === "organisation.ukprn") {
+      const ukprnRegex = /^\d{8}$/i;
+      if (!ukprnRegex.test(model.value)) {
+        model.validationMessages.value =
+          "organisation.ukprn can only be a 8 digit number";
       }
     }
     if (model.condition === "organisation.id") {
@@ -60,7 +67,11 @@ const validate = async (req, currentPolicyConditions) => {
     }
   }
 
-  // TODO Do exit function now if there's an error already?
+  // Ensure all 3 fields are populated and have sensible values before doing more
+  // thorough validation
+  if (Object.keys(model.validationMessages).length > 0) {
+    return model;
+  }
 
   for (const condition of currentPolicyConditions) {
     // Find if new value matches any existing values. If the result isn't empty, we have a match.
@@ -88,27 +99,31 @@ const validate = async (req, currentPolicyConditions) => {
     }
   }
 
-  // TODO? If condition is id then check that organisation exists
+  if (model.condition === "organisation.id") {
+    const organisation = await getOrganisationById(model.value);
+    console.log(organisation);
+    if (!organisation) {
+      model.validationMessages.value = "Organisation id does not exist";
+    }
+  }
 
   return model;
 };
 
 const postCreatePolicyCondition = async (req, res) => {
-  const service = await getServiceById(req.params.sid, req.id);
   const policy = await getPolicyById(req.params.sid, req.params.pid, req.id);
   const model = await validate(req, policy.conditions);
+  const manageRolesForService = await getUserServiceRoles(req);
 
   if (Object.keys(model.validationMessages).length > 0) {
-    // TODO back link broken
     return res.render("services/views/createPolicyCondition", {
       ...model,
       csrfToken: req.csrfToken(),
       policy,
-      service,
-      backLink: `/services/${req.params.sid}/policies`,
-      serviceId: req.params.sid,
-      policyId: policy.id,
+      cancelLink: `/services/${req.params.sid}/policies/${req.params.pid}/conditionsAndRoles`,
+      backLink: `/services/${req.params.sid}/policies/${req.params.pid}/conditionsAndRoles`,
       currentNavigation: "policies",
+      userRoles: manageRolesForService,
     });
   }
 
@@ -124,11 +139,10 @@ const postCreatePolicyCondition = async (req, res) => {
         ...model,
         csrfToken: req.csrfToken(),
         policy,
-        service,
-        backLink: `/services/${req.params.sid}/policies`,
-        serviceId: req.params.sid,
-        policyId: policy.id,
+        cancelLink: `/services/${req.params.sid}/policies/${req.params.pid}/conditionsAndRoles`,
+        backLink: `/services/${req.params.sid}/policies/${req.params.pid}/conditionsAndRoles`,
         currentNavigation: "policies",
+        userRoles: manageRolesForService,
       });
     }
     return res.redirect("confirm-create-policy-condition");

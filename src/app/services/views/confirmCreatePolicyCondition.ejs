@@ -7,45 +7,36 @@
             <p class="govuk-body">Review these details before confirming.</p>
 
             <dl class="govuk-summary-list">
-
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">
-                        Review summary
+                        Condition   
                     </dt>
-                    <dd class="app-check-your-answers__answer">
-                    </dd>
-                </div>
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">
-                        Condition
-                    </dt>
-                    <dd class="app-check-your-answers__answer">
-                        <%=locals.condition%>
+                    <dd class="govuk-summary-list__value">
+                        <p class="govuk-body"><%=locals.condition%></p>
                     </dd>
                 </div>
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">
                         Operation
                     </dt>
-                    <dd class="app-check-your-answers__answer">
-                        <%= locals.operation%> 
+                    <dd class="govuk-summary-list__value">
+                        <p class="govuk-body"><%= locals.operator%></p>
                     </dd>
                 </div>
-
-                <div class="app-check-your-answers__contents">
+                <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">
-                        Value
+                      Value
                     </dt>
-                    <dd class="app-check-your-answers__answer">
-                        <%=locals.value%>
+                    <dd class="govuk-summary-list__value">
+                      <p class="govuk-body"><%=locals.value%></p>
                     </dd>
-                </div>
+                  </div>
             </dl>
 
             <form method="post">
                 <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
                 <div class="govuk-button-group">
-                    <button type="submit" class="govuk-button" data-module="govuk-button">Edit service</button>
+                    <button type="submit" class="govuk-button" data-module="govuk-button">Save condition</button>
                     <a href="<%= locals.cancelLink %>" class="govuk-button govuk-button--secondary">Cancel</a>
                 </div>
             </form>
