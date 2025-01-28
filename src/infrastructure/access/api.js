@@ -121,7 +121,7 @@ const getPolicyById = async (sid, pid, correlationId) => {
 const updatePolicyById = async (sid, pid, policyBody, correlationId) => {
   return callApi(
     "PATCH",
-    `services/${sid}/policy/${pid}`,
+    `services/${sid}/policies/${pid}`,
     correlationId,
     policyBody,
   );

@@ -77,7 +77,8 @@ const validate = async (req, currentPolicyConditions) => {
       model.validationMessages.value = "Duplicate existing policy found";
     }
 
-    // If condition AND value match, but operator is different, then we have a contradiction (can't have is AND is_not)
+    // If condition AND value match, but operator is different, then we have a contradiction
+    // as we can't have is AND is_not for the same value
     if (
       model.condition === condition.field &&
       model.operator !== condition.operator &&
