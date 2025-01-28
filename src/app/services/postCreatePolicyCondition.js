@@ -101,7 +101,6 @@ const validate = async (req, currentPolicyConditions) => {
 
   if (model.condition === "organisation.id") {
     const organisation = await getOrganisationById(model.value);
-    console.log(organisation);
     if (!organisation) {
       model.validationMessages.value = "Organisation id does not exist";
     }
