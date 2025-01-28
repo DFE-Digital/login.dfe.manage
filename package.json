@@ -1,6 +1,6 @@
 {
   "name": "login.dfe.manage",
-  "version": "10.0.0",
+  "version": "11.0.0",
   "description": "",
   "engines": {
     "node": "18.17.0"
