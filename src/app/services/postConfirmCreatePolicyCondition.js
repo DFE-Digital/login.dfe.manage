@@ -7,23 +7,36 @@ const postConfirmCreatePolicyCondition = async (req, res) => {
   const model = req.session.createPolicyConditionData;
   const policy = await getPolicyById(req.params.sid, req.params.pid, req.id);
 
-  // push new condition to condition list (either new row if new, or modify existing if condition already exists)
+  const conditionAndOperatorInPolicy = policy.conditions.find(
+    (condition) =>
+      condition.field === model.condition &&
+      condition.operator === model.operator,
+  );
 
-  // if (conditionInPolicy) {
-  // TODO handle case if condition already exists
-  // } else {
-  // If condition isn't in policy, simply push new object to array
-  policy.conditions.push({
-    field: model.condition,
-    operator: model.operator,
-    value: [model.value],
-  });
-  // }
+  if (conditionAndOperatorInPolicy) {
+    // Add value to existing field if field and operator already present
+    for (const condition of policy.conditions) {
+      if (
+        condition.field === model.condition &&
+        condition.operator === model.operator
+      ) {
+        condition.value.push(model.value);
+      }
+    }
+  } else {
+    policy.conditions.push({
+      field: model.condition,
+      operator: model.operator,
+      value: [model.value],
+    });
+  }
 
-  // call function that calls services/id/policies/id api endpoint in access
   await updatePolicyById(req.params.sid, req.params.pid, policy, req.id);
   req.session.createPolicyConditionData = undefined;
-  // flash success banner
+  res.flash(
+    "info",
+    `Policy condition ${model.condition} ${model.operator} ${model.value} successfully added`,
+  );
 
   return res.redirect("conditionsAndRoles");
 };
