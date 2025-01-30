@@ -18,9 +18,11 @@
         <div class="govuk-grid-column-three-quarters">
             <%- include('policySummary'); %>
         </div>
-        <a class="govuk-link" href="create-policy-condition">
-            Create Policy Condition
-        </a>
+        <%  if (locals.canUserAddPolicyConditions) { %>
+            <a class="govuk-link" href="create-policy-condition">
+                Create Policy Condition
+            </a>
+        <% } %>
     </div>
     <div class="govuk-grid-row govuk-!-margin-top-6">
         <div class="govuk-grid-column-full">
@@ -29,7 +31,6 @@
                     Contents
                 </h2>
                 <ul class="govuk-tabs__list" role="tablist">
-
                         <li class="govuk-tabs__list-item govuk-tabs__list-item--selected" id="policy-conditions-tab">
                             <a class="govuk-tabs__tab" href="#policy-conditions-panel" role="tab">
                                 Conditions

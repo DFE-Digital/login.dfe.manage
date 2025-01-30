@@ -50,6 +50,20 @@ const hasRole = (role) => (req, res, next) => {
   return res.status(401).render("errors/views/notAuthorised");
 };
 
+/**
+ * Checks if user has a non-service specific role (e.g., a role with a code that
+ * isn't in the format of `<uuid>_<rolename>`)
+ * @param {string} [role] - Code of the role that is being checked
+ */
+const hasGenericRole = (role) => (req, res, next) => {
+  if (req.userServices && req.userServices.roles.length > 0) {
+    if (req.userServices.roles.find((x) => x.code === role)) {
+      return next();
+    }
+  }
+  return res.status(401).render("errors/views/notAuthorised");
+};
+
 const hasInvite = async (req, res, next) => {
   const service = await getServiceById(req.params.sid, req.id);
   if (
@@ -129,6 +143,7 @@ module.exports = {
   isManageUser,
   isManageUserForService,
   hasRole,
+  hasGenericRole,
   mapUserStatus,
   mapUserRole,
   hasInvite,

@@ -364,6 +364,13 @@ const getUserServiceRoles = async (req) => {
   return userRolesForService.map((x) => x.role);
 };
 
+const doesUserHaveRole = async (req, role) => {
+  if (req.userServices.roles.find((x) => x.code === role)) {
+    return true;
+  }
+  return false;
+};
+
 const unpackMultiSelect = (parameter) => {
   if (!parameter) {
     return [];
@@ -588,6 +595,7 @@ const getReturnUrl = (requestQuery, url) => {
 };
 
 module.exports = {
+  doesUserHaveRole,
   mapUserToSupportModel,
   getUserDetails,
   getUserDetailsById,

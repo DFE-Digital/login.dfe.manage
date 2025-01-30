@@ -5,6 +5,7 @@ const {
   isLoggedIn,
   isManageUserForService,
   hasRole,
+  hasGenericRole,
   hasInvite,
 } = require("../../infrastructure/utils");
 
@@ -462,7 +463,7 @@ const services = (csrf) => {
     "/:sid/policies/:pid/create-policy-condition",
     csrf,
     isManageUserForService,
-    hasRole("accessManage"),
+    hasGenericRole("manageAddPolicyCondition"),
     asyncWrapper(getCreatePolicyCondition),
   );
 
@@ -470,7 +471,7 @@ const services = (csrf) => {
     "/:sid/policies/:pid/create-policy-condition",
     csrf,
     isManageUserForService,
-    hasRole("accessManage"),
+    hasGenericRole("manageAddPolicyCondition"),
     asyncWrapper(postCreatePolicyCondition),
   );
 
@@ -478,7 +479,7 @@ const services = (csrf) => {
     "/:sid/policies/:pid/confirm-create-policy-condition",
     csrf,
     isManageUserForService,
-    hasRole("accessManage"),
+    hasGenericRole("manageAddPolicyCondition"),
     asyncWrapper(getConfirmCreatePolicyCondition),
   );
 
@@ -486,7 +487,7 @@ const services = (csrf) => {
     "/:sid/policies/:pid/confirm-create-policy-condition",
     csrf,
     isManageUserForService,
-    hasRole("accessManage"),
+    hasGenericRole("manageAddPolicyCondition"),
     asyncWrapper(postConfirmCreatePolicyCondition),
   );
 
