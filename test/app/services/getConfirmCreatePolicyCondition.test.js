@@ -36,7 +36,7 @@ const policy = {
   ],
 };
 
-describe("when getting the list of service banners page", () => {
+describe("when using the getConfirmCreatePolicyCondition function", () => {
   let req;
 
   beforeEach(() => {
@@ -72,7 +72,7 @@ describe("when getting the list of service banners page", () => {
     res.mockResetAll();
   });
 
-  it("then it should return the service banners view", async () => {
+  it("should return the confirmCreatePolicyCondition view", async () => {
     await getConfirmCreatePolicyCondition(req, res);
 
     expect(res.render.mock.calls.length).toBe(1);
@@ -81,7 +81,7 @@ describe("when getting the list of service banners page", () => {
     );
   });
 
-  it("then it should include csrf token in model", async () => {
+  it("should include csrf token in model", async () => {
     await getConfirmCreatePolicyCondition(req, res);
 
     expect(res.render.mock.calls[0][1]).toMatchObject({
@@ -89,7 +89,7 @@ describe("when getting the list of service banners page", () => {
     });
   });
 
-  it("then it should include the service banners list in the model", async () => {
+  it("should include the following in the model on success", async () => {
     await getConfirmCreatePolicyCondition(req, res);
 
     expect(res.render.mock.calls[0][1]).toMatchObject({

@@ -24,7 +24,7 @@ const getPolicyConditions = async (req, res) => {
   const service = await getServiceById(req.params.sid, req.id);
   const policy = await getPolicyById(req.params.sid, req.params.pid, req.id);
   const manageRolesForService = await getUserServiceRoles(req);
-  const canUserAddPolicyConditions = await doesUserHaveRole(
+  const canUserAddPolicyConditions = doesUserHaveRole(
     req,
     "manageAddPolicyCondition",
   );
@@ -47,7 +47,7 @@ const getPolicyConditions = async (req, res) => {
     backLink: `/services/${req.params.sid}/policies`,
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
-    canUserAddPolicyConditions: canUserAddPolicyConditions,
+    canUserAddPolicyConditions,
     currentNavigation: "policies",
   });
 };

@@ -40,6 +40,20 @@ const postConfirmCreatePolicyCondition = async (req, res) => {
   }
 
   await updatePolicyById(req.params.sid, req.params.pid, policy, req.id);
+
+  logger.audit(
+    `${req.user.email} (id: ${req.user.sub}) added a policy condition for service ${req.params.sid} and policy ${req.params.pid}`,
+    {
+      type: "manage",
+      subType: "policy-condition-added",
+      userId: req.user.sub,
+      userEmail: req.user.email,
+      field: model.condition,
+      operator: model.operator,
+      value: model.value,
+    },
+  );
+
   req.session.createPolicyConditionData = undefined;
   res.flash(
     "info",

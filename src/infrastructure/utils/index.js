@@ -56,10 +56,12 @@ const hasRole = (role) => (req, res, next) => {
  * @param {string} [role] - Code of the role that is being checked
  */
 const hasGenericRole = (role) => (req, res, next) => {
-  if (req.userServices && req.userServices.roles.length > 0) {
-    if (req.userServices.roles.find((x) => x.code === role)) {
-      return next();
-    }
+  if (
+    req.userServices &&
+    req.userServices.roles.length > 0 &&
+    req.userServices.roles.find((x) => x.code === role)
+  ) {
+    return next();
   }
   return res.status(401).render("errors/views/notAuthorised");
 };

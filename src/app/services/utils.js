@@ -364,11 +364,8 @@ const getUserServiceRoles = async (req) => {
   return userRolesForService.map((x) => x.role);
 };
 
-const doesUserHaveRole = async (req, role) => {
-  if (req.userServices.roles.find((x) => x.code === role)) {
-    return true;
-  }
-  return false;
+const doesUserHaveRole = (req, role) => {
+  return req.userServices.roles.find((x) => x.code === role) ? true : false;
 };
 
 const unpackMultiSelect = (parameter) => {

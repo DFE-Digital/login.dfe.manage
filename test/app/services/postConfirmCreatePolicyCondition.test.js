@@ -60,7 +60,7 @@ const requestBody = {
   },
 };
 
-describe("when getting the list of service banners page", () => {
+describe("when using the postConfirmCreatePolicyCondition function", () => {
   let req;
 
   beforeEach(() => {
