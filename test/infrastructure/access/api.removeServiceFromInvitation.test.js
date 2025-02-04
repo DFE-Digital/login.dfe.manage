@@ -38,7 +38,7 @@ describe("when calling the removeServiceFromInvitation function", () => {
     });
   });
 
-  it("then it should call associated-with-user resource with user id", async () => {
+  it("then it should call invitations resource with relevent ids", async () => {
     await removeServiceFromInvitation(
       invitationId,
       serviceId,

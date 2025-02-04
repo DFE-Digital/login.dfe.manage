@@ -39,7 +39,7 @@ describe("when running the getUsersByIdV2 function", () => {
     });
   });
 
-  it("then it should call associated-with-user resource with user id", async () => {
+  it("then it should call users resource with user id", async () => {
     await getUsersByIdV2(userIds, correlationId);
 
     expect(fetchApi.mock.calls).toHaveLength(1);

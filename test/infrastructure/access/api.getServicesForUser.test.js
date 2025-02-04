@@ -44,7 +44,7 @@ const apiResponse = {
   ],
 };
 
-describe("when getting a users organisations mapping from api", () => {
+describe("when calling the getServicesForUser function", () => {
   beforeEach(() => {
     fetchApi.mockReset();
     fetchApi.mockImplementation(() => {
@@ -59,7 +59,7 @@ describe("when getting a users organisations mapping from api", () => {
     });
   });
 
-  it("then it should call associated-with-user resource with user id", async () => {
+  it("then it should call services resource with user id", async () => {
     await getServicesForUser(userId, correlationId);
 
     expect(fetchApi.mock.calls).toHaveLength(1);

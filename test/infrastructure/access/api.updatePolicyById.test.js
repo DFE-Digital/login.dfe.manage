@@ -60,7 +60,7 @@ describe("when calling the updatePolicyById function", () => {
     });
   });
 
-  it("then it should call associated-with-user resource with user id", async () => {
+  it("then it should call servies and policies resource with relevant ids", async () => {
     await updatePolicyById(serviceId, policyId, policy, correlationId);
 
     expect(fetchApi.mock.calls).toHaveLength(1);

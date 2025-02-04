@@ -39,7 +39,7 @@ describe("when running the resendInvitation function", () => {
     });
   });
 
-  it("then it should call associated-with-user resource with user id", async () => {
+  it("should call invitation resend resource with invitation id", async () => {
     await resendInvitation(invitationId, correlationId);
 
     expect(fetchApi.mock.calls).toHaveLength(1);
@@ -51,7 +51,7 @@ describe("when running the resendInvitation function", () => {
     });
   });
 
-  it("then it should use the token from jwt strategy as bearer token", async () => {
+  it("should use the token from jwt strategy as bearer token", async () => {
     await resendInvitation(invitationId, correlationId);
 
     expect(fetchApi.mock.calls[0][1]).toMatchObject({
@@ -61,7 +61,7 @@ describe("when running the resendInvitation function", () => {
     });
   });
 
-  it("then it should include the correlation id", async () => {
+  it("should include the correlation id", async () => {
     await resendInvitation(invitationId, correlationId);
 
     expect(fetchApi.mock.calls[0][1]).toMatchObject({

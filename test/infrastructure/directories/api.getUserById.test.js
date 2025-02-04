@@ -22,7 +22,7 @@ const apiResponse = {
   email: "test@example.com",
 };
 
-describe("when getting a users organisations mapping from api", () => {
+describe("when calling the getUserById function", () => {
   beforeEach(() => {
     fetchApi.mockReset();
     fetchApi.mockImplementation(() => {
@@ -37,7 +37,7 @@ describe("when getting a users organisations mapping from api", () => {
     });
   });
 
-  it("then it should call associated-with-user resource with user id", async () => {
+  it("should call user resource with user id", async () => {
     await getUserById(userId, correlationId);
 
     expect(fetchApi.mock.calls).toHaveLength(1);
@@ -49,7 +49,7 @@ describe("when getting a users organisations mapping from api", () => {
     });
   });
 
-  it("then it should use the token from jwt strategy as bearer token", async () => {
+  it("should use the token from jwt strategy as bearer token", async () => {
     await getUserById(userId, correlationId);
 
     expect(fetchApi.mock.calls[0][1]).toMatchObject({
@@ -59,7 +59,7 @@ describe("when getting a users organisations mapping from api", () => {
     });
   });
 
-  it("then it should include the correlation id", async () => {
+  it("should include the correlation id", async () => {
     await getUserById(userId, correlationId);
 
     expect(fetchApi.mock.calls[0][1]).toMatchObject({
