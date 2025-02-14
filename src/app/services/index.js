@@ -5,6 +5,7 @@ const {
   isLoggedIn,
   isManageUserForService,
   hasRole,
+  hasGenericRole,
   hasInvite,
 } = require("../../infrastructure/utils");
 
@@ -71,6 +72,10 @@ const {
   post: postListPolicies,
 } = require("./listPolicies");
 const getPolicyConditions = require("./getPolicyConditionsAndRoles");
+const getCreatePolicyCondition = require("./getCreatePolicyCondition");
+const postCreatePolicyCondition = require("./postCreatePolicyCondition");
+const getConfirmCreatePolicyCondition = require("./getConfirmCreatePolicyCondition");
+const postConfirmCreatePolicyCondition = require("./postConfirmCreatePolicyCondition");
 
 const {
   get: getAssociateRoles,
@@ -452,6 +457,38 @@ const services = (csrf) => {
     isManageUserForService,
     hasRole("accessManage"),
     asyncWrapper(getPolicyConditions),
+  );
+
+  router.get(
+    "/:sid/policies/:pid/create-policy-condition",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("manageAddPolicyCondition"),
+    asyncWrapper(getCreatePolicyCondition),
+  );
+
+  router.post(
+    "/:sid/policies/:pid/create-policy-condition",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("manageAddPolicyCondition"),
+    asyncWrapper(postCreatePolicyCondition),
+  );
+
+  router.get(
+    "/:sid/policies/:pid/confirm-create-policy-condition",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("manageAddPolicyCondition"),
+    asyncWrapper(getConfirmCreatePolicyCondition),
+  );
+
+  router.post(
+    "/:sid/policies/:pid/confirm-create-policy-condition",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("manageAddPolicyCondition"),
+    asyncWrapper(postConfirmCreatePolicyCondition),
   );
 
   return router;

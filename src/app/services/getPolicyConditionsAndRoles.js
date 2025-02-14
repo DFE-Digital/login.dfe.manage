@@ -1,6 +1,7 @@
 const { getPolicyById } = require("../../infrastructure/access");
 const { getServiceById } = require("../../infrastructure/applications");
 const {
+  doesUserHaveRole,
   getFriendlyFieldName,
   getFriendlyValues,
   getUserServiceRoles,
@@ -23,6 +24,10 @@ const getPolicyConditions = async (req, res) => {
   const service = await getServiceById(req.params.sid, req.id);
   const policy = await getPolicyById(req.params.sid, req.params.pid, req.id);
   const manageRolesForService = await getUserServiceRoles(req);
+  const canUserAddPolicyConditions = doesUserHaveRole(
+    req,
+    "manageAddPolicyCondition",
+  );
   await mapPolicyConstraints(policy, req.id);
 
   policy.roles.sort((a, b) => a.name.localeCompare(b.name));
@@ -42,6 +47,7 @@ const getPolicyConditions = async (req, res) => {
     backLink: `/services/${req.params.sid}/policies`,
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
+    canUserAddPolicyConditions,
     currentNavigation: "policies",
   });
 };
