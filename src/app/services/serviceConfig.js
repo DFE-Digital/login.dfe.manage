@@ -518,7 +518,7 @@ const validate = async (req, currentService, oldService) => {
         model.validationMessages.clientSecret =
           ERROR_MESSAGES.INVALID_CLIENT_SECRET;
       }
-    } catch (e) {
+    } catch {
       model.validationMessages.clientSecret =
         ERROR_MESSAGES.INVALID_CLIENT_SECRET;
     }
@@ -535,7 +535,7 @@ const validate = async (req, currentService, oldService) => {
       if (validateApiSecret.length !== 8) {
         model.validationMessages.apiSecret = ERROR_MESSAGES.INVALID_API_SECRET;
       }
-    } catch (e) {
+    } catch {
       model.validationMessages.apiSecret = ERROR_MESSAGES.INVALID_API_SECRET;
     }
   }
