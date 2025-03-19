@@ -231,9 +231,9 @@
                         <td class="govuk-table__cell govuk-!-font-size-<%= showFilters ? '14 govuk-!-padding-right-2' : '16' %>"><%= organisations[i].upin %></td>
                         <td class="govuk-table__cell govuk-!-font-size-<%= showFilters ? '14 govuk-!-padding-right-2' : '16' %>"><%= organisations[i].ukprn %></td>
                         <td class="govuk-table__cell govuk-!-font-size-<%= showFilters ? '14 govuk-!-padding-right-0' : '16' %> govuk-table__cell--numeric">
-                            <span class="govuk-label govuk-tag govuk-tag--<%= organisations[i].status.tagColor %>">
+                            <strong class="govuk-tag govuk-tag--<%= organisations[i].status.tagColor %>">
                                 <%= organisations[i].status!==undefined ? organisations[i].status.name : '' %>
-                            </span>
+                            </strong>
                         </td>
                     </tr>
                 <% } %>

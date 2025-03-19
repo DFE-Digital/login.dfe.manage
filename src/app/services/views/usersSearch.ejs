@@ -255,7 +255,7 @@
                                 <%= numberOfOrgs ? users[i].organisations[0].roleName : '' %>
                             </td>
                             <td class="govuk-table__cell govuk-!-font-size-16"<% if (numberOfOrgs > 1) { %> rowspan="<%= numberOfOrgs %>"<% } %>>
-                               <span class="govuk-label govuk-tag govuk-tag--<%= users[i].status.tagColor %>"> <%= users[i].status.description %> </span> 
+                               <strong class="govuk-tag govuk-tag--<%= users[i].status.tagColor %>"> <%= users[i].status.description %> </strong> 
                             </td>
                             <td class="govuk-table__cell govuk-!-font-size-16 govuk-table__cell--numeric"<% if (numberOfOrgs > 1) { %> rowspan="<%= numberOfOrgs %>"<% } %>>
                                 <%= users[i].formattedLastLogin ? users[i].formattedLastLogin : 'Never' %>
