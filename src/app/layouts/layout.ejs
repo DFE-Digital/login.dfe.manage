@@ -5,6 +5,8 @@
         <meta http-equiv="x-ua-compatible" content="ie=edge" />
         <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <!-- <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+        <meta name="theme-color" content="#0b0c0c"> -->
 
         <title>
             <%= (locals.validationMessages && Object.keys(locals.validationMessages).length !== 0) ? `Error: ` : '' %>
@@ -15,32 +17,16 @@
             rel="stylesheet"
             href="<%= locals.urls.assets %>/gds-upgrade/css/screen.css?version=<%= locals.assets.version %>" />
 
-        <link
-            rel="shortcut icon"
-            href="<%= locals.urls.assets %>/gds-upgrade/images/favicon.ico"
-            type="image/x-icon" />
-
-        <link
-            rel="apple-touch-icon"
-            sizes="180x180"
-            href="<%= locals.urls.assets %>/gds-upgrade/images/apple-icon-180x180.png" />
-        <link
-            rel="apple-touch-icon"
-            sizes="167x167"
-            href="<%= locals.urls.assets %>/gds-upgrade/images/apple-icon-167x167.png" />
-        <link
-            rel="apple-touch-icon"
-            sizes="152x152"
-            href="<%= locals.urls.assets %>/gds-upgrade/images/apple-icon-152x152.png" />
-        <link
-            rel="apple-touch-icon"
-            href="<%= locals.urls.assets %>/gds-upgrade/images/apple-icon.png" />
+        <link link rel="icon" sizes="48x48" href="<%= locals.urls.assets %>/gds-upgrade/images/favicon.ico"/>
+        <link rel="icon" sizes="any" href="<%= locals.urls.assets %>/gds-upgrade/images/favicon.svg" type="image/svg+xml">
+        <link rel="mask-icon" href="<%= locals.urls.assets %>/gds-upgrade/images/govuk-icon-mask.svg" color="#0b0c0c">
+        <link rel="apple-touch-icon" href="<%= locals.urls.assets %>/gds-upgrade/images/govuk-icon-180.png">
+        <link rel="manifest" href="<%= locals.urls.assets %>/gds-upgrade/manifest.json">
+    
         
         <script type="text/javascript" src="<%=locals.urls.assets%>/gds-upgrade/javascript/vendors/jquery.min.js?version=<%=locals.assets.version%>"></script>
 
-        <meta
-            property="og:image"
-            content="<%= locals.urls.assets %>/gds-upgrade/images/opengraph-image.png" />
+        <meta property="og:image" content="<%= locals.urls.assets %>/gds-upgrade/images/govuk-opengraph-image.png">
     </head>
 
     <body class="govuk-template__body">
