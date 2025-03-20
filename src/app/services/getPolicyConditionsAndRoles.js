@@ -11,12 +11,12 @@ const { forEachAsync } = require("../../utils/asyncHelpers");
 const mapPolicyConstraints = async (policy, correlationId) => {
   await forEachAsync(policy.conditions, async (condition) => {
     const currentCondition = condition;
-    currentCondition.value = await getFriendlyValues(
+    currentCondition.friendlyValue = await getFriendlyValues(
       condition.field,
       condition.value,
       correlationId,
     );
-    currentCondition.field = getFriendlyFieldName(condition.field);
+    currentCondition.friendlyField = getFriendlyFieldName(condition.field);
   });
 };
 
@@ -29,6 +29,7 @@ const getPolicyConditions = async (req, res) => {
     "manageAddPolicyCondition",
   );
   await mapPolicyConstraints(policy, req.id);
+  console.log(policy.conditions);
 
   policy.roles.sort((a, b) => a.name.localeCompare(b.name));
   policy.conditions.sort((a, b) => a.field.localeCompare(b.field));

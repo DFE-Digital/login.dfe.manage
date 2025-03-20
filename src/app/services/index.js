@@ -76,6 +76,8 @@ const getCreatePolicyCondition = require("./getCreatePolicyCondition");
 const postCreatePolicyCondition = require("./postCreatePolicyCondition");
 const getConfirmCreatePolicyCondition = require("./getConfirmCreatePolicyCondition");
 const postConfirmCreatePolicyCondition = require("./postConfirmCreatePolicyCondition");
+const getConfirmRemovePolicyCondition = require("./getConfirmRemovePolicyCondition");
+const postConfirmRemovePolicyCondition = require("./postConfirmRemovePolicyCondition");
 
 const {
   get: getAssociateRoles,
@@ -489,6 +491,22 @@ const services = (csrf) => {
     isManageUserForService,
     hasGenericRole("manageAddPolicyCondition"),
     asyncWrapper(postConfirmCreatePolicyCondition),
+  );
+
+  router.get(
+    "/:sid/policies/:pid/confirm-remove-policy-condition",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("manageAddPolicyCondition"),
+    asyncWrapper(getConfirmRemovePolicyCondition),
+  );
+
+  router.post(
+    "/:sid/policies/:pid/confirm-remove-policy-condition",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("manageAddPolicyCondition"),
+    asyncWrapper(postConfirmRemovePolicyCondition),
   );
 
   return router;
