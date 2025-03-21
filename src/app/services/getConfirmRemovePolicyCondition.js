@@ -11,7 +11,6 @@ const getConfirmRemovePolicyCondition = async (req, res) => {
   // }
 
   const policy = await getPolicyById(req.params.sid, req.params.pid, req.id);
-  console.log(policy.conditions);
   const manageRolesForService = await getUserServiceRoles(req);
 
   return res.render("services/views/confirmRemovePolicyCondition", {

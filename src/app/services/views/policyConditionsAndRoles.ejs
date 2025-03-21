@@ -49,12 +49,9 @@
                     <table class="govuk-table cell-align-top">
                         <thead class="govuk-table__head">
                             <tr class="govuk-table__row sortable">
-                                <th scope="col" class="govuk-table__header width-20">Condition</th>
+                                <th scope="col" class="govuk-table__header width-40">Condition</th>
                                 <th scope="col" class="govuk-table__header width-20">Operator</th>
                                 <th scope="col" class="govuk-table__header width-40 govuk-table__header--numeric">Value</th>
-                                <%  if (locals.canUserAddPolicyConditions) { %>
-                                <th scope="col" class="govuk-table__header width-20"> </th>
-                                <% } %>
                             </tr>
                         </thead>
                         <tbody class="govuk-table__body">
@@ -73,10 +70,12 @@
                                 <td class="govuk-table__cell"><%= condition.friendlyField %></td>
                                 <td class="govuk-table__cell"><%= condition.operator %></td>
                             <% if (condition.value.length === 1) { %>
-                                <td class="govuk-table__cell govuk-table__cell--numeric"><%= condition.friendlyValue[0] %></td>
-                                <%  if (locals.canUserAddPolicyConditions) { %>
-                                <td class="govuk-table__cell"><a href="confirm-remove-policy-condition?condition=<%= condition.field %>&operator=<%= condition.operator %>&value=<%= condition.value %>">Remove</a></td>
-                                <% } %>
+                                <td class="govuk-table__cell govuk-table__cell--numeric">
+                                    <%= condition.friendlyValue[0] %>
+                                    <%  if (locals.canUserAddPolicyConditions) { %>
+                                    <a href="confirm-remove-policy-condition?condition=<%= condition.field %>&operator=<%= condition.operator %>&value=<%= condition.value %>">Remove</a>
+                                    <% } %>
+                                </td>
                             <% } else { %>
                                 <td class="govuk-table__cell govuk-table__cell--numeric">
                                     <details class="govuk-details" data-module="govuk-details">

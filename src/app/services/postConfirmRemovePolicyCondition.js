@@ -5,38 +5,36 @@ const {
 const logger = require("../../infrastructure/logger");
 
 const postConfirmRemovePolicyCondition = async (req, res) => {
-  const model = req.session.createPolicyConditionData;
+  const condition = req.body.condition;
+  const operator = req.body.operator;
+  const value = req.body.value;
+
   const policy = await getPolicyById(req.params.sid, req.params.pid, req.id);
-  const conditionAndOperatorInPolicy = policy.conditions.find(
-    (condition) =>
-      condition.field === model.condition &&
-      condition.operator === model.operator,
+  const conditionOperatorAndValueInPolicy = policy.conditions.find(
+    (policyCondition) =>
+      policyCondition.field === condition &&
+      policyCondition.operator === operator &&
+      policyCondition.value.includes(value),
   );
 
-  if (conditionAndOperatorInPolicy) {
-    // Add value to existing field if field and operator already present
-    for (const condition of policy.conditions) {
-      if (
-        condition.field === model.condition &&
-        condition.operator === model.operator
-      ) {
-        logger.info(
-          `[${model.condition}] and [${model.operator}] found in policy, pushing value into existing condition`,
-          { correlationId: req.id },
-        );
-        condition.value.push(model.value);
-      }
+  if (conditionOperatorAndValueInPolicy) {
+    if (conditionOperatorAndValueInPolicy.value.length === 1) {
+      // If only 1 value for condition, remove the whole condition from the policy
+      const conditionIndex = policy.conditions.indexOf(
+        conditionOperatorAndValueInPolicy,
+      );
+      policy.conditions.splice(conditionIndex, 1);
+    } else {
+      // If more than 1 value for condition, remove just that value from the array for that condition
+      const index = conditionOperatorAndValueInPolicy.value.indexOf(value);
+      conditionOperatorAndValueInPolicy.value.splice(index, 1);
     }
   } else {
+    // Very unlikely to ever get to this.  If someone tampered with the hidden values then it's possible.
     logger.info(
-      `[${model.condition}] and [${model.operator}] not found in policy, pushing new record to array`,
+      `[${condition}] and [${operator}] and [${value}] not found in existing policy`,
       { correlationId: req.id },
     );
-    policy.conditions.push({
-      field: model.condition,
-      operator: model.operator,
-      value: [model.value],
-    });
   }
 
   await updatePolicyById(req.params.sid, req.params.pid, policy, req.id);
@@ -48,15 +46,15 @@ const postConfirmRemovePolicyCondition = async (req, res) => {
       subType: "policy-condition-removed",
       userId: req.user.sub,
       userEmail: req.user.email,
-      field: model.condition,
-      operator: model.operator,
-      value: model.value,
+      field: condition,
+      operator: operator,
+      value: value,
     },
   );
 
   res.flash(
     "info",
-    `Policy condition ${model.condition} ${model.operator} ${model.value} successfully removed`,
+    `Policy condition ${condition} ${operator} ${value} successfully removed`,
   );
 
   return res.redirect("conditionsAndRoles");
