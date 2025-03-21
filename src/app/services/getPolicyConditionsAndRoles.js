@@ -28,9 +28,9 @@ const getPolicyConditions = async (req, res) => {
     req,
     "manageAddPolicyCondition",
   );
-  await mapPolicyConstraints(policy, req.id);
-  console.log(policy.conditions);
 
+  // Need to sort before mapping, otherwise the friendly names
+  // and statuses won't line up
   policy.roles.sort((a, b) => a.name.localeCompare(b.name));
   policy.conditions.sort((a, b) => a.field.localeCompare(b.field));
   policy.conditions.forEach((conditionType) => {
@@ -40,6 +40,7 @@ const getPolicyConditions = async (req, res) => {
       a.localeCompare(b, undefined, { numeric: isNumeric }),
     );
   });
+  await mapPolicyConstraints(policy, req.id);
 
   return res.render("services/views/policyConditionsAndRoles", {
     csrfToken: req.csrfToken(),
