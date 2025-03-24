@@ -1,6 +1,5 @@
 const { getPolicyById } = require("../../infrastructure/access");
 const {
-  doesUserHaveRole,
   getUserServiceRoles,
   getFriendlyFieldName,
   getFriendlyValues,
@@ -12,14 +11,6 @@ const getConfirmRemovePolicyCondition = async (req, res) => {
   const value = req.query.value;
   const correlationId = req.id;
   const manageRolesForService = await getUserServiceRoles(req);
-  const canUserAddPolicyConditions = doesUserHaveRole(
-    req,
-    "manageAddPolicyCondition",
-  );
-
-  if (!canUserAddPolicyConditions) {
-    return res.redirect("conditionsAndRoles");
-  }
 
   const policy = await getPolicyById(
     req.params.sid,

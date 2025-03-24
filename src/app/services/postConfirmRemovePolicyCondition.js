@@ -2,21 +2,12 @@ const {
   getPolicyById,
   updatePolicyById,
 } = require("../../infrastructure/access");
-const { doesUserHaveRole } = require("./utils");
 const logger = require("../../infrastructure/logger");
 
 const postConfirmRemovePolicyCondition = async (req, res) => {
   const condition = req.body.condition;
   const operator = req.body.operator;
   const value = req.body.value;
-  const canUserAddPolicyConditions = doesUserHaveRole(
-    req,
-    "manageAddPolicyCondition",
-  );
-
-  if (!canUserAddPolicyConditions) {
-    return res.redirect("conditionsAndRoles");
-  }
 
   const policy = await getPolicyById(req.params.sid, req.params.pid, req.id);
   const conditionOperatorAndValueInPolicy = policy.conditions.find(

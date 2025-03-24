@@ -59,13 +59,6 @@ describe("when using the getConfirmRemovePolicyCondition function", () => {
             numericId: "23413",
             status: { id: 1 },
           },
-          {
-            id: "E6B7C861-7D76-4D75-BA23-26E4A89B9E4E",
-            name: "Manage - Add policy condition",
-            code: "manageAddPolicyCondition",
-            numericId: "23413",
-            status: { id: 1 },
-          },
         ],
       },
       session: {
@@ -82,22 +75,6 @@ describe("when using the getConfirmRemovePolicyCondition function", () => {
     getPolicyById.mockReturnValue(policy);
 
     res.mockResetAll();
-  });
-
-  it("should redirect if the user doesn't have the correct permissions", async () => {
-    req.userServices.roles = [
-      {
-        id: "E6B7C861-7D76-4D75-BA23-26E4A89B9E4E",
-        name: "Test service - Service Configuration",
-        code: "service-1_serviceconfig",
-        numericId: "23413",
-        status: { id: 1 },
-      },
-    ];
-    await getConfirmRemovePolicyCondition(req, res);
-
-    expect(res.redirect.mock.calls.length).toBe(1);
-    expect(res.redirect.mock.calls[0][0]).toBe("conditionsAndRoles");
   });
 
   it("should return the confirmRemovePolicyCondition view", async () => {
@@ -133,30 +110,5 @@ describe("when using the getConfirmRemovePolicyCondition function", () => {
       policy: policy,
       userRoles: ["serviceconfig"],
     });
-  });
-
-  it("should redirect if the session missing createPolicyConditionData", async () => {
-    req = getRequestMock({
-      params: {
-        sid: "service-1",
-        pid: "policy-1",
-      },
-      userServices: {
-        roles: [
-          {
-            id: "E6B7C861-7D76-4D75-BA23-26E4A89B9E4E",
-            name: "Test service - Service Configuration",
-            code: "service-1_serviceconfig",
-            numericId: "23413",
-            status: { id: 1 },
-          },
-        ],
-      },
-      session: {},
-    });
-    await getConfirmRemovePolicyCondition(req, res);
-
-    expect(res.redirect.mock.calls.length).toBe(1);
-    expect(res.redirect.mock.calls[0][0]).toBe("conditionsAndRoles");
   });
 });

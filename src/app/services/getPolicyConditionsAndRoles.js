@@ -24,9 +24,9 @@ const getPolicyConditions = async (req, res) => {
   const service = await getServiceById(req.params.sid, req.id);
   const policy = await getPolicyById(req.params.sid, req.params.pid, req.id);
   const manageRolesForService = await getUserServiceRoles(req);
-  const canUserAddPolicyConditions = doesUserHaveRole(
+  const canUserModifyPolicyConditions = doesUserHaveRole(
     req,
-    "manageAddPolicyCondition",
+    "manageModifyPolicyCondition",
   );
 
   // Need to sort before mapping, otherwise the friendly names
@@ -49,7 +49,7 @@ const getPolicyConditions = async (req, res) => {
     backLink: `/services/${req.params.sid}/policies`,
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
-    canUserAddPolicyConditions,
+    canUserModifyPolicyConditions,
     currentNavigation: "policies",
   });
 };

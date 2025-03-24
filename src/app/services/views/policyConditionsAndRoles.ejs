@@ -18,7 +18,7 @@
         <div class="govuk-grid-column-three-quarters">
             <%- include('policySummary'); %>
         </div>
-        <%  if (locals.canUserAddPolicyConditions) { %>
+        <%  if (locals.canUserModifyPolicyConditions) { %>
             <a class="govuk-link" href="create-policy-condition">
                 Create Policy Condition
             </a>
@@ -72,7 +72,7 @@
                             <% if (condition.value.length === 1) { %>
                                 <td class="govuk-table__cell govuk-table__cell--numeric">
                                     <%= condition.friendlyValue[0] %>
-                                    <%  if (locals.canUserAddPolicyConditions) { %>
+                                    <%  if (locals.canUserModifyPolicyConditions) { %>
                                     <a href="confirm-remove-policy-condition?condition=<%= condition.field %>&operator=<%= condition.operator %>&value=<%= condition.value %>">Remove</a>
                                     <% } %>
                                 </td>

@@ -54,13 +54,6 @@ const requestBody = {
         numericId: "23413",
         status: { id: 1 },
       },
-      {
-        id: "E6B7C861-7D76-4D75-BA23-26E4A89B9E4E",
-        name: "Manage - Add policy condition",
-        code: "manageAddPolicyCondition",
-        numericId: "23413",
-        status: { id: 1 },
-      },
     ],
   },
 };
