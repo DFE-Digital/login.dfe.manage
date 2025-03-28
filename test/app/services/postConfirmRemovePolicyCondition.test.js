@@ -121,12 +121,12 @@ describe("when using the postConfirmRemovePolicyCondition function", () => {
     testReq.body.value = "10000";
     await postConfirmRemovePolicyCondition(testReq, res);
 
-    expect(updatePolicyById.mock.calls[0][2].conditions.length).toBe(3);
-    const testCondition = updatePolicyById.mock.calls[0][2].conditions.find(
-      (condition) => condition.field === "organisation.type.id",
+    expect(updatePolicyById.mock.calls.length).toBe(0);
+    expect(res.flash.mock.calls).toHaveLength(1);
+    expect(res.flash).toHaveBeenCalledWith(
+      "info",
+      "Policy condition organisation.status.id is 10000 not found in policy. Policy has not been modified",
     );
-    // Should remain untouched if value doesn't match an existing value
-    expect(testCondition.value).toStrictEqual(["57"]);
     expect(res.redirect.mock.calls.length).toBe(1);
     expect(res.redirect.mock.calls[0][0]).toBe("conditionsAndRoles");
   });

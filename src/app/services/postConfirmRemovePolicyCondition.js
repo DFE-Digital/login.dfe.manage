@@ -35,6 +35,11 @@ const postConfirmRemovePolicyCondition = async (req, res) => {
       `[${condition}] and [${operator}] and [${value}] not found in existing policy`,
       { correlationId: req.id },
     );
+    res.flash(
+      "info",
+      `Policy condition ${condition} ${operator} ${value} not found in policy. Policy has not been modified`,
+    );
+    return res.redirect("conditionsAndRoles");
   }
 
   await updatePolicyById(req.params.sid, req.params.pid, policy, req.id);
