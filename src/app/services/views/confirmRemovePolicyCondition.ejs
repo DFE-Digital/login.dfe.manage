@@ -1,0 +1,53 @@
+<div class="govuk-width-container govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <span class="govuk-caption-l"><%= policy.name %></span>
+            <h1 class="govuk-heading-l text-break">
+                Are you sure you want to remove this policy?
+            </h1>
+            <p class="govuk-body">Review these details before confirming.</p>
+            <p class="govuk-body">Removing this policy condition will stop additional users covered by it from accessing the associated role(s),
+                but will not remove user current user access to them, this must be done through the support or manage console.</p>
+
+            <dl class="govuk-summary-list">
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Condition   
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        <p class="govuk-body"><%=locals.friendlyField%></p>
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Operator
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        <p class="govuk-body"><%= locals.operator%></p>
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                      Value
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                      <p class="govuk-body"><%=locals.friendlyValue%></p>
+                    </dd>
+                  </div>
+            </dl>
+
+            <form method="post">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
+                <input type="hidden" name="condition" value="<%= locals.condition %>"/>
+                <input type="hidden" name="operator" value="<%= locals.operator %>"/>
+                <input type="hidden" name="value" value="<%= locals.value %>"/>
+
+                <div class="govuk-button-group">
+                    <button type="submit" class="govuk-button govuk-button--warning" data-module="govuk-button">Yes, remove this policy</button>
+                    <a href="<%= locals.cancelLink %>" class="govuk-button govuk-button--secondary">Cancel</a>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>

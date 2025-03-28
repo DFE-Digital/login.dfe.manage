@@ -76,6 +76,8 @@ const getCreatePolicyCondition = require("./getCreatePolicyCondition");
 const postCreatePolicyCondition = require("./postCreatePolicyCondition");
 const getConfirmCreatePolicyCondition = require("./getConfirmCreatePolicyCondition");
 const postConfirmCreatePolicyCondition = require("./postConfirmCreatePolicyCondition");
+const getConfirmRemovePolicyCondition = require("./getConfirmRemovePolicyCondition");
+const postConfirmRemovePolicyCondition = require("./postConfirmRemovePolicyCondition");
 
 const {
   get: getAssociateRoles,
@@ -463,7 +465,7 @@ const services = (csrf) => {
     "/:sid/policies/:pid/create-policy-condition",
     csrf,
     isManageUserForService,
-    hasGenericRole("manageAddPolicyCondition"),
+    hasGenericRole("manageModifyPolicyCondition"),
     asyncWrapper(getCreatePolicyCondition),
   );
 
@@ -471,7 +473,7 @@ const services = (csrf) => {
     "/:sid/policies/:pid/create-policy-condition",
     csrf,
     isManageUserForService,
-    hasGenericRole("manageAddPolicyCondition"),
+    hasGenericRole("manageModifyPolicyCondition"),
     asyncWrapper(postCreatePolicyCondition),
   );
 
@@ -479,7 +481,7 @@ const services = (csrf) => {
     "/:sid/policies/:pid/confirm-create-policy-condition",
     csrf,
     isManageUserForService,
-    hasGenericRole("manageAddPolicyCondition"),
+    hasGenericRole("manageModifyPolicyCondition"),
     asyncWrapper(getConfirmCreatePolicyCondition),
   );
 
@@ -487,8 +489,24 @@ const services = (csrf) => {
     "/:sid/policies/:pid/confirm-create-policy-condition",
     csrf,
     isManageUserForService,
-    hasGenericRole("manageAddPolicyCondition"),
+    hasGenericRole("manageModifyPolicyCondition"),
     asyncWrapper(postConfirmCreatePolicyCondition),
+  );
+
+  router.get(
+    "/:sid/policies/:pid/confirm-remove-policy-condition",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("manageModifyPolicyCondition"),
+    asyncWrapper(getConfirmRemovePolicyCondition),
+  );
+
+  router.post(
+    "/:sid/policies/:pid/confirm-remove-policy-condition",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("manageModifyPolicyCondition"),
+    asyncWrapper(postConfirmRemovePolicyCondition),
   );
 
   return router;

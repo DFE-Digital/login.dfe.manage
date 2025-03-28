@@ -11,12 +11,12 @@ const { forEachAsync } = require("../../utils/asyncHelpers");
 const mapPolicyConstraints = async (policy, correlationId) => {
   await forEachAsync(policy.conditions, async (condition) => {
     const currentCondition = condition;
-    currentCondition.value = await getFriendlyValues(
+    currentCondition.friendlyValue = await getFriendlyValues(
       condition.field,
       condition.value,
       correlationId,
     );
-    currentCondition.field = getFriendlyFieldName(condition.field);
+    currentCondition.friendlyField = getFriendlyFieldName(condition.field);
   });
 };
 
@@ -24,12 +24,13 @@ const getPolicyConditions = async (req, res) => {
   const service = await getServiceById(req.params.sid, req.id);
   const policy = await getPolicyById(req.params.sid, req.params.pid, req.id);
   const manageRolesForService = await getUserServiceRoles(req);
-  const canUserAddPolicyConditions = doesUserHaveRole(
+  const canUserModifyPolicyConditions = doesUserHaveRole(
     req,
-    "manageAddPolicyCondition",
+    "manageModifyPolicyCondition",
   );
-  await mapPolicyConstraints(policy, req.id);
 
+  // Need to sort before mapping, otherwise the friendly names
+  // and statuses won't line up
   policy.roles.sort((a, b) => a.name.localeCompare(b.name));
   policy.conditions.sort((a, b) => a.field.localeCompare(b.field));
   policy.conditions.forEach((conditionType) => {
@@ -39,6 +40,7 @@ const getPolicyConditions = async (req, res) => {
       a.localeCompare(b, undefined, { numeric: isNumeric }),
     );
   });
+  await mapPolicyConstraints(policy, req.id);
 
   return res.render("services/views/policyConditionsAndRoles", {
     csrfToken: req.csrfToken(),
@@ -47,7 +49,7 @@ const getPolicyConditions = async (req, res) => {
     backLink: `/services/${req.params.sid}/policies`,
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
-    canUserAddPolicyConditions,
+    canUserModifyPolicyConditions,
     currentNavigation: "policies",
   });
 };

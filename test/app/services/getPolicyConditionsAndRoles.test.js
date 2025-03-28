@@ -97,7 +97,7 @@ describe("When displaying the selected policy's conditions and roles", () => {
     expect(getPolicyById.mock.calls[0][2]).toBe("correlationId");
   });
 
-  it("then it should include the mapped policy ", async () => {
+  it("then it should include the mapped policy", async () => {
     await getPolicyConditions(req, res);
 
     expect(res.render.mock.calls[0][1]).toMatchObject({
@@ -105,9 +105,11 @@ describe("When displaying the selected policy's conditions and roles", () => {
         applicationId: "service1",
         conditions: [
           {
-            field: "Organisation type",
+            field: "organisation.type.id",
             operator: "is",
-            value: ["Academy 16-19 Sponsor Led"],
+            value: ["46"],
+            friendlyField: "Organisation type",
+            friendlyValue: ["Academy 16-19 Sponsor Led"],
           },
         ],
       },
