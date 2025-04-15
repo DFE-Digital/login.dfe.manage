@@ -141,7 +141,8 @@ const config = {
       connectionString: process.env.REDIS_CONN + "/3?tls=true"
     },
     key2SuccessServiceId: process.env.SUCC_SVC_ID
-  },search: {
+  },
+  search: {
     type: "api",
     service: {
       url: "https://" + process.env.STANDALONE_SEARCH_HOST_NAME,
