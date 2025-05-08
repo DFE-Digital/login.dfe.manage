@@ -124,13 +124,14 @@ describe("when editing a service for a user", () => {
 
     expect(logger.audit.mock.calls).toHaveLength(1);
     expect(logger.audit.mock.calls[0][0]).toBe(
-      "user@unit.test (id: user1) updated service service name for organisation org name (id: org1) for user undefined (id: user1)",
+      "user@unit.test updated service service name for user undefined",
     );
     expect(logger.audit.mock.calls[0][1]).toMatchObject({
       type: "manage",
       subType: "user-service-updated",
       userId: "user1",
       userEmail: "user@unit.test",
+      organisationId: "org1",
       editedUser: "user1",
       editedFields: [
         {

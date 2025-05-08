@@ -232,12 +232,13 @@ const post = async (req, res) => {
 
   // audit add service to user
   logger.audit(
-    `${req.user.email} (id: ${req.user.sub}) added services for organisation ${req.session.user.organisationName} (id: ${organisationId}) for user ${req.session.user.email} (id: ${uid})`,
+    `${req.user.email} added services for user ${req.session.user.email}`,
     {
       type: "manage",
       subType: "user-services-added",
       userId: req.user.sub,
       userEmail: req.user.email,
+      organisationId,
       editedUser: uid,
       editedFields: [
         {
