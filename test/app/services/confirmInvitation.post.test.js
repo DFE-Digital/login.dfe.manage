@@ -322,13 +322,14 @@ describe("when inviting a new user", () => {
 
     expect(logger.audit.mock.calls).toHaveLength(2);
     expect(logger.audit.mock.calls[1][0]).toBe(
-      "user@unit.test (id: user1) added services for organisation organisation name (id: org1) for user john.doe@unit.test (id: user1)",
+      "user@unit.test added services for user john.doe@unit.test",
     );
     expect(logger.audit.mock.calls[1][1]).toMatchObject({
       type: "manage",
       subType: "user-services-added",
       userId: "user1",
       userEmail: "user@unit.test",
+      organisationId: "org1",
       editedUser: "user1",
       editedFields: [
         {

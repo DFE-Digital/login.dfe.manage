@@ -76,12 +76,13 @@ const post = async (req, res) => {
   );
 
   logger.audit(
-    `${req.user.email} (id: ${req.user.sub}) updated service ${model.service.name} for organisation ${model.organisation.name} (id: ${model.organisation.id}) for user ${model.user.email} (id: ${model.user.id})`,
+    `${req.user.email} updated service ${model.service.name} for user ${model.user.email}`,
     {
       type: "manage",
       subType: "user-service-updated",
       userId: req.user.sub,
       userEmail: req.user.email,
+      organisationId: model.organisation.id,
       editedUser: model.user.id,
       editedFields: [
         {
