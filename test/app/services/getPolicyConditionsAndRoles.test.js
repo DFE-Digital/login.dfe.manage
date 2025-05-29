@@ -153,7 +153,7 @@ describe("When displaying the selected policy's conditions and roles", () => {
     expect(res.render.mock.calls[0][1].policy.roles[3].name).toBe("Role E");
   });
 
-  it("then it should return the condition fields in the policy sorted by name", async () => {
+  it("then it should return the condition fields in the policy sorted by friendlyField", async () => {
     getPolicyById.mockReturnValue({
       id: "conditionId",
       name: "condition name",
@@ -180,16 +180,16 @@ describe("When displaying the selected policy's conditions and roles", () => {
     });
 
     await getPolicyConditions(req, res);
-    expect(res.render.mock.calls[0][1].policy.conditions[0].field).toBe(
+    expect(res.render.mock.calls[0][1].policy.conditions[0].friendlyField).toBe(
       "Condition A",
     );
-    expect(res.render.mock.calls[0][1].policy.conditions[1].field).toBe(
+    expect(res.render.mock.calls[0][1].policy.conditions[1].friendlyField).toBe(
       "Condition B",
     );
-    expect(res.render.mock.calls[0][1].policy.conditions[2].field).toBe(
+    expect(res.render.mock.calls[0][1].policy.conditions[2].friendlyField).toBe(
       "Condition C",
     );
-    expect(res.render.mock.calls[0][1].policy.conditions[3].field).toBe(
+    expect(res.render.mock.calls[0][1].policy.conditions[3].friendlyField).toBe(
       "Condition D",
     );
   });
@@ -210,20 +210,30 @@ describe("When displaying the selected policy's conditions and roles", () => {
 
     await getPolicyConditions(req, res);
     // Will sort the values parsed as numbers, so 02 === 2, and 010 === 10.
-    expect(res.render.mock.calls[0][1].policy.conditions[0].value[0]).toBe(
-      "0.1",
-    );
-    expect(res.render.mock.calls[0][1].policy.conditions[0].value[1]).toBe(
-      "01",
-    );
-    expect(res.render.mock.calls[0][1].policy.conditions[0].value[2]).toBe("1");
-    expect(res.render.mock.calls[0][1].policy.conditions[0].value[3]).toBe("2");
-    expect(res.render.mock.calls[0][1].policy.conditions[0].value[4]).toBe(
-      "02",
-    );
-    expect(res.render.mock.calls[0][1].policy.conditions[0].value[5]).toBe(
-      "010",
-    );
+    expect(
+      res.render.mock.calls[0][1].policy.conditions[0].mappedValues[0]
+        .friendlyValue,
+    ).toBe("0.1");
+    expect(
+      res.render.mock.calls[0][1].policy.conditions[0].mappedValues[1]
+        .friendlyValue,
+    ).toBe("01");
+    expect(
+      res.render.mock.calls[0][1].policy.conditions[0].mappedValues[2]
+        .friendlyValue,
+    ).toBe("1");
+    expect(
+      res.render.mock.calls[0][1].policy.conditions[0].mappedValues[3]
+        .friendlyValue,
+    ).toBe("2");
+    expect(
+      res.render.mock.calls[0][1].policy.conditions[0].mappedValues[4]
+        .friendlyValue,
+    ).toBe("02");
+    expect(
+      res.render.mock.calls[0][1].policy.conditions[0].mappedValues[5]
+        .friendlyValue,
+    ).toBe("010");
   });
 
   it("then it should return the values for an alphanumeric condition values sorted lexicographically", async () => {
@@ -241,11 +251,29 @@ describe("When displaying the selected policy's conditions and roles", () => {
     });
 
     await getPolicyConditions(req, res);
-    expect(res.render.mock.calls[0][1].policy.conditions[0].value[0]).toBe("A");
-    expect(res.render.mock.calls[0][1].policy.conditions[0].value[1]).toBe("B");
-    expect(res.render.mock.calls[0][1].policy.conditions[0].value[2]).toBe("D");
-    expect(res.render.mock.calls[0][1].policy.conditions[0].value[3]).toBe("D");
-    expect(res.render.mock.calls[0][1].policy.conditions[0].value[4]).toBe("E");
-    expect(res.render.mock.calls[0][1].policy.conditions[0].value[5]).toBe("Z");
+    expect(
+      res.render.mock.calls[0][1].policy.conditions[0].mappedValues[0]
+        .friendlyValue,
+    ).toBe("A");
+    expect(
+      res.render.mock.calls[0][1].policy.conditions[0].mappedValues[1]
+        .friendlyValue,
+    ).toBe("B");
+    expect(
+      res.render.mock.calls[0][1].policy.conditions[0].mappedValues[2]
+        .friendlyValue,
+    ).toBe("D");
+    expect(
+      res.render.mock.calls[0][1].policy.conditions[0].mappedValues[3]
+        .friendlyValue,
+    ).toBe("D");
+    expect(
+      res.render.mock.calls[0][1].policy.conditions[0].mappedValues[4]
+        .friendlyValue,
+    ).toBe("E");
+    expect(
+      res.render.mock.calls[0][1].policy.conditions[0].mappedValues[5]
+        .friendlyValue,
+    ).toBe("Z");
   });
 });
