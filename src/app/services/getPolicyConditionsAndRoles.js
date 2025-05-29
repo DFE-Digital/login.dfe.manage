@@ -13,19 +13,18 @@ const mapPolicyConstraints = async (policy, correlationId) => {
     condition.mappedValues = [];
     const currentCondition = condition;
 
-    currentCondition.friendlyValue = await getFriendlyValues(
+    const friendlyValues = await getFriendlyValues(
       condition.field,
       condition.value,
       correlationId,
     );
     currentCondition.friendlyField = getFriendlyFieldName(condition.field);
-    for (let i = 0; i < currentCondition.friendlyValue.length; i++) {
+    for (let i = 0; i < friendlyValues.length; i++) {
       currentCondition.mappedValues.push({
         value: currentCondition.value[i],
-        friendlyValue: currentCondition.friendlyValue[i],
+        friendlyValue: friendlyValues[i],
       });
     }
-    console.log(currentCondition);
   });
 };
 
@@ -43,11 +42,10 @@ const getPolicyConditions = async (req, res) => {
   policy.conditions.sort((a, b) =>
     a.friendlyField.localeCompare(b.friendlyField),
   );
-  // Need to sort on friendly name
   policy.conditions.forEach((conditionType) => {
     const isNumeric =
-      conditionType.friendlyValue.length > 1 &&
-      /^[0-9]+$/.test(conditionType.friendlyValue[0]);
+      conditionType.value.length > 1 && /^[0-9]+$/.test(conditionType.value[0]);
+    // Sort on friendly name so they display alphabetically
     conditionType.mappedValues.sort((a, b) =>
       a.friendlyValue.localeCompare(b.friendlyValue, undefined, {
         numeric: isNumeric,

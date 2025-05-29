@@ -109,7 +109,9 @@ describe("When displaying the selected policy's conditions and roles", () => {
             operator: "is",
             value: ["46"],
             friendlyField: "Organisation type",
-            friendlyValue: ["Academy 16-19 Sponsor Led"],
+            mappedValues: [
+              { friendlyValue: "Academy 16-19 Sponsor Led", value: "46" },
+            ],
           },
         ],
       },
