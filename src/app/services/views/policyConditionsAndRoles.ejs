@@ -69,11 +69,11 @@
                             <tr class="govuk-table__row">   
                                 <td class="govuk-table__cell"><%= condition.friendlyField %></td>
                                 <td class="govuk-table__cell"><%= condition.operator %></td>
-                            <% if (condition.value.length === 1) { %>
+                            <% if (condition.mappedValues.length === 1) { %>
                                 <td class="govuk-table__cell govuk-table__cell--numeric">
-                                    <%= condition.friendlyValue[0] %>
+                                    <%= condition.mappedValues[0].friendlyValue %>
                                     <%  if (locals.canUserModifyPolicyConditions) { %>
-                                    <a href="confirm-remove-policy-condition?condition=<%= condition.field %>&operator=<%= condition.operator %>&value=<%= condition.value %>">Remove</a>
+                                    <a href="confirm-remove-policy-condition?condition=<%= condition.field %>&operator=<%= condition.operator %>&value=<%= condition.mappedValues[0].value %>">Remove</a>
                                     <% } %>
                                 </td>
                             <% } else { %>
@@ -81,14 +81,14 @@
                                     <details class="govuk-details">
                                         <summary class="govuk-details__summary">
                                             <span class="govuk-details__summary-text">
-                                                <%= condition.value.length %> values
+                                                <%= condition.mappedValues.length %> values
                                             </span>
                                         </summary>
                                         <div class="govuk-details__text">
-                                        <% for (let i = 0; i < condition.value.length; i++) {
-                                            const selectedcondition = condition.friendlyValue[i];
+                                        <% for (let i = 0; i < condition.mappedValues.length; i++) {
+                                            const selectedCondition = condition.mappedValues[i];
                                         %>
-                                            <p><%= selectedcondition %> <a href="confirm-remove-policy-condition?condition=<%= condition.field %>&operator=<%= condition.operator %>&value=<%= condition.value[i] %>">Remove</a></p>
+                                            <p><%= selectedCondition.friendlyValue %> <a href="confirm-remove-policy-condition?condition=<%= condition.field %>&operator=<%= condition.operator %>&value=<%= selectedCondition.value %>">Remove</a></p>
                                         <% } %>
                                         </div>
                                     </details>
