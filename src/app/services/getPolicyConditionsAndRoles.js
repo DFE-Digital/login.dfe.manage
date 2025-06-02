@@ -10,13 +10,21 @@ const { forEachAsync } = require("../../utils/asyncHelpers");
 
 const mapPolicyConstraints = async (policy, correlationId) => {
   await forEachAsync(policy.conditions, async (condition) => {
+    condition.mappedValues = [];
     const currentCondition = condition;
-    currentCondition.friendlyValue = await getFriendlyValues(
+
+    const friendlyValues = await getFriendlyValues(
       condition.field,
       condition.value,
       correlationId,
     );
     currentCondition.friendlyField = getFriendlyFieldName(condition.field);
+    for (let i = 0; i < friendlyValues.length; i++) {
+      currentCondition.mappedValues.push({
+        value: currentCondition.value[i],
+        friendlyValue: friendlyValues[i],
+      });
+    }
   });
 };
 
@@ -28,19 +36,22 @@ const getPolicyConditions = async (req, res) => {
     req,
     "manageModifyPolicyCondition",
   );
+  await mapPolicyConstraints(policy, req.id);
 
-  // Need to sort before mapping, otherwise the friendly names
-  // and statuses won't line up
   policy.roles.sort((a, b) => a.name.localeCompare(b.name));
-  policy.conditions.sort((a, b) => a.field.localeCompare(b.field));
+  policy.conditions.sort((a, b) =>
+    a.friendlyField.localeCompare(b.friendlyField),
+  );
   policy.conditions.forEach((conditionType) => {
     const isNumeric =
       conditionType.value.length > 1 && /^[0-9]+$/.test(conditionType.value[0]);
-    conditionType.value.sort((a, b) =>
-      a.localeCompare(b, undefined, { numeric: isNumeric }),
+    // Sort on friendly name so they display alphabetically
+    conditionType.mappedValues.sort((a, b) =>
+      a.friendlyValue.localeCompare(b.friendlyValue, undefined, {
+        numeric: isNumeric,
+      }),
     );
   });
-  await mapPolicyConstraints(policy, req.id);
 
   return res.render("services/views/policyConditionsAndRoles", {
     csrfToken: req.csrfToken(),
