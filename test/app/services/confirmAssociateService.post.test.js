@@ -244,7 +244,7 @@ describe("when confirm associating a service to user", () => {
 
     expect(logger.audit.mock.calls).toHaveLength(1);
     expect(logger.audit.mock.calls[0][0]).toBe(
-      "user@unit.test (id: user1) added service service name for organisation Great Big School (id: 88a1ed39-5a98-43da-b66e-78e564ea72b0) for user test@test.com (id: user1)",
+      "user@unit.test added service service name for user test@test.com",
     );
     expect(logger.audit.mock.calls[0][1]).toMatchObject({
       type: "manage",
