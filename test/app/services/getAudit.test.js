@@ -235,7 +235,7 @@ describe("when getting users audit details", () => {
           },
         },
         {
-          timestamp: "2025-01-29T17:31:00.000Z",
+          timestamp: new Date("2025-01-29T17:31:00.000Z"),
           formattedTimestamp: "29 Jan 2025 05:31pm",
           event: {
             type: "manage",
