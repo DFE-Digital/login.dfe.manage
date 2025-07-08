@@ -246,7 +246,7 @@ describe("when getting users organisation details", () => {
 
     expect(logger.audit.mock.calls).toHaveLength(1);
     expect(logger.audit.mock.calls[0][0]).toBe(
-      "super.user@unit.test (id: user1) viewed user undefined (id: user1)",
+      "super.user@unit.test viewed user undefined",
     );
     expect(logger.audit.mock.calls[0][1]).toMatchObject({
       type: "organisations",

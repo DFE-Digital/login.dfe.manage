@@ -29,6 +29,22 @@ const {
 const { getServiceById } = require("../../../src/infrastructure/applications");
 const getAudit = require("../../../src/app/services/getAudit");
 
+const organisationId = "org-1";
+
+const createSimpleAuditRecord = (type, subType, message) => {
+  return {
+    type,
+    subType,
+    userId: "user1",
+    userEmail: "some.user@test.tester",
+    editedUser: "edited-user1",
+    organisationId,
+    level: "audit",
+    message,
+    timestamp: "2025-01-29T17:31:00.000Z",
+  };
+};
+
 describe("when getting users audit details", () => {
   let req;
   let res;
@@ -103,6 +119,11 @@ describe("when getting users audit details", () => {
           message: "Some detailed message",
           timestamp: "2018-01-29T17:31:00.000Z",
         },
+        createSimpleAuditRecord(
+          "manage",
+          "user-service-added",
+          "some.user@test.tester added service Test Service for user another.user@example.com",
+        ),
       ],
       numberOfPages: 3,
       numberOfRecords: 56,
@@ -143,35 +164,17 @@ describe("when getting users audit details", () => {
     }));
   });
 
-  it("then it should send result using audit view", async () => {
+  it("then it should include csrf token, user details, page and number of pages in model", async () => {
     await getAudit(req, res);
 
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][0]).toBe("services/views/audit");
-  });
-
-  it("then it should include csrf token in model", async () => {
-    await getAudit(req, res);
-
     expect(res.render.mock.calls[0][1]).toMatchObject({
       csrfToken: "token",
-    });
-  });
-
-  it("then it should include user details in model", async () => {
-    await getAudit(req, res);
-
-    expect(res.render.mock.calls[0][1]).toMatchObject({
       user: {
         id: "user1",
       },
-    });
-  });
-
-  it("then it should include number of pages of audits in model", async () => {
-    await getAudit(req, res);
-
-    expect(res.render.mock.calls[0][1]).toMatchObject({
+      page: 3,
       numberOfPages: 3,
     });
   });
@@ -231,15 +234,23 @@ describe("when getting users audit details", () => {
             id: "user1",
           },
         },
+        {
+          timestamp: "2025-01-29T17:31:00.000Z",
+          formattedTimestamp: "29 Jan 2025 05:31pm",
+          event: {
+            type: "manage",
+            subType: "user-service-added",
+            description:
+              "some.user@test.tester added service Test Service for user another.user@example.com",
+          },
+          service: null,
+          organisation: undefined,
+          result: true,
+          user: {
+            id: "user1",
+          },
+        },
       ],
-    });
-  });
-
-  it("then it should include page number in model", async () => {
-    await getAudit(req, res);
-
-    expect(res.render.mock.calls[0][1]).toMatchObject({
-      page: 3,
     });
   });
 

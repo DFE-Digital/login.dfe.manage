@@ -119,16 +119,13 @@ const getUserOrganisations = async (req, res) => {
   const manageRolesForService = await getUserServiceRoles(req);
   const currentService = await getServiceById(req.params.sid, req.id);
 
-  logger.audit(
-    `${req.user.email} (id: ${req.user.sub}) viewed user ${user.email} (id: ${user.id})`,
-    {
-      type: "organisations",
-      subType: "user-view",
-      userId: req.user.sub,
-      userEmail: req.user.email,
-      viewedUser: user.id,
-    },
-  );
+  logger.audit(`${req.user.email} viewed user ${user.email}`, {
+    type: "organisations",
+    subType: "user-view",
+    userId: req.user.sub,
+    userEmail: req.user.email,
+    viewedUser: user.id,
+  });
 
   let backLink = `/services/${req.params.sid}/users`;
   const returnOrgId = getReturnOrgId(req.query);
