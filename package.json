@@ -10,7 +10,7 @@
   "license": "MIT",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "settings='./config/login.dfe.manage.dev.json' nodemon src/index.js",
+    "dev": "nodemon src/index.js",
     "dev:checks": "npm run lint && npm run test",
     "format": "prettier . --write",
     "lint": "eslint .",
