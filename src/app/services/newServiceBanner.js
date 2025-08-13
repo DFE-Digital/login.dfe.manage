@@ -1,4 +1,5 @@
 const moment = require("moment");
+const sanitizeHtml = require("sanitize-html");
 const {
   getBannerById,
   upsertBanner,
@@ -46,8 +47,8 @@ const get = async (req, res) => {
     if (existingBanner) {
       model.isEditExisting = true;
       model.name = existingBanner.name;
-      model.bannerTitle = existingBanner.title;
-      model.message = existingBanner.message;
+      model.bannerTitle = sanitizeHtml(existingBanner.title); // ToDo: add sanitize-html here
+      model.message = sanitizeHtml(existingBanner.message); // ToDo: add sanitize-html here
       model.isActive = existingBanner.isActive;
 
       if (existingBanner.isActive) {
@@ -101,8 +102,8 @@ const validate = async (req) => {
   }
   const model = {
     name: req.body.bannerName || "",
-    bannerTitle: req.body.bannerTitle || "",
-    message: req.body.bannerMessage || "",
+    bannerTitle: sanitizeHtml(req.body.bannerTitle) || "", // ToDo: add sanitize-html here
+    message: sanitizeHtml(req.body.bannerMessage) || "", // ToDo: add sanitize-html here
     bannerDisplay: req.body.bannerDisplay || "",
     fromDay: req.body.fromDay,
     fromMonth: req.body.fromMonth,
@@ -234,8 +235,8 @@ const post = async (req, res) => {
   const body = {
     id: req.params.bid ? req.params.bid : undefined,
     name: model.name,
-    title: model.bannerTitle,
-    message: model.message,
+    title: model.bannerTitle, // ToDo: add sanitize-html here?
+    message: model.message, // ToDo: add sanitize-html here?
     validFrom: model.fromDate,
     validTo: model.toDate,
     isActive: model.isActive,
