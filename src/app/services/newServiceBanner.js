@@ -47,8 +47,8 @@ const get = async (req, res) => {
     if (existingBanner) {
       model.isEditExisting = true;
       model.name = existingBanner.name;
-      model.bannerTitle = sanitizeHtml(existingBanner.title); // ToDo: add sanitize-html here
-      model.message = sanitizeHtml(existingBanner.message); // ToDo: add sanitize-html here
+      model.bannerTitle = sanitizeHtml(existingBanner.title);
+      model.message = sanitizeHtml(existingBanner.message);
       model.isActive = existingBanner.isActive;
 
       if (existingBanner.isActive) {
@@ -102,8 +102,8 @@ const validate = async (req) => {
   }
   const model = {
     name: req.body.bannerName || "",
-    bannerTitle: sanitizeHtml(req.body.bannerTitle) || "", // ToDo: add sanitize-html here
-    message: sanitizeHtml(req.body.bannerMessage) || "", // ToDo: add sanitize-html here
+    bannerTitle: sanitizeHtml(req.body.bannerTitle) || "",
+    message: sanitizeHtml(req.body.bannerMessage) || "",
     bannerDisplay: req.body.bannerDisplay || "",
     fromDay: req.body.fromDay,
     fromMonth: req.body.fromMonth,
@@ -235,8 +235,8 @@ const post = async (req, res) => {
   const body = {
     id: req.params.bid ? req.params.bid : undefined,
     name: model.name,
-    title: model.bannerTitle, // ToDo: add sanitize-html here?
-    message: model.message, // ToDo: add sanitize-html here?
+    title: model.bannerTitle,
+    message: model.message,
     validFrom: model.fromDate,
     validTo: model.toDate,
     isActive: model.isActive,
