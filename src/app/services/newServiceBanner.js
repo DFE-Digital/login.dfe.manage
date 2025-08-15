@@ -1,4 +1,5 @@
 const moment = require("moment");
+const sanitizeHtml = require("sanitize-html");
 const {
   getBannerById,
   upsertBanner,
@@ -46,8 +47,8 @@ const get = async (req, res) => {
     if (existingBanner) {
       model.isEditExisting = true;
       model.name = existingBanner.name;
-      model.bannerTitle = existingBanner.title;
-      model.message = existingBanner.message;
+      model.bannerTitle = sanitizeHtml(existingBanner.title);
+      model.message = sanitizeHtml(existingBanner.message);
       model.isActive = existingBanner.isActive;
 
       if (existingBanner.isActive) {
@@ -101,8 +102,8 @@ const validate = async (req) => {
   }
   const model = {
     name: req.body.bannerName || "",
-    bannerTitle: req.body.bannerTitle || "",
-    message: req.body.bannerMessage || "",
+    bannerTitle: sanitizeHtml(req.body.bannerTitle) || "",
+    message: sanitizeHtml(req.body.bannerMessage) || "",
     bannerDisplay: req.body.bannerDisplay || "",
     fromDay: req.body.fromDay,
     fromMonth: req.body.fromMonth,
