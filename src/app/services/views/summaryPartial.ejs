@@ -68,15 +68,17 @@
     <% if (!area==='audit' || !locals.isInvitation) { %>
         <aside id="actions" class="govuk-!-margin-top-0">
             <h2 class="govuk-heading-m">Related actions</h2>
-            <ul class="govuk-list">
-                <li>
-                <% if (area==='audit' ) { %>
-                    <a id="change-service" class="govuk-link-bold" href="/services/<%= locals.serviceId %>/users/<%=user.id%>/organisations<%= locals.returnOrgId ? `?returnOrg=${locals.returnOrgId}` : '' %>">View user details</a>
-                <% } else { %>
-                    <a id="change-service" class="govuk-link-bold" href="/services/<%= locals.serviceId %>/users/<%=user.id%>/audit<%= locals.returnOrgId ? `?returnOrg=${locals.returnOrgId}` : '' %>">View user sign in audit</a>
-                <% } %>
-                </li>
-            </ul>
+            <nav aria-label="Related actions">
+                <ul class="govuk-list">
+                    <li>
+                    <% if (area==='audit' ) { %>
+                        <a id="change-service" class="govuk-link-bold" href="/services/<%= locals.serviceId %>/users/<%=user.id%>/organisations<%= locals.returnOrgId ? `?returnOrg=${locals.returnOrgId}` : '' %>">View user details</a>
+                    <% } else { %>
+                        <a id="change-service" class="govuk-link-bold" href="/services/<%= locals.serviceId %>/users/<%=user.id%>/audit<%= locals.returnOrgId ? `?returnOrg=${locals.returnOrgId}` : '' %>">View user sign in audit</a>
+                    <% } %>
+                    </li>
+                </ul>
+            </nav>
         </aside>
     <% } %>
     </div>

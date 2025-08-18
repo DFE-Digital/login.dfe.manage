@@ -81,11 +81,13 @@
     <div class="govuk-grid-column-one-quarter">
         <aside id="actions" class="govuk-!-margin-top-0">
             <h2 class="govuk-heading-m">Related actions</h2>
-            <ul class="govuk-list">
-                <li>
-                    <a class="govuk-link-bold" href="<%= locals.organisation.id %>/remove-service<%= locals.returnOrgId ? `?returnOrg=${locals.returnOrgId}` : '' %>">Remove service</a>
-                </li>
-            </ul>
+            <nav aria-label="Related actions">
+                <ul class="govuk-list">
+                    <li>
+                        <a class="govuk-link-bold" href="<%= locals.organisation.id %>/remove-service<%= locals.returnOrgId ? `?returnOrg=${locals.returnOrgId}` : '' %>">Remove service</a>
+                    </li>
+                </ul>
+            </nav>
         </aside>
     </div>
 </div>
