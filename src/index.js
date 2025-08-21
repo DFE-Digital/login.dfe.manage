@@ -105,6 +105,8 @@ const init = async () => {
     : assetsUrl;
   Object.assign(app.locals, {
     urls: {
+      accessibilityStatementUrl:
+        config.hostingEnvironment.accessibilityStatementUrl,
       profile: config.hostingEnvironment.profileUrl,
       services: config.hostingEnvironment.servicesUrl,
       interactions: config.hostingEnvironment.interactionsUrl,
