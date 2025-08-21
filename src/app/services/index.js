@@ -11,6 +11,10 @@ const {
 
 const { getDashboard } = require("./getDashboard");
 const getServiceInfo = require("./getServiceInfo");
+const getEditServiceInfo = require("./getEditServiceInfo");
+const postEditServiceInfo = require("./postEditServiceInfo");
+const getConfirmEditServiceInfo = require("./getConfirmEditServiceInfo");
+const postConfirmEditServiceInfo = require("./getEditServiceInfo");
 const { getServiceConfig, postServiceConfig } = require("./serviceConfig");
 const {
   getConfirmServiceConfig,
@@ -117,6 +121,35 @@ const services = (csrf) => {
     csrf,
     isManageUserForService,
     asyncWrapper(getServiceInfo),
+  );
+
+  router.get(
+    "/:sid/service-information/edit",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("manageModifyPolicyCondition"),
+    asyncWrapper(getEditServiceInfo),
+  );
+  router.post(
+    "/:sid/service-information/edit",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("manageModifyPolicyCondition"),
+    asyncWrapper(postEditServiceInfo),
+  );
+  router.get(
+    "/:sid/service-information/edit/confirm",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("manageModifyPolicyCondition"),
+    asyncWrapper(getConfirmEditServiceInfo),
+  );
+  router.post(
+    "/:sid/service-information/edit/confirm",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("manageModifyPolicyCondition"),
+    asyncWrapper(postConfirmEditServiceInfo),
   );
 
   // service config
