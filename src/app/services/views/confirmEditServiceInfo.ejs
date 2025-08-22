@@ -1,0 +1,38 @@
+<div class="govuk-width-container govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <h1 class="govuk-heading-l text-break">
+                Review details for <%= locals.service.name %>
+            </h1>
+            <p class="govuk-body">Review these details before confirming.</p>
+
+            <dl class="govuk-summary-list">
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Name  
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        <p class="govuk-body"><%=locals.model.name%></p>
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Description
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        <p class="govuk-body"><%= locals.model.description%></p>
+                    </dd>
+                </div>
+            </dl>
+
+            <form method="post">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
+                <div class="govuk-button-group">
+                    <button type="submit" class="govuk-button" data-module="govuk-button">Save</button>
+                    <a href="<%= locals.cancelLink %>" class="govuk-button govuk-button--secondary">Cancel</a>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
