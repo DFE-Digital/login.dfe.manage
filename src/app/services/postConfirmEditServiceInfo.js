@@ -1,7 +1,38 @@
 const logger = require("../../infrastructure/logger");
+const {
+  listAllServices,
+  getServiceById,
+  updateService,
+} = require("../../infrastructure/applications");
 
 const postConfirmEditServiceInfo = async (req, res) => {
   const model = req.session.editServiceInfo;
+  if (!model) {
+    // TODO figure out where to redirect too
+    logger.info("No model, redirecting away");
+    return res.redirect("edit");
+  }
+
+  // TODO pass existing name and desc (maybe id) in session to stop us having
+  // to make this call repeatedly
+  const service = await getServiceById(req.params.sid, req.id);
+
+  if (service.name !== model.name) {
+    // Only check if the name was changed
+    const allServices = await listAllServices();
+    const isMatchingName = allServices.services.find(
+      (service) => service.name === model.name,
+    );
+    if (isMatchingName) {
+      // TODO figure out how to handle it if the name changed in the meantime
+      logger.info(
+        "Service name must be unique and cannot already exist in DfE Sign-in",
+      );
+      return res.redirect(
+        `/services/${req.params.sid}/service-information/edit`,
+      );
+    }
+  }
 
   // const serviceRoles = Get roles
   // if (serviceRoles) {
@@ -13,12 +44,11 @@ const postConfirmEditServiceInfo = async (req, res) => {
   //     }
   //}
 
-  // Update name and description of service
-
-  //await updatePolicyById(req.params.sid, req.params.pid, policy, req.id);
-  logger.info(
-    `Update the name and/or description of the service. name: ${model.name} desc: ${model.description}`,
-  );
+  const updatedService = {
+    name: model.name,
+    description: model.description,
+  };
+  await updateService(req.params.sid, updatedService, req.id);
   logger.info("Update the role data (if required)");
 
   // logger.audit(

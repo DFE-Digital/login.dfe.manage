@@ -4,7 +4,6 @@ const {
 } = require("../../infrastructure/applications");
 const { getUserServiceRoles } = require("./utils");
 const logger = require("../../infrastructure/logger");
-// const { getAllServices } = require("../../infrastructure/applications/api");
 
 const validate = async (req) => {
   const model = {
@@ -13,11 +12,14 @@ const validate = async (req) => {
     validationMessages: {},
   };
 
+  const service = await getServiceById(req.params.sid, req.id);
+
   if (!model.name) {
     model.validationMessages.name = "Enter a name";
   } else if (model.name.length > 200) {
     model.validationMessages.name = "Name must be 200 characters or less";
-  } else {
+  } else if (service.name !== model.name) {
+    // Only check if the name was changed
     const allServices = await listAllServices();
     const isMatchingName = allServices.services.find(
       (service) => service.name === model.name,
@@ -65,6 +67,7 @@ const postEditServiceInfo = async (req, res) => {
     "Validation passed.  Saving name/description to session for confirmation",
     { correlationId: req.id },
   );
+  // TODO do we maybe pass in service name, desc and Id. Id stops potential tampering?
   req.session.editServiceInfo = model;
   req.session.save((error) => {
     if (error) {
