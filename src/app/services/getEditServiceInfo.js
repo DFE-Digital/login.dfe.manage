@@ -7,6 +7,7 @@ const getEditServiceInfo = async (req, res) => {
 
   return res.render("services/views/editServiceInfo", {
     csrfToken: req.csrfToken(),
+    validationMessages: {},
     service: {
       name: service.name || "",
       description: service.description || "",
