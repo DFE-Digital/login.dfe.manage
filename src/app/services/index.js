@@ -14,7 +14,7 @@ const getServiceInfo = require("./getServiceInfo");
 const getEditServiceInfo = require("./getEditServiceInfo");
 const postEditServiceInfo = require("./postEditServiceInfo");
 const getConfirmEditServiceInfo = require("./getConfirmEditServiceInfo");
-const postConfirmEditServiceInfo = require("./getEditServiceInfo");
+const postConfirmEditServiceInfo = require("./postConfirmEditServiceInfo");
 const { getServiceConfig, postServiceConfig } = require("./serviceConfig");
 const {
   getConfirmServiceConfig,

@@ -1,4 +1,7 @@
-const { getServiceById } = require("../../infrastructure/applications");
+const {
+  getServiceById,
+  listAllServices,
+} = require("../../infrastructure/applications");
 const { getUserServiceRoles } = require("./utils");
 const logger = require("../../infrastructure/logger");
 // const { getAllServices } = require("../../infrastructure/applications/api");
@@ -11,35 +14,26 @@ const validate = async (req) => {
   };
 
   if (!model.name) {
-    model.validationMessages.name = "Please enter a name";
+    model.validationMessages.name = "Enter a name";
+  } else if (model.name.length > 200) {
+    model.validationMessages.name = "Name must be 200 characters or less";
+  } else {
+    const allServices = await listAllServices();
+    const isMatchingName = allServices.services.find(
+      (service) => service.name === model.name,
+    );
+    if (isMatchingName) {
+      model.validationMessages.name =
+        "Service name must be unique and cannot already exist in DfE Sign-in";
+    }
   }
 
   if (!model.description) {
-    model.validationMessages.description = "Please enter an description";
+    model.validationMessages.description = "Enter a description";
+  } else if (model.description.length > 200) {
+    model.validationMessages.description =
+      "Description must be 200 characters or less";
   }
-
-  // TODO add validation - below block copied from create new service in support
-  //   if (!model.name) {
-  //   model.validationMessages.name = "Enter a name";
-  // } else if (model.name.length > 200) {
-  //   model.validationMessages.name = "Name must be 200 characters or less";
-  // } else {
-  //   const allServices = await getAllServices();
-  //   const isMatchingName = allServices.services.find(
-  //     (service) => service.name === model.name,
-  //   );
-  //   if (isMatchingName) {
-  //     model.validationMessages.name =
-  //       "Service name must be unique and cannot already exist in DfE Sign-in";
-  //   }
-  // }
-
-  // if (!model.description) {
-  //   model.validationMessages.description = "Enter a description";
-  // } else if (model.description.length > 200) {
-  //   model.validationMessages.description =
-  //     "Description must be 200 characters or less";
-  // }
 
   return model;
 };
@@ -51,7 +45,7 @@ const postEditServiceInfo = async (req, res) => {
 
   if (Object.keys(model.validationMessages).length > 0) {
     return res.render("services/views/editServiceInfo", {
-      ...model,
+      model,
       csrfToken: req.csrfToken(),
       service: {
         name: service.name || "",
@@ -63,6 +57,9 @@ const postEditServiceInfo = async (req, res) => {
       currentNavigation: "",
     });
   }
+
+  // TODO once validation passed, need to figure out which fields have actually changed and only pass
+  // that in.
 
   logger.info(
     "Validation passed.  Saving name/description to session for confirmation",
@@ -89,7 +86,7 @@ const postEditServiceInfo = async (req, res) => {
         currentNavigation: "",
       });
     }
-    return res.redirect("confirm-create-policy-condition");
+    return res.redirect("edit/confirm");
   });
 };
 

@@ -7,10 +7,13 @@ const getEditServiceInfo = async (req, res) => {
 
   return res.render("services/views/editServiceInfo", {
     csrfToken: req.csrfToken(),
-    validationMessages: {},
-    service: {
+    model: {
       name: service.name || "",
       description: service.description || "",
+      validationMessages: {},
+    },
+    service: {
+      name: service.name || "",
     },
     backLink: `/services/${req.params.sid}`,
     serviceId: req.params.sid,

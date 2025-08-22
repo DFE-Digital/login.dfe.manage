@@ -8,29 +8,27 @@
 
             <form method="post">
                 <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
-                            <form method="post" class="prevent-form-double-submission" id="form-new-banner">
-                <input type="hidden" name="_csrf" value="<%=csrfToken%>" />
 
                 <fieldset class="govuk-fieldset" id="fieldset-new-banner">
                     <legend class="govuk-visually-hidden">Edit service info</legend>
-                    <div class="govuk-form-group <%= (locals.validationMessages.name !== undefined) ? 'govuk-form-group--error' : '' %>">
+                    <div class="govuk-form-group <%= (locals.model.validationMessages.name !== undefined) ? 'govuk-form-group--error' : '' %>">
                         <label class="govuk-label govuk-label--s" for="name">Name</label>
-                    <% if (locals.validationMessages.name !== undefined) { %>
+                    <% if (locals.model.validationMessages.name !== undefined) { %>
                         <p id="validation-name" class="govuk-error-message">
-                            <span class="govuk-visually-hidden">Error:</span> <%=locals.validationMessages.name %>
+                            <span class="govuk-visually-hidden">Error:</span> <%=locals.model.validationMessages.name %>
                         </p>
                     <% } %>
-                        <input type="text" id="name" name="name" value="<%=locals.service.name%>" class="govuk-input govuk-!-width-three-quarters" maxlength="20"<% if (locals.validationMessages.name) { %> aria-invalid="true" aria-describedby="validation-name" <% } %>>
+                        <input type="text" id="name" name="name" value="<%=locals.model.name%>" class="govuk-input govuk-!-width-three-quarters" maxlength="20"<% if (locals.model.validationMessages.name) { %> aria-invalid="true" aria-describedby="validation-name" <% } %>>
                     </div>
 
-                    <div class="govuk-form-group <%= (locals.validationMessages.description !== undefined) ? 'govuk-form-group--error' : '' %>">
+                    <div class="govuk-form-group <%= (locals.model.validationMessages.description !== undefined) ? 'govuk-form-group--error' : '' %>">
                         <label class="govuk-label govuk-label--s" for="description">Description</label>
-                    <% if (locals.validationMessages.description !== undefined) { %>
+                    <% if (locals.model.validationMessages.description !== undefined) { %>
                         <p id="validation-description" class="govuk-error-message">
-                            <span class="govuk-visually-hidden">Error:</span> <%=locals.validationMessages.description %>
+                            <span class="govuk-visually-hidden">Error:</span> <%=locals.model.validationMessages.description %>
                         </p>
                     <% } %>
-                        <textarea type="text" id="description" name="description" class="govuk-textarea govuk-!-width-three-quarters" rows="4" maxlength="400"<% if (locals.validationMessages.description) { %> aria-invalid="true" aria-describedby="validation-description" <% } %>><%=locals.service.description%></textarea>
+                        <textarea type="text" id="description" name="description" class="govuk-textarea govuk-!-width-three-quarters" rows="4" maxlength="400"<% if (locals.model.validationMessages.description) { %> aria-invalid="true" aria-describedby="validation-description" <% } %>><%=locals.model.description%></textarea>
                     </div>
                 </fieldset>
                 <div class="govuk-button-group">
