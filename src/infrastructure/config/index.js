@@ -37,6 +37,7 @@ const config = {
     sessionSecret: process.env.SESSION_ENCRYPTION_SECRET_MNG,
     sessionCookieExpiryInMinutes: 480,
     gaTrackingId: process.env.GOOGLE_ANALYTICS_ID,
+    accessibilityStatementUrl: process.env.ACCESSIBILITY_STATEMENT_URL,
     interactionsUrl: "https://" + process.env.STANDALONE_INTERACTIONS_HOST_NAME,
     helpUrl: "https://" + process.env.STANDALONE_HELP_HOST_NAME,
     servicesUrl: "https://" + process.env.STANDALONE_SERVICES_HOST_NAME,
