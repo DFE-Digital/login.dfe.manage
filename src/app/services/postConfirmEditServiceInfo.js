@@ -4,7 +4,10 @@ const {
   getServiceById,
   updateService,
 } = require("../../infrastructure/applications");
-const { listRolesOfService } = require("../../infrastructure/access");
+const {
+  listRolesOfService,
+  updateRole,
+} = require("../../infrastructure/access");
 const config = require("../../infrastructure/config");
 
 const postConfirmEditServiceInfo = async (req, res) => {
@@ -37,14 +40,14 @@ const postConfirmEditServiceInfo = async (req, res) => {
     name: model.name,
     description: model.description,
   };
-  await updateService(req.params.sid, updatedService, req.id);
+  // await updateService(req.params.sid, updatedService, req.id);
   logger.info("Successfully updated service details", {
     correlationId: req.id,
   });
 
   if (service.name !== model.name) {
     logger.info(
-      "Service name changed.  Updating any internal manage roles for the service",
+      "Service name changed. Attempting to update internal manage roles so service name matches",
       { correlationId: req.id },
     );
     // Check for internal manage roles and update service name to new one
@@ -53,11 +56,22 @@ const postConfirmEditServiceInfo = async (req, res) => {
     const roles = rolesOfService.filter((role) =>
       role.name.startsWith(service.name),
     );
-    console.log(roles);
-    // roles.forEach((role) => {
-    // Amend role name to include new service name
-    // call patch role endpoint
-    // });
+    logger.info(
+      `[${roles.length}] internal manage roles found, attempting to update them`,
+      { correlationId: req.id },
+    );
+    roles.forEach((role) => {
+      // Turns 'servicename - manage role name' into ' - manage role name'
+      const roleSecondHalf = role.name.substring(
+        service.name.length,
+        role.name.length,
+      );
+      const updatedRoleName = updatedService.name + roleSecondHalf;
+      logger.info(`Updating [${role.name}] to [${updatedRoleName}]`, {
+        correlationId: req.id,
+      });
+      //await updateRole(role.id, {name: updatedRoleName})
+    });
   }
 
   // logger.audit(
