@@ -12,13 +12,13 @@ const config = require("../../infrastructure/config");
 
 const postConfirmEditServiceInfo = async (req, res) => {
   const model = req.session.editServiceInfo;
+  const serviceId = req.params.sid;
+  const correlationId = req.id;
   if (!model) {
-    return res.redirect(`/services/${req.params.sid}/service-information/`);
+    return res.redirect(`/services/${serviceId}/service-information/`);
   }
 
-  // TODO pass existing name and desc (maybe id) in session to stop us having
-  // to make this call repeatedly
-  const service = await getServiceById(req.params.sid, req.id);
+  const service = await getServiceById(req.params.sid, correlationId);
 
   if (service.name !== model.name) {
     // Only check if the name was changed
@@ -32,7 +32,7 @@ const postConfirmEditServiceInfo = async (req, res) => {
         "error",
         "Service name must be unique and cannot already exist in DfE Sign-in",
       );
-      return res.redirect(`/services/${req.params.sid}/service-information/`);
+      return res.redirect(`/services/${serviceId}/service-information/`);
     }
   }
 
@@ -40,7 +40,7 @@ const postConfirmEditServiceInfo = async (req, res) => {
     name: model.name,
     description: model.description,
   };
-  // await updateService(req.params.sid, updatedService, req.id);
+  await updateService(serviceId, updatedService, correlationId);
   logger.info("Successfully updated service details", {
     correlationId: req.id,
   });
@@ -52,28 +52,37 @@ const postConfirmEditServiceInfo = async (req, res) => {
     );
     // Check for internal manage roles and update service name to new one
     const manageServiceId = config.access.identifiers.service;
-    const rolesOfService = await listRolesOfService(manageServiceId, req.id);
+    const rolesOfService = await listRolesOfService(
+      manageServiceId,
+      correlationId,
+    );
     const roles = rolesOfService.filter((role) =>
       role.name.startsWith(service.name),
     );
     logger.info(
-      `[${roles.length}] internal manage roles found, attempting to update them`,
-      { correlationId: req.id },
+      `Found [${roles.length}] internal manage roles, attempting to update them`,
+      { correlationId: correlationId },
     );
-    roles.forEach((role) => {
-      // Turns 'servicename - manage role name' into ' - manage role name'
-      const roleSecondHalf = role.name.substring(
-        service.name.length,
-        role.name.length,
-      );
-      const updatedRoleName = updatedService.name + roleSecondHalf;
-      logger.info(`Updating [${role.name}] to [${updatedRoleName}]`, {
-        correlationId: req.id,
-      });
-      //await updateRole(role.id, {name: updatedRoleName})
-    });
+
+    await Promise.all(
+      roles.map(async (role) => {
+        // Turns 'servicename - manage role name' into ' - manage role name'
+        const roleSecondHalf = role.name.substring(
+          service.name.length,
+          role.name.length,
+        );
+        const updatedRoleName = updatedService.name + roleSecondHalf;
+        try {
+          await updateRole(manageServiceId, role.id, { name: updatedRoleName });
+        } catch (e) {
+          // TODO what do we do if role update fails? Flash a message?
+          logger.error(e);
+        }
+      }),
+    );
   }
 
+  // TODO figure out what bits changed and add them to the editedFields array
   // logger.audit(
   //   `${req.user.email} (id: ${req.user.sub}) updated the name and/or description of service ${req.params.sid}`,
   //   {
@@ -83,6 +92,13 @@ const postConfirmEditServiceInfo = async (req, res) => {
   //     userEmail: req.user.email,
   //     name: model.name,
   //     description: model.description,
+  //     editedFields: [
+  //       {
+  //         name: "delete_banner",
+  //         oldValue: req.params.bid,
+  //         newValue: undefined,
+  //       },
+  //     ],
   //   },
   // );
 

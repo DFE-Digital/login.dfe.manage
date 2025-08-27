@@ -127,8 +127,13 @@ const updatePolicyById = async (sid, pid, policyBody, correlationId) => {
   );
 };
 
-const updateRole = async (roleId, roleBody, correlationId) => {
-  return callApi("PATCH", `services/roles/${roleId}`, correlationId, roleBody);
+const updateRole = async (serviceId, roleId, roleBody, correlationId) => {
+  return callApi(
+    "PATCH",
+    `services/${serviceId}/roles/${roleId}`,
+    correlationId,
+    roleBody,
+  );
 };
 
 const addUserService = async (uid, sid, oid, roles, correlationId) => {
