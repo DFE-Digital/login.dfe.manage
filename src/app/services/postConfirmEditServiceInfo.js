@@ -20,7 +20,7 @@ const postConfirmEditServiceInfo = async (req, res) => {
 
   const service = await getServiceById(req.params.sid, correlationId);
 
-  if (model.name && service.name !== model.name) {
+  if (model.name) {
     // Only check if the name was changed
     const allServices = await listAllServices();
     const isMatchingName = allServices.services.find(

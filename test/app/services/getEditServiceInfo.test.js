@@ -76,4 +76,20 @@ describe("when getting the edit service info page", () => {
       userRoles: ["serviceid_serviceconfiguration"],
     });
   });
+
+  it("should display data stored in the session if present", async () => {
+    req.session.editServiceInfo = {
+      name: "new name",
+      description: "new description",
+    };
+    await getEditServiceInfo(req, res);
+
+    expect(getUserServiceRoles.mock.calls).toHaveLength(1);
+    expect(getUserServiceRoles.mock.calls[0][0]).toMatchObject(req);
+    expect(res.render.mock.calls[0][1].model).toStrictEqual({
+      description: "new description",
+      name: "new name",
+      validationMessages: {},
+    });
+  });
 });

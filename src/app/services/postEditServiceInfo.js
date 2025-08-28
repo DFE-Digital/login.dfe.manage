@@ -57,7 +57,7 @@ const postEditServiceInfo = async (req, res) => {
       model,
       csrfToken: req.csrfToken(),
       service: {
-        name: service.name || "",
+        name: service.name,
       },
       backLink: `/services/${req.params.sid}/service-information`,
       cancelLink: `/services/${req.params.sid}/service-information`,
@@ -90,7 +90,7 @@ const postEditServiceInfo = async (req, res) => {
         model,
         csrfToken: req.csrfToken(),
         service: {
-          name: service.name || "",
+          name: service.name,
         },
         backLink: `/services/${req.params.sid}/service-information`,
         cancelLink: `/services/${req.params.sid}/service-information`,

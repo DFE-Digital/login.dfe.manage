@@ -81,16 +81,104 @@ describe("when getting the post edit service info page", () => {
     expect(res.redirect.mock.calls[0][0]).toBe("edit/confirm");
   });
 
-  it("should display the editServiceInfo view with an error if the name is empty", async () => {
+  it("should redirect to the confirm page on success - only changing name", async () => {
+    req.body = {
+      name: "new-name-only",
+      description: "service description",
+    };
+    await postEditServiceInfo(req, res);
+
+    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toBe("edit/confirm");
+  });
+
+  it("should redirect to the confirm page on success - only changing description", async () => {
+    req.body = {
+      name: "service one",
+      description: "new-descripion",
+    };
+    await postEditServiceInfo(req, res);
+
+    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toBe("edit/confirm");
+  });
+
+  it("should display an error if the name is empty", async () => {
     req.body.name = "";
     await postEditServiceInfo(req, res);
 
-    expect(getServiceById.mock.calls).toHaveLength(1);
-    expect(getServiceById.mock.calls[0][0]).toBe("service-1");
-    expect(getServiceById.mock.calls[0][1]).toBe("correlationId");
+    expect(res.render.mock.calls).toHaveLength(1);
+    expect(res.render.mock.calls[0][0]).toBe("services/views/editServiceInfo");
+    expect(res.render.mock.calls[0][1].model.validationMessages).toMatchObject({
+      name: "Enter a name",
+    });
+  });
+
+  it("should display an error if the name is over 200 characters", async () => {
+    req.body.name = "abcde12345".repeat(20) + "a"; // 201 characters
+    await postEditServiceInfo(req, res);
 
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][0]).toBe("services/views/editServiceInfo");
+    expect(res.render.mock.calls[0][1].model.validationMessages).toMatchObject({
+      name: "Name must be 200 characters or less",
+    });
+  });
+
+  it("should display an error if the name is the same as another service", async () => {
+    req.body.name = "service two";
+    await postEditServiceInfo(req, res);
+
+    expect(res.render.mock.calls).toHaveLength(1);
+    expect(res.render.mock.calls[0][0]).toBe("services/views/editServiceInfo");
+    expect(res.render.mock.calls[0][1].model.validationMessages).toMatchObject({
+      name: "Service name must be unique and cannot already exist in DfE Sign-in",
+    });
+  });
+
+  it("should display an error if the description is empty", async () => {
+    req.body.description = "";
+    await postEditServiceInfo(req, res);
+
+    expect(res.render.mock.calls).toHaveLength(1);
+    expect(res.render.mock.calls[0][0]).toBe("services/views/editServiceInfo");
+    expect(res.render.mock.calls[0][1].model.validationMessages).toMatchObject({
+      description: "Enter a description",
+    });
+  });
+
+  it("should display an error if the description is over 50 characters", async () => {
+    req.body.description = "abcde12345".repeat(20) + "a"; // 201 characters
+    await postEditServiceInfo(req, res);
+
+    expect(res.render.mock.calls).toHaveLength(1);
+    expect(res.render.mock.calls[0][0]).toBe("services/views/editServiceInfo");
+    expect(res.render.mock.calls[0][1].model.validationMessages).toMatchObject({
+      description: "Description must be 200 characters or less",
+    });
+  });
+
+  it("should display an error if the description is over 50 characters", async () => {
+    req.body.description = "abcde12345".repeat(20) + "a"; // 201 characters
+    await postEditServiceInfo(req, res);
+
+    expect(res.render.mock.calls).toHaveLength(1);
+    expect(res.render.mock.calls[0][0]).toBe("services/views/editServiceInfo");
+    expect(res.render.mock.calls[0][1].model.validationMessages).toMatchObject({
+      description: "Description must be 200 characters or less",
+    });
+  });
+
+  it("should display an error if the name and description are the same as the original", async () => {
+    req.body.name = "service one";
+    req.body.description = "service description";
+    await postEditServiceInfo(req, res);
+
+    expect(res.render.mock.calls).toHaveLength(1);
+    expect(res.render.mock.calls[0][0]).toBe("services/views/editServiceInfo");
+    expect(res.render.mock.calls[0][1].model.validationMessages).toMatchObject({
+      name: "Neither the name or description is different from the original",
+    });
   });
 
   it("should render an error when the session.save fails", async () => {

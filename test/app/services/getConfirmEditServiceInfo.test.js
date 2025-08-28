@@ -14,6 +14,12 @@ const { getUserServiceRoles } = require("../../../src/app/services/utils");
 
 const res = getResponseMock();
 const serviceId = "service-1";
+const getServiceByIdData = {
+  id: "service-1",
+  name: "service one",
+  description: "service description",
+  // Other fields would be present, but omitted for brevity
+};
 
 describe("when getting the edit service info page", () => {
   let req;
@@ -39,12 +45,7 @@ describe("when getting the edit service info page", () => {
     });
 
     getServiceById.mockReset();
-    getServiceById.mockReturnValue({
-      id: "service-1",
-      name: "service one",
-      description: "service description",
-      // Other fields would be present, but omitted for brevity
-    });
+    getServiceById.mockReturnValue(getServiceByIdData);
 
     getUserServiceRoles
       .mockReset()
@@ -84,5 +85,15 @@ describe("when getting the edit service info page", () => {
       serviceId: serviceId,
       userRoles: ["serviceid_serviceconfiguration"],
     });
+  });
+
+  it("should redirect to the service information page if there is no data in the session", async () => {
+    req.session = {};
+    await getConfirmEditServiceInfo(req, res);
+
+    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toBe(
+      `/services/${req.params.sid}/service-information`,
+    );
   });
 });

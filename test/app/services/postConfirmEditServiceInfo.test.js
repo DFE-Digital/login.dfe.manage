@@ -4,20 +4,33 @@ jest.mock("./../../../src/infrastructure/config", () =>
 jest.mock("./../../../src/infrastructure/logger", () =>
   require("../../utils").loggerMockFactory(),
 );
+jest.mock("./../../../src/infrastructure/access");
 jest.mock("./../../../src/infrastructure/applications");
 jest.mock("../../../src/app/services/utils");
 
 const { getRequestMock, getResponseMock } = require("../../utils");
 const postConfirmEditServiceInfo = require("../../../src/app/services/postConfirmEditServiceInfo");
 const {
+  listRolesOfService,
+  updateRole,
+} = require("../../../src/infrastructure/access");
+const {
   getServiceById,
   listAllServices,
+  updateService,
 } = require("../../../src/infrastructure/applications");
 const { getUserServiceRoles } = require("../../../src/app/services/utils");
 
 const res = getResponseMock();
 
-const listAllServicesResponse = {
+const getServiceByIdData = {
+  id: "service-1",
+  name: "service one",
+  description: "service description",
+  // Other fields would be present, but omitted for brevity
+};
+
+const listAllServicesData = {
   services: [
     {
       id: "service-1",
@@ -32,6 +45,17 @@ const listAllServicesResponse = {
   ],
 };
 
+const listRolesOfServiceData = [
+  {
+    code: "service code",
+    id: "role-id",
+    name: "service one - Service configuration",
+    status: {
+      id: 1,
+    },
+  },
+];
+
 describe("when getting the post confirm edit service info page", () => {
   let req;
 
@@ -40,13 +64,9 @@ describe("when getting the post confirm edit service info page", () => {
       params: {
         sid: "service-1",
       },
-      body: {
-        name: "new-service-name",
-        description: "existing-service-description",
-      },
       session: {
         editServiceInfo: {
-          name: "new-service-name",
+          name: "new service name",
         },
       },
       userServices: {
@@ -59,19 +79,16 @@ describe("when getting the post confirm edit service info page", () => {
     });
 
     getServiceById.mockReset();
-    getServiceById.mockReturnValue({
-      id: "service-1",
-      name: "service one",
-      description: "service description",
-      // Other fields would be present, but omitted for brevity
-    });
+    getServiceById.mockReturnValue(getServiceByIdData);
 
     listAllServices.mockReset();
-    listAllServices.mockReturnValue(listAllServicesResponse);
+    listAllServices.mockReturnValue(listAllServicesData);
 
-    getUserServiceRoles
-      .mockReset()
-      .mockReturnValue(["serviceid_serviceconfiguration"]);
+    listRolesOfService.mockReset();
+    listRolesOfService.mockReturnValue(listRolesOfServiceData);
+
+    getUserServiceRoles.mockReset();
+    getUserServiceRoles.mockReturnValue(["serviceid_serviceconfiguration"]);
 
     res.mockResetAll();
   });
@@ -79,9 +96,101 @@ describe("when getting the post confirm edit service info page", () => {
   it("should redirect to the confirm page on success", async () => {
     await postConfirmEditServiceInfo(req, res);
 
+    expect(listRolesOfService.mock.calls).toHaveLength(1);
+    expect(updateRole.mock.calls).toHaveLength(1);
+    expect(updateService.mock.calls).toHaveLength(1);
+
     expect(res.redirect.mock.calls.length).toBe(1);
     expect(res.redirect.mock.calls[0][0]).toBe(
       "/services/service-1/service-information",
+    );
+    expect(res.flash.mock.calls).toHaveLength(3);
+    expect(res.flash.mock.calls[0][0]).toBe("title");
+    expect(res.flash.mock.calls[0][1]).toBe("Success");
+    expect(res.flash.mock.calls[1][0]).toBe("heading");
+    expect(res.flash.mock.calls[1][1]).toBe(
+      "Service updated: new service name",
+    );
+    expect(res.flash.mock.calls[2][0]).toBe("message");
+    expect(res.flash.mock.calls[2][1]).toBe(
+      "Successfully updated service name",
+    );
+  });
+
+  it("should redirect to the service-information page when no data in the session", async () => {
+    req.session.editServiceInfo = undefined;
+
+    await postConfirmEditServiceInfo(req, res);
+
+    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toBe(
+      "/services/service-1/service-information",
+    );
+  });
+
+  it("should error if it attempts to change a name to one that already exists", async () => {
+    // TODO fill in test more.  Also functionality still needs tidying up.
+    // It's possible that another service used the name between the edit screen and the
+    // confirm edit screen. This test makes sure that we don't try and update it if that happens.
+    req.session.editServiceInfo = {
+      name: "service one",
+    };
+    await postConfirmEditServiceInfo(req, res);
+
+    expect(updateService.mock.calls).toHaveLength(0);
+
+    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toBe(
+      "/services/service-1/service-information",
+    );
+  });
+
+  it("should update internal manage roles if the name has changed", async () => {
+    await postConfirmEditServiceInfo(req, res);
+
+    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toBe(
+      "/services/service-1/service-information",
+    );
+    expect(res.flash.mock.calls).toHaveLength(3);
+    expect(res.flash.mock.calls[0][0]).toBe("title");
+    expect(res.flash.mock.calls[0][1]).toBe("Success");
+    expect(res.flash.mock.calls[1][0]).toBe("heading");
+    expect(res.flash.mock.calls[1][1]).toBe(
+      "Service updated: new service name",
+    );
+    expect(res.flash.mock.calls[2][0]).toBe("message");
+    expect(res.flash.mock.calls[2][1]).toBe(
+      "Successfully updated service name",
+    );
+  });
+
+  it("should flash that description has changed when only description changed", async () => {
+    req.session.editServiceInfo = {
+      description: "new service description",
+    };
+
+    await postConfirmEditServiceInfo(req, res);
+
+    expect(res.flash.mock.calls).toHaveLength(3);
+    expect(res.flash.mock.calls[2][0]).toBe("message");
+    expect(res.flash.mock.calls[2][1]).toBe(
+      "Successfully updated service description",
+    );
+  });
+
+  it("should flash that both name and description has changed when both changed", async () => {
+    req.session.editServiceInfo = {
+      name: "new service name",
+      description: "new service description",
+    };
+
+    await postConfirmEditServiceInfo(req, res);
+
+    expect(res.flash.mock.calls).toHaveLength(3);
+    expect(res.flash.mock.calls[2][0]).toBe("message");
+    expect(res.flash.mock.calls[2][1]).toBe(
+      "Successfully updated service name and description",
     );
   });
 });

@@ -6,8 +6,8 @@ const getEditServiceInfo = async (req, res) => {
   const manageRolesForService = await getUserServiceRoles(req);
 
   const model = {
-    name: service.name || "",
-    description: service.description || "",
+    name: service.name,
+    description: service.description,
     validationMessages: {},
   };
 
@@ -20,7 +20,7 @@ const getEditServiceInfo = async (req, res) => {
     csrfToken: req.csrfToken(),
     model,
     service: {
-      name: service.name || "",
+      name: service.name,
     },
     backLink: `/services/${req.params.sid}/service-information`,
     cancelLink: `/services/${req.params.sid}/service-information`,
