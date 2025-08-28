@@ -8,6 +8,9 @@ const getServiceInfo = async (req, res) => {
     req,
     "manageModifyPolicyCondition",
   );
+  if (req.session.editServiceInfo) {
+    req.session.editServiceInfo = undefined;
+  }
   return res.render("services/views/serviceInfo", {
     csrfToken: req.csrfToken(),
     service: {

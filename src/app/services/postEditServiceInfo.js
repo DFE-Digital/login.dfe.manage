@@ -60,9 +60,10 @@ const postEditServiceInfo = async (req, res) => {
         name: service.name || "",
       },
       backLink: `/services/${req.params.sid}/service-information`,
+      cancelLink: `/services/${req.params.sid}/service-information`,
       serviceId: req.params.sid,
       userRoles: manageRolesForService,
-      currentNavigation: "",
+      currentNavigation: "configuration",
     });
   }
 
@@ -73,7 +74,6 @@ const postEditServiceInfo = async (req, res) => {
   if (hasNameChanged) {
     changedData["name"] = model.name;
   }
-
   if (hasDescriptionChanged) {
     changedData["description"] = model.description;
   }
@@ -93,9 +93,10 @@ const postEditServiceInfo = async (req, res) => {
           name: service.name || "",
         },
         backLink: `/services/${req.params.sid}/service-information`,
+        cancelLink: `/services/${req.params.sid}/service-information`,
         serviceId: req.params.sid,
         userRoles: manageRolesForService,
-        currentNavigation: "",
+        currentNavigation: "configuration",
       });
     }
     return res.redirect("edit/confirm");

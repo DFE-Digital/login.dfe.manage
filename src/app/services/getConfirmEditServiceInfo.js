@@ -3,8 +3,7 @@ const { getUserServiceRoles } = require("./utils");
 
 const getConfirmEditServiceInfo = async (req, res) => {
   if (!req.session.editServiceInfo) {
-    // TODO figure out where to redirect too
-    return res.redirect("edit");
+    return res.redirect(`/services/${req.params.sid}/service-information`);
   }
   const model = req.session.editServiceInfo;
   const service = await getServiceById(req.params.sid, req.id);
@@ -14,9 +13,9 @@ const getConfirmEditServiceInfo = async (req, res) => {
     csrfToken: req.csrfToken(),
     model,
     service,
-    backLink: `/services/${req.params.sid}`,
-    cancelLink: `/services/${req.params.sid}`,
-    currentNavigation: "policies",
+    backLink: `/services/${req.params.sid}/service-information/edit`,
+    cancelLink: `/services/${req.params.sid}/service-information`,
+    currentNavigation: "configuration",
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
   });

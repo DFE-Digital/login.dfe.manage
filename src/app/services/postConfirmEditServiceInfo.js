@@ -37,13 +37,16 @@ const postConfirmEditServiceInfo = async (req, res) => {
   }
 
   await updateService(serviceId, model, correlationId);
-  logger.info("Successfully updated service details", {
-    correlationId: req.id,
-  });
+  logger.info(
+    `Successfully updated service details for service [${serviceId}]`,
+    {
+      correlationId: req.id,
+    },
+  );
 
   if (model.name && service.name !== model.name) {
     logger.info(
-      "Service name changed. Attempting to update internal manage roles so service name matches",
+      `Service name changed for service [${serviceId}]. Attempting to update internal manage roles so service name matches`,
       { correlationId: req.id },
     );
     // Check for internal manage roles and update service name to new one
@@ -56,7 +59,7 @@ const postConfirmEditServiceInfo = async (req, res) => {
       role.name.startsWith(service.name),
     );
     logger.info(
-      `Found [${roles.length}] internal manage roles, attempting to update them`,
+      `Found [${roles.length}] internal manage roles for service [${serviceId}]`,
       { correlationId: correlationId },
     );
 
@@ -100,7 +103,19 @@ const postConfirmEditServiceInfo = async (req, res) => {
 
   req.session.editServiceInfo = undefined;
   // TODO service-information page doesn't render flash, so need to add that
-  res.flash("info", `Successfully updated service name and/or description`);
+  const flashServiceName = model.name ? model.name : service.name;
+  let flashMessageText;
+  if (model.name && model.description) {
+    flashMessageText = "Successfully updated service name and description";
+  } else if (model.description) {
+    flashMessageText = "Successfully updated service description";
+  } else {
+    flashMessageText = "Successfully updated service name";
+  }
+
+  res.flash("title", "Success");
+  res.flash("heading", `Service updated: ${flashServiceName}`);
+  res.flash("message", flashMessageText);
 
   return res.redirect(`/services/${req.params.sid}/service-information`);
 };
