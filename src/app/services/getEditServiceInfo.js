@@ -26,7 +26,7 @@ const getEditServiceInfo = async (req, res) => {
     cancelLink: `/services/${req.params.sid}/service-information`,
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
-    currentNavigation: "configuration",
+    currentNavigation: "",
   });
 };
 

@@ -15,7 +15,7 @@ const postConfirmEditServiceInfo = async (req, res) => {
   const serviceId = req.params.sid;
   const correlationId = req.id;
   if (!model) {
-    return res.redirect(`/services/${serviceId}/service-information/`);
+    return res.redirect(`/services/${serviceId}/service-information`);
   }
 
   const service = await getServiceById(req.params.sid, correlationId);
@@ -32,7 +32,7 @@ const postConfirmEditServiceInfo = async (req, res) => {
         "error",
         "Service name must be unique and cannot already exist in DfE Sign-in",
       );
-      return res.redirect(`/services/${serviceId}/service-information/`);
+      return res.redirect(`/services/${serviceId}/service-information`);
     }
   }
 

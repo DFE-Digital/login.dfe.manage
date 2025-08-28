@@ -63,7 +63,7 @@ const postEditServiceInfo = async (req, res) => {
       cancelLink: `/services/${req.params.sid}/service-information`,
       serviceId: req.params.sid,
       userRoles: manageRolesForService,
-      currentNavigation: "configuration",
+      currentNavigation: "",
     });
   }
 
@@ -96,7 +96,7 @@ const postEditServiceInfo = async (req, res) => {
         cancelLink: `/services/${req.params.sid}/service-information`,
         serviceId: req.params.sid,
         userRoles: manageRolesForService,
-        currentNavigation: "configuration",
+        currentNavigation: "",
       });
     }
     return res.redirect("edit/confirm");

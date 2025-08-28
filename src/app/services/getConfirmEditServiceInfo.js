@@ -15,7 +15,7 @@ const getConfirmEditServiceInfo = async (req, res) => {
     service,
     backLink: `/services/${req.params.sid}/service-information/edit`,
     cancelLink: `/services/${req.params.sid}/service-information`,
-    currentNavigation: "configuration",
+    currentNavigation: "",
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
   });
