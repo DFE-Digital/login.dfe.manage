@@ -20,7 +20,7 @@ const postConfirmEditServiceInfo = async (req, res) => {
 
   const service = await getServiceById(req.params.sid, correlationId);
 
-  if (service.name !== model.name) {
+  if (model.name && service.name !== model.name) {
     // Only check if the name was changed
     const allServices = await listAllServices();
     const isMatchingName = allServices.services.find(
@@ -36,16 +36,12 @@ const postConfirmEditServiceInfo = async (req, res) => {
     }
   }
 
-  const updatedService = {
-    name: model.name,
-    description: model.description,
-  };
-  await updateService(serviceId, updatedService, correlationId);
+  await updateService(serviceId, model, correlationId);
   logger.info("Successfully updated service details", {
     correlationId: req.id,
   });
 
-  if (service.name !== model.name) {
+  if (model.name && service.name !== model.name) {
     logger.info(
       "Service name changed. Attempting to update internal manage roles so service name matches",
       { correlationId: req.id },
@@ -71,7 +67,7 @@ const postConfirmEditServiceInfo = async (req, res) => {
           service.name.length,
           role.name.length,
         );
-        const updatedRoleName = updatedService.name + roleSecondHalf;
+        const updatedRoleName = model.name + roleSecondHalf;
         try {
           await updateRole(manageServiceId, role.id, { name: updatedRoleName });
         } catch (e) {

@@ -5,14 +5,12 @@ const {
 const { getUserServiceRoles } = require("./utils");
 const logger = require("../../infrastructure/logger");
 
-const validate = async (req) => {
+const validate = async (req, service) => {
   const model = {
     name: req.body.name || "",
     description: req.body.description || "",
     validationMessages: {},
   };
-
-  const service = await getServiceById(req.params.sid, req.id);
 
   if (!model.name) {
     model.validationMessages.name = "Enter a name";
@@ -37,12 +35,21 @@ const validate = async (req) => {
       "Description must be 200 characters or less";
   }
 
+  if (model.name && model.description) {
+    const isNameUnchanged = service.name === model.name;
+    const isDescriptionUnchanged = service.description === model.description;
+    if (isNameUnchanged && isDescriptionUnchanged) {
+      model.validationMessages.name =
+        "Neither the name or description is different from the original";
+    }
+  }
+
   return model;
 };
 
 const postEditServiceInfo = async (req, res) => {
   const service = await getServiceById(req.params.sid, req.id);
-  const model = await validate(req);
+  const model = await validate(req, service);
   const manageRolesForService = await getUserServiceRoles(req);
 
   if (Object.keys(model.validationMessages).length > 0) {
@@ -51,24 +58,27 @@ const postEditServiceInfo = async (req, res) => {
       csrfToken: req.csrfToken(),
       service: {
         name: service.name || "",
-        description: service.description || "",
       },
-      backLink: `/services/${req.params.sid}`,
+      backLink: `/services/${req.params.sid}/service-information`,
       serviceId: req.params.sid,
       userRoles: manageRolesForService,
       currentNavigation: "",
     });
   }
 
-  // TODO once validation passed, need to figure out which fields have actually changed and only pass
-  // that in.
+  const hasNameChanged = service.name !== model.name;
+  const hasDescriptionChanged = service.description !== model.description;
+  const changedData = {};
 
-  logger.info(
-    "Validation passed.  Saving name/description to session for confirmation",
-    { correlationId: req.id },
-  );
-  // TODO do we maybe pass in service name, desc and Id. Id stops potential tampering?
-  req.session.editServiceInfo = model;
+  if (hasNameChanged) {
+    changedData["name"] = model.name;
+  }
+
+  if (hasDescriptionChanged) {
+    changedData["description"] = model.description;
+  }
+
+  req.session.editServiceInfo = changedData;
   req.session.save((error) => {
     if (error) {
       // Any error saving to session should hopefully be temporary. Assuming this, we log the error
@@ -77,13 +87,12 @@ const postEditServiceInfo = async (req, res) => {
       model.validationMessages.name =
         "Something went wrong submitting data, please try again";
       return res.render("services/views/editServiceInfo", {
-        ...model,
+        model,
         csrfToken: req.csrfToken(),
         service: {
           name: service.name || "",
-          description: service.description || "",
         },
-        backLink: `/services/${req.params.sid}`,
+        backLink: `/services/${req.params.sid}/service-information`,
         serviceId: req.params.sid,
         userRoles: manageRolesForService,
         currentNavigation: "",
