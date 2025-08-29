@@ -14,7 +14,7 @@ const getServiceInfo = async (req, res) => {
   return res.render("services/views/serviceInfo", {
     csrfToken: req.csrfToken(),
     service: {
-      name: service.name || "",
+      name: service.name,
       description: service.description || "",
     },
     backLink: `/services/${req.params.sid}`,

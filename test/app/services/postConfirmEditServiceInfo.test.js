@@ -27,6 +27,9 @@ const getServiceByIdData = {
   id: "service-1",
   name: "service one",
   description: "service description",
+  relyingParty: {
+    client_id: "serviceClientId",
+  },
   // Other fields would be present, but omitted for brevity
 };
 
@@ -191,6 +194,27 @@ describe("when getting the post confirm edit service info page", () => {
     expect(res.flash.mock.calls[2][0]).toBe("message");
     expect(res.flash.mock.calls[2][1]).toBe(
       "Successfully updated service name and description",
+    );
+  });
+
+  it("should flash an info message if the update role fails", async () => {
+    updateRole.mockImplementation(() => {
+      throw new Error("Something went wrong");
+    });
+    await postConfirmEditServiceInfo(req, res);
+
+    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toBe(
+      "/services/service-1/service-information",
+    );
+    expect(res.flash.mock.calls).toHaveLength(6);
+    expect(res.flash.mock.calls[0][0]).toBe("title");
+    expect(res.flash.mock.calls[0][1]).toBe("Info");
+    expect(res.flash.mock.calls[1][0]).toBe("heading");
+    expect(res.flash.mock.calls[1][1]).toBe("Role failed to update");
+    expect(res.flash.mock.calls[2][0]).toBe("message");
+    expect(res.flash.mock.calls[2][1]).toBe(
+      "An internal role failed to update.  Please notify us of this.",
     );
   });
 });

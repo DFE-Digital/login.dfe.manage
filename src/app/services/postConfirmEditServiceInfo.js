@@ -27,7 +27,6 @@ const postConfirmEditServiceInfo = async (req, res) => {
       (service) => service.name === model.name,
     );
     if (isMatchingName) {
-      // TODO service-information page needs to handle flash
       res.flash(
         "error",
         "Service name must be unique and cannot already exist in DfE Sign-in",
@@ -63,6 +62,8 @@ const postConfirmEditServiceInfo = async (req, res) => {
       { correlationId: correlationId },
     );
 
+    let roleFailedToUpdate = false;
+
     await Promise.all(
       roles.map(async (role) => {
         // Turns 'servicename - manage role name' into ' - manage role name'
@@ -74,44 +75,67 @@ const postConfirmEditServiceInfo = async (req, res) => {
         try {
           await updateRole(manageServiceId, role.id, { name: updatedRoleName });
         } catch (e) {
-          // TODO what do we do if role update fails? Flash a message?
+          // Error happening here isn't fatal, so we'll continue but log an error and flash a message to the user.
+          roleFailedToUpdate = true;
           logger.error(e);
         }
       }),
     );
+
+    if (roleFailedToUpdate) {
+      res.flash("title", "Info");
+      res.flash("heading", "Role failed to update");
+      res.flash(
+        "message",
+        "An internal role failed to update.  Please notify us of this.",
+      );
+    }
   }
 
-  // TODO figure out what bits changed and add them to the editedFields array
-  // logger.audit(
-  //   `${req.user.email} (id: ${req.user.sub}) updated the name and/or description of service ${req.params.sid}`,
-  //   {
-  //     type: "manage",
-  //     subType: "service-info-edit",
-  //     userId: req.user.sub,
-  //     userEmail: req.user.email,
-  //     name: model.name,
-  //     description: model.description,
-  //     editedFields: [
-  //       {
-  //         name: "delete_banner",
-  //         oldValue: req.params.bid,
-  //         newValue: undefined,
-  //       },
-  //     ],
-  //   },
-  // );
-
-  req.session.editServiceInfo = undefined;
-  // TODO service-information page doesn't render flash, so need to add that
-  const flashServiceName = model.name ? model.name : service.name;
   let flashMessageText;
+  const editedFields = [];
   if (model.name && model.description) {
     flashMessageText = "Successfully updated service name and description";
+    editedFields.push({
+      name: "name",
+      oldValue: service.name,
+      newValue: model.name,
+    });
+    editedFields.push({
+      name: "description",
+      oldValue: service.description,
+      newValue: model.description,
+    });
   } else if (model.description) {
     flashMessageText = "Successfully updated service description";
+    editedFields.push({
+      name: "description",
+      oldValue: service.description,
+      newValue: model.description,
+    });
   } else {
     flashMessageText = "Successfully updated service name";
+    editedFields.push({
+      name: "name",
+      oldValue: service.name,
+      newValue: model.name,
+    });
   }
+
+  logger.audit(
+    `${req.user.email} updated the name and/or description of service`,
+    {
+      type: "manage",
+      subType: "service-info-edit",
+      userId: req.user.sub,
+      userEmail: req.user.email,
+      client: service.relyingParty.client_id,
+      editedFields,
+    },
+  );
+
+  req.session.editServiceInfo = undefined;
+  const flashServiceName = model.name ? model.name : service.name;
 
   res.flash("title", "Success");
   res.flash("heading", `Service updated: ${flashServiceName}`);
