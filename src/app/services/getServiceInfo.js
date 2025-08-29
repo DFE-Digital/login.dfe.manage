@@ -6,7 +6,7 @@ const getServiceInfo = async (req, res) => {
   const manageRolesForService = await getUserServiceRoles(req);
   const canUserModifyService = doesUserHaveRole(
     req,
-    "manageModifyPolicyCondition",
+    "internalServiceConfigurationManager",
   );
   if (req.session.editServiceInfo) {
     req.session.editServiceInfo = undefined;

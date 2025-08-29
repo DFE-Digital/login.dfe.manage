@@ -127,28 +127,28 @@ const services = (csrf) => {
     "/:sid/service-information/edit",
     csrf,
     isManageUserForService,
-    hasGenericRole("manageModifyPolicyCondition"),
+    hasGenericRole("internalServiceConfigurationManager"),
     asyncWrapper(getEditServiceInfo),
   );
   router.post(
     "/:sid/service-information/edit",
     csrf,
     isManageUserForService,
-    hasGenericRole("manageModifyPolicyCondition"),
+    hasGenericRole("internalServiceConfigurationManager"),
     asyncWrapper(postEditServiceInfo),
   );
   router.get(
     "/:sid/service-information/edit/confirm",
     csrf,
     isManageUserForService,
-    hasGenericRole("manageModifyPolicyCondition"),
+    hasGenericRole("internalServiceConfigurationManager"),
     asyncWrapper(getConfirmEditServiceInfo),
   );
   router.post(
     "/:sid/service-information/edit/confirm",
     csrf,
     isManageUserForService,
-    hasGenericRole("manageModifyPolicyCondition"),
+    hasGenericRole("internalServiceConfigurationManager"),
     asyncWrapper(postConfirmEditServiceInfo),
   );
 
@@ -498,7 +498,7 @@ const services = (csrf) => {
     "/:sid/policies/:pid/create-policy-condition",
     csrf,
     isManageUserForService,
-    hasGenericRole("manageModifyPolicyCondition"),
+    hasGenericRole("internalServiceConfigurationManager"),
     asyncWrapper(getCreatePolicyCondition),
   );
 
@@ -506,7 +506,7 @@ const services = (csrf) => {
     "/:sid/policies/:pid/create-policy-condition",
     csrf,
     isManageUserForService,
-    hasGenericRole("manageModifyPolicyCondition"),
+    hasGenericRole("internalServiceConfigurationManager"),
     asyncWrapper(postCreatePolicyCondition),
   );
 
@@ -514,7 +514,7 @@ const services = (csrf) => {
     "/:sid/policies/:pid/confirm-create-policy-condition",
     csrf,
     isManageUserForService,
-    hasGenericRole("manageModifyPolicyCondition"),
+    hasGenericRole("internalServiceConfigurationManager"),
     asyncWrapper(getConfirmCreatePolicyCondition),
   );
 
@@ -522,7 +522,7 @@ const services = (csrf) => {
     "/:sid/policies/:pid/confirm-create-policy-condition",
     csrf,
     isManageUserForService,
-    hasGenericRole("manageModifyPolicyCondition"),
+    hasGenericRole("internalServiceConfigurationManager"),
     asyncWrapper(postConfirmCreatePolicyCondition),
   );
 
@@ -530,7 +530,7 @@ const services = (csrf) => {
     "/:sid/policies/:pid/confirm-remove-policy-condition",
     csrf,
     isManageUserForService,
-    hasGenericRole("manageModifyPolicyCondition"),
+    hasGenericRole("internalServiceConfigurationManager"),
     asyncWrapper(getConfirmRemovePolicyCondition),
   );
 
@@ -538,7 +538,7 @@ const services = (csrf) => {
     "/:sid/policies/:pid/confirm-remove-policy-condition",
     csrf,
     isManageUserForService,
-    hasGenericRole("manageModifyPolicyCondition"),
+    hasGenericRole("internalServiceConfigurationManager"),
     asyncWrapper(postConfirmRemovePolicyCondition),
   );
 
