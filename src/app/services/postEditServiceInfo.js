@@ -30,9 +30,9 @@ const validate = async (req, service) => {
 
   if (!model.description) {
     model.validationMessages.description = "Enter a description";
-  } else if (model.description.length > 200) {
+  } else if (model.description.length > 400) {
     model.validationMessages.description =
-      "Description must be 200 characters or less";
+      "Description must be 400 characters or less";
   }
 
   if (model.name && model.description) {

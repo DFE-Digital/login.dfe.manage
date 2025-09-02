@@ -147,25 +147,14 @@ describe("when getting the post edit service info page", () => {
     });
   });
 
-  it("should display an error if the description is over 50 characters", async () => {
-    req.body.description = "abcde12345".repeat(20) + "a"; // 201 characters
+  it("should display an error if the description is over 400 characters", async () => {
+    req.body.description = "abcde12345".repeat(40) + "a"; // 401 characters
     await postEditServiceInfo(req, res);
 
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][0]).toBe("services/views/editServiceInfo");
     expect(res.render.mock.calls[0][1].model.validationMessages).toMatchObject({
-      description: "Description must be 200 characters or less",
-    });
-  });
-
-  it("should display an error if the description is over 50 characters", async () => {
-    req.body.description = "abcde12345".repeat(20) + "a"; // 201 characters
-    await postEditServiceInfo(req, res);
-
-    expect(res.render.mock.calls).toHaveLength(1);
-    expect(res.render.mock.calls[0][0]).toBe("services/views/editServiceInfo");
-    expect(res.render.mock.calls[0][1].model.validationMessages).toMatchObject({
-      description: "Description must be 200 characters or less",
+      description: "Description must be 400 characters or less",
     });
   });
 

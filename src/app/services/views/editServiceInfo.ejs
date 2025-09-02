@@ -18,18 +18,25 @@
                             <span class="govuk-visually-hidden">Error:</span> <%=locals.model.validationMessages.name %>
                         </p>
                     <% } %>
-                        <input type="text" id="name" name="name" value="<%=locals.model.name%>" class="govuk-input govuk-!-width-three-quarters" maxlength="20"<% if (locals.model.validationMessages.name) { %> aria-invalid="true" aria-describedby="validation-name" <% } %>>
+                        <input type="text" id="name" name="name" value="<%=locals.model.name%>" class="govuk-input govuk-!-width-three-quarters" maxlength="200"<% if (locals.model.validationMessages.name) { %> aria-invalid="true" aria-describedby="validation-name" <% } %>>
                     </div>
 
-                    <div class="govuk-form-group <%= (locals.model.validationMessages.description !== undefined) ? 'govuk-form-group--error' : '' %>">
-                        <label class="govuk-label govuk-label--s" for="description">Description</label>
+                    <div class="govuk-form-group govuk-character-count <%= (locals.model.validationMessages.description !== undefined) ? 'govuk-form-group--error' : '' %>"
+                    data-module="govuk-character-count" data-maxlength="400">
+                    <label class="govuk-label govuk-label--s" for="description">Description</label>
                     <% if (locals.model.validationMessages.description !== undefined) { %>
-                        <p id="validation-description" class="govuk-error-message">
+                        <span id="validation-message" class="govuk-error-message">
                             <span class="govuk-visually-hidden">Error:</span> <%=locals.model.validationMessages.description %>
-                        </p>
+                        </span>
                     <% } %>
-                        <textarea type="text" id="description" name="description" class="govuk-textarea govuk-!-width-three-quarters" rows="4" maxlength="400"<% if (locals.model.validationMessages.description) { %> aria-invalid="true" aria-describedby="validation-description" <% } %>><%=locals.model.description%></textarea>
+                    <textarea class="govuk-textarea govuk-!-width-three-quarters govuk-js-character-count" aria-describedby="description-info<%- (locals.model.validationMessages.description !== undefined) ? ' validation-message" aria-invalid="true"' : '"' %>
+                        id="description" name="description" rows="4" maxlength="400" ><%=locals.model.description%></textarea>
+                    <div id="description-info" class="govuk-hint govuk-character-count__message">
+                        You can enter up to 400 characters
                     </div>
+                </div>
+
+
                 </fieldset>
                 <div class="govuk-button-group">
                     <button type="submit" class="govuk-button" data-module="govuk-button">Save</button>
