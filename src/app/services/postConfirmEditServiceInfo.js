@@ -54,8 +54,9 @@ const postConfirmEditServiceInfo = async (req, res) => {
       manageServiceId,
       correlationId,
     );
+    // Internal manage role codes are in the form of 'serviceId_role' (e.g., service-id_serviceconfig)
     const roles = rolesOfService.filter((role) =>
-      role.name.startsWith(service.name),
+      role.code.toLowerCase().startsWith(serviceId.toLowerCase()),
     );
     logger.info(
       `Found [${roles.length}] internal manage roles for service [${serviceId}]`,
@@ -66,12 +67,10 @@ const postConfirmEditServiceInfo = async (req, res) => {
 
     await Promise.all(
       roles.map(async (role) => {
-        // Turns 'servicename - manage role name' into ' - manage role name'
-        const roleSecondHalf = role.name.substring(
-          service.name.length,
-          role.name.length,
-        );
-        const updatedRoleName = model.name + roleSecondHalf;
+        // This assumes the internal roles are always in the form of 'service - role'
+        // where the role never has a dash in it.
+        const roleSecondHalf = role.name.split("-").at(-1);
+        const updatedRoleName = model.name + " -" + roleSecondHalf;
         try {
           await updateRole(manageServiceId, role.id, { name: updatedRoleName });
         } catch (e) {

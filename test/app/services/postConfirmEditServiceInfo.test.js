@@ -50,7 +50,7 @@ const listAllServicesData = {
 
 const listRolesOfServiceData = [
   {
-    code: "service code",
+    code: "service-1_serviceconfig",
     id: "role-id",
     name: "service one - Service configuration",
     status: {
