@@ -69,6 +69,16 @@ describe("when getting the Service Info page", () => {
     expect(getServiceById.mock.calls).toHaveLength(1);
     expect(getServiceById.mock.calls[0][0]).toBe("service1");
     expect(getServiceById.mock.calls[0][1]).toBe("correlationId");
+
+    expect(res.render.mock.calls[0][1]).toMatchObject({
+      csrfToken: "token",
+      backLink: "/services/service1",
+      userRoles: ["serviceid_serviceconfiguration"],
+      service: {
+        name: "service one",
+        description: "service description",
+      },
+    });
   });
 
   it("then it should get the user`s Manage roles for the service", async () => {
@@ -78,38 +88,39 @@ describe("when getting the Service Info page", () => {
     expect(getUserServiceRoles.mock.calls[0][0]).toMatchObject(req);
   });
 
-  it("then it should include csrf token in model", async () => {
-    await getServiceInfo(req, res);
-
-    expect(res.render.mock.calls[0][1]).toMatchObject({
-      csrfToken: "token",
+  it("should include an empty string in the service description in the model even if it is null", async () => {
+    getServiceById.mockReturnValue({
+      id: "service1",
+      name: "service one",
+      description: null,
+      relyingParty: {
+        client_id: "clientid",
+        client_secret: "dewier-thrombi-confounder-mikado",
+        api_secret: "dewier-thrombi-confounder-mikado",
+        service_home: "https://www.servicehome.com",
+        postResetUrl: "https://www.postreset.com",
+        redirect_uris: ["https://www.redirect.com"],
+        post_logout_redirect_uris: ["https://www.logout.com"],
+        grant_types: ["implicit", "authorization_code"],
+        response_types: ["code"],
+      },
     });
-  });
-
-  it("then it should include the service name and service description in the model", async () => {
     await getServiceInfo(req, res);
 
     expect(res.render.mock.calls[0][1]).toMatchObject({
       service: {
         name: "service one",
-        description: "service description",
+        description: "",
       },
     });
   });
 
-  it("then should include the back link in the model", async () => {
+  it("should clear the editServiceInfo data in the session if present", async () => {
+    req.session.editServiceInfo = {
+      name: "Test name",
+    };
     await getServiceInfo(req, res);
 
-    expect(res.render.mock.calls[0][1]).toMatchObject({
-      backLink: "/services/service1",
-    });
-  });
-
-  it("then should include the user roles in the model", async () => {
-    await getServiceInfo(req, res);
-
-    expect(res.render.mock.calls[0][1]).toMatchObject({
-      userRoles: ["serviceid_serviceconfiguration"],
-    });
+    expect(req.session.editServiceInfo).toBe(undefined);
   });
 });

@@ -16,6 +16,9 @@ const configMockFactory = (customConfig) => ({
   },
   access: {
     type: "static",
+    identifiers: {
+      service: "manage-service-id",
+    },
   },
   search: {
     type: "static",
