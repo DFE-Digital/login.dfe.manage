@@ -254,21 +254,6 @@ describe("when getting users audit details", () => {
     });
   });
 
-  it("then it should include total number of records in model", async () => {
-    await getAudit(req, res);
-
-    expect(res.render.mock.calls[0][1]).toMatchObject({
-      totalNumberOfResults: 56,
-    });
-  });
-
-  it("then it should get user details", async () => {
-    await getAudit(req, res);
-
-    expect(getUserDetailsById.mock.calls).toHaveLength(1);
-    expect(getUserDetailsById.mock.calls[0][0]).toBe(req.params.uid);
-  });
-
   it("then it should get page of audits using page 1 if page not specified", async () => {
     req.query.page = undefined;
 
@@ -279,12 +264,27 @@ describe("when getting users audit details", () => {
     expect(getPageOfUserAudits.mock.calls[0][1]).toBe(1);
   });
 
-  it("then it should get page of audits using page specified", async () => {
+  it("then it should get page of audits using page specified and get user details", async () => {
     await getAudit(req, res);
 
+    expect(getUserDetailsById.mock.calls).toHaveLength(1);
+    expect(getUserDetailsById.mock.calls[0][0]).toBe(req.params.uid);
     expect(getPageOfUserAudits.mock.calls).toHaveLength(1);
     expect(getPageOfUserAudits.mock.calls[0][0]).toBe("user1");
     expect(getPageOfUserAudits.mock.calls[0][1]).toBe(3);
+
+    expect(getServiceIdForClientId.mock.calls).toHaveLength(2);
+    expect(getServiceIdForClientId.mock.calls[0][0]).toBe("client-1");
+    expect(getServiceIdForClientId.mock.calls[1][0]).toBe("client-2");
+
+    expect(getServiceById.mock.calls).toHaveLength(3);
+    expect(getServiceById.mock.calls[0][0]).toBe("service-1");
+    expect(getServiceById.mock.calls[1][0]).toBe("service-1");
+    expect(getServiceById.mock.calls[2][0]).toBe("service-2");
+
+    expect(res.render.mock.calls[0][1]).toMatchObject({
+      totalNumberOfResults: 56,
+    });
   });
 
   it("then it should return 400 if specified page is not numeric", async () => {
@@ -295,19 +295,6 @@ describe("when getting users audit details", () => {
     expect(res.status.mock.calls).toHaveLength(1);
     expect(res.status.mock.calls[0][0]).toBe(400);
     expect(res.send.mock.calls).toHaveLength(1);
-  });
-
-  it("then it should get service for each audit that has client", async () => {
-    await getAudit(req, res);
-
-    expect(getServiceIdForClientId.mock.calls).toHaveLength(2);
-    expect(getServiceIdForClientId.mock.calls[0][0]).toBe("client-1");
-    expect(getServiceIdForClientId.mock.calls[1][0]).toBe("client-2");
-
-    expect(getServiceById.mock.calls).toHaveLength(3);
-    expect(getServiceById.mock.calls[0][0]).toBe("service-1");
-    expect(getServiceById.mock.calls[1][0]).toBe("service-1");
-    expect(getServiceById.mock.calls[2][0]).toBe("service-2");
   });
 
   it("then it should include the returnOrgId as null, if the returnOrg ID isn't set", async () => {

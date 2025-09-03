@@ -34,7 +34,7 @@ const getPolicyConditions = async (req, res) => {
   const manageRolesForService = await getUserServiceRoles(req);
   const canUserModifyPolicyConditions = doesUserHaveRole(
     req,
-    "manageModifyPolicyCondition",
+    "internalServiceConfigurationManager",
   );
   await mapPolicyConstraints(policy, req.id);
 

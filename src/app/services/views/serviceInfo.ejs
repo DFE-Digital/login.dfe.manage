@@ -1,12 +1,35 @@
 <div class="govuk-width-container govuk-main-wrapper">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-three-quarters">
+            <% if (locals.flash.title && locals.flash.heading && locals.flash.message) { %>
+                <div id="notification-wrapper" class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+                    <div class="govuk-notification-banner__header">
+                        <span class="close-button">x</span>
+                        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                            <%= locals.flash.title %>
+                        </h2>
+                    </div>
+                    <div class="govuk-notification-banner__content">
+                        <h3 class="govuk-notification-banner__heading">
+                            <%= locals.flash.heading %>
+                        </h3>
+                        <p class="govuk-body">
+                            <%= locals.flash.message %>
+                        </p>
+                    </div>
+                </div>
+            <% } %>
             <h1 class="govuk-heading-xl govuk-!-margin-top-0 text-break">
                 <span class="govuk-caption-xl"><%=locals.service.name%></span>
                 View your service name and description
             </h1>
             <p class="govuk-body"> This is the name and description of your service. This is the information DfE Sign-in users will see on the My services page of their account. </p>
-            <p class="govuk-body"><a class="govuk-link" href="<%= locals.urls.serviceNow%>">Contact us</a> to request a change to the service name or description.</p>
+            <% if (locals.canUserModifyService ) { %>
+                <p class="govuk-body">Click here to <a class="govuk-link" href="service-information/edit">Edit service info</a>.</p>
+            <% } else { %>
+                <p class="govuk-body"><a class="govuk-link" href="<%= locals.urls.serviceNow%>">Contact us</a> to request a change to the service name or description.</p>
+            <% } %>
+            
         </div>
     </div>
 

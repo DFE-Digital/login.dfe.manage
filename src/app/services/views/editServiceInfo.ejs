@@ -1,0 +1,49 @@
+<div class="govuk-width-container govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <h1 class="govuk-heading-l text-break">
+                Edit service info for <%= locals.service.name %>
+            </h1>
+            <p class="govuk-body">Review these details before confirming.</p>
+
+            <form method="post">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
+
+                <fieldset class="govuk-fieldset" id="fieldset-new-banner">
+                    <legend class="govuk-visually-hidden">Edit service info</legend>
+                    <div class="govuk-form-group <%= (locals.model.validationMessages.name !== undefined) ? 'govuk-form-group--error' : '' %>">
+                        <label class="govuk-label govuk-label--s" for="name">Name</label>
+                    <% if (locals.model.validationMessages.name !== undefined) { %>
+                        <p id="validation-name" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span> <%=locals.model.validationMessages.name %>
+                        </p>
+                    <% } %>
+                        <input type="text" id="name" name="name" value="<%=locals.model.name%>" class="govuk-input govuk-!-width-three-quarters" maxlength="200"<% if (locals.model.validationMessages.name) { %> aria-invalid="true" aria-describedby="validation-name" <% } %>>
+                    </div>
+
+                    <div class="govuk-form-group govuk-character-count <%= (locals.model.validationMessages.description !== undefined) ? 'govuk-form-group--error' : '' %>"
+                    data-module="govuk-character-count" data-maxlength="400">
+                    <label class="govuk-label govuk-label--s" for="description">Description</label>
+                    <% if (locals.model.validationMessages.description !== undefined) { %>
+                        <span id="validation-message" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span> <%=locals.model.validationMessages.description %>
+                        </span>
+                    <% } %>
+                    <textarea class="govuk-textarea govuk-!-width-three-quarters govuk-js-character-count" aria-describedby="description-info<%- (locals.model.validationMessages.description !== undefined) ? ' validation-message" aria-invalid="true"' : '"' %>
+                        id="description" name="description" rows="4" maxlength="400" ><%=locals.model.description%></textarea>
+                    <div id="description-info" class="govuk-hint govuk-character-count__message">
+                        You can enter up to 400 characters
+                    </div>
+                </div>
+
+
+                </fieldset>
+                <div class="govuk-button-group">
+                    <button type="submit" class="govuk-button" data-module="govuk-button">Save</button>
+                    <a href="<%= locals.cancelLink %>" class="govuk-button govuk-button--secondary">Cancel</a>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
