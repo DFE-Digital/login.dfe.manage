@@ -3,10 +3,8 @@ const {
   AUTHENTICATION_FLOWS_PATTERNS,
 } = require("../../constants/serviceConfigConstants");
 const { getSearchDetailsForUserById } = require("../../infrastructure/search");
-const {
-  getInvitation,
-  getUserById,
-} = require("../../infrastructure/directories");
+const { getUserById } = require("../../infrastructure/directories");
+const { getInvitationRaw } = require("login.dfe.api-client/invitations");
 const { getServicesForUser } = require("../../infrastructure/access");
 const { mapUserStatus } = require("../../infrastructure/utils");
 const { getOrganisationByIdV2 } = require("../../infrastructure/organisations");
@@ -41,7 +39,7 @@ const mapUserToSupportModel = (user, userFromSearch) => ({
 
 const getUserDetailsById = async (uid, correlationId) => {
   if (uid.startsWith("inv-")) {
-    const invitation = await getInvitation(uid.substr(4), correlationId);
+    const invitation = await getInvitationRaw({ by: { id: uid.substr(4) } });
     return {
       id: uid,
       name: `${invitation.firstName} ${invitation.lastName}`,

@@ -1,14 +1,3 @@
-const getInvitation = async (invitationId) => {
-  return {
-    firstName: "Some",
-    lastName: "User",
-    email: "some.user@test.local",
-    keyToSuccessId: "1234567",
-    tokenSerialNumber: "12345678901",
-    id: invitationId,
-  };
-};
-
 const getUsersByIdV2 = async () => {
   return Promise.resolve([]);
 };
@@ -30,7 +19,6 @@ const createInvite = async () => {
 };
 
 module.exports = {
-  getInvitation,
   getUsersByIdV2,
   getUserById,
   createInvite,
