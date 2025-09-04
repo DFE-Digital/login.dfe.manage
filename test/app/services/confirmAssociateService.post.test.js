@@ -21,8 +21,9 @@ jest.mock("login.dfe.jobs-client", () => ({
   NotificationClient: jest.fn(),
 }));
 
-jest.mock("./../../../src/infrastructure/applications", () => ({
-  getServiceById: jest.fn(),
+jest.mock("login.dfe.api-client/api/setup");
+jest.mock("login.dfe.api-client/services", () => ({
+  getServiceRaw: jest.fn(),
 }));
 jest.mock("./../../../src/infrastructure/organisations");
 
@@ -42,7 +43,7 @@ const {
 } = require("../../../src/infrastructure/access");
 
 const { getUserDetails } = require("../../../src/app/services/utils");
-const { getServiceById } = require("../../../src/infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const postConfirmAssociateService =
   require("../../../src/app/services/confirmAssociateService").post;
 
@@ -88,8 +89,8 @@ describe("when confirm associating a service to user", () => {
       email: "test@test.com",
     });
 
-    getServiceById.mockReset();
-    getServiceById.mockReturnValue({
+    getServiceRaw.mockReset();
+    getServiceRaw.mockReturnValue({
       id: "service1",
       dateActivated: "10/10/2018",
       name: "service name",

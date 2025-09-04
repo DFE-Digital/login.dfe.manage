@@ -11,7 +11,7 @@ const {
   getReturnOrgId,
 } = require("./utils");
 const logger = require("../../infrastructure/logger");
-const { getServiceById } = require("../../infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const {
   getServicesForUser,
   getAllInvitationServices,
@@ -118,7 +118,9 @@ const getUserOrganisations = async (req, res) => {
     });
 
   const manageRolesForService = await getUserServiceRoles(req);
-  const currentService = await getServiceById(req.params.sid, req.id);
+  const currentService = await getServiceRaw({
+    by: { serviceId: req.params.sid },
+  });
 
   logger.audit(`${req.user.email} viewed user ${user.email}`, {
     type: "organisations",

@@ -54,14 +54,6 @@ const mapServiceFieldsToAttributes = (fields) =>
     return mappedField;
   });
 
-const getServiceById = async (idOrClientId) =>
-  applications.find(
-    (a) =>
-      a.id.toLowerCase() === idOrClientId.toLowerCase() ||
-      (a.relyingParty &&
-        a.relyingParty.clientId.toLowerCase() === idOrClientId.toLowerCase()),
-  );
-
 const getServiceSummaries = async (ids, fields) => {
   const lowercaseIds = ids.map((id) => id.toLowerCase());
   const foundApps = applications.filter(
@@ -123,7 +115,6 @@ const listAllBannersForService = async (id, correlationId) =>
   );
 
 module.exports = {
-  getServiceById,
   getServiceSummaries,
   updateService,
   listAllServices,

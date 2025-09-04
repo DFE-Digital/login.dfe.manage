@@ -14,11 +14,12 @@ jest.mock("../../../src/app/services/utils", () =>
 jest.mock("./../../../src/infrastructure/access", () => ({
   listRolesOfService: jest.fn(),
 }));
-jest.mock("./../../../src/infrastructure/applications", () => ({
-  getServiceById: jest.fn(),
-}));
 jest.mock("./../../../src/infrastructure/organisations", () => ({
   getOrganisationByIdV2: jest.fn(),
+}));
+jest.mock("login.dfe.api-client/api/setup");
+jest.mock("login.dfe.api-client/services", () => ({
+  getServiceRaw: jest.fn(),
 }));
 
 const { getRequestMock, getResponseMock } = require("../../utils");
@@ -27,7 +28,7 @@ const {
   getOrganisationByIdV2,
 } = require("../../../src/infrastructure/organisations");
 const { getUserDetails } = require("../../../src/app/services/utils");
-const { getServiceById } = require("../../../src/infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const getConfirmEditService =
   require("../../../src/app/services/confirmEditService").get;
 
@@ -50,8 +51,8 @@ describe("when displaying the confirm edit service view", () => {
       },
     });
 
-    getServiceById.mockReset();
-    getServiceById.mockReturnValue({
+    getServiceRaw.mockReset();
+    getServiceRaw.mockReturnValue({
       id: "service1",
       dateActivated: "10/10/2018",
       name: "service name",
@@ -85,9 +86,10 @@ describe("when displaying the confirm edit service view", () => {
   it("then it should get the service details by id", async () => {
     await getConfirmEditService(req, res);
 
-    expect(getServiceById.mock.calls).toHaveLength(1);
-    expect(getServiceById.mock.calls[0][0]).toBe("service1");
-    expect(getServiceById.mock.calls[0][1]).toBe("correlationId");
+    expect(getServiceRaw.mock.calls).toHaveLength(1);
+    expect(getServiceRaw).toHaveBeenCalledWith({
+      by: { serviceId: "service1" },
+    });
   });
 
   it("then it should get the selected roles details", async () => {

@@ -1,6 +1,6 @@
 const { NotificationClient } = require("login.dfe.jobs-client");
 const config = require("../../infrastructure/config");
-const { getServiceById } = require("../../infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const {
   listRolesOfService,
   addUserService,
@@ -19,7 +19,9 @@ const {
 const logger = require("../../infrastructure/logger");
 
 const getModel = async (req) => {
-  const service = await getServiceById(req.params.sid, req.id);
+  const service = await getServiceRaw({
+    by: { serviceId: req.params.sid },
+  });
   const allRolesForService = await listRolesOfService(req.params.sid, req.id);
   const selectedRoleIds = req.session.service.roles;
   const roleDetails = allRolesForService.filter((x) =>

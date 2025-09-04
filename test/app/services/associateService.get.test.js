@@ -12,8 +12,9 @@ jest.mock("../../../src/app/services/utils", () =>
 );
 jest.mock("login.dfe.policy-engine");
 jest.mock("../../../src/infrastructure/organisations");
-jest.mock("../../../src/infrastructure/applications", () => ({
-  getServiceById: jest.fn(),
+jest.mock("login.dfe.api-client/api/setup");
+jest.mock("login.dfe.api-client/services", () => ({
+  getServiceRaw: jest.fn(),
 }));
 
 const PolicyEngine = require("login.dfe.policy-engine");
@@ -22,7 +23,7 @@ const { getUserDetails } = require("../../../src/app/services/utils");
 const {
   getOrganisationByIdV2,
 } = require("../../../src/infrastructure/organisations");
-const { getServiceById } = require("../../../src/infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 
 const policyEngine = {
   getPolicyApplicationResultsForUser: jest.fn(),
@@ -57,8 +58,8 @@ describe("when displaying the associate service view", () => {
       name: "Organisation One",
     });
 
-    getServiceById.mockReset();
-    getServiceById.mockReturnValue({
+    getServiceRaw.mockReset();
+    getServiceRaw.mockReturnValue({
       id: "service1",
       dateActivated: "10/10/2018",
       name: "Service One",
@@ -86,8 +87,10 @@ describe("when displaying the associate service view", () => {
   it("then it should get the service details by id", async () => {
     await getAssociateService(req, res);
 
-    expect(getServiceById.mock.calls).toHaveLength(1);
-    expect(getServiceById.mock.calls[0][0]).toBe("service1");
+    expect(getServiceRaw.mock.calls).toHaveLength(1);
+    expect(getServiceRaw).toHaveBeenCalledWith({
+      by: { serviceId: "service1" },
+    });
   });
 
   it("then it should get the org details", async () => {

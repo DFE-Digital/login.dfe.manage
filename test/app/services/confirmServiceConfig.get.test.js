@@ -5,14 +5,17 @@ jest.mock("./../../../src/infrastructure/config", () =>
 jest.mock("./../../../src/infrastructure/logger", () =>
   require("../../utils").loggerMockFactory(),
 );
-jest.mock("./../../../src/infrastructure/applications");
 jest.mock("../../../src/app/services/utils");
+jest.mock("login.dfe.api-client/api/setup");
+jest.mock("login.dfe.api-client/services", () => ({
+  getServiceRaw: jest.fn(),
+}));
 
 const { getRequestMock, getResponseMock } = require("../../utils");
 const {
   getConfirmServiceConfig,
 } = require("../../../src/app/services/confirmServiceConfig");
-const { getServiceById } = require("../../../src/infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const { getUserServiceRoles } = require("../../../src/app/services/utils");
 
 const res = getResponseMock();
@@ -43,8 +46,8 @@ describe("when getting the Review service config changes page", () => {
       },
     });
 
-    getServiceById.mockReset();
-    getServiceById.mockReturnValue({
+    getServiceRaw.mockReset();
+    getServiceRaw.mockReturnValue({
       id: "service1",
       name: "service one",
       description: "service description",
@@ -143,15 +146,16 @@ describe("when getting the Review service config changes page", () => {
   it("then it should get the service by id", async () => {
     await getConfirmServiceConfig(req, res);
 
-    expect(getServiceById.mock.calls).toHaveLength(1);
-    expect(getServiceById.mock.calls[0][0]).toBe("service1");
-    expect(getServiceById.mock.calls[0][1]).toBe("correlationId");
+    expect(getServiceRaw.mock.calls).toHaveLength(1);
+    expect(getServiceRaw).toHaveBeenCalledWith({
+      by: { serviceId: "service1" },
+    });
   });
 
   it("should throw an error when unable to get the service by id", async () => {
     const errorMessage = "Error fetching service by ID";
 
-    getServiceById.mockImplementation(() => {
+    getServiceRaw.mockImplementation(() => {
       throw new Error(errorMessage);
     });
 

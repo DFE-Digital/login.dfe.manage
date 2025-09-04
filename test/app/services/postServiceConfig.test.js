@@ -33,14 +33,17 @@ jest.mock("login.dfe.validation", () => ({
   urlValidator: jest.fn(),
 }));
 
+jest.mock("login.dfe.api-client/api/setup");
+jest.mock("login.dfe.api-client/services", () => ({
+  getServiceRaw: jest.fn(),
+}));
+
 const { getRequestMock, getResponseMock } = require("../../utils");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const {
   postServiceConfig,
 } = require("../../../src/app/services/serviceConfig");
-const {
-  getServiceById,
-  updateService,
-} = require("../../../src/infrastructure/applications");
+const { updateService } = require("../../../src/infrastructure/applications");
 const {
   getUserServiceRoles,
   checkClientId,
@@ -51,7 +54,7 @@ const {
 
 const res = getResponseMock();
 
-// Represents the getServiceById response.
+// Represents the getServiceRaw response.
 const currentAuthServiceInfo = {
   id: "service1",
   name: "service one",
@@ -182,8 +185,8 @@ describe("when editing the AUTH flow service configuration", () => {
 
     updateService.mockReset();
     updateService.mockImplementation(() => Promise.resolve([]));
-    getServiceById.mockReset();
-    getServiceById
+    getServiceRaw.mockReset();
+    getServiceRaw
       .mockReturnValueOnce({ ...currentAuthServiceInfo })
       .mockReturnValueOnce(null);
     res.mockResetAll();
@@ -667,8 +670,8 @@ describe("when editing the HYBRID flow service configuration", () => {
 
     updateService.mockReset();
     updateService.mockImplementation(() => Promise.resolve([]));
-    getServiceById.mockReset();
-    getServiceById
+    getServiceRaw.mockReset();
+    getServiceRaw
       .mockReturnValueOnce({ ...currentHybridServiceInfo })
       .mockReturnValueOnce(null);
     res.mockResetAll();
@@ -841,8 +844,8 @@ describe("when editing the IMPLICIT flow service configuration", () => {
 
     updateService.mockReset();
     updateService.mockImplementation(() => Promise.resolve([]));
-    getServiceById.mockReset();
-    getServiceById
+    getServiceRaw.mockReset();
+    getServiceRaw
       .mockReturnValueOnce({ ...currentImplicitServiceInfo })
       .mockReturnValueOnce(null);
     res.mockResetAll();

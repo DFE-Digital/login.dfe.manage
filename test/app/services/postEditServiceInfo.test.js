@@ -6,14 +6,16 @@ jest.mock("./../../../src/infrastructure/logger", () =>
 );
 jest.mock("./../../../src/infrastructure/applications");
 jest.mock("../../../src/app/services/utils");
+jest.mock("login.dfe.api-client/api/setup");
+jest.mock("login.dfe.api-client/services", () => ({
+  getServiceRaw: jest.fn(),
+}));
 
 const { getRequestMock, getResponseMock } = require("../../utils");
 const postEditServiceInfo = require("../../../src/app/services/postEditServiceInfo");
-const {
-  getServiceById,
-  listAllServices,
-} = require("../../../src/infrastructure/applications");
+const { listAllServices } = require("../../../src/infrastructure/applications");
 const { getUserServiceRoles } = require("../../../src/app/services/utils");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 
 const res = getResponseMock();
 
@@ -56,8 +58,8 @@ describe("when getting the post edit service info page", () => {
       },
     });
 
-    getServiceById.mockReset();
-    getServiceById.mockReturnValue({
+    getServiceRaw.mockReset();
+    getServiceRaw.mockReturnValue({
       id: "service-1",
       name: "service one",
       description: "service description",

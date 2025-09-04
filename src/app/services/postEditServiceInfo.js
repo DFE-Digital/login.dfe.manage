@@ -1,7 +1,5 @@
-const {
-  getServiceById,
-  listAllServices,
-} = require("../../infrastructure/applications");
+const { listAllServices } = require("../../infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const { getUserServiceRoles } = require("./utils");
 const logger = require("../../infrastructure/logger");
 
@@ -48,7 +46,9 @@ const validate = async (req, service) => {
 };
 
 const postEditServiceInfo = async (req, res) => {
-  const service = await getServiceById(req.params.sid, req.id);
+  const service = await getServiceRaw({
+    by: { serviceId: req.params.sid },
+  });
   const model = await validate(req, service);
   const manageRolesForService = await getUserServiceRoles(req);
 

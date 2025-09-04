@@ -5,12 +5,16 @@ jest.mock("../../../src/infrastructure/logger", () =>
   require("../../utils").loggerMockFactory(),
 );
 
-jest.mock("../../../src/infrastructure/applications");
 jest.mock("../../../src/infrastructure/access");
+
+jest.mock("login.dfe.api-client/api/setup");
+jest.mock("login.dfe.api-client/services", () => ({
+  getServiceRaw: jest.fn(),
+}));
 
 const { getRequestMock, getResponseMock } = require("../../utils");
 const getPolicyConditions = require("../../../src/app/services/getPolicyConditionsAndRoles");
-const { getServiceById } = require("../../../src/infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const { getPolicyById } = require("../../../src/infrastructure/access");
 
 const res = getResponseMock();
@@ -33,8 +37,8 @@ describe("When displaying the selected policy's conditions and roles", () => {
       },
     });
 
-    getServiceById.mockReset();
-    getServiceById.mockReturnValue({
+    getServiceRaw.mockReset();
+    getServiceRaw.mockReturnValue({
       id: "service1",
       dateActivated: "10/10/2018",
       name: "service name",
@@ -83,9 +87,10 @@ describe("When displaying the selected policy's conditions and roles", () => {
   it("then it should get the service by id", async () => {
     await getPolicyConditions(req, res);
 
-    expect(getServiceById.mock.calls).toHaveLength(1);
-    expect(getServiceById.mock.calls[0][0]).toBe("service1");
-    expect(getServiceById.mock.calls[0][1]).toBe("correlationId");
+    expect(getServiceRaw.mock.calls).toHaveLength(1);
+    expect(getServiceRaw).toHaveBeenCalledWith({
+      by: { serviceId: "service1" },
+    });
   });
 
   it("then it should get the policy by id", async () => {

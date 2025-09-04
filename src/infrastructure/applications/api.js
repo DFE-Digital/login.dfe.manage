@@ -26,9 +26,6 @@ const callApi = async (endpoint, method, body, correlationId) => {
   }
 };
 
-const getServiceById = async (id, correlationId) =>
-  callApi(`services/${id}`, "GET", undefined, correlationId);
-
 const getServiceSummaries = async (ids, fields, correlationId) =>
   callApi(
     `service-summaries/${ids.join()}?fields=${fields.join()}`,
@@ -117,7 +114,6 @@ const removeBanner = async (sid, bid, correlationId) =>
   callApi(`services/${sid}/banners/${bid}`, "DELETE", undefined, correlationId);
 
 module.exports = {
-  getServiceById,
   getServiceSummaries,
   updateService,
   listAllServices,

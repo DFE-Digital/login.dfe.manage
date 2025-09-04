@@ -1,7 +1,5 @@
-const {
-  listBannersForService,
-  getServiceById,
-} = require("../../infrastructure/applications");
+const { listBannersForService } = require("../../infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const { getUserServiceRoles } = require("./utils");
 const {
   dateFormat,
@@ -26,7 +24,9 @@ const get = async (req, res) => {
       ? dateFormat(banner.updatedAt, "shortDateFormat")
       : "",
   }));
-  const serviceDetails = await getServiceById(req.params.sid, req.id);
+  const serviceDetails = await getServiceRaw({
+    by: { serviceId: req.params.sid },
+  });
   const manageRolesForService = await getUserServiceRoles(req);
   let activeBannerIndex = findActiveBannerIndex(serviceBanners.banners);
   if (activeBannerIndex === -1) {
@@ -62,7 +62,9 @@ const post = async (req, res) => {
     page,
     req.id,
   );
-  const serviceDetails = await getServiceById(req.params.sid, req.id);
+  const serviceDetails = await getServiceRaw({
+    by: { serviceId: req.params.sid },
+  });
 
   return res.render("services/views/serviceBanners", {
     csrfToken: req.csrfToken(),

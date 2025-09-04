@@ -1,6 +1,6 @@
 const { searchForUsers } = require("../../infrastructure/search");
 const logger = require("../../infrastructure/logger");
-const { getServiceById } = require("../../infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const {
   userStatusMap,
   lastLoginIntervalsMap,
@@ -197,7 +197,9 @@ const getFiltersModel = async (req) => {
 
 const viewModel = async (req) => {
   const result = await search(req);
-  const service = await getServiceById(req.params.sid, req.id);
+  const service = await getServiceRaw({
+    by: { serviceId: req.params.sid },
+  });
   const manageRolesForService = await getUserServiceRoles(req);
 
   // remove hidden organisations from displaying

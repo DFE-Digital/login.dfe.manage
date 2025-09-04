@@ -1,4 +1,4 @@
-const { getServiceById } = require("../../infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const { getPageOfPoliciesForService } = require("../../infrastructure/access");
 const { getUserServiceRoles } = require("./utils");
 
@@ -9,7 +9,9 @@ const viewModel = async (req) => {
     page = 1;
   }
 
-  const serviceDetails = await getServiceById(req.params.sid, req.id);
+  const serviceDetails = await getServiceRaw({
+    by: { serviceId: req.params.sid },
+  });
   const servicePolicies = await getPageOfPoliciesForService(
     req.params.sid,
     page,

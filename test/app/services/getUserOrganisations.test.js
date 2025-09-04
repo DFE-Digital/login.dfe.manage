@@ -9,7 +9,8 @@ jest.mock("../../../src/app/services/utils", () =>
     "getReturnOrgId",
   ]),
 );
-
+jest.mock("login.dfe.api-client/api/setup");
+jest.mock("login.dfe.api-client/services");
 jest.mock("./../../../src/infrastructure/organisations");
 jest.mock("login.dfe.api-client/users");
 jest.mock("../../../src/infrastructure/access");

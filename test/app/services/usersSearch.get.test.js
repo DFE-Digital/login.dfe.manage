@@ -5,12 +5,13 @@ jest.mock("./../../../src/infrastructure/logger", () =>
   require("./../../utils").loggerMockFactory(),
 );
 jest.mock("./../../../src/infrastructure/search");
-jest.mock("./../../../src/infrastructure/applications");
+jest.mock("login.dfe.api-client/api/setup");
+jest.mock("login.dfe.api-client/services", () => ({
+  getServiceRaw: jest.fn(),
+}));
 
 const { searchForUsers } = require("./../../../src/infrastructure/search");
-const {
-  getServiceById,
-} = require("./../../../src/infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const { getRequestMock, getResponseMock } = require("./../../utils");
 const { get } = require("./../../../src/app/services/usersSearch");
 
@@ -64,8 +65,8 @@ describe("When getting users search ", () => {
       users: usersSearchResult,
     });
 
-    getServiceById.mockReset();
-    getServiceById.mockReturnValue({
+    getServiceRaw.mockReset();
+    getServiceRaw.mockReturnValue({
       id: "service1",
       dateActivated: "10/10/2018",
       name: "service name",

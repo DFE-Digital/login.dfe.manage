@@ -11,7 +11,10 @@ jest.mock("../../../src/app/services/utils", () =>
   ]),
 );
 
-jest.mock("./../../../src/infrastructure/applications");
+jest.mock("login.dfe.api-client/api/setup");
+jest.mock("login.dfe.api-client/services", () => ({
+  getServiceRaw: jest.fn(),
+}));
 jest.mock("./../../../src/infrastructure/organisations");
 jest.mock("./../../../src/app/services/utils");
 
@@ -20,7 +23,7 @@ const { getUserDetails } = require("../../../src/app/services/utils");
 const {
   getOrganisationByIdV2,
 } = require("../../../src/infrastructure/organisations");
-const { getServiceById } = require("../../../src/infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const getRemoveService = require("../../../src/app/services/removeService").get;
 
 const res = getResponseMock();
@@ -36,8 +39,8 @@ describe("when displaying the remove service access view", () => {
       sid: "service1",
     };
 
-    getServiceById.mockReset();
-    getServiceById.mockReturnValue({
+    getServiceRaw.mockReset();
+    getServiceRaw.mockReturnValue({
       id: "service1",
       dateActivated: "10/10/2018",
       name: "service name",
@@ -57,9 +60,10 @@ describe("when displaying the remove service access view", () => {
   it("then it should get the selected user service", async () => {
     await getRemoveService(req, res);
 
-    expect(getServiceById.mock.calls).toHaveLength(1);
-    expect(getServiceById.mock.calls[0][0]).toBe("service1");
-    expect(getServiceById.mock.calls[0][1]).toBe("correlationId");
+    expect(getServiceRaw.mock.calls).toHaveLength(1);
+    expect(getServiceRaw).toHaveBeenCalledWith({
+      by: { serviceId: "service1" },
+    });
   });
 
   it("then it should get the organisation details", async () => {

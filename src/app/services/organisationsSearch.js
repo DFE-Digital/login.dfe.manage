@@ -4,7 +4,7 @@ const {
   getOrganisationCategories,
   listOrganisationStatus,
 } = require("../../infrastructure/organisations");
-const { getServiceById } = require("../../infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const {
   getUserServiceRoles,
   unpackMultiSelect,
@@ -184,7 +184,9 @@ const search = async (req) => {
 const buildModel = async (req) => {
   const [service, manageRolesForService, pageOfOrganisations] =
     await Promise.all([
-      getServiceById(req.params.sid, req.id),
+      getServiceRaw({
+        by: { serviceId: req.params.sid },
+      }),
       getUserServiceRoles(req),
       search(req),
     ]);

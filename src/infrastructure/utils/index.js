@@ -1,5 +1,5 @@
 const { getSingleUserService } = require("../access");
-const { getServiceById } = require("../applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const config = require("../config");
 
 const isLoggedIn = (req, res, next) => {
@@ -67,7 +67,9 @@ const hasGenericRole = (role) => (req, res, next) => {
 };
 
 const hasInvite = async (req, res, next) => {
-  const service = await getServiceById(req.params.sid, req.id);
+  const service = await getServiceRaw({
+    by: { serviceId: req.params.sid },
+  });
   if (
     service.relyingParty &&
     service.relyingParty.params &&

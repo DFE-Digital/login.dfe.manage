@@ -8,6 +8,10 @@ jest.mock("../../../src/app/services/utils", () =>
   ]),
 );
 
+jest.mock("login.dfe.api-client/api/setup");
+jest.mock("login.dfe.api-client/services", () => ({
+  getServiceRaw: jest.fn(),
+}));
 jest.mock("./../../../src/infrastructure/utils");
 jest.mock("./../../../src/infrastructure/organisations");
 jest.mock("./../../../src/infrastructure/applications");
@@ -26,7 +30,7 @@ const {
 const {
   getServiceIdForClientId,
 } = require("../../../src/infrastructure/serviceMapping");
-const { getServiceById } = require("../../../src/infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const getAudit = require("../../../src/app/services/getAudit");
 
 const organisationId = "org-1";
@@ -156,11 +160,11 @@ describe("when getting users audit details", () => {
       return null;
     });
 
-    getServiceById.mockReset();
-    getServiceById.mockImplementation((serviceId) => ({
-      id: serviceId,
-      name: serviceId,
-      description: serviceId,
+    getServiceRaw.mockReset();
+    getServiceRaw.mockImplementation((params) => ({
+      id: params.by.serviceId,
+      name: params.by.serviceId,
+      description: params.by.serviceId,
     }));
   });
 
@@ -277,10 +281,16 @@ describe("when getting users audit details", () => {
     expect(getServiceIdForClientId.mock.calls[0][0]).toBe("client-1");
     expect(getServiceIdForClientId.mock.calls[1][0]).toBe("client-2");
 
-    expect(getServiceById.mock.calls).toHaveLength(3);
-    expect(getServiceById.mock.calls[0][0]).toBe("service-1");
-    expect(getServiceById.mock.calls[1][0]).toBe("service-1");
-    expect(getServiceById.mock.calls[2][0]).toBe("service-2");
+    expect(getServiceRaw.mock.calls).toHaveLength(3);
+    expect(getServiceRaw.mock.calls[0][0]).toMatchObject({
+      by: { serviceId: "service-1" },
+    });
+    expect(getServiceRaw.mock.calls[1][0]).toMatchObject({
+      by: { serviceId: "service-1" },
+    });
+    expect(getServiceRaw.mock.calls[2][0]).toMatchObject({
+      by: { serviceId: "service-2" },
+    });
 
     expect(res.render.mock.calls[0][1]).toMatchObject({
       totalNumberOfResults: 56,

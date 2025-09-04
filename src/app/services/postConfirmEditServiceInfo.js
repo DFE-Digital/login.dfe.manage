@@ -1,9 +1,9 @@
 const logger = require("../../infrastructure/logger");
 const {
   listAllServices,
-  getServiceById,
   updateService,
 } = require("../../infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const {
   listRolesOfService,
   updateRole,
@@ -18,7 +18,9 @@ const postConfirmEditServiceInfo = async (req, res) => {
     return res.redirect(`/services/${serviceId}/service-information`);
   }
 
-  const service = await getServiceById(req.params.sid, correlationId);
+  const service = await getServiceRaw({
+    by: { serviceId: req.params.sid },
+  });
 
   if (model.name) {
     // Only check if the name was changed
