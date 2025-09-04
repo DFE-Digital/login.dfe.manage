@@ -1,7 +1,3 @@
-const getUsersByIdV2 = async () => {
-  return Promise.resolve([]);
-};
-
 const getUserById = async () => {
   return {
     sub: "7a1b077a-d7d4-4b60-83e8-1a1b49849510",
@@ -19,7 +15,6 @@ const createInvite = async () => {
 };
 
 module.exports = {
-  getUsersByIdV2,
   getUserById,
   createInvite,
 };

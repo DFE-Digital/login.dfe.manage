@@ -2,27 +2,6 @@ const config = require("./../config");
 const { fetchApi } = require("login.dfe.async-retry");
 const jwtStrategy = require("login.dfe.jwt-strategies");
 
-const getUsersByIdV2 = async (ids, correlationId) => {
-  const token = await jwtStrategy(config.directories.service).getBearerToken();
-  try {
-    return await fetchApi(`${config.directories.service.url}/users/by-ids`, {
-      method: "POST",
-      headers: {
-        authorization: `bearer ${token}`,
-        "x-correlation-id": correlationId,
-      },
-      body: {
-        ids: ids.toString(),
-      },
-    });
-  } catch (e) {
-    if (e.statusCode === 404) {
-      return null;
-    }
-    throw e;
-  }
-};
-
 const getUserById = async (uid, correlationId) => {
   const token = await jwtStrategy(config.directories.service).getBearerToken();
 
@@ -152,7 +131,6 @@ const updateInvite = async (id, email, correlationId) => {
 };
 
 module.exports = {
-  getUsersByIdV2,
   getUserById,
   getInvitationByEmail,
   createInvite,
