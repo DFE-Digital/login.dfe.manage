@@ -21,6 +21,7 @@ const oidc = require("./infrastructure/oidc");
 const configSchema = require("./infrastructure/config/schema");
 const config = require("./infrastructure/config");
 const logger = require("./infrastructure/logger");
+const { setupApi } = require("login.dfe.api-client/api/setup");
 
 const redisClient = new Redis(config.serviceMapping.params.connectionString);
 
@@ -33,6 +34,30 @@ const redisStore = new RedisStore({
 const registerRoutes = require("./routes");
 
 configSchema.validate();
+
+setupApi({
+  auth: {
+    tenant: config.directories.service.auth.tenant,
+    authorityHostUrl: config.directories.service.auth.authorityHostUrl,
+    clientId: config.directories.service.auth.clientId,
+    clientSecret: config.directories.service.auth.clientSecret,
+    resource: config.directories.service.auth.resource,
+  },
+  api: {
+    directories: {
+      baseUri: config.directories.service.url,
+    },
+    organisations: {
+      baseUri: config.organisations.service.url,
+    },
+    applications: {
+      baseUri: config.applications.service.url,
+    },
+    access: {
+      baseUri: config.access.service.url,
+    },
+  },
+});
 
 https.globalAgent.maxSockets = http.globalAgent.maxSockets =
   config.hostingEnvironment.agentKeepAlive.maxSockets || 50;

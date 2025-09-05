@@ -4,7 +4,7 @@ const {
   getAllUserOrganisations,
   getInvitationOrganisations,
 } = require("../../infrastructure/organisations");
-const { getUsersByIdV2 } = require("../../infrastructure/directories");
+const { getUsersRaw } = require("login.dfe.api-client/users");
 const {
   getUserDetails,
   getUserServiceRoles,
@@ -17,16 +17,17 @@ const {
   getAllInvitationServices,
 } = require("../../infrastructure/access");
 
-const getApproverDetails = async (organisation, correlationId) => {
+const getApproverDetails = async (organisation) => {
   const allApproverIds = flatten(organisation.map((org) => org.approvers));
   const distinctApproverIds = uniq(allApproverIds);
   if (distinctApproverIds.length === 0) {
     return [];
   }
-  const approverDetails = await getUsersByIdV2(
-    distinctApproverIds,
-    correlationId,
-  );
+  const approverDetails = await getUsersRaw({
+    by: {
+      userIds: distinctApproverIds,
+    },
+  });
   return approverDetails;
 };
 
@@ -38,7 +39,7 @@ const getOrganisations = async (userId, correlationId) => {
     return [];
   }
 
-  const allApprovers = await getApproverDetails(orgMapping, correlationId);
+  const allApprovers = await getApproverDetails(orgMapping);
 
   return Promise.all(
     orgMapping.map(async (invitation) => {
