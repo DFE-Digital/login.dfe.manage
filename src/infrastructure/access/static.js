@@ -14,7 +14,7 @@ const services = [
     ],
   },
 ];
-const getServicesForUser = (id) => {
+const getServicesForUserRaw = (id) => {
   const userServices = services.find(
     (x) => x.userId.toLowerCase() === id.toLowerCase(),
   );
@@ -83,7 +83,7 @@ const addUserService = async () => Promise.resolve(null);
 const addInvitationService = async () => Promise.resolve(null);
 
 module.exports = {
-  getServicesForUser,
+  getServicesForUserRaw,
   getSingleUserService,
   getSingleInvitationService,
   listRolesOfService,

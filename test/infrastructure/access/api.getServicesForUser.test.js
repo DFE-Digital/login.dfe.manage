@@ -13,9 +13,7 @@ jest.mock("./../../../src/infrastructure/config", () =>
 
 const { fetchApi } = require("login.dfe.async-retry");
 const jwtStrategy = require("login.dfe.jwt-strategies");
-const {
-  getServicesForUser,
-} = require("../../../src/infrastructure/access/api");
+const { getUserServicesRaw } = require("login.dfe.api-client/users");
 
 const userId = "user-1";
 const correlationId = "abc123";
@@ -44,7 +42,7 @@ const apiResponse = {
   ],
 };
 
-describe("when calling the getServicesForUser function", () => {
+describe("when calling the getUserServicesRaw function", () => {
   beforeEach(() => {
     fetchApi.mockReset();
     fetchApi.mockImplementation(() => {
@@ -60,7 +58,7 @@ describe("when calling the getServicesForUser function", () => {
   });
 
   it("then it should call services resource with user id", async () => {
-    await getServicesForUser(userId, correlationId);
+    await getUserServicesRaw({ userId });
 
     expect(fetchApi.mock.calls).toHaveLength(1);
     expect(fetchApi.mock.calls[0][0]).toBe(
@@ -72,7 +70,7 @@ describe("when calling the getServicesForUser function", () => {
   });
 
   it("then it should use the token from jwt strategy as bearer token", async () => {
-    await getServicesForUser(userId, correlationId);
+    await getUserServicesRaw({ userId });
 
     expect(fetchApi.mock.calls[0][1]).toMatchObject({
       headers: {
@@ -82,7 +80,7 @@ describe("when calling the getServicesForUser function", () => {
   });
 
   it("then it should include the correlation id", async () => {
-    await getServicesForUser(userId, correlationId);
+    await getUserServicesRaw({ userId });
 
     expect(fetchApi.mock.calls[0][1]).toMatchObject({
       headers: {
@@ -98,7 +96,7 @@ describe("when calling the getServicesForUser function", () => {
       throw error;
     });
 
-    const result = await getServicesForUser(userId, correlationId);
+    const result = getUserServicesRaw({ userId });
     expect(result).toEqual(undefined);
   });
 
@@ -110,7 +108,7 @@ describe("when calling the getServicesForUser function", () => {
     });
 
     try {
-      await getServicesForUser(userId, correlationId);
+      await getUserServicesRaw({ userId });
     } catch (e) {
       expect(e.statusCode).toEqual(500);
       expect(e.message).toEqual("Server Error");

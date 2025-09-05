@@ -5,7 +5,7 @@ const {
 const { getSearchDetailsForUserById } = require("../../infrastructure/search");
 const { getUserRaw } = require("login.dfe.api-client/users");
 const { getInvitationRaw } = require("login.dfe.api-client/invitations");
-const { getServicesForUser } = require("../../infrastructure/access");
+const { getUserServicesRaw } = require("login.dfe.api-client/users");
 const { mapUserStatus } = require("../../infrastructure/utils");
 const { getOrganisationByIdV2 } = require("../../infrastructure/organisations");
 const { mapAsync } = require("../../utils/asyncHelpers");
@@ -57,7 +57,7 @@ const getUserDetailsById = async (uid, correlationId) => {
   const userSearch = await getSearchDetailsForUserById(uid);
   const rawUser = await getUserRaw({ by: { id: uid } });
   const user = mapUserToSupportModel(rawUser, userSearch);
-  const serviceDetails = await getServicesForUser(uid, correlationId);
+  const serviceDetails = await getUserServicesRaw({ uid });
 
   const ktsDetails = serviceDetails
     ? serviceDetails.find(
