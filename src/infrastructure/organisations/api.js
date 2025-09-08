@@ -189,20 +189,6 @@ const putInvitationInOrganisation = async (
   );
 };
 
-const putUserInOrganisation = async (
-  userId,
-  organisationId,
-  role,
-  correlationId,
-) => {
-  return callOrganisationsApi(
-    `organisations/${organisationId}/users/${userId}`,
-    "PUT",
-    { roleId: role },
-    correlationId,
-  );
-};
-
 const getPendingRequestsAssociatedWithUser = async (userId, correlationId) => {
   return callOrganisationsApi(
     `/organisations/requests-for-user/${userId}`,
@@ -260,7 +246,6 @@ module.exports = {
   getUserOrganisations,
   getOrganisationByIdV2,
   putInvitationInOrganisation,
-  putUserInOrganisation,
   getPendingRequestsAssociatedWithUser,
   updateRequestById,
   searchOrgsAssociatedWithService,
