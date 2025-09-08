@@ -7,8 +7,8 @@ const logger = require("../../infrastructure/logger");
 
 const validate = async (req, service) => {
   const model = {
-    name: req.body.name || "",
-    description: req.body.description || "",
+    name: req.body.name.trim() || "",
+    description: req.body.description.trim() || "",
     validationMessages: {},
   };
 
@@ -17,10 +17,13 @@ const validate = async (req, service) => {
   } else if (model.name.length > 200) {
     model.validationMessages.name = "Name must be 200 characters or less";
   } else if (service.name !== model.name) {
-    // Only check if the name was changed
+    // Only check if the name was changed.  Also exclude existing service from search
+    // as this will allow us to modify capitalisation of letters for this service.
     const allServices = await listAllServices(req.id);
     const isMatchingName = allServices.services.find(
-      (service) => service.name === model.name,
+      (service) =>
+        service.name.toLowerCase() === model.name.toLowerCase() &&
+        service.id !== req.params.sid,
     );
     if (isMatchingName) {
       model.validationMessages.name =
