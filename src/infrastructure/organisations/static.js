@@ -91,10 +91,6 @@ const getOrganisationByIdV2 = async (id) => {
   );
 };
 
-const getPendingRequestsAssociatedWithUser = async () => {
-  return Promise.resolve();
-};
-
 const updateRequestById = async () => {
   return Promise.resolve();
 };
@@ -117,7 +113,6 @@ module.exports = {
   getInvitationOrganisations,
   searchOrganisations,
   getOrganisationByIdV2,
-  getPendingRequestsAssociatedWithUser,
   updateRequestById,
   searchOrgsAssociatedWithService,
 };
