@@ -91,10 +91,6 @@ const getOrganisationByIdV2 = async (id) => {
   );
 };
 
-const updateRequestById = async () => {
-  return Promise.resolve();
-};
-
 const searchOrgsAssociatedWithService = async (
   serviceId,
   criteria,
@@ -113,6 +109,5 @@ module.exports = {
   getInvitationOrganisations,
   searchOrganisations,
   getOrganisationByIdV2,
-  updateRequestById,
   searchOrgsAssociatedWithService,
 };
