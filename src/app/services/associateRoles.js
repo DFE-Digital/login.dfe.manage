@@ -44,16 +44,6 @@ const getViewModel = async (req) => {
   };
 };
 
-const get = async (req, res) => {
-  if (!req.session.user) {
-    return res.redirect(`/services/${req.params.sid}/users`);
-  }
-
-  const model = await getViewModel(req);
-
-  return res.render("services/views/associateRoles", model);
-};
-
 const post = async (req, res) => {
   if (!req.session.user) {
     return res.redirect(`/services/${req.params.sid}/users`);
@@ -96,6 +86,5 @@ const post = async (req, res) => {
 };
 
 module.exports = {
-  get,
   post,
 };
