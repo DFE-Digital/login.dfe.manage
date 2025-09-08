@@ -17,7 +17,6 @@ jest.mock("./../../../src/infrastructure/access");
 jest.mock("./../../../src/infrastructure/search", () => ({
   getSearchDetailsForUserById: jest.fn(),
   updateIndex: jest.fn(),
-  createIndex: jest.fn(),
 }));
 
 const { getRequestMock, getResponseMock } = require("../../utils");
