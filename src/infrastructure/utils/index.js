@@ -1,5 +1,4 @@
 const { getSingleUserService } = require("../access");
-const { getServiceById } = require("../applications");
 const config = require("../config");
 
 const isLoggedIn = (req, res, next) => {
@@ -64,18 +63,6 @@ const hasGenericRole = (role) => (req, res, next) => {
     return next();
   }
   return res.status(401).render("errors/views/notAuthorised");
-};
-
-const hasInvite = async (req, res, next) => {
-  const service = await getServiceById(req.params.sid, req.id);
-  if (
-    service.relyingParty &&
-    service.relyingParty.params &&
-    service.relyingParty.params.allowManageInvite === "true"
-  ) {
-    return next();
-  }
-  return res.status(401).render("errors/views/notFound");
 };
 
 const getUserDisplayName = (user) =>
@@ -148,7 +135,6 @@ module.exports = {
   hasGenericRole,
   mapUserStatus,
   mapUserRole,
-  hasInvite,
   userStatusMap,
   lastLoginIntervalsMap,
 };
