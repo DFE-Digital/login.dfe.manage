@@ -1,5 +1,7 @@
-const { listBannersForService } = require("../../infrastructure/applications");
-const { getServiceRaw } = require("login.dfe.api-client/services");
+const {
+  getServiceRaw,
+  getServiceBannersRaw,
+} = require("login.dfe.api-client/services");
 const { getUserServiceRoles } = require("./utils");
 const {
   dateFormat,
@@ -12,12 +14,11 @@ const get = async (req, res) => {
   if (isNaN(page)) {
     page = 1;
   }
-  const serviceBanners = await listBannersForService(
-    req.params.sid,
-    10,
+  const serviceBanners = await getServiceBannersRaw({
+    serviceId: req.params.sid,
+    pageSize: 10,
     page,
-    req.id,
-  );
+  });
   serviceBanners.banners = serviceBanners.banners.map((banner) => ({
     ...banner,
     formattedUpdateAt: banner.updatedAt
@@ -56,12 +57,11 @@ const post = async (req, res) => {
   if (isNaN(page)) {
     page = 1;
   }
-  const serviceBanners = await listBannersForService(
-    req.params.sid,
-    10,
+  const serviceBanners = await getServiceBannersRaw({
+    serviceId: req.params.sid,
+    pageSize: 10,
     page,
-    req.id,
-  );
+  });
   const serviceDetails = await getServiceRaw({
     by: { serviceId: req.params.sid },
   });
