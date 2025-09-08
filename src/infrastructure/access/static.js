@@ -21,7 +21,7 @@ const getServicesForUserRaw = (id) => {
   return Promise.resolve(userServices);
 };
 
-const getSingleUserService = () => Promise.resolve([]);
+const getSingleUserServiceRaw = () => Promise.resolve([]);
 
 const getSingleInvitationService = () => Promise.resolve([]);
 
@@ -84,8 +84,8 @@ const addInvitationService = async () => Promise.resolve(null);
 
 module.exports = {
   getServicesForUserRaw,
-  getSingleUserService,
-  getSingleInvitationService,
+  getSingleUserServiceRaw,
+  getSingleInvitationServiceRaw,
   listRolesOfService,
   updateUserService,
   updateInvitationService,

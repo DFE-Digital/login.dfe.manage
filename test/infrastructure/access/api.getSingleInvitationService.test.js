@@ -13,9 +13,10 @@ jest.mock("./../../../src/infrastructure/config", () =>
 
 const { fetchApi } = require("login.dfe.async-retry");
 const jwtStrategy = require("login.dfe.jwt-strategies");
-const {
-  getSingleInvitationService,
-} = require("../../../src/infrastructure/access/api");
+// const {
+//   getSingleInvitationService,
+// } = require("../../../src/infrastructure/access/api");
+const { getInvitationRaw } = require("login.dfe.api-client/invitations");
 
 const invitationId = "inv-1";
 const serviceId = "service-1";
@@ -23,7 +24,7 @@ const organisationId = "org-1";
 const correlationId = "abc123";
 const apiResponse = {};
 
-describe("when calling the getSingleInvitationService function", () => {
+describe("when calling the getSingleInvitationServiceRaw function", () => {
   beforeEach(() => {
     fetchApi.mockReset();
     fetchApi.mockImplementation(() => {
@@ -39,7 +40,7 @@ describe("when calling the getSingleInvitationService function", () => {
   });
 
   it("then it should call associated-with-user resource with user id", async () => {
-    await getSingleInvitationService(
+    await getSingleInvitationServiceRaw(
       invitationId,
       serviceId,
       organisationId,
@@ -56,7 +57,7 @@ describe("when calling the getSingleInvitationService function", () => {
   });
 
   it("then it should use the token from jwt strategy as bearer token", async () => {
-    await getSingleInvitationService(
+    await getSingleInvitationServiceRaw(
       invitationId,
       serviceId,
       organisationId,
@@ -71,7 +72,7 @@ describe("when calling the getSingleInvitationService function", () => {
   });
 
   it("then it should include the correlation id", async () => {
-    await getSingleInvitationService(
+    await getSingleInvitationServiceRaw(
       invitationId,
       serviceId,
       organisationId,
@@ -92,7 +93,7 @@ describe("when calling the getSingleInvitationService function", () => {
       throw error;
     });
 
-    const result = await getSingleInvitationService(
+    const result = await getSingleInvitationServiceRaw(
       invitationId,
       serviceId,
       organisationId,
@@ -109,7 +110,7 @@ describe("when calling the getSingleInvitationService function", () => {
     });
 
     try {
-      await getSingleInvitationService(
+      await getSingleInvitationServiceRaw(
         invitationId,
         serviceId,
         organisationId,

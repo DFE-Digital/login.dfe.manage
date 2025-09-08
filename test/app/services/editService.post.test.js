@@ -18,10 +18,8 @@ jest.mock("login.dfe.policy-engine");
 
 const PolicyEngine = require("login.dfe.policy-engine");
 const { getRequestMock, getResponseMock } = require("../../utils");
-const {
-  getSingleUserService,
-  getSingleInvitationService,
-} = require("../../../src/infrastructure/access");
+const { getSingleUserService } = require("../../../src/infrastructure/access");
+const { getInvitationRaw } = require("login.dfe.api-client/invitations");
 const { getServiceById } = require("../../../src/infrastructure/applications");
 const {
   getOrganisationByIdV2,
@@ -55,8 +53,8 @@ describe("when selecting the roles for a service", () => {
       status: "active",
     });
 
-    getSingleInvitationService.mockReset();
-    getSingleInvitationService.mockReturnValue({
+    getSingleInvitationServiceRaw.mockReset();
+    getSingleInvitationServiceRaw.mockReturnValue({
       id: "service1",
       dateActivated: "10/10/2018",
       name: "service name",

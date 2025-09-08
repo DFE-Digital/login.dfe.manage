@@ -18,10 +18,8 @@ jest.mock("./../../../src/infrastructure/organisations");
 
 const PolicyEngine = require("login.dfe.policy-engine");
 const { getRequestMock, getResponseMock } = require("../../utils");
-const {
-  getSingleUserService,
-  getSingleInvitationService,
-} = require("../../../src/infrastructure/access");
+const { getSingleUserService } = require("../../../src/infrastructure/access");
+const { getInvitationRaw } = require("login.dfe.api-client/invitations");
 const { getServiceById } = require("../../../src/infrastructure/applications");
 const { getUserDetails } = require("../../../src/app/services/utils");
 const {
@@ -62,8 +60,8 @@ describe("when displaying the edit service view", () => {
       status: "active",
     });
 
-    getSingleInvitationService.mockReset();
-    getSingleInvitationService.mockReturnValue({
+    getSingleInvitationServiceRaw.mockReset();
+    getSingleInvitationServiceRaw.mockReturnValue({
       id: "service1",
       dateActivated: "10/10/2018",
       name: "service name",
@@ -112,11 +110,13 @@ describe("when displaying the edit service view", () => {
     req.params.uid = "inv-user1";
     await getEditService(req, res);
 
-    expect(getSingleInvitationService.mock.calls).toHaveLength(1);
-    expect(getSingleInvitationService.mock.calls[0][0]).toBe("user1");
-    expect(getSingleInvitationService.mock.calls[0][1]).toBe("service1");
-    expect(getSingleInvitationService.mock.calls[0][2]).toBe("org1");
-    expect(getSingleInvitationService.mock.calls[0][3]).toBe("correlationId");
+    expect(getSingleInvitationServiceRaw.mock.calls).toHaveLength(1);
+    expect(getSingleInvitationServiceRaw.mock.calls[0][0]).toBe("user1");
+    expect(getSingleInvitationServiceRaw.mock.calls[0][1]).toBe("service1");
+    expect(getSingleInvitationServiceRaw.mock.calls[0][2]).toBe("org1");
+    expect(getSingleInvitationServiceRaw.mock.calls[0][3]).toBe(
+      "correlationId",
+    );
   });
 
   it("then it should get user details", async () => {
