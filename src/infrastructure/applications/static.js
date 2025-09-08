@@ -1,7 +1,5 @@
 const updateService = async () => Promise.resolve(null);
 
-const listAllServices = async () => Promise.resolve(null);
-
 const listBannersForService = async (page) =>
   Promise.resolve({
     banners: {
@@ -29,7 +27,6 @@ const listAllBannersForService = async (id, correlationId) =>
 
 module.exports = {
   updateService,
-  listAllServices,
   listBannersForService,
   getBannerById,
   upsertBanner,

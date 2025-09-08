@@ -26,9 +26,6 @@ const callApi = async (endpoint, method, body, correlationId) => {
   }
 };
 
-const listAllServices = async (correlationId) =>
-  callApi("services", "GET", undefined, correlationId);
-
 const updateService = async (id, serviceDetails, correlationId) => {
   const body = {};
   if (serviceDetails.name) {
@@ -107,7 +104,6 @@ const removeBanner = async (sid, bid, correlationId) =>
 
 module.exports = {
   updateService,
-  listAllServices,
   listBannersForService,
   getBannerById,
   upsertBanner,

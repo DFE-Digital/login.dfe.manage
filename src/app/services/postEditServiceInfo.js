@@ -1,12 +1,14 @@
-const { listAllServices } = require("../../infrastructure/applications");
-const { getServiceRaw } = require("login.dfe.api-client/services");
+const {
+  getServiceRaw,
+  getPaginatedServicesRaw,
+} = require("login.dfe.api-client/services");
 const { getUserServiceRoles } = require("./utils");
 const logger = require("../../infrastructure/logger");
 
 const validate = async (req, service) => {
   const model = {
-    name: req.body.name || "",
-    description: req.body.description || "",
+    name: (req.body.name || "").trim(),
+    description: (req.body.description || "").trim(),
     validationMessages: {},
   };
 
@@ -14,11 +16,15 @@ const validate = async (req, service) => {
     model.validationMessages.name = "Enter a name";
   } else if (model.name.length > 200) {
     model.validationMessages.name = "Name must be 200 characters or less";
-  } else if (service.name !== model.name) {
+  } else if (service.name.toLowerCase() !== model.name.toLowerCase()) {
     // Only check if the name was changed
-    const allServices = await listAllServices();
+    const allServices = await getPaginatedServicesRaw({
+      pageSize: 1000,
+      pageNumber: 1,
+    });
+    const modelNameLower = model.name.toLowerCase();
     const isMatchingName = allServices.services.find(
-      (service) => service.name === model.name,
+      (service) => service.name.toLowerCase() === modelNameLower,
     );
     if (isMatchingName) {
       model.validationMessages.name =
