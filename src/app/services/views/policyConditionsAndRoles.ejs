@@ -88,13 +88,17 @@
                                         <% for (let i = 0; i < condition.mappedValues.length; i++) {
                                             const selectedCondition = condition.mappedValues[i];
                                         %>
-                                            <p><%= selectedCondition.friendlyValue %> <a href="confirm-remove-policy-condition?condition=<%= condition.field %>&operator=<%= condition.operator %>&value=<%= selectedCondition.value %>">Remove</a></p>
+                                            <p>
+                                                <%= selectedCondition.friendlyValue %>
+                                                <%  if (locals.canUserModifyPolicyConditions) { %>
+                                                <a href="confirm-remove-policy-condition?condition=<%= condition.field %>&operator=<%= condition.operator %>&value=<%= selectedCondition.value %>">Remove</a>
+                                                <% } %>
+                                            </p>
                                         <% } %>
                                         </div>
                                     </details>
                                 </td>
-                            <% }%>
-
+                            <% } %>
                             </tr>
                         <% } %>
                         </tbody>
