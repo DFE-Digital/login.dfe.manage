@@ -83,7 +83,6 @@ const postConfirmCreatePolicyCondition = require("./postConfirmCreatePolicyCondi
 const getConfirmRemovePolicyCondition = require("./getConfirmRemovePolicyCondition");
 const postConfirmRemovePolicyCondition = require("./postConfirmRemovePolicyCondition");
 
-const { post: postAssociateRoles } = require("./associateRoles");
 const {
   get: getConfirmInvitation,
   post: postConfirmInvitation,
@@ -256,24 +255,6 @@ const services = (csrf) => {
     isManageUserForService,
     hasRole("serviceSup"),
     asyncWrapper(postUsersSearch),
-  );
-
-  router.post(
-    "/:sid/users/:uid/associate-roles",
-    csrf,
-    isManageUserForService,
-    hasRole("serviceSup"),
-    asyncWrapper(hasInvite),
-    asyncWrapper(postAssociateRoles),
-  );
-
-  router.post(
-    "/:sid/users/associate-roles",
-    csrf,
-    isManageUserForService,
-    hasRole("serviceSup"),
-    asyncWrapper(hasInvite),
-    asyncWrapper(postAssociateRoles),
   );
 
   router.get(
