@@ -20,48 +20,11 @@ const {
   updateIndex,
   createIndex,
 } = require("../../infrastructure/search");
-const { waitForIndexToUpdate, getUserServiceRoles } = require("./utils");
+const { waitForIndexToUpdate } = require("./utils");
 
 const notificationClient = new NotificationClient({
   connectionString: config.notifications.connectionString,
 });
-
-const get = async (req, res) => {
-  if (!req.session.user) {
-    return res.redirect(`/services/${req.params.sid}/users`);
-  }
-
-  const allRolesForService = await listRolesOfService(req.params.sid, req.id);
-  const selectedRoleIds = req.session.user.roles || [];
-  const roleDetails = allRolesForService.filter((x) =>
-    selectedRoleIds.find((y) => y.toLowerCase() === x.id.toLowerCase()),
-  );
-  const manageRolesForService = await getUserServiceRoles(req);
-
-  return res.render("services/views/confirmInvitation", {
-    csrfToken: req.csrfToken(),
-    backLink: true,
-    cancelLink: `/services/${req.params.sid}/users`,
-    user: {
-      firstName: req.session.user.firstName,
-      lastName: req.session.user.lastName,
-      email: req.session.user.email,
-      isExistingUser: req.params.uid,
-    },
-    organisation: {
-      name: req.session.user.organisationName,
-      permissionLevel:
-        req.session.user.permission === 10000 ? "Approver" : "End user",
-    },
-    service: {
-      name: req.session.user.service,
-      roles: roleDetails,
-    },
-    serviceId: req.params.sid,
-    userRoles: manageRolesForService,
-    currentNavigation: "users",
-  });
-};
 
 const post = async (req, res) => {
   if (!req.session.user) {
@@ -259,6 +222,5 @@ const post = async (req, res) => {
 };
 
 module.exports = {
-  get,
   post,
 };
