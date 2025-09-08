@@ -18,7 +18,7 @@ const validate = async (req, service) => {
     model.validationMessages.name = "Name must be 200 characters or less";
   } else if (service.name !== model.name) {
     // Only check if the name was changed
-    const allServices = await listAllServices();
+    const allServices = await listAllServices(req.id);
     const isMatchingName = allServices.services.find(
       (service) => service.name === model.name,
     );

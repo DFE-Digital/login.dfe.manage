@@ -38,7 +38,10 @@ const getServiceSummaries = async (ids, fields, correlationId) =>
   );
 
 const listAllServices = async (correlationId) =>
-  callApi("services", "GET", undefined, correlationId);
+  // Hard code this to 1000 as a short term fix (1000 is a lot more services then we have)
+  // This endpoint will be reworked in the future to give us all of them if no query strings
+  // are provided.
+  callApi("services?pageSize=1000", "GET", undefined, correlationId);
 
 const updateService = async (id, serviceDetails, correlationId) => {
   const body = {};
