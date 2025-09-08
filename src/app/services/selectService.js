@@ -1,7 +1,7 @@
 const sortBy = require("lodash/sortBy");
 const chunk = require("lodash/chunk");
-const { getServiceSummaries } = require("../../infrastructure/applications");
 const logger = require("../../infrastructure/logger");
+const { getServiceSummariesRaw } = require("login.dfe.api-client/services");
 
 const getServiceDetails = async (req) => {
   // Unique service IDs obtained from the user's manage roles.
@@ -13,7 +13,10 @@ const getServiceDetails = async (req) => {
   // Group service IDs into requests (promises) to get their summaries.
   const groupedServices = chunk([...userServicesIds], 33);
   const requests = groupedServices.map((x) =>
-    getServiceSummaries(x, ["id", "name", "description"], req.id),
+    getServiceSummariesRaw({
+      serviceIds: x,
+      fields: ["id", "name", "description"],
+    }),
   );
   // Wait for all requests to complete or one to fail.
   const responses = await Promise.all(requests);

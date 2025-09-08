@@ -3,15 +3,18 @@ const mockUtils = require("../../utils");
 const mockConfig = mockUtils.configMockFactory();
 const mockLogger = mockUtils.loggerMockFactory();
 
+jest.mock("login.dfe.api-client/api/setup");
+jest.mock("login.dfe.api-client/services", () => ({
+  getServiceSummariesRaw: jest.fn(),
+}));
+
 jest.mock("./../../../src/infrastructure/config", () => mockConfig);
 jest.mock("./../../../src/infrastructure/logger", () => mockLogger);
 jest.mock("./../../../src/infrastructure/applications");
 
 const { getRequestMock, getResponseMock } = require("../../utils");
 const getSelectService = require("../../../src/app/services/selectService").get;
-const {
-  getServiceSummaries,
-} = require("../../../src/infrastructure/applications");
+const { getServiceSummariesRaw } = require("login.dfe.api-client/services");
 
 const res = getResponseMock();
 
@@ -39,8 +42,8 @@ describe("When going to the select-service page", () => {
       },
     });
 
-    getServiceSummaries.mockReset();
-    getServiceSummaries.mockReturnValue({
+    getServiceSummariesRaw.mockReset();
+    getServiceSummariesRaw.mockReturnValue({
       services: [
         {
           id: "serviceid",
@@ -60,17 +63,11 @@ describe("When going to the select-service page", () => {
   it("Then it should get the necessary service information with one request if the user has <=33 unique services", async () => {
     await getSelectService(req, res);
 
-    expect(getServiceSummaries.mock.calls).toHaveLength(1);
-    expect(getServiceSummaries.mock.calls[0][0]).toStrictEqual([
-      "serviceid",
-      "serviceid1",
-    ]);
-    expect(getServiceSummaries.mock.calls[0][1]).toStrictEqual([
-      "id",
-      "name",
-      "description",
-    ]);
-    expect(getServiceSummaries.mock.calls[0][2]).toBe("correlationId");
+    expect(getServiceSummariesRaw.mock.calls).toHaveLength(1);
+    expect(getServiceSummariesRaw).toHaveBeenCalledWith({
+      fields: ["id", "name", "description"],
+      serviceIds: ["serviceid", "serviceid1"],
+    });
   });
 
   it("Then it should get the necessary service information with multiple requests if the user has > 33 unique services", async () => {
@@ -83,25 +80,15 @@ describe("When going to the select-service page", () => {
     };
     await getSelectService(req, res);
 
-    expect(getServiceSummaries.mock.calls).toHaveLength(2);
-    expect(getServiceSummaries.mock.calls[0][0]).toStrictEqual(
-      requestedIds.slice(0, 33),
-    );
-    expect(getServiceSummaries.mock.calls[1][0]).toStrictEqual(
-      requestedIds.slice(33),
-    );
-    expect(getServiceSummaries.mock.calls[0][1]).toStrictEqual([
-      "id",
-      "name",
-      "description",
-    ]);
-    expect(getServiceSummaries.mock.calls[1][1]).toStrictEqual([
-      "id",
-      "name",
-      "description",
-    ]);
-    expect(getServiceSummaries.mock.calls[0][2]).toBe("correlationId");
-    expect(getServiceSummaries.mock.calls[1][2]).toBe("correlationId");
+    expect(getServiceSummariesRaw.mock.calls).toHaveLength(2);
+    expect(getServiceSummariesRaw).toHaveBeenCalledWith({
+      fields: ["id", "name", "description"],
+      serviceIds: requestedIds.slice(0, 33),
+    });
+    expect(getServiceSummariesRaw).toHaveBeenCalledWith({
+      fields: ["id", "name", "description"],
+      serviceIds: requestedIds.slice(33),
+    });
   });
 
   it("Then it should log and throw an error if no active services could be found for the user", async () => {
@@ -112,7 +99,7 @@ describe("When going to the select-service page", () => {
     );
     const expectedMessage = `No manage services found with IDs [${[...userServicesIds].join()}]`;
 
-    getServiceSummaries.mockReturnValue(null);
+    getServiceSummariesRaw.mockReturnValue(null);
 
     await expect(async () => getSelectService(req, res)).rejects.toThrow(
       `${expectedMessage}, correlation ID ${req.id}`,
@@ -132,7 +119,7 @@ describe("When going to the select-service page", () => {
         },
       ],
     };
-    getServiceSummaries.mockReturnValue({
+    getServiceSummariesRaw.mockReturnValue({
       id: "serviceid",
       name: "service one",
       description: "service one description",
