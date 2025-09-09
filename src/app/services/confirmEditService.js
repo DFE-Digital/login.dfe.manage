@@ -1,7 +1,7 @@
 const { getServiceRaw } = require("login.dfe.api-client/services");
+const { updateUserServiceRoles } = require("login.dfe.api-client/users");
 const {
   listRolesOfService,
-  updateUserService,
   updateInvitationService,
 } = require("../../infrastructure/access");
 const {
@@ -54,7 +54,12 @@ const updateService = async (uid, sid, oid, selectedRoles, reqId) => {
         selectedRoles,
         reqId,
       )
-    : updateUserService(uid, sid, oid, selectedRoles, reqId);
+    : updateUserServiceRoles({
+        userId: uid,
+        serviceId: sid,
+        organisationId: oid,
+        serviceRoleIds: selectedRoles,
+      });
   return update;
 };
 

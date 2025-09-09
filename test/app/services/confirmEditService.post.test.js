@@ -11,8 +11,13 @@ jest.mock("../../../src/app/services/utils", () =>
   ]),
 );
 
+jest.mock("login.dfe.api-client/api/setup");
+jest.mock("login.dfe.api-client/users", () => ({
+  updateUserServiceRoles: jest.fn(),
+}));
+jest.mock("./../../../src/infrastructure/utils/banners");
+
 jest.mock("./../../../src/infrastructure/access", () => ({
-  updateUserService: jest.fn(),
   updateInvitationService: jest.fn(),
   listRolesOfService: jest.fn(),
 }));
@@ -29,8 +34,8 @@ const logger = require("../../../src/infrastructure/logger");
 const { getRequestMock, getResponseMock } = require("../../utils");
 const {
   updateInvitationService,
-  updateUserService,
 } = require("../../../src/infrastructure/access");
+const { updateUserServiceRoles } = require("login.dfe.api-client/users");
 const { listRolesOfService } = require("../../../src/infrastructure/access");
 const {
   getOrganisationByIdV2,
@@ -90,7 +95,7 @@ describe("when editing a service for a user", () => {
       name: "org name",
     });
 
-    updateUserService.mockReset();
+    updateUserServiceRoles.mockReset();
     updateInvitationService.mockReset();
 
     res.mockResetAll();
@@ -112,12 +117,13 @@ describe("when editing a service for a user", () => {
   it("then it should edit service for user if request for user", async () => {
     await postConfirmEditService(req, res);
 
-    expect(updateUserService.mock.calls).toHaveLength(1);
-    expect(updateUserService.mock.calls[0][0]).toBe("user1");
-    expect(updateUserService.mock.calls[0][1]).toBe("service1");
-    expect(updateUserService.mock.calls[0][2]).toBe("org1");
-    expect(updateUserService.mock.calls[0][3]).toEqual(["role_id"]);
-    expect(updateUserService.mock.calls[0][4]).toBe("correlationId");
+    expect(updateUserServiceRoles.mock.calls).toHaveLength(1);
+    expect(updateUserServiceRoles).toHaveBeenCalledWith({
+      userId: "user1",
+      serviceId: "service1",
+      organisationId: "org1",
+      serviceRoleIds: ["role_id"],
+    });
   });
 
   it("then it should should audit service being edited", async () => {
