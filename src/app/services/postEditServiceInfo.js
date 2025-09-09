@@ -17,8 +17,8 @@ const validate = async (req, service) => {
   } else if (model.name.length > 200) {
     model.validationMessages.name = "Name must be 200 characters or less";
   } else if (service.name !== model.name) {
-    // Only check if the name was changed.  Also exclude existing service from search
-    // as this will allow us to modify capitalisation of letters for this service.
+    // Exclude existing service from search as this will allow us to
+    // modify capitalisation of letters for this service.
     const allServices = await listAllServices(req.id);
     const isMatchingName = allServices.services.find(
       (service) =>
@@ -38,13 +38,11 @@ const validate = async (req, service) => {
       "Description must be 400 characters or less";
   }
 
-  if (model.name && model.description) {
-    const isNameUnchanged = service.name === model.name;
-    const isDescriptionUnchanged = service.description === model.description;
-    if (isNameUnchanged && isDescriptionUnchanged) {
-      model.validationMessages.name =
-        "Neither the name or description is different from the original";
-    }
+  const isNameUnchanged = service.name === model.name;
+  const isDescriptionUnchanged = service.description === model.description;
+  if (isNameUnchanged && isDescriptionUnchanged) {
+    model.validationMessages.name =
+      "Neither the name or description is different from the original";
   }
 
   return model;
