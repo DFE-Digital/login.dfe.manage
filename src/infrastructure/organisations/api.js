@@ -97,26 +97,6 @@ const getInvitationOrganisations = async (invitationId, correlationId) => {
   );
 };
 
-const searchOrganisations = async (
-  criteria,
-  filterByCategories,
-  pageNumber,
-  sortBy,
-  sortDirection,
-  correlationId,
-  filterByStatus,
-) => {
-  const uri = buildOrgSearchUri("organisations", {
-    criteria,
-    filterByCategories,
-    pageNumber,
-    sortBy,
-    sortDirection,
-    filterByStatus,
-  });
-  return callOrganisationsApi(uri, "GET", undefined, correlationId);
-};
-
 const searchOrgsAssociatedWithService = async (
   serviceId,
   criteria,
@@ -150,7 +130,6 @@ const getOrganisationById = async (id, correlationId) => {
 
 module.exports = {
   getInvitationOrganisations,
-  searchOrganisations,
   getOrganisationById,
   searchOrgsAssociatedWithService,
 };

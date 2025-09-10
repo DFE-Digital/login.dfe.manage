@@ -37,10 +37,6 @@ const getPageOfOrganisations = async (pageNumber) => {
   });
 };
 
-const searchOrganisations = async (criteria, pageNumber, correlationId) => {
-  return getPageOfOrganisations(pageNumber, correlationId);
-};
-
 const searchOrgsAssociatedWithService = async (
   serviceId,
   criteria,
@@ -55,6 +51,5 @@ const searchOrgsAssociatedWithService = async (
 module.exports = {
   getOrganisationById,
   getInvitationOrganisations,
-  searchOrganisations,
   searchOrgsAssociatedWithService,
 };

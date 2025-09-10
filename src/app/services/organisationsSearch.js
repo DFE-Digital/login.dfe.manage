@@ -1,11 +1,11 @@
 const {
-  searchOrganisations,
   searchOrgsAssociatedWithService,
 } = require("../../infrastructure/organisations");
 const { getServiceRaw } = require("login.dfe.api-client/services");
 const {
   getOrganisationStatuses,
   getOrganisationCategories,
+  searchOrganisationsRaw,
 } = require("login.dfe.api-client/organisations");
 const {
   getUserServiceRoles,
@@ -141,15 +141,14 @@ const search = async (req) => {
       },
     );
   } else {
-    results = await searchOrganisations(
-      encodeURIComponent(safeCriteria),
-      orgTypes,
+    results = await searchOrganisationsRaw({
+      organisationName: encodeURIComponent(safeCriteria),
+      categories: orgTypes,
       pageNumber,
       sortBy,
-      sortAsc ? "asc" : "desc",
-      req.id,
-      orgStatuses,
-    );
+      sortDirection: sortAsc ? "asc" : "desc",
+      status: orgStatuses,
+    });
     logger.audit(
       `${req.user.email} (id: ${req.user.sub}) searched for organisations in manage using criteria "${criteria}"`,
       {

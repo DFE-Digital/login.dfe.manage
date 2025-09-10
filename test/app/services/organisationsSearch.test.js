@@ -8,11 +8,15 @@ jest.mock("./../../../src/infrastructure/organisations");
 jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
 }));
+jest.mock("login.dfe.api-client/organisations");
+
 const {
-  searchOrganisations,
   searchOrgsAssociatedWithService,
 } = require("../../../src/infrastructure/organisations");
 const { getRequestMock, getResponseMock } = require("../../utils");
+const {
+  searchOrganisationsRaw,
+} = require("login.dfe.api-client/organisations");
 const search = require("../../../src/app/services/organisationsSearch");
 
 const res = getResponseMock();
@@ -28,7 +32,7 @@ const orgsResult = {
 
 describe("when searching for all organisations", () => {
   beforeEach(() => {
-    searchOrganisations.mockReset().mockReturnValue(orgsResult);
+    searchOrganisationsRaw.mockReset().mockReturnValue(orgsResult);
   });
 
   [
@@ -83,16 +87,15 @@ describe("when searching for all organisations", () => {
 
       await action(req, res);
 
-      expect(searchOrganisations).toHaveBeenCalledTimes(1);
-      expect(searchOrganisations).toHaveBeenCalledWith(
-        "org1",
-        [],
-        2,
-        "name",
-        "asc",
-        req.id,
-        [],
-      );
+      expect(searchOrganisationsRaw).toHaveBeenCalledTimes(1);
+      expect(searchOrganisationsRaw).toHaveBeenCalledWith({
+        organisationName: "org1",
+        categories: [],
+        pageNumber: 2,
+        sortBy: "name",
+        sortDirection: "asc",
+        status: [],
+      });
     });
 
     it(`then it should search for all orgs with no criteria if none specified (${method} / ${dataLocation})`, async () => {
@@ -113,16 +116,15 @@ describe("when searching for all organisations", () => {
 
       await action(req, res);
 
-      expect(searchOrganisations).toHaveBeenCalledTimes(1);
-      expect(searchOrganisations).toHaveBeenCalledWith(
-        "",
-        [],
-        2,
-        "name",
-        "asc",
-        req.id,
-        [],
-      );
+      expect(searchOrganisationsRaw).toHaveBeenCalledTimes(1);
+      expect(searchOrganisationsRaw).toHaveBeenCalledWith({
+        organisationName: "",
+        categories: [],
+        pageNumber: 2,
+        sortBy: "name",
+        sortDirection: "asc",
+        status: [],
+      });
     });
 
     it(`then it should request page 1 if no page specified (${method} / ${dataLocation})`, async () => {
@@ -143,16 +145,15 @@ describe("when searching for all organisations", () => {
 
       await action(req, res);
 
-      expect(searchOrganisations).toHaveBeenCalledTimes(1);
-      expect(searchOrganisations).toHaveBeenCalledWith(
-        "org1",
-        [],
-        1,
-        "name",
-        "asc",
-        req.id,
-        [],
-      );
+      expect(searchOrganisationsRaw).toHaveBeenCalledTimes(1);
+      expect(searchOrganisationsRaw).toHaveBeenCalledWith({
+        organisationName: "org1",
+        categories: [],
+        pageNumber: 1,
+        sortBy: "name",
+        sortDirection: "asc",
+        status: [],
+      });
     });
   });
 });
