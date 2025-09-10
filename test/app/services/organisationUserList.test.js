@@ -6,7 +6,6 @@ jest.mock("./../../../src/infrastructure/logger", () =>
 );
 jest.mock("./../../../src/infrastructure/organisations");
 jest.mock("./../../../src/infrastructure/search");
-jest.mock("login.dfe.api-client/api/setup");
 jest.mock("login.dfe.api-client/services");
 const {
   getOrganisationByIdV2,

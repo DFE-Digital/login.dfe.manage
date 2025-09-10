@@ -10,8 +10,6 @@ jest.mock("../../../src/app/services/utils", () =>
     "getReturnUrl",
   ]),
 );
-
-jest.mock("login.dfe.api-client/api/setup");
 jest.mock("login.dfe.api-client/users", () => ({
   updateUserServiceRoles: jest.fn(),
 }));
@@ -22,7 +20,6 @@ jest.mock("./../../../src/infrastructure/access", () => ({
   listRolesOfService: jest.fn(),
 }));
 
-jest.mock("login.dfe.api-client/api/setup");
 jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
 }));

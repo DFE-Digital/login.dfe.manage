@@ -33,7 +33,6 @@ jest.mock("login.dfe.validation", () => ({
   urlValidator: jest.fn(),
 }));
 
-jest.mock("login.dfe.api-client/api/setup");
 jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
 }));

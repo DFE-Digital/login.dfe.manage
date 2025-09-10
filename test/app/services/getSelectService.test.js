@@ -2,8 +2,6 @@ const mockUtils = require("../../utils");
 
 const mockConfig = mockUtils.configMockFactory();
 const mockLogger = mockUtils.loggerMockFactory();
-
-jest.mock("login.dfe.api-client/api/setup");
 jest.mock("login.dfe.api-client/services", () => ({
   getServiceSummariesRaw: jest.fn(),
 }));
