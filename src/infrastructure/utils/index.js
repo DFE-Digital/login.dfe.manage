@@ -1,5 +1,4 @@
 const { getSingleUserService } = require("../access");
-const { getServiceRaw } = require("login.dfe.api-client/services");
 const config = require("../config");
 
 const isLoggedIn = (req, res, next) => {
@@ -64,20 +63,6 @@ const hasGenericRole = (role) => (req, res, next) => {
     return next();
   }
   return res.status(401).render("errors/views/notAuthorised");
-};
-
-const hasInvite = async (req, res, next) => {
-  const service = await getServiceRaw({
-    by: { serviceId: req.params.sid },
-  });
-  if (
-    service.relyingParty &&
-    service.relyingParty.params &&
-    service.relyingParty.params.allowManageInvite === "true"
-  ) {
-    return next();
-  }
-  return res.status(401).render("errors/views/notFound");
 };
 
 const getUserDisplayName = (user) =>
@@ -150,7 +135,6 @@ module.exports = {
   hasGenericRole,
   mapUserStatus,
   mapUserRole,
-  hasInvite,
   userStatusMap,
   lastLoginIntervalsMap,
 };
