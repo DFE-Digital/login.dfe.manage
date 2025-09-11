@@ -10,7 +10,7 @@ const { mapUserStatus } = require("../../infrastructure/utils");
 const { getOrganisationByIdV2 } = require("../../infrastructure/organisations");
 const { mapAsync } = require("../../utils/asyncHelpers");
 const config = require("../../infrastructure/config");
-const { getServiceById } = require("../../infrastructure/applications/api");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const { dateFormat } = require("../helpers/dateFormatterHelper");
 
 const mapUserToSupportModel = (user, userFromSearch) => ({
@@ -562,8 +562,10 @@ const isValidUrl = async (urlValidator) =>
     .then((result) => result)
     .catch((err) => err);
 
-const checkClientId = async (clientId, reqId) => {
-  const service = await getServiceById(clientId, reqId);
+const checkClientId = async (clientId) => {
+  const service = await getServiceRaw({
+    by: { clientId: clientId },
+  });
   return !!service;
 };
 

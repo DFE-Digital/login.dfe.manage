@@ -6,6 +6,10 @@ jest.mock("./../../../src/infrastructure/logger", () =>
 );
 jest.mock("./../../../src/infrastructure/access");
 jest.mock("./../../../src/infrastructure/applications");
+jest.mock("login.dfe.api-client/services", () => ({
+  getServiceRaw: jest.fn(),
+  getPaginatedServicesRaw: jest.fn(),
+}));
 jest.mock("../../../src/app/services/utils");
 
 const { getRequestMock, getResponseMock } = require("../../utils");
@@ -14,13 +18,12 @@ const {
   listRolesOfService,
   updateRole,
 } = require("../../../src/infrastructure/access");
-const {
-  getServiceById,
-  listAllServices,
-  updateService,
-} = require("../../../src/infrastructure/applications");
+const { updateService } = require("../../../src/infrastructure/applications");
 const { getUserServiceRoles } = require("../../../src/app/services/utils");
-
+const {
+  getServiceRaw,
+  getPaginatedServicesRaw,
+} = require("login.dfe.api-client/services");
 const res = getResponseMock();
 
 const getServiceByIdData = {
@@ -81,11 +84,11 @@ describe("when getting the post confirm edit service info page", () => {
       },
     });
 
-    getServiceById.mockReset();
-    getServiceById.mockReturnValue(getServiceByIdData);
+    getServiceRaw.mockReset();
+    getServiceRaw.mockReturnValue(getServiceByIdData);
 
-    listAllServices.mockReset();
-    listAllServices.mockReturnValue(listAllServicesData);
+    getPaginatedServicesRaw.mockReset();
+    getPaginatedServicesRaw.mockReturnValue(listAllServicesData);
 
     listRolesOfService.mockReset();
     listRolesOfService.mockReturnValue(listRolesOfServiceData);

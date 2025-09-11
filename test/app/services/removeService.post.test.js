@@ -11,7 +11,9 @@ jest.mock("../../../src/app/services/utils", () =>
   ]),
 );
 
-jest.mock("./../../../src/infrastructure/applications");
+jest.mock("login.dfe.api-client/services", () => ({
+  getServiceRaw: jest.fn(),
+}));
 jest.mock("./../../../src/infrastructure/organisations");
 jest.mock("./../../../src/infrastructure/access");
 jest.mock("./../../../src/infrastructure/search", () => ({
@@ -24,7 +26,7 @@ const { getUserDetails } = require("../../../src/app/services/utils");
 const {
   getOrganisationByIdV2,
 } = require("../../../src/infrastructure/organisations");
-const { getServiceById } = require("../../../src/infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const {
   getSearchDetailsForUserById,
   updateIndex,
@@ -49,8 +51,8 @@ describe("when displaying the remove service access view", () => {
       sid: "service1",
     };
 
-    getServiceById.mockReset();
-    getServiceById.mockReturnValue({
+    getServiceRaw.mockReset();
+    getServiceRaw.mockReturnValue({
       id: "service1",
       dateActivated: "10/10/2018",
       name: "service name",

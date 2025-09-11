@@ -26,20 +26,6 @@ const callApi = async (endpoint, method, body, correlationId) => {
   }
 };
 
-const getServiceById = async (id, correlationId) =>
-  callApi(`services/${id}`, "GET", undefined, correlationId);
-
-const getServiceSummaries = async (ids, fields, correlationId) =>
-  callApi(
-    `service-summaries/${ids.join()}?fields=${fields.join()}`,
-    "GET",
-    undefined,
-    correlationId,
-  );
-
-const listAllServices = async (correlationId) =>
-  callApi("services", "GET", undefined, correlationId);
-
 const updateService = async (id, serviceDetails, correlationId) => {
   const body = {};
   if (serviceDetails.name) {
@@ -83,30 +69,6 @@ const updateService = async (id, serviceDetails, correlationId) => {
   return callApi(`services/${id}`, "PATCH", body, correlationId);
 };
 
-const listBannersForService = async (id, pageSize, page, correlationId) =>
-  callApi(
-    `services/${id}/banners?pageSize=${pageSize}?&page=${page}`,
-    "GET",
-    undefined,
-    correlationId,
-  );
-
-const listAllBannersForService = async (id, correlationId) => {
-  const allBanners = [];
-
-  let pageNumber = 1;
-  let isMorePages = true;
-  while (isMorePages) {
-    const page = await listBannersForService(id, 25, pageNumber, correlationId);
-    page.banners.forEach((banner) => {
-      allBanners.push(banner);
-    });
-    pageNumber += 1;
-    isMorePages = pageNumber <= page.totalNumberOfPages;
-  }
-  return allBanners;
-};
-
 const getBannerById = async (id, bid, correlationId) =>
   callApi(`services/${id}/banners/${bid}`, "GET", undefined, correlationId);
 
@@ -117,13 +79,8 @@ const removeBanner = async (sid, bid, correlationId) =>
   callApi(`services/${sid}/banners/${bid}`, "DELETE", undefined, correlationId);
 
 module.exports = {
-  getServiceById,
-  getServiceSummaries,
   updateService,
-  listAllServices,
-  listBannersForService,
   getBannerById,
   upsertBanner,
   removeBanner,
-  listAllBannersForService,
 };

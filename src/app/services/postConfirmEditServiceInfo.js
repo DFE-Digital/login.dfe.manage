@@ -1,9 +1,9 @@
 const logger = require("../../infrastructure/logger");
+const { updateService } = require("../../infrastructure/applications");
 const {
-  listAllServices,
-  getServiceById,
-  updateService,
-} = require("../../infrastructure/applications");
+  getServiceRaw,
+  getPaginatedServicesRaw,
+} = require("login.dfe.api-client/services");
 const {
   listRolesOfService,
   updateRole,
@@ -18,13 +18,19 @@ const postConfirmEditServiceInfo = async (req, res) => {
     return res.redirect(`/services/${serviceId}/service-information`);
   }
 
-  const service = await getServiceById(req.params.sid, correlationId);
+  const service = await getServiceRaw({
+    by: { serviceId: req.params.sid },
+  });
 
   if (model.name) {
     // Only check if the name was changed
-    const allServices = await listAllServices();
+    const allServices = await getPaginatedServicesRaw({
+      pageSize: 1000,
+      pageNumber: 1,
+    });
+    const modelNameLower = model.name.toLowerCase();
     const isMatchingName = allServices.services.find(
-      (service) => service.name === model.name,
+      (service) => service.name.toLowerCase() === modelNameLower,
     );
     if (isMatchingName) {
       res.flash(

@@ -4,15 +4,20 @@ jest.mock("./../../../src/infrastructure/config", () =>
 jest.mock("./../../../src/infrastructure/logger", () =>
   require("./../../utils").loggerMockFactory(),
 );
-jest.mock("./../../../src/infrastructure/applications");
+
+jest.mock("login.dfe.api-client/services", () => ({
+  getServiceRaw: jest.fn(),
+  getServiceBannersRaw: jest.fn(),
+}));
 
 const { getRequestMock, getResponseMock } = require("./../../utils");
 const getServiceBanners =
   require("./../../../src/app/services/serviceBanners").get;
 const {
-  listBannersForService,
-  getServiceById,
-} = require("./../../../src/infrastructure/applications");
+  getServiceRaw,
+  getServiceBannersRaw,
+} = require("login.dfe.api-client/services");
+
 const res = getResponseMock();
 
 describe("when getting the list of service banners page", () => {
@@ -35,8 +40,8 @@ describe("when getting the list of service banners page", () => {
       },
     });
 
-    listBannersForService.mockReset();
-    listBannersForService.mockReturnValue({
+    getServiceBannersRaw.mockReset();
+    getServiceBannersRaw.mockReturnValue({
       banners: [
         {
           serviceId: "serviceid",
@@ -48,8 +53,8 @@ describe("when getting the list of service banners page", () => {
       ],
     });
 
-    getServiceById.mockReset();
-    getServiceById.mockReturnValue({
+    getServiceRaw.mockReset();
+    getServiceRaw.mockReturnValue({
       id: "service1",
       name: "service one",
       description: "service description",
@@ -71,19 +76,21 @@ describe("when getting the list of service banners page", () => {
   it("then it should get the services banners by service id", async () => {
     await getServiceBanners(req, res);
 
-    expect(listBannersForService.mock.calls).toHaveLength(1);
-    expect(listBannersForService.mock.calls[0][0]).toBe("service1");
-    expect(listBannersForService.mock.calls[0][1]).toBe(10);
-    expect(listBannersForService.mock.calls[0][2]).toBe(1);
-    expect(listBannersForService.mock.calls[0][3]).toBe("correlationId");
+    expect(getServiceBannersRaw.mock.calls).toHaveLength(1);
+    expect(getServiceBannersRaw).toHaveBeenCalledWith({
+      page: 1,
+      pageSize: 10,
+      serviceId: "service1",
+    });
   });
 
   it("then it should get the service details", async () => {
     await getServiceBanners(req, res);
 
-    expect(getServiceById.mock.calls).toHaveLength(1);
-    expect(getServiceById.mock.calls[0][0]).toBe("service1");
-    expect(getServiceById.mock.calls[0][1]).toBe("correlationId");
+    expect(getServiceRaw.mock.calls).toHaveLength(1);
+    expect(getServiceRaw).toHaveBeenCalledWith({
+      by: { serviceId: "service1" },
+    });
   });
 
   it("then it should return the service banners view", async () => {

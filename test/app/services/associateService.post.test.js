@@ -12,11 +12,13 @@ jest.mock("../../../src/app/services/utils", () =>
 );
 
 jest.mock("login.dfe.policy-engine");
-jest.mock("../../../src/infrastructure/applications");
+jest.mock("login.dfe.api-client/services", () => ({
+  getServiceRaw: jest.fn(),
+}));
 
 const PolicyEngine = require("login.dfe.policy-engine");
 const { getRequestMock, getResponseMock } = require("../../utils");
-const { getServiceById } = require("../../../src/infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 
 const policyEngine = {
   getPolicyApplicationResultsForUser: jest.fn(),
@@ -36,8 +38,8 @@ describe("when associating a service with user", () => {
       sid: "service1",
     };
 
-    getServiceById.mockReset();
-    getServiceById.mockReturnValue({
+    getServiceRaw.mockReset();
+    getServiceRaw.mockReturnValue({
       id: "service1",
       name: "Service One",
     });

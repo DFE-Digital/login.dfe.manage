@@ -4,12 +4,14 @@ jest.mock("./../../../src/infrastructure/config", () =>
 jest.mock("./../../../src/infrastructure/logger", () =>
   require("../../utils").loggerMockFactory(),
 );
-jest.mock("./../../../src/infrastructure/applications");
 jest.mock("../../../src/app/services/utils");
+jest.mock("login.dfe.api-client/services", () => ({
+  getServiceRaw: jest.fn(),
+}));
 
 const { getRequestMock, getResponseMock } = require("../../utils");
 const getConfirmEditServiceInfo = require("../../../src/app/services/getConfirmEditServiceInfo");
-const { getServiceById } = require("../../../src/infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const { getUserServiceRoles } = require("../../../src/app/services/utils");
 
 const res = getResponseMock();
@@ -44,8 +46,8 @@ describe("when getting the edit service info page", () => {
       },
     });
 
-    getServiceById.mockReset();
-    getServiceById.mockReturnValue(getServiceByIdData);
+    getServiceRaw.mockReset();
+    getServiceRaw.mockReturnValue(getServiceByIdData);
 
     getUserServiceRoles
       .mockReset()
@@ -57,9 +59,10 @@ describe("when getting the edit service info page", () => {
   it("should display the confirmEditServiceInfo view", async () => {
     await getConfirmEditServiceInfo(req, res);
 
-    expect(getServiceById.mock.calls).toHaveLength(1);
-    expect(getServiceById.mock.calls[0][0]).toBe("service-1");
-    expect(getServiceById.mock.calls[0][1]).toBe("correlationId");
+    expect(getServiceRaw.mock.calls).toHaveLength(1);
+    expect(getServiceRaw).toHaveBeenCalledWith({
+      by: { serviceId: "service-1" },
+    });
 
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][0]).toBe(

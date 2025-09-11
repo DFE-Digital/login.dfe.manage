@@ -13,8 +13,10 @@ jest.mock("../../../src/app/services/utils", () =>
 
 jest.mock("login.dfe.policy-engine");
 jest.mock("./../../../src/infrastructure/access");
-jest.mock("./../../../src/infrastructure/applications");
 jest.mock("./../../../src/infrastructure/organisations");
+jest.mock("login.dfe.api-client/services", () => ({
+  getServiceRaw: jest.fn(),
+}));
 
 const PolicyEngine = require("login.dfe.policy-engine");
 const { getRequestMock, getResponseMock } = require("../../utils");
@@ -22,7 +24,7 @@ const {
   getSingleUserService,
   getSingleInvitationService,
 } = require("../../../src/infrastructure/access");
-const { getServiceById } = require("../../../src/infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const { getUserDetails } = require("../../../src/app/services/utils");
 const {
   getOrganisationByIdV2,
@@ -70,8 +72,8 @@ describe("when displaying the edit service view", () => {
       status: "active",
     });
 
-    getServiceById.mockReset();
-    getServiceById.mockReturnValue({
+    getServiceRaw.mockReset();
+    getServiceRaw.mockReturnValue({
       serviceId: "service1",
       name: "service one",
       description: "service description",
