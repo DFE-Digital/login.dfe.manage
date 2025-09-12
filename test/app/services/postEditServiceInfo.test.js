@@ -21,7 +21,7 @@ const {
 
 const res = getResponseMock();
 
-const listAllServicesResponse = {
+const getPaginatedServicesRawResponse = {
   services: [
     {
       id: "service-1",
@@ -69,7 +69,7 @@ describe("when getting the post edit service info page", () => {
     });
 
     getPaginatedServicesRaw.mockReset();
-    getPaginatedServicesRaw.mockReturnValue(listAllServicesResponse);
+    getPaginatedServicesRaw.mockReturnValue(getPaginatedServicesRawResponse);
 
     getUserServiceRoles
       .mockReset()
@@ -140,6 +140,31 @@ describe("when getting the post edit service info page", () => {
     });
   });
 
+  it("should display an error if the name with different capitalisation is the same as another service", async () => {
+    req.body.name = "SeRvIcE tWo";
+    await postEditServiceInfo(req, res);
+
+    expect(res.render.mock.calls).toHaveLength(1);
+    expect(res.render.mock.calls[0][0]).toBe("services/views/editServiceInfo");
+    expect(res.render.mock.calls[0][1].model.validationMessages).toMatchObject({
+      name: "Service name must be unique and cannot already exist in DfE Sign-in",
+    });
+  });
+
+  it("should allow a user to change the capitalisation of the name of the service", async () => {
+    // This test shows we're allowed to match the name of an existing service, but only if it's
+    // the service we're trying to change. This allows us to make changes to capitalisation without
+    // having to write a script to do so.
+    req.body = {
+      name: "sErViCe OnE",
+      description: "service description",
+    };
+    await postEditServiceInfo(req, res);
+
+    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toBe("edit/confirm");
+  });
+
   it("should display an error if the description is empty", async () => {
     req.body.description = "";
     await postEditServiceInfo(req, res);
@@ -165,6 +190,18 @@ describe("when getting the post edit service info page", () => {
   it("should display an error if the name and description are the same as the original", async () => {
     req.body.name = "service one";
     req.body.description = "service description";
+    await postEditServiceInfo(req, res);
+
+    expect(res.render.mock.calls).toHaveLength(1);
+    expect(res.render.mock.calls[0][0]).toBe("services/views/editServiceInfo");
+    expect(res.render.mock.calls[0][1].model.validationMessages).toMatchObject({
+      name: "Neither the name or description is different from the original",
+    });
+  });
+
+  it("should display an error if the only change to name and description was spaces bieng added to the start and end", async () => {
+    req.body.name = "  service one  ";
+    req.body.description = "  service description  ";
     await postEditServiceInfo(req, res);
 
     expect(res.render.mock.calls).toHaveLength(1);

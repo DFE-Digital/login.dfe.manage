@@ -30,7 +30,9 @@ const postConfirmEditServiceInfo = async (req, res) => {
     });
     const modelNameLower = model.name.toLowerCase();
     const isMatchingName = allServices.services.find(
-      (service) => service.name.toLowerCase() === modelNameLower,
+      (service) =>
+        service.name.toLowerCase() === modelNameLower &&
+        service.id !== req.params.sid,
     );
     if (isMatchingName) {
       res.flash(
