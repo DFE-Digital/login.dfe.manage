@@ -12,17 +12,19 @@ jest.mock("../../../src/app/services/utils", () =>
 );
 
 jest.mock("./../../../src/infrastructure/access");
-jest.mock("./../../../src/infrastructure/applications");
 jest.mock("./../../../src/infrastructure/organisations");
 jest.mock("login.dfe.policy-engine");
+jest.mock("login.dfe.api-client/services", () => ({
+  getServiceRaw: jest.fn(),
+}));
 
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const PolicyEngine = require("login.dfe.policy-engine");
 const { getRequestMock, getResponseMock } = require("../../utils");
 const {
   getSingleUserService,
   getSingleInvitationService,
 } = require("../../../src/infrastructure/access");
-const { getServiceById } = require("../../../src/infrastructure/applications");
 const {
   getOrganisationByIdV2,
 } = require("../../../src/infrastructure/organisations");
@@ -63,8 +65,8 @@ describe("when selecting the roles for a service", () => {
       status: "active",
     });
 
-    getServiceById.mockReset();
-    getServiceById.mockReturnValue({
+    getServiceRaw.mockReset();
+    getServiceRaw.mockReturnValue({
       serviceId: "service1",
       name: "service one",
       description: "service description",

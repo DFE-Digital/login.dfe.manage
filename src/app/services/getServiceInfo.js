@@ -1,8 +1,10 @@
-const { getServiceById } = require("../../infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const { doesUserHaveRole, getUserServiceRoles } = require("./utils");
 
 const getServiceInfo = async (req, res) => {
-  const service = await getServiceById(req.params.sid, req.id);
+  const service = await getServiceRaw({
+    by: { serviceId: req.params.sid },
+  });
   const manageRolesForService = await getUserServiceRoles(req);
   const canUserModifyService = doesUserHaveRole(
     req,

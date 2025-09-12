@@ -5,6 +5,8 @@ jest.mock("./../../../src/infrastructure/logger", () =>
   require("./../../utils").loggerMockFactory(),
 );
 jest.mock("./../../../src/infrastructure/applications");
+jest.mock("login.dfe.api-client/services");
+jest.mock("./../../../src/infrastructure/utils/banners");
 
 const logger = require("./../../../src/infrastructure/logger");
 const { getRequestMock, getResponseMock } = require("./../../utils");
@@ -13,8 +15,10 @@ const postNewServiceBanner =
 const {
   getBannerById,
   upsertBanner,
-  listAllBannersForService,
 } = require("./../../../src/infrastructure/applications");
+const {
+  listAllBannersForService,
+} = require("./../../../src/infrastructure/utils/banners");
 const res = getResponseMock();
 
 describe("when creating a new service banner", () => {

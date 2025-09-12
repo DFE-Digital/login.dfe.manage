@@ -3,16 +3,14 @@ const {
   AUTHENTICATION_FLOWS_PATTERNS,
 } = require("../../constants/serviceConfigConstants");
 const { getSearchDetailsForUserById } = require("../../infrastructure/search");
-const {
-  getInvitation,
-  getUserById,
-} = require("../../infrastructure/directories");
+const { getUserRaw } = require("login.dfe.api-client/users");
+const { getInvitationRaw } = require("login.dfe.api-client/invitations");
 const { getServicesForUser } = require("../../infrastructure/access");
 const { mapUserStatus } = require("../../infrastructure/utils");
 const { getOrganisationByIdV2 } = require("../../infrastructure/organisations");
 const { mapAsync } = require("../../utils/asyncHelpers");
 const config = require("../../infrastructure/config");
-const { getServiceById } = require("../../infrastructure/applications/api");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const { dateFormat } = require("../helpers/dateFormatterHelper");
 
 const mapUserToSupportModel = (user, userFromSearch) => ({
@@ -41,7 +39,7 @@ const mapUserToSupportModel = (user, userFromSearch) => ({
 
 const getUserDetailsById = async (uid, correlationId) => {
   if (uid.startsWith("inv-")) {
-    const invitation = await getInvitation(uid.substr(4), correlationId);
+    const invitation = await getInvitationRaw({ by: { id: uid.substr(4) } });
     return {
       id: uid,
       name: `${invitation.firstName} ${invitation.lastName}`,
@@ -57,7 +55,7 @@ const getUserDetailsById = async (uid, correlationId) => {
     };
   }
   const userSearch = await getSearchDetailsForUserById(uid);
-  const rawUser = await getUserById(uid, correlationId);
+  const rawUser = await getUserRaw({ by: { id: uid } });
   const user = mapUserToSupportModel(rawUser, userSearch);
   const serviceDetails = await getServicesForUser(uid, correlationId);
 
@@ -99,8 +97,8 @@ const getUserDetailsById = async (uid, correlationId) => {
 const getUserDetails = async (req) =>
   getUserDetailsById(req.params.uid, req.id);
 
-const getFriendlyUser = async (userId, correlationId) => {
-  const user = await getUserById(userId, correlationId);
+const getFriendlyUser = async (userId) => {
+  const user = await getUserRaw({ by: { id: userId } });
   if (!user) {
     return userId;
   }
@@ -564,8 +562,10 @@ const isValidUrl = async (urlValidator) =>
     .then((result) => result)
     .catch((err) => err);
 
-const checkClientId = async (clientId, reqId) => {
-  const service = await getServiceById(clientId, reqId);
+const checkClientId = async (clientId) => {
+  const service = await getServiceRaw({
+    by: { clientId: clientId },
+  });
   return !!service;
 };
 

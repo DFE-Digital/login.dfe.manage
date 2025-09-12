@@ -4,29 +4,30 @@ const {
   getAllUserOrganisations,
   getInvitationOrganisations,
 } = require("../../infrastructure/organisations");
-const { getUsersByIdV2 } = require("../../infrastructure/directories");
+const { getUsersRaw } = require("login.dfe.api-client/users");
 const {
   getUserDetails,
   getUserServiceRoles,
   getReturnOrgId,
 } = require("./utils");
 const logger = require("../../infrastructure/logger");
-const { getServiceById } = require("../../infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const {
   getServicesForUser,
   getAllInvitationServices,
 } = require("../../infrastructure/access");
 
-const getApproverDetails = async (organisation, correlationId) => {
+const getApproverDetails = async (organisation) => {
   const allApproverIds = flatten(organisation.map((org) => org.approvers));
   const distinctApproverIds = uniq(allApproverIds);
   if (distinctApproverIds.length === 0) {
     return [];
   }
-  const approverDetails = await getUsersByIdV2(
-    distinctApproverIds,
-    correlationId,
-  );
+  const approverDetails = await getUsersRaw({
+    by: {
+      userIds: distinctApproverIds,
+    },
+  });
   return approverDetails;
 };
 
@@ -38,7 +39,7 @@ const getOrganisations = async (userId, correlationId) => {
     return [];
   }
 
-  const allApprovers = await getApproverDetails(orgMapping, correlationId);
+  const allApprovers = await getApproverDetails(orgMapping);
 
   return Promise.all(
     orgMapping.map(async (invitation) => {
@@ -117,7 +118,9 @@ const getUserOrganisations = async (req, res) => {
     });
 
   const manageRolesForService = await getUserServiceRoles(req);
-  const currentService = await getServiceById(req.params.sid, req.id);
+  const currentService = await getServiceRaw({
+    by: { serviceId: req.params.sid },
+  });
 
   logger.audit(`${req.user.email} viewed user ${user.email}`, {
     type: "organisations",

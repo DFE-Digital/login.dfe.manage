@@ -1,6 +1,5 @@
 const Sequelize = require("sequelize");
 const { logs, db } = require("./sequelize-schema");
-const { getUserById } = require("./../../infrastructure/directories");
 
 const { Op } = Sequelize;
 const { QueryTypes } = Sequelize;
@@ -125,12 +124,6 @@ const getPageOfUserAudits = async (userId, pageNumber) => {
     numberOfPages: Math.ceil(count / pageSize),
     numberOfRecords: count,
   };
-};
-
-const getUserName = async (userId) => {
-  const user = await getUserById(userId);
-
-  return `${user.given_name} ${user.family_name}`;
 };
 
 const getAllAuditsSince = async (sinceDate) => {
@@ -260,84 +253,11 @@ const getUserChangeHistory = async (userId, pageNumber) => {
   );
 };
 
-const getAuditEvent = (type, subType, unlockType) => {
-  let event = `Digipass event ${type} - ${subType}`;
-
-  if (type === "sign-in" && subType === "digipass") {
-    event = "Login";
-  } else if (subType === "digipass-resync") {
-    event = `${type} - Resync`;
-  } else if (type === "support" && subType === "digipass-unlock") {
-    event = `Unlock - UnlockType: "${unlockType}"`;
-  } else if (type === "support" && subType === "digipass-deactivate") {
-    event = "Deactivate";
-  } else if (type === "support" && subType === "digipass-assign") {
-    event = "Assigned";
-  }
-  return event;
-};
-
-const getTokenAudits = async (userId, serialNumber, pageNumber, userName) => {
-  const where = {
-    key: {
-      [Op.eq]: "deviceSerialNumber",
-    },
-    value: {
-      [Op.eq]: serialNumber,
-    },
-  };
-  const metaSubQuery = db.dialect.QueryGenerator.selectQuery("AuditLogMeta", {
-    attributes: ["AuditId"],
-    where,
-  }).slice(0, -1);
-
-  const rawAudits = await getPageOfAudits(
-    {
-      id: {
-        [Op.in]: [Sequelize.literal(metaSubQuery)],
-      },
-    },
-    pageNumber,
-  );
-
-  if (!rawAudits || !rawAudits.audits || rawAudits.audits.length === 0) {
-    return {
-      audits: [],
-      numberOfPages: 0,
-      numberOfRecords: 0,
-    };
-  }
-
-  const auditRecords = [];
-
-  for (let i = 0; i < rawAudits.audits.length; i++) {
-    const audit = rawAudits.audits[i];
-
-    auditRecords.push({
-      date: new Date(audit.timestamp),
-      name: audit.userId
-        ? audit.userId === userId
-          ? userName
-          : await getUserName(audit.userId)
-        : audit.userEmail,
-      success: audit.success === "0" ? "Failure" : "Success",
-      event: getAuditEvent(audit.type, audit.subType, audit.unlockType),
-    });
-  }
-
-  return {
-    audits: auditRecords,
-    numberOfPages: rawAudits.numberOfPages,
-    numberOfRecords: rawAudits.numberOfRecords,
-  };
-};
-
 module.exports = {
   getAllAuditsSince,
   getUserAudit,
   getUserLoginAuditsSince,
   getUserLoginAuditsForService,
   getUserChangeHistory,
-  getTokenAudits,
   getPageOfUserAudits,
 };

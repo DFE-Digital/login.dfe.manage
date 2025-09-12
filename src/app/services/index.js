@@ -6,7 +6,6 @@ const {
   isManageUserForService,
   hasRole,
   hasGenericRole,
-  hasInvite,
 } = require("../../infrastructure/utils");
 
 const { getDashboard } = require("./getDashboard");
@@ -83,14 +82,6 @@ const postConfirmCreatePolicyCondition = require("./postConfirmCreatePolicyCondi
 const getConfirmRemovePolicyCondition = require("./getConfirmRemovePolicyCondition");
 const postConfirmRemovePolicyCondition = require("./postConfirmRemovePolicyCondition");
 
-const {
-  get: getAssociateRoles,
-  post: postAssociateRoles,
-} = require("./associateRoles");
-const {
-  get: getConfirmInvitation,
-  post: postConfirmInvitation,
-} = require("./confirmInvitation");
 const getAudit = require("./getAudit");
 const postUpdateAuditLog = require("./postUpdateAuditLog");
 
@@ -259,57 +250,6 @@ const services = (csrf) => {
     isManageUserForService,
     hasRole("serviceSup"),
     asyncWrapper(postUsersSearch),
-  );
-
-  router.get(
-    "/:sid/users/:uid/associate-roles",
-    csrf,
-    isManageUserForService,
-    hasRole("serviceSup"),
-    asyncWrapper(hasInvite),
-    asyncWrapper(getAssociateRoles),
-  );
-  router.post(
-    "/:sid/users/:uid/associate-roles",
-    csrf,
-    isManageUserForService,
-    hasRole("serviceSup"),
-    asyncWrapper(hasInvite),
-    asyncWrapper(postAssociateRoles),
-  );
-
-  router.get(
-    "/:sid/users/associate-roles",
-    csrf,
-    isManageUserForService,
-    hasRole("serviceSup"),
-    asyncWrapper(hasInvite),
-    asyncWrapper(getAssociateRoles),
-  );
-  router.post(
-    "/:sid/users/associate-roles",
-    csrf,
-    isManageUserForService,
-    hasRole("serviceSup"),
-    asyncWrapper(hasInvite),
-    asyncWrapper(postAssociateRoles),
-  );
-
-  router.get(
-    "/:sid/users/:uid/confirm-details",
-    csrf,
-    isManageUserForService,
-    hasRole("serviceSup"),
-    asyncWrapper(hasInvite),
-    asyncWrapper(getConfirmInvitation),
-  );
-  router.post(
-    "/:sid/users/:uid/confirm-details",
-    csrf,
-    isManageUserForService,
-    hasRole("serviceSup"),
-    asyncWrapper(hasInvite),
-    asyncWrapper(postConfirmInvitation),
   );
 
   router.get(

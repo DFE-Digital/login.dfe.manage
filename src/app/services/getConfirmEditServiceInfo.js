@@ -1,4 +1,4 @@
-const { getServiceById } = require("../../infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const { getUserServiceRoles } = require("./utils");
 
 const getConfirmEditServiceInfo = async (req, res) => {
@@ -6,7 +6,9 @@ const getConfirmEditServiceInfo = async (req, res) => {
     return res.redirect(`/services/${req.params.sid}/service-information`);
   }
   const model = req.session.editServiceInfo;
-  const service = await getServiceById(req.params.sid, req.id);
+  const service = await getServiceRaw({
+    by: { serviceId: req.params.sid },
+  });
   const manageRolesForService = await getUserServiceRoles(req);
 
   return res.render("services/views/confirmEditServiceInfo", {

@@ -3,16 +3,17 @@ const mockUtils = require("../../utils");
 const mockConfig = mockUtils.configMockFactory();
 const mockLogger = mockUtils.loggerMockFactory();
 
+jest.mock("login.dfe.api-client/services", () => ({
+  getServiceSummariesRaw: jest.fn(),
+}));
+
 jest.mock("./../../../src/infrastructure/config", () => mockConfig);
 jest.mock("./../../../src/infrastructure/logger", () => mockLogger);
-jest.mock("./../../../src/infrastructure/applications");
 
 const { getRequestMock, getResponseMock } = require("../../utils");
+const { getServiceSummariesRaw } = require("login.dfe.api-client/services");
 const postSelectService =
   require("../../../src/app/services/selectService").post;
-const {
-  getServiceSummaries,
-} = require("../../../src/infrastructure/applications");
 
 const res = getResponseMock();
 
@@ -33,8 +34,8 @@ describe("When selecting a service", () => {
       },
     });
 
-    getServiceSummaries.mockReset();
-    getServiceSummaries.mockReturnValue({
+    getServiceSummariesRaw.mockReset();
+    getServiceSummariesRaw.mockReturnValue({
       services: [
         {
           id: "serviceid",

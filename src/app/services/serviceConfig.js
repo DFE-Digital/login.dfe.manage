@@ -8,7 +8,7 @@ const {
   TOKEN_ENDPOINT_AUTH_METHOD,
   ERROR_MESSAGES,
 } = require("../../constants/serviceConfigConstants");
-const { getServiceById } = require("../../infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const {
   getUserServiceRoles,
   determineAuthFlowByRespType,
@@ -103,7 +103,9 @@ const buildCurrentServiceModel = async (req) => {
       req.query?.action === ACTIONS.AMEND_CHANGES
         ? req.session.serviceConfigurationChanges
         : {};
-    const service = await getServiceById(req.params.sid, req.id);
+    const service = await getServiceRaw({
+      by: { serviceId: req.params.sid },
+    });
     const currentServiceModel = buildServiceModelFromObject(
       service,
       sessionService,
@@ -373,9 +375,9 @@ const validate = async (req, currentService, oldService) => {
     model.validationMessages.clientId = ERROR_MESSAGES.INVALID_CLIENT_ID_LENGTH;
   } else if (
     clientId.toLowerCase() !== currentService.clientId.toLowerCase() &&
-    (await checkClientId(clientId, req.id))
+    (await checkClientId(clientId))
   ) {
-    // If getServiceById returns truthy, then that clientId is already in use.
+    // If getServiceRaw returns truthy, then that clientId is already in use.
     model.validationMessages.clientId = ERROR_MESSAGES.CLIENT_ID_UNAVAILABLE;
   }
 

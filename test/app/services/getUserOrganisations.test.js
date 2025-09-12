@@ -9,9 +9,9 @@ jest.mock("../../../src/app/services/utils", () =>
     "getReturnOrgId",
   ]),
 );
-
+jest.mock("login.dfe.api-client/services");
 jest.mock("./../../../src/infrastructure/organisations");
-jest.mock("./../../../src/infrastructure/directories");
+jest.mock("login.dfe.api-client/users");
 jest.mock("../../../src/infrastructure/access");
 
 const logger = require("../../../src/infrastructure/logger");
@@ -21,7 +21,7 @@ const {
   getAllUserOrganisations,
   getInvitationOrganisations,
 } = require("../../../src/infrastructure/organisations");
-const { getUsersByIdV2 } = require("../../../src/infrastructure/directories");
+const { getUsersRaw } = require("login.dfe.api-client/users");
 const { getUserDetails } = require("../../../src/app/services/utils");
 const { getServicesForUser } = require("../../../src/infrastructure/access");
 
@@ -168,8 +168,8 @@ describe("when getting users organisation details", () => {
       },
     ]);
 
-    getUsersByIdV2.mockReset();
-    getUsersByIdV2.mockReturnValue([
+    getUsersRaw.mockReset();
+    getUsersRaw.mockReturnValue([
       {
         sub: "user1",
         given_name: "User",

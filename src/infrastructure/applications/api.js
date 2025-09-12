@@ -26,23 +26,6 @@ const callApi = async (endpoint, method, body, correlationId) => {
   }
 };
 
-const getServiceById = async (id, correlationId) =>
-  callApi(`services/${id}`, "GET", undefined, correlationId);
-
-const getServiceSummaries = async (ids, fields, correlationId) =>
-  callApi(
-    `service-summaries/${ids.join()}?fields=${fields.join()}`,
-    "GET",
-    undefined,
-    correlationId,
-  );
-
-const listAllServices = async (correlationId) =>
-  // Hard code this to 1000 as a short term fix (1000 is a lot more services then we have)
-  // This endpoint will be reworked in the future to give us all of them if no query strings
-  // are provided.
-  callApi("services?pageSize=1000", "GET", undefined, correlationId);
-
 const updateService = async (id, serviceDetails, correlationId) => {
   const body = {};
   if (serviceDetails.name) {
@@ -86,30 +69,6 @@ const updateService = async (id, serviceDetails, correlationId) => {
   return callApi(`services/${id}`, "PATCH", body, correlationId);
 };
 
-const listBannersForService = async (id, pageSize, page, correlationId) =>
-  callApi(
-    `services/${id}/banners?pageSize=${pageSize}?&page=${page}`,
-    "GET",
-    undefined,
-    correlationId,
-  );
-
-const listAllBannersForService = async (id, correlationId) => {
-  const allBanners = [];
-
-  let pageNumber = 1;
-  let isMorePages = true;
-  while (isMorePages) {
-    const page = await listBannersForService(id, 25, pageNumber, correlationId);
-    page.banners.forEach((banner) => {
-      allBanners.push(banner);
-    });
-    pageNumber += 1;
-    isMorePages = pageNumber <= page.totalNumberOfPages;
-  }
-  return allBanners;
-};
-
 const getBannerById = async (id, bid, correlationId) =>
   callApi(`services/${id}/banners/${bid}`, "GET", undefined, correlationId);
 
@@ -120,13 +79,8 @@ const removeBanner = async (sid, bid, correlationId) =>
   callApi(`services/${sid}/banners/${bid}`, "DELETE", undefined, correlationId);
 
 module.exports = {
-  getServiceById,
-  getServiceSummaries,
   updateService,
-  listAllServices,
-  listBannersForService,
   getBannerById,
   upsertBanner,
   removeBanner,
-  listAllBannersForService,
 };

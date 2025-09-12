@@ -116,16 +116,8 @@ const updateIndex = async (userId, body, correlationId) => {
   await callApi(`/users/${userId}`, "PATCH", body, correlationId);
 };
 
-const createIndex = async (id, correlationId) => {
-  const body = {
-    id,
-  };
-  await callApi("/users/update-index", "POST", body, correlationId);
-};
-
 module.exports = {
   searchForUsers,
   getSearchDetailsForUserById,
   updateIndex,
-  createIndex,
 };

@@ -6,6 +6,10 @@ jest.mock("./../../../src/infrastructure/logger", () =>
 );
 jest.mock("./../../../src/infrastructure/access");
 jest.mock("./../../../src/infrastructure/applications");
+jest.mock("login.dfe.api-client/services", () => ({
+  getServiceRaw: jest.fn(),
+  getPaginatedServicesRaw: jest.fn(),
+}));
 jest.mock("../../../src/app/services/utils");
 
 const { getRequestMock, getResponseMock } = require("../../utils");
@@ -14,13 +18,12 @@ const {
   listRolesOfService,
   updateRole,
 } = require("../../../src/infrastructure/access");
-const {
-  getServiceById,
-  listAllServices,
-  updateService,
-} = require("../../../src/infrastructure/applications");
+const { updateService } = require("../../../src/infrastructure/applications");
 const { getUserServiceRoles } = require("../../../src/app/services/utils");
-
+const {
+  getServiceRaw,
+  getPaginatedServicesRaw,
+} = require("login.dfe.api-client/services");
 const res = getResponseMock();
 
 const getServiceByIdData = {
@@ -33,7 +36,7 @@ const getServiceByIdData = {
   // Other fields would be present, but omitted for brevity
 };
 
-const listAllServicesData = {
+const getPaginatedServicesRawData = {
   services: [
     {
       id: "service-1",
@@ -81,11 +84,11 @@ describe("when getting the post confirm edit service info page", () => {
       },
     });
 
-    getServiceById.mockReset();
-    getServiceById.mockReturnValue(getServiceByIdData);
+    getServiceRaw.mockReset();
+    getServiceRaw.mockReturnValue(getServiceByIdData);
 
-    listAllServices.mockReset();
-    listAllServices.mockReturnValue(listAllServicesData);
+    getPaginatedServicesRaw.mockReset();
+    getPaginatedServicesRaw.mockReturnValue(getPaginatedServicesRawData);
 
     listRolesOfService.mockReset();
     listRolesOfService.mockReturnValue(listRolesOfServiceData);
@@ -132,15 +135,28 @@ describe("when getting the post confirm edit service info page", () => {
   });
 
   it("should error if it attempts to change a name to one that already exists", async () => {
-    // TODO fill in test more.  Also functionality still needs tidying up.
-    // It's possible that another service used the name between the edit screen and the
-    // confirm edit screen. This test makes sure that we don't try and update it if that happens.
     req.session.editServiceInfo = {
-      name: "service one",
+      name: "service two",
     };
     await postConfirmEditServiceInfo(req, res);
 
     expect(updateService.mock.calls).toHaveLength(0);
+
+    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toBe(
+      "/services/service-1/service-information",
+    );
+  });
+
+  it("should succeed if it attempts to change the capitalisation of the existing service", async () => {
+    req.session.editServiceInfo = {
+      name: "SeRViCE OnE",
+    };
+    await postConfirmEditServiceInfo(req, res);
+
+    expect(listRolesOfService.mock.calls).toHaveLength(1);
+    expect(updateRole.mock.calls).toHaveLength(1);
+    expect(updateService.mock.calls).toHaveLength(1);
 
     expect(res.redirect.mock.calls.length).toBe(1);
     expect(res.redirect.mock.calls[0][0]).toBe(

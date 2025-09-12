@@ -1,14 +1,14 @@
 const {
-  getServiceById,
-  listAllServices,
-} = require("../../infrastructure/applications");
+  getServiceRaw,
+  getPaginatedServicesRaw,
+} = require("login.dfe.api-client/services");
 const { getUserServiceRoles } = require("./utils");
 const logger = require("../../infrastructure/logger");
 
 const validate = async (req, service) => {
   const model = {
-    name: req.body.name.trim() || "",
-    description: req.body.description.trim() || "",
+    name: (req.body.name || "").trim(),
+    description: (req.body.description || "").trim(),
     validationMessages: {},
   };
 
@@ -19,10 +19,22 @@ const validate = async (req, service) => {
   } else if (service.name !== model.name) {
     // Exclude existing service from search as this will allow us to
     // modify capitalisation of letters for this service.
-    const allServices = await listAllServices(req.id);
+    // const allServices = await listAllServices(req.id);
+    // const isMatchingName = allServices.services.find(
+    //   (service) =>
+    //     service.name.toLowerCase() === model.name.toLowerCase() &&
+    //     service.id !== req.params.sid,
+    //} else if (service.name !== model.name.toLowerCase()) {
+    // Exclude existing service from search as this will allow us to
+    // modify capitalisation of letters for this service.
+    const allServices = await getPaginatedServicesRaw({
+      pageSize: 1000,
+      pageNumber: 1,
+    });
+    const modelNameLower = model.name.toLowerCase();
     const isMatchingName = allServices.services.find(
       (service) =>
-        service.name.toLowerCase() === model.name.toLowerCase() &&
+        service.name.toLowerCase() === modelNameLower &&
         service.id !== req.params.sid,
     );
     if (isMatchingName) {
@@ -49,7 +61,9 @@ const validate = async (req, service) => {
 };
 
 const postEditServiceInfo = async (req, res) => {
-  const service = await getServiceById(req.params.sid, req.id);
+  const service = await getServiceRaw({
+    by: { serviceId: req.params.sid },
+  });
   const model = await validate(req, service);
   const manageRolesForService = await getUserServiceRoles(req);
 

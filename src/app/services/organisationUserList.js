@@ -3,7 +3,7 @@ const { getOrganisationByIdV2 } = require("../../infrastructure/organisations");
 const { mapUserRole } = require("../../infrastructure/utils");
 const { getUserServiceRoles } = require("./utils");
 const { dateFormat } = require("../helpers/dateFormatterHelper");
-const { getServiceById } = require("../../infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 
 const search = async (req) => {
   const organisationId = req.params.oid;
@@ -67,7 +67,9 @@ const search = async (req) => {
 const render = async (req, res) => {
   const organisation = await getOrganisationByIdV2(req.params.oid, req.id);
   const manageRolesForService = await getUserServiceRoles(req);
-  const service = await getServiceById(req.params.sid, req.id);
+  const service = await getServiceRaw({
+    by: { serviceId: req.params.sid },
+  });
   const result = await search(req);
 
   const users = result.users.map((user) => {

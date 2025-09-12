@@ -1,7 +1,7 @@
 const {
-  listBannersForService,
-  getServiceById,
-} = require("../../infrastructure/applications");
+  getServiceRaw,
+  getServiceBannersRaw,
+} = require("login.dfe.api-client/services");
 const { getUserServiceRoles } = require("./utils");
 const {
   dateFormat,
@@ -14,19 +14,20 @@ const get = async (req, res) => {
   if (isNaN(page)) {
     page = 1;
   }
-  const serviceBanners = await listBannersForService(
-    req.params.sid,
-    10,
+  const serviceBanners = await getServiceBannersRaw({
+    serviceId: req.params.sid,
+    pageSize: 10,
     page,
-    req.id,
-  );
+  });
   serviceBanners.banners = serviceBanners.banners.map((banner) => ({
     ...banner,
     formattedUpdateAt: banner.updatedAt
       ? dateFormat(banner.updatedAt, "shortDateFormat")
       : "",
   }));
-  const serviceDetails = await getServiceById(req.params.sid, req.id);
+  const serviceDetails = await getServiceRaw({
+    by: { serviceId: req.params.sid },
+  });
   const manageRolesForService = await getUserServiceRoles(req);
   let activeBannerIndex = findActiveBannerIndex(serviceBanners.banners);
   if (activeBannerIndex === -1) {
@@ -56,13 +57,14 @@ const post = async (req, res) => {
   if (isNaN(page)) {
     page = 1;
   }
-  const serviceBanners = await listBannersForService(
-    req.params.sid,
-    10,
+  const serviceBanners = await getServiceBannersRaw({
+    serviceId: req.params.sid,
+    pageSize: 10,
     page,
-    req.id,
-  );
-  const serviceDetails = await getServiceById(req.params.sid, req.id);
+  });
+  const serviceDetails = await getServiceRaw({
+    by: { serviceId: req.params.sid },
+  });
 
   return res.render("services/views/serviceBanners", {
     csrfToken: req.csrfToken(),

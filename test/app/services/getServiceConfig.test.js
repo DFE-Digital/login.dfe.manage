@@ -24,9 +24,13 @@ jest.mock("../../../src/app/services/utils", () => {
   };
 });
 
+jest.mock("login.dfe.api-client/services", () => ({
+  getServiceRaw: jest.fn(),
+}));
+
 const { getRequestMock, getResponseMock } = require("../../utils");
 const { getServiceConfig } = require("../../../src/app/services/serviceConfig");
-const { getServiceById } = require("../../../src/infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const { getUserServiceRoles } = require("../../../src/app/services/utils");
 const { ACTIONS } = require("../../../src/constants/serviceConfigConstants");
 
@@ -58,8 +62,8 @@ describe("when getting the service config page", () => {
       },
     });
 
-    getServiceById.mockReset();
-    getServiceById.mockReturnValue({
+    getServiceRaw.mockReset();
+    getServiceRaw.mockReturnValue({
       id: "service1",
       name: "service one",
       description: "service description",
@@ -101,15 +105,16 @@ describe("when getting the service config page", () => {
   it("then it should get the service by id", async () => {
     await getServiceConfig(req, res);
 
-    expect(getServiceById.mock.calls).toHaveLength(1);
-    expect(getServiceById.mock.calls[0][0]).toBe("service1");
-    expect(getServiceById.mock.calls[0][1]).toBe("correlationId");
+    expect(getServiceRaw.mock.calls).toHaveLength(1);
+    expect(getServiceRaw).toHaveBeenCalledWith({
+      by: { serviceId: "service1" },
+    });
   });
 
   it("should throw an error when unable to get the service by id", async () => {
     const errorMessage = "Error fetching service by ID";
 
-    getServiceById.mockImplementation(() => {
+    getServiceRaw.mockImplementation(() => {
       throw new Error(errorMessage);
     });
 
@@ -237,7 +242,7 @@ describe("when getting the service config page", () => {
   });
 
   it("should set tokenEndpointAuthMethod correctly when service.relyingParty has token_endpoint_auth_method as client_secret_post", async () => {
-    getServiceById.mockReturnValue({
+    getServiceRaw.mockReturnValue({
       relyingParty: {
         token_endpoint_auth_method: "client_secret_post",
       },
@@ -251,7 +256,7 @@ describe("when getting the service config page", () => {
   });
 
   it("should set tokenEndpointAuthMethod to client_secret_basic when relyingParty.token_endpoint_auth_method is client_secret_basic", async () => {
-    getServiceById.mockReturnValue({
+    getServiceRaw.mockReturnValue({
       relyingParty: {
         token_endpoint_auth_method: null,
       },

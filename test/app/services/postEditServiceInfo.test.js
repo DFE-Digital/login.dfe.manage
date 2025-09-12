@@ -4,20 +4,24 @@ jest.mock("./../../../src/infrastructure/config", () =>
 jest.mock("./../../../src/infrastructure/logger", () =>
   require("../../utils").loggerMockFactory(),
 );
-jest.mock("./../../../src/infrastructure/applications");
+
 jest.mock("../../../src/app/services/utils");
+jest.mock("login.dfe.api-client/services", () => ({
+  getServiceRaw: jest.fn(),
+  getPaginatedServicesRaw: jest.fn(),
+}));
 
 const { getRequestMock, getResponseMock } = require("../../utils");
 const postEditServiceInfo = require("../../../src/app/services/postEditServiceInfo");
-const {
-  getServiceById,
-  listAllServices,
-} = require("../../../src/infrastructure/applications");
 const { getUserServiceRoles } = require("../../../src/app/services/utils");
+const {
+  getServiceRaw,
+  getPaginatedServicesRaw,
+} = require("login.dfe.api-client/services");
 
 const res = getResponseMock();
 
-const listAllServicesResponse = {
+const getPaginatedServicesRawResponse = {
   services: [
     {
       id: "service-1",
@@ -56,16 +60,16 @@ describe("when getting the post edit service info page", () => {
       },
     });
 
-    getServiceById.mockReset();
-    getServiceById.mockReturnValue({
+    getServiceRaw.mockReset();
+    getServiceRaw.mockReturnValue({
       id: "service-1",
       name: "service one",
       description: "service description",
       // Other fields would be present, but omitted for brevity
     });
 
-    listAllServices.mockReset();
-    listAllServices.mockReturnValue(listAllServicesResponse);
+    getPaginatedServicesRaw.mockReset();
+    getPaginatedServicesRaw.mockReturnValue(getPaginatedServicesRawResponse);
 
     getUserServiceRoles
       .mockReset()

@@ -8,6 +8,9 @@ jest.mock("./../../../src/infrastructure/logger", () =>
   mockUtils.loggerMockFactory(),
 );
 jest.mock("./../../../src/infrastructure/applications");
+jest.mock("login.dfe.api-client/services", () => ({
+  getServiceRaw: jest.fn(),
+}));
 
 jest.mock("../../../src/app/services/utils", () => {
   const actualUtilsFunctions = jest.requireActual(
@@ -34,10 +37,7 @@ const { getRequestMock, getResponseMock } = require("../../utils");
 const {
   postConfirmServiceConfig,
 } = require("../../../src/app/services/confirmServiceConfig");
-const {
-  getServiceById,
-  updateService,
-} = require("../../../src/infrastructure/applications");
+const { updateService } = require("../../../src/infrastructure/applications");
 const {
   getUserServiceRoles,
   checkClientId,
@@ -46,6 +46,7 @@ const logger = require("../../../src/infrastructure/logger");
 const {
   ERROR_MESSAGES,
 } = require("../../../src/constants/serviceConfigConstants");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 
 const res = getResponseMock();
 
@@ -101,8 +102,8 @@ describe("when confirming service config changes in the review page", () => {
     checkClientId.mockReset();
 
     updateService.mockReset();
-    getServiceById.mockReset();
-    getServiceById
+    getServiceRaw.mockReset();
+    getServiceRaw
       .mockReturnValueOnce({ ...currentServiceInfo })
       .mockReturnValueOnce(null);
 

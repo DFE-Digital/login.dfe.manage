@@ -11,7 +11,7 @@ const logger = require("../../infrastructure/logger");
 const {
   getServiceIdForClientId,
 } = require("../../infrastructure/serviceMapping");
-const { getServiceById } = require("../../infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const {
   getOrganisationById,
   getUserOrganisations,
@@ -152,7 +152,7 @@ const getCachedServiceIdForClientId = async (client) => {
 const getCachedServiceById = async (serviceId, reqId) => {
   const key = `${serviceId}:${reqId}`;
   if (!(key in cachedServices)) {
-    const service = await getServiceById(serviceId, reqId);
+    const service = await getServiceRaw({ by: { serviceId: serviceId } });
     cachedServices[key] = service;
   }
   return cachedServices[key];
@@ -166,7 +166,9 @@ const getAudit = async (req, res) => {
   const user = await getCachedUserById(req.params.uid, req.id);
   const userOrganisations = await getUserOrganisations(req.params.uid, req.id);
   const manageRolesForService = await getUserServiceRoles(req);
-  const currentService = await getServiceById(req.params.sid, req.id);
+  const currentService = await getServiceRaw({
+    by: { serviceId: req.params.sid },
+  });
 
   const pageNumber =
     req.query && req.query.page ? parseInt(req.query.page, 10) : 1;

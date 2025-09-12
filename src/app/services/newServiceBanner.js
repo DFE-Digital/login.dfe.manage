@@ -3,10 +3,12 @@ const sanitizeHtml = require("sanitize-html");
 const {
   getBannerById,
   upsertBanner,
-  listAllBannersForService,
 } = require("../../infrastructure/applications");
 const logger = require("../../infrastructure/logger");
 const { getUserServiceRoles } = require("./utils");
+const {
+  listAllBannersForService,
+} = require("../../infrastructure/utils/banners");
 
 const get = async (req, res) => {
   const manageRolesForService = await getUserServiceRoles(req);
@@ -154,7 +156,6 @@ const validate = async (req) => {
     } else {
       const allCurrentServiceBanners = await listAllBannersForService(
         req.params.sid,
-        req.id,
       );
       const isInRange = allCurrentServiceBanners.find(
         (x) =>
@@ -177,7 +178,6 @@ const validate = async (req) => {
     } else {
       const allCurrentServiceBanners = await listAllBannersForService(
         req.params.sid,
-        req.id,
       );
       const isInRange = allCurrentServiceBanners.find(
         (x) =>
@@ -200,7 +200,6 @@ const validate = async (req) => {
     // TODO: link to the existing banner that is always display
     const allCurrentServiceBanners = await listAllBannersForService(
       req.params.sid,
-      req.id,
     );
     const isAlwaysOnBanner = allCurrentServiceBanners.find(
       (x) => x.isActive === true && x.id !== req.params.bid,

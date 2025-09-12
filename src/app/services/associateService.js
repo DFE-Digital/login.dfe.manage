@@ -1,6 +1,6 @@
 const PolicyEngine = require("login.dfe.policy-engine");
 const config = require("../../infrastructure/config");
-const { getServiceById } = require("../../infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const {
   getUserDetails,
   getUserServiceRoles,
@@ -13,7 +13,9 @@ const policyEngine = new PolicyEngine(config);
 const getViewModel = async (req) => {
   const user = await getUserDetails(req);
   const organisation = await getOrganisationByIdV2(req.params.oid, req.id);
-  const service = await getServiceById(req.params.sid);
+  const service = await getServiceRaw({
+    by: { serviceId: req.params.sid },
+  });
   const policyResult = await policyEngine.getPolicyApplicationResultsForUser(
     req.params.uid.startsWith("inv-") ? undefined : req.params.uid,
     req.params.oid,

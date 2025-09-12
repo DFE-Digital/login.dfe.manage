@@ -6,12 +6,13 @@ jest.mock("./../../../src/infrastructure/logger", () =>
 );
 jest.mock("./../../../src/infrastructure/applications");
 jest.mock("./../../../src/infrastructure/access");
+jest.mock("login.dfe.api-client/services", () => ({
+  getServiceRaw: jest.fn(),
+}));
 
 const { getRequestMock, getResponseMock } = require("./../../utils");
 const getListPolicies = require("./../../../src/app/services/listPolicies").get;
-const {
-  getServiceById,
-} = require("./../../../src/infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const {
   getPageOfPoliciesForService,
 } = require("./../../../src/infrastructure/access");
@@ -58,8 +59,8 @@ describe("when getting the list of service policies", () => {
       totalNumberOfRecords: 1,
     });
 
-    getServiceById.mockReset();
-    getServiceById.mockReturnValue({
+    getServiceRaw.mockReset();
+    getServiceRaw.mockReturnValue({
       id: "service1",
       name: "service one",
       description: "service description",
@@ -91,9 +92,10 @@ describe("when getting the list of service policies", () => {
   it("then it should get the service details", async () => {
     await getListPolicies(req, res);
 
-    expect(getServiceById.mock.calls).toHaveLength(1);
-    expect(getServiceById.mock.calls[0][0]).toBe("service1");
-    expect(getServiceById.mock.calls[0][1]).toBe("correlationId");
+    expect(getServiceRaw.mock.calls).toHaveLength(1);
+    expect(getServiceRaw).toHaveBeenCalledWith({
+      by: { serviceId: "service1" },
+    });
   });
 
   it("then it should return the service policies view", async () => {

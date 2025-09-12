@@ -2,7 +2,7 @@ const {
   removeServiceFromUser,
   removeServiceFromInvitation,
 } = require("../../infrastructure/access");
-const { getServiceById } = require("../../infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const {
   getUserDetails,
   waitForIndexToUpdate,
@@ -18,7 +18,9 @@ const {
 const logger = require("../../infrastructure/logger");
 
 const getModel = async (req) => {
-  const service = await getServiceById(req.params.sid, req.id);
+  const service = await getServiceRaw({
+    by: { serviceId: req.params.sid },
+  });
   const user = await getUserDetails(req);
   const organisation = await getOrganisationByIdV2(req.params.oid, req.id);
   const manageRolesForService = await getUserServiceRoles(req);

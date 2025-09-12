@@ -1,9 +1,7 @@
 const niceware = require("niceware");
 const UrlValidator = require("login.dfe.validation/src/urlValidator");
-const {
-  getServiceById,
-  updateService,
-} = require("../../infrastructure/applications");
+const { updateService } = require("../../infrastructure/applications");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const logger = require("../../infrastructure/logger");
 const {
   getUserServiceRoles,
@@ -89,7 +87,9 @@ const createFlattenedMappedServiceConfigChanges = (
     .filter((mappedValue) => mappedValue !== null); // Filter out null entries
 
 const buildCurrentServiceModel = async (req) => {
-  const service = await getServiceById(req.params.sid, req.id);
+  const service = await getServiceRaw({
+    by: { serviceId: req.params.sid },
+  });
   return {
     name: service.name || "",
   };
@@ -262,7 +262,7 @@ const validate = async (req, currentService) => {
     } else if (clientId && !/^[A-Za-z0-9-]+$/.test(clientId)) {
       model.validationMessages.clientId = ERROR_MESSAGES.INVALID_CLIENT_ID;
     } else if (clientId && (await checkClientId(clientId, req.id))) {
-      // If getServiceById returns truthy, then that clientId is already in use.
+      // If getServiceRaw returns truthy, then that clientId is already in use.
       model.validationMessages.clientId = ERROR_MESSAGES.CLIENT_ID_UNAVAILABLE;
     }
 

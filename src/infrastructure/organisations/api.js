@@ -175,81 +175,6 @@ const getOrganisationByIdV2 = async (id, correlationId) => {
   );
 };
 
-const getOrganisationForUserV2 = async (userId, correlationId) => {
-  return await callOrganisationsApi(
-    `organisations/v2/associated-with-user/${userId}`,
-    "GET",
-    undefined,
-    correlationId,
-  );
-};
-
-const putInvitationInOrganisation = async (
-  invitationId,
-  organisationId,
-  role,
-  correlationId,
-) => {
-  return callOrganisationsApi(
-    `organisations/${organisationId}/invitations/${invitationId}`,
-    "PUT",
-    { roleId: role },
-    correlationId,
-  );
-};
-
-const putUserInOrganisation = async (
-  userId,
-  organisationId,
-  role,
-  correlationId,
-) => {
-  return callOrganisationsApi(
-    `organisations/${organisationId}/users/${userId}`,
-    "PUT",
-    { roleId: role },
-    correlationId,
-  );
-};
-
-const getPendingRequestsAssociatedWithUser = async (userId, correlationId) => {
-  return callOrganisationsApi(
-    `/organisations/requests-for-user/${userId}`,
-    "GET",
-    undefined,
-    correlationId,
-  );
-};
-
-const updateRequestById = async (
-  requestId,
-  status,
-  actionedBy,
-  actionedReason,
-  actionedAt,
-  correlationId,
-) => {
-  const body = {};
-  if (status) {
-    body.status = status;
-  }
-  if (actionedBy) {
-    body.actioned_by = actionedBy;
-  }
-  if (actionedReason) {
-    body.actioned_reason = actionedReason;
-  }
-  if (actionedAt) {
-    body.actioned_at = actionedAt;
-  }
-  return callOrganisationsApi(
-    `/organisations/requests/${requestId}`,
-    "PATCH",
-    body,
-    correlationId,
-  );
-};
-
 const getOrganisationCategories = async (correlationId) =>
   callOrganisationsApi(
     "organisations/categories",
@@ -268,11 +193,6 @@ module.exports = {
   getOrganisationById,
   getUserOrganisations,
   getOrganisationByIdV2,
-  getOrganisationForUserV2,
-  putInvitationInOrganisation,
-  putUserInOrganisation,
-  getPendingRequestsAssociatedWithUser,
-  updateRequestById,
   searchOrgsAssociatedWithService,
   getOrganisationCategories,
   listOrganisationStatus,
