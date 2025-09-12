@@ -19,14 +19,6 @@ const validate = async (req, service) => {
   } else if (service.name !== model.name) {
     // Exclude existing service from search as this will allow us to
     // modify capitalisation of letters for this service.
-    // const allServices = await listAllServices(req.id);
-    // const isMatchingName = allServices.services.find(
-    //   (service) =>
-    //     service.name.toLowerCase() === model.name.toLowerCase() &&
-    //     service.id !== req.params.sid,
-    //} else if (service.name !== model.name.toLowerCase()) {
-    // Exclude existing service from search as this will allow us to
-    // modify capitalisation of letters for this service.
     const allServices = await getPaginatedServicesRaw({
       pageSize: 1000,
       pageNumber: 1,
