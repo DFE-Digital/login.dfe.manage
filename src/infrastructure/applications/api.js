@@ -72,11 +72,7 @@ const updateService = async (id, serviceDetails, correlationId) => {
 const upsertBanner = async (sid, banner, correlationId) =>
   callApi(`services/${sid}/banners`, "POST", banner, correlationId);
 
-const removeBanner = async (sid, bid, correlationId) =>
-  callApi(`services/${sid}/banners/${bid}`, "DELETE", undefined, correlationId);
-
 module.exports = {
   updateService,
   upsertBanner,
-  removeBanner,
 };

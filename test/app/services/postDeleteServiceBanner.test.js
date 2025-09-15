@@ -4,13 +4,13 @@ jest.mock("./../../../src/infrastructure/config", () =>
 jest.mock("./../../../src/infrastructure/logger", () =>
   require("./../../utils").loggerMockFactory(),
 );
-jest.mock("./../../../src/infrastructure/applications");
+jest.mock("login.dfe.api-client/services");
 
 const logger = require("./../../../src/infrastructure/logger");
 const { getRequestMock, getResponseMock } = require("./../../utils");
 const postDeleteServiceBanner =
   require("./../../../src/app/services/deleteServiceBanner").post;
-const { removeBanner } = require("./../../../src/infrastructure/applications");
+const { deleteServiceBanner } = require("login.dfe.api-client/services");
 const res = getResponseMock();
 
 describe("when deleting a service banner", () => {
@@ -24,17 +24,18 @@ describe("when deleting a service banner", () => {
       },
     });
 
-    removeBanner.mockReset();
+    deleteServiceBanner.mockReset();
     res.mockResetAll();
   });
 
   it("then it should delete the banner", async () => {
     await postDeleteServiceBanner(req, res);
 
-    expect(removeBanner.mock.calls).toHaveLength(1);
-    expect(removeBanner.mock.calls[0][0]).toBe("service1");
-    expect(removeBanner.mock.calls[0][1]).toBe("bannerId");
-    expect(removeBanner.mock.calls[0][2]).toBe("correlationId");
+    expect(deleteServiceBanner.mock.calls).toHaveLength(1);
+    expect(deleteServiceBanner).toHaveBeenCalledWith({
+      bannerId: "bannerId",
+      serviceId: "service1",
+    });
   });
 
   it("then it should redirect to service banners", async () => {
