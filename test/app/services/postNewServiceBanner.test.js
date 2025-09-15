@@ -12,10 +12,8 @@ const logger = require("./../../../src/infrastructure/logger");
 const { getRequestMock, getResponseMock } = require("./../../utils");
 const postNewServiceBanner =
   require("./../../../src/app/services/newServiceBanner").post;
-const {
-  getBannerById,
-  upsertBanner,
-} = require("./../../../src/infrastructure/applications");
+const { upsertBanner } = require("./../../../src/infrastructure/applications");
+const { getServiceBannerRaw } = require("login.dfe.api-client/services");
 const {
   listAllBannersForService,
 } = require("./../../../src/infrastructure/utils/banners");
@@ -47,8 +45,8 @@ describe("when creating a new service banner", () => {
         toMinute: "30",
       },
     });
-    getBannerById.mockReset();
-    getBannerById.mockReturnValue({
+    getServiceBannerRaw.mockReset();
+    getServiceBannerRaw.mockReturnValue({
       id: "bannerId",
       serviceId: "serviceId",
       name: "banner name",

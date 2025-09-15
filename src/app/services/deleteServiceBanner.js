@@ -1,17 +1,14 @@
 const logger = require("../../infrastructure/logger");
-const {
-  removeBanner,
-  getBannerById,
-} = require("../../infrastructure/applications");
+const { removeBanner } = require("../../infrastructure/applications");
 const { getUserServiceRoles } = require("./utils");
 const { dateFormat } = require("../helpers/dateFormatterHelper");
+const { getServiceBannerRaw } = require("login.dfe.api-client/services");
 
 const get = async (req, res) => {
-  const serviceBanners = await getBannerById(
-    req.params.sid,
-    req.params.bid,
-    req.id,
-  );
+  const serviceBanners = await getServiceBannerRaw({
+    serviceId: req.params.sid,
+    bannerId: req.params.bid,
+  });
   serviceBanners.formattedValidFrom = serviceBanners.validFrom
     ? dateFormat(serviceBanners.validFrom, "longDateFormat")
     : "";

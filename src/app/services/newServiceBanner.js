@@ -1,14 +1,12 @@
 const moment = require("moment");
 const sanitizeHtml = require("sanitize-html");
-const {
-  getBannerById,
-  upsertBanner,
-} = require("../../infrastructure/applications");
+const { upsertBanner } = require("../../infrastructure/applications");
 const logger = require("../../infrastructure/logger");
 const { getUserServiceRoles } = require("./utils");
 const {
   listAllBannersForService,
 } = require("../../infrastructure/utils/banners");
+const { getServiceBannerRaw } = require("login.dfe.api-client/services");
 
 const get = async (req, res) => {
   const manageRolesForService = await getUserServiceRoles(req);
@@ -41,11 +39,10 @@ const get = async (req, res) => {
   };
 
   if (req.params.bid) {
-    const existingBanner = await getBannerById(
-      req.params.sid,
-      req.params.bid,
-      req.id,
-    );
+    const existingBanner = await getServiceBannerRaw({
+      serviceId: req.params.sid,
+      bannerId: req.params.bid,
+    });
     if (existingBanner) {
       model.isEditExisting = true;
       model.name = existingBanner.name;

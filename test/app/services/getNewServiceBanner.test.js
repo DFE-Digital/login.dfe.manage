@@ -4,12 +4,12 @@ jest.mock("./../../../src/infrastructure/config", () =>
 jest.mock("./../../../src/infrastructure/logger", () =>
   require("./../../utils").loggerMockFactory(),
 );
-jest.mock("./../../../src/infrastructure/applications");
+jest.mock("login.dfe.api-client/services");
 
 const { getRequestMock, getResponseMock } = require("./../../utils");
 const getNewServiceBanner =
   require("./../../../src/app/services/newServiceBanner").get;
-const { getBannerById } = require("./../../../src/infrastructure/applications");
+const { getServiceBannerRaw } = require("login.dfe.api-client/services");
 const res = getResponseMock();
 
 describe("when getting the create new service banner view", () => {
@@ -30,8 +30,8 @@ describe("when getting the create new service banner view", () => {
       },
     });
 
-    getBannerById.mockReset();
-    getBannerById.mockReturnValue({
+    getServiceBannerRaw.mockReset();
+    getServiceBannerRaw.mockReturnValue({
       id: "bannerId",
       serviceId: "serviceId",
       name: "banner name",
@@ -59,10 +59,11 @@ describe("when getting the create new service banner view", () => {
   it("then it should get the banner by id if editing banner", async () => {
     await getNewServiceBanner(req, res);
 
-    expect(getBannerById.mock.calls).toHaveLength(1);
-    expect(getBannerById.mock.calls[0][0]).toBe("service1");
-    expect(getBannerById.mock.calls[0][1]).toBe("bannerId");
-    expect(getBannerById.mock.calls[0][2]).toBe("correlationId");
+    expect(getServiceBannerRaw.mock.calls).toHaveLength(1);
+    expect(getServiceBannerRaw).toHaveBeenCalledWith({
+      bannerId: "bannerId",
+      serviceId: "service1",
+    });
   });
 
   it("then it should include the banner being edited details", async () => {
@@ -80,6 +81,6 @@ describe("when getting the create new service banner view", () => {
     req.params.bid = null;
     await getNewServiceBanner(req, res);
 
-    expect(getBannerById.mock.calls).toHaveLength(0);
+    expect(getServiceBannerRaw.mock.calls).toHaveLength(0);
   });
 });
