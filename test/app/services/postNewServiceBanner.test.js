@@ -12,8 +12,10 @@ const logger = require("./../../../src/infrastructure/logger");
 const { getRequestMock, getResponseMock } = require("./../../utils");
 const postNewServiceBanner =
   require("./../../../src/app/services/newServiceBanner").post;
-const { upsertBanner } = require("./../../../src/infrastructure/applications");
-const { getServiceBannerRaw } = require("login.dfe.api-client/services");
+const {
+  getServiceBannerRaw,
+  upsertServiceBannerRaw,
+} = require("login.dfe.api-client/services");
 const {
   listAllBannersForService,
 } = require("./../../../src/infrastructure/utils/banners");
@@ -63,7 +65,7 @@ describe("when creating a new service banner", () => {
         message: "banner message",
       },
     ]);
-    upsertBanner.mockReset();
+    upsertServiceBannerRaw.mockReset();
     res.mockResetAll();
   });
 
@@ -327,18 +329,19 @@ describe("when creating a new service banner", () => {
   it("then it should upsert the banner", async () => {
     await postNewServiceBanner(req, res);
 
-    expect(upsertBanner.mock.calls).toHaveLength(1);
-    expect(upsertBanner.mock.calls[0][0]).toBe("service1");
-    expect(upsertBanner.mock.calls[0][1]).toEqual({
-      id: "bannerId",
-      isActive: true,
-      message: "banner message",
-      name: "banner name",
-      title: "banner title",
-      validFrom: null,
-      validTo: null,
+    expect(upsertServiceBannerRaw.mock.calls).toHaveLength(1);
+    expect(upsertServiceBannerRaw).toHaveBeenCalledWith({
+      banner: {
+        id: "bannerId",
+        isActive: true,
+        message: "banner message",
+        name: "banner name",
+        title: "banner title",
+        validFrom: null,
+        validTo: null,
+      },
+      serviceId: "service1",
     });
-    expect(upsertBanner.mock.calls[0][2]).toBe("correlationId");
   });
 
   it("then it should redirect to service banners", async () => {

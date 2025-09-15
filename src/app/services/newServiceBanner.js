@@ -1,12 +1,14 @@
 const moment = require("moment");
 const sanitizeHtml = require("sanitize-html");
-const { upsertBanner } = require("../../infrastructure/applications");
 const logger = require("../../infrastructure/logger");
 const { getUserServiceRoles } = require("./utils");
 const {
   listAllBannersForService,
 } = require("../../infrastructure/utils/banners");
-const { getServiceBannerRaw } = require("login.dfe.api-client/services");
+const {
+  getServiceBannerRaw,
+  upsertServiceBannerRaw,
+} = require("login.dfe.api-client/services");
 
 const get = async (req, res) => {
   const manageRolesForService = await getUserServiceRoles(req);
@@ -260,7 +262,7 @@ const post = async (req, res) => {
       },
     );
   }
-  await upsertBanner(req.params.sid, body, req.id);
+  await upsertServiceBannerRaw({ serviceId: req.params.sid, banner: body });
 
   req.params.bid
     ? res.flash("info", "Service banner updated successfully")
