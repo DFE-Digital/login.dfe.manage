@@ -41,16 +41,13 @@ describe("When getting users search ", () => {
 
     usersSearchResult = [
       {
-        name: "Timmy Tester",
+        firstName: "Timmy",
+        lastName: "Tester",
         email: "timmy@tester.test",
-        organisation: {
-          name: "Testco",
-        },
+        primaryOrganisation: "Testco",
         organisations: [],
         lastLogin: new Date(2018, 0, 11, 11, 30, 57),
-        status: {
-          description: "Active",
-        },
+        statusId: 1,
       },
     ];
 
@@ -117,8 +114,22 @@ describe("When getting users search ", () => {
   it("then it should include users", async () => {
     await get(req, res);
 
+    console.log(res.render.mock.calls[0][1]);
+
     expect(res.render.mock.calls[0][1]).toMatchObject({
-      users: usersSearchResult,
+      users: [
+        {
+          name: "Timmy Tester",
+          organisation: {
+            name: "Testco",
+          },
+          status: {
+            id: 1,
+            description: "Active",
+            tagColor: "green",
+          },
+        },
+      ],
     });
   });
 });

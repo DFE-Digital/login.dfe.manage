@@ -1,5 +1,8 @@
 const { getOrganisationByIdV2 } = require("../../infrastructure/organisations");
-const { mapUserRole } = require("../../infrastructure/utils");
+const {
+  mapUserRole,
+  mapSearchUserToSupportModel,
+} = require("../../infrastructure/utils");
 const { getUserServiceRoles } = require("./utils");
 const { dateFormat } = require("../helpers/dateFormatterHelper");
 const { getServiceRaw } = require("login.dfe.api-client/services");
@@ -47,7 +50,7 @@ const search = async (req) => {
     sortOrder: sortAsc ? "asc" : "desc",
     numberOfPages: results.numberOfPages,
     totalNumberOfResults: results.totalNumberOfResults,
-    users: results.users,
+    users: results.users.map(mapSearchUserToSupportModel),
     sort: {
       name: {
         nextDirection: sortBy === "name" ? (sortAsc ? "desc" : "asc") : "asc",

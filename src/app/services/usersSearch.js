@@ -8,6 +8,7 @@ const {
 const {
   userStatusMap,
   lastLoginIntervalsMap,
+  mapSearchUserToSupportModel,
 } = require("../../infrastructure/utils/index");
 const {
   getUserServiceRoles,
@@ -118,7 +119,7 @@ const search = async (req) => {
     sortOrder: sortAsc ? "asc" : "desc",
     numberOfPages: results.numberOfPages,
     totalNumberOfResults: results.totalNumberOfResults,
-    users: results.users,
+    users: results.users.map(mapSearchUserToSupportModel),
     services: showServices,
     selectedOrganisationCategories: filters.organisationCategories,
     selectedLastLoginIntervals: filters.lastLogin,
