@@ -5,14 +5,25 @@ jest.mock("./../../../src/infrastructure/logger", () =>
   require("../../utils").loggerMockFactory(),
 );
 jest.mock("./../../../src/infrastructure/organisations");
-jest.mock("./../../../src/infrastructure/search");
 jest.mock("login.dfe.api-client/services");
+
+jest.mock("login.dfe.api-client/users", () => {
+  const { mapSupportUserSortByToSearchApi } = jest.requireActual(
+    "login.dfe.api-client/users",
+  );
+  return {
+    ...jest.createMockFromModule("login.dfe.api-client/users"),
+    mapSupportUserSortByToSearchApi,
+  };
+});
+
 const {
   getOrganisationByIdV2,
 } = require("../../../src/infrastructure/organisations");
-const { searchForUsers } = require("../../../src/infrastructure/search");
 const { getRequestMock, getResponseMock } = require("../../utils");
 const organisationUserList = require("../../../src/app/services/organisationUserList");
+
+const { searchUsersRaw } = require("login.dfe.api-client/users");
 
 const res = getResponseMock();
 const orgResult = { id: "org-1", name: "organisation one" };
@@ -40,7 +51,7 @@ describe("when displaying organisation users", () => {
   beforeEach(() => {
     getOrganisationByIdV2.mockReset().mockReturnValue(orgResult);
 
-    searchForUsers.mockReset().mockReturnValue(usersResult);
+    searchUsersRaw.mockReset().mockReturnValue(usersResult);
   });
 
   [
@@ -121,9 +132,15 @@ describe("when displaying organisation users", () => {
 
       await action(req, res);
 
-      expect(searchForUsers).toHaveBeenCalledTimes(1);
-      expect(searchForUsers).toHaveBeenCalledWith("*", 2, "name", "asc", {
-        organisations: ["org-1"],
+      expect(searchUsersRaw).toHaveBeenCalledTimes(1);
+      expect(searchUsersRaw).toHaveBeenCalledWith({
+        searchCriteria: "*",
+        pageNumber: 2,
+        sortBy: "searchableName",
+        sortDirection: "asc",
+        filterBy: {
+          organisationIds: ["org-1"],
+        },
       });
     });
 
@@ -147,9 +164,15 @@ describe("when displaying organisation users", () => {
 
       await action(req, res);
 
-      expect(searchForUsers).toHaveBeenCalledTimes(1);
-      expect(searchForUsers).toHaveBeenCalledWith("*", 1, "name", "asc", {
-        organisations: ["org-1"],
+      expect(searchUsersRaw).toHaveBeenCalledTimes(1);
+      expect(searchUsersRaw).toHaveBeenCalledWith({
+        searchCriteria: "*",
+        pageNumber: 1,
+        sortBy: "searchableName",
+        sortDirection: "asc",
+        filterBy: {
+          organisationIds: ["org-1"],
+        },
       });
     });
 
@@ -175,9 +198,15 @@ describe("when displaying organisation users", () => {
 
       await action(req, res);
 
-      expect(searchForUsers).toHaveBeenCalledTimes(1);
-      expect(searchForUsers).toHaveBeenCalledWith("*", 3, "name", "asc", {
-        organisations: ["org-1"],
+      expect(searchUsersRaw).toHaveBeenCalledTimes(1);
+      expect(searchUsersRaw).toHaveBeenCalledWith({
+        searchCriteria: "*",
+        pageNumber: 3,
+        sortBy: "searchableName",
+        sortDirection: "asc",
+        filterBy: {
+          organisationIds: ["org-1"],
+        },
       });
     });
 
@@ -203,9 +232,15 @@ describe("when displaying organisation users", () => {
 
       await action(req, res);
 
-      expect(searchForUsers).toHaveBeenCalledTimes(1);
-      expect(searchForUsers).toHaveBeenCalledWith("*", 3, "name", "desc", {
-        organisations: ["org-1"],
+      expect(searchUsersRaw).toHaveBeenCalledTimes(1);
+      expect(searchUsersRaw).toHaveBeenCalledWith({
+        searchCriteria: "*",
+        pageNumber: 3,
+        sortBy: "searchableName",
+        sortDirection: "desc",
+        filterBy: {
+          organisationIds: ["org-1"],
+        },
       });
     });
 
@@ -231,9 +266,15 @@ describe("when displaying organisation users", () => {
 
       await action(req, res);
 
-      expect(searchForUsers).toHaveBeenCalledTimes(1);
-      expect(searchForUsers).toHaveBeenCalledWith("*", 3, "email", "asc", {
-        organisations: ["org-1"],
+      expect(searchUsersRaw).toHaveBeenCalledTimes(1);
+      expect(searchUsersRaw).toHaveBeenCalledWith({
+        searchCriteria: "*",
+        pageNumber: 3,
+        sortBy: "searchableEmail",
+        sortDirection: "asc",
+        filterBy: {
+          organisationIds: ["org-1"],
+        },
       });
     });
 
@@ -259,9 +300,15 @@ describe("when displaying organisation users", () => {
 
       await action(req, res);
 
-      expect(searchForUsers).toHaveBeenCalledTimes(1);
-      expect(searchForUsers).toHaveBeenCalledWith("*", 3, "email", "desc", {
-        organisations: ["org-1"],
+      expect(searchUsersRaw).toHaveBeenCalledTimes(1);
+      expect(searchUsersRaw).toHaveBeenCalledWith({
+        searchCriteria: "*",
+        pageNumber: 3,
+        sortBy: "searchableEmail",
+        sortDirection: "desc",
+        filterBy: {
+          organisationIds: ["org-1"],
+        },
       });
     });
 
@@ -287,9 +334,15 @@ describe("when displaying organisation users", () => {
 
       await action(req, res);
 
-      expect(searchForUsers).toHaveBeenCalledTimes(1);
-      expect(searchForUsers).toHaveBeenCalledWith("*", 3, "status", "asc", {
-        organisations: ["org-1"],
+      expect(searchUsersRaw).toHaveBeenCalledTimes(1);
+      expect(searchUsersRaw).toHaveBeenCalledWith({
+        searchCriteria: "*",
+        pageNumber: 3,
+        sortBy: "statusId",
+        sortDirection: "asc",
+        filterBy: {
+          organisationIds: ["org-1"],
+        },
       });
     });
 
@@ -315,9 +368,15 @@ describe("when displaying organisation users", () => {
 
       await action(req, res);
 
-      expect(searchForUsers).toHaveBeenCalledTimes(1);
-      expect(searchForUsers).toHaveBeenCalledWith("*", 3, "status", "desc", {
-        organisations: ["org-1"],
+      expect(searchUsersRaw).toHaveBeenCalledTimes(1);
+      expect(searchUsersRaw).toHaveBeenCalledWith({
+        searchCriteria: "*",
+        pageNumber: 3,
+        sortBy: "statusId",
+        sortDirection: "desc",
+        filterBy: {
+          organisationIds: ["org-1"],
+        },
       });
     });
 
@@ -343,9 +402,15 @@ describe("when displaying organisation users", () => {
 
       await action(req, res);
 
-      expect(searchForUsers).toHaveBeenCalledTimes(1);
-      expect(searchForUsers).toHaveBeenCalledWith("*", 3, "lastlogin", "asc", {
-        organisations: ["org-1"],
+      expect(searchUsersRaw).toHaveBeenCalledTimes(1);
+      expect(searchUsersRaw).toHaveBeenCalledWith({
+        searchCriteria: "*",
+        pageNumber: 3,
+        sortBy: "lastLogin",
+        sortDirection: "asc",
+        filterBy: {
+          organisationIds: ["org-1"],
+        },
       });
     });
 
@@ -371,9 +436,15 @@ describe("when displaying organisation users", () => {
 
       await action(req, res);
 
-      expect(searchForUsers).toHaveBeenCalledTimes(1);
-      expect(searchForUsers).toHaveBeenCalledWith("*", 3, "lastlogin", "desc", {
-        organisations: ["org-1"],
+      expect(searchUsersRaw).toHaveBeenCalledTimes(1);
+      expect(searchUsersRaw).toHaveBeenCalledWith({
+        searchCriteria: "*",
+        pageNumber: 3,
+        sortBy: "lastLogin",
+        sortDirection: "desc",
+        filterBy: {
+          organisationIds: ["org-1"],
+        },
       });
     });
 
@@ -397,9 +468,15 @@ describe("when displaying organisation users", () => {
 
       await action(req, res);
 
-      expect(searchForUsers).toHaveBeenCalledTimes(1);
-      expect(searchForUsers).toHaveBeenCalledWith("*", 3, "name", "asc", {
-        organisations: ["org-1"],
+      expect(searchUsersRaw).toHaveBeenCalledTimes(1);
+      expect(searchUsersRaw).toHaveBeenCalledWith({
+        searchCriteria: "*",
+        pageNumber: 3,
+        sortBy: "searchableName",
+        sortDirection: "asc",
+        filterBy: {
+          organisationIds: ["org-1"],
+        },
       });
     });
 

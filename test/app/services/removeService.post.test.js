@@ -14,12 +14,9 @@ jest.mock("../../../src/app/services/utils", () =>
 jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
 }));
+jest.mock("login.dfe.api-client/users");
 jest.mock("./../../../src/infrastructure/organisations");
 jest.mock("./../../../src/infrastructure/access");
-jest.mock("./../../../src/infrastructure/search", () => ({
-  getSearchDetailsForUserById: jest.fn(),
-  updateIndex: jest.fn(),
-}));
 
 const { getRequestMock, getResponseMock } = require("../../utils");
 const { getUserDetails } = require("../../../src/app/services/utils");
@@ -28,9 +25,9 @@ const {
 } = require("../../../src/infrastructure/organisations");
 const { getServiceRaw } = require("login.dfe.api-client/services");
 const {
-  getSearchDetailsForUserById,
-  updateIndex,
-} = require("../../../src/infrastructure/search");
+  searchUserByIdRaw,
+  updateUserDetailsInSearchIndex,
+} = require("login.dfe.api-client/users");
 const {
   removeServiceFromInvitation,
   removeServiceFromUser,
@@ -70,8 +67,8 @@ describe("when displaying the remove service access view", () => {
       lastName: "Doe",
     });
 
-    getSearchDetailsForUserById.mockReset();
-    getSearchDetailsForUserById.mockReturnValue({
+    searchUserByIdRaw.mockReset();
+    searchUserByIdRaw.mockReturnValue({
       organisations: [
         {
           id: "org1",
@@ -86,7 +83,7 @@ describe("when displaying the remove service access view", () => {
 
     removeServiceFromUser.mockReset();
     removeServiceFromInvitation.mockReset();
-    updateIndex.mockReset();
+    updateUserDetailsInSearchIndex.mockReset();
   });
 
   it("then it should delete service for invitation if request for invitation", async () => {
