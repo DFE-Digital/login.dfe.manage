@@ -86,7 +86,7 @@ const search = async (req) => {
   }
 
   const results = await searchUsersRaw({
-    searchCriteria: "${encodeURIComponent(criteria)}*",
+    searchCriteria: `${encodeURIComponent(criteria)}*`,
     pageNumber: page,
     sortBy: mapSupportUserSortByToSearchApi({ sortBy }),
     sortDirection: sortAsc
