@@ -71,7 +71,7 @@ const search = async (req) => {
   const filterBy = {};
 
   if (showServices === "current") {
-    filterBy.services = [serviceId];
+    filterBy.serviceIds = [serviceId];
   }
 
   if (filters.organisationCategories?.length > 0) {
