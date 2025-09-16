@@ -1,5 +1,5 @@
 const logger = require("../../infrastructure/logger");
-const { updateService } = require("../../infrastructure/applications");
+const { updateService } = require("../../infrastructure/utils/services");
 const {
   getServiceRaw,
   getPaginatedServicesRaw,
@@ -43,7 +43,8 @@ const postConfirmEditServiceInfo = async (req, res) => {
     }
   }
 
-  await updateService(serviceId, model, correlationId);
+  await updateService(serviceId, model);
+
   logger.info(
     `Successfully updated service details for service [${serviceId}]`,
     {

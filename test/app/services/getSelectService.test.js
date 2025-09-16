@@ -8,7 +8,7 @@ jest.mock("login.dfe.api-client/services", () => ({
 
 jest.mock("./../../../src/infrastructure/config", () => mockConfig);
 jest.mock("./../../../src/infrastructure/logger", () => mockLogger);
-jest.mock("./../../../src/infrastructure/applications");
+jest.mock("./../../../src/infrastructure/utils/services");
 
 const { getRequestMock, getResponseMock } = require("../../utils");
 const getSelectService = require("../../../src/app/services/selectService").get;
