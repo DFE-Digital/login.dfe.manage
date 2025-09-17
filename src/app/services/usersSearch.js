@@ -1,9 +1,14 @@
-const { searchForUsers } = require("../../infrastructure/search");
 const logger = require("../../infrastructure/logger");
 const { getServiceRaw } = require("login.dfe.api-client/services");
 const {
+  UserSearchSortDirection,
+  mapSupportUserSortByToSearchApi,
+  searchUsersRaw,
+} = require("login.dfe.api-client/users");
+const {
   userStatusMap,
   lastLoginIntervalsMap,
+  mapSearchUserToSupportModel,
 } = require("../../infrastructure/utils/index");
 const {
   getUserServiceRoles,
@@ -63,32 +68,33 @@ const search = async (req) => {
   const showServices =
     paramsSource.showServices || paramsSource.services || "all";
 
+  const filterBy = {};
+
   if (showServices === "current") {
-    filters = { ...filters, services: [serviceId] };
+    filterBy.serviceIds = [serviceId];
   }
 
-  let mappedToDateFilters = { ...filters };
-
-  if (
-    Object.prototype.hasOwnProperty.call(filters, "lastLogin") &&
-    filters.lastLogin.length > 0
-  ) {
-    const mappedLoginIntervalsToDates = mapLastLoginValuesToDateValues(
-      filters.lastLogin,
-    );
-    mappedToDateFilters = {
-      ...mappedToDateFilters,
-      lastLogin: mappedLoginIntervalsToDates,
-    };
+  if (filters.organisationCategories?.length > 0) {
+    filterBy.organisationCategories = filters.organisationCategories;
   }
 
-  const results = await searchForUsers(
-    `${encodeURIComponent(criteria)}*`,
-    page,
-    sortBy,
-    sortAsc ? "asc" : "desc",
-    mappedToDateFilters,
-  );
+  if (filters.lastLogin?.length > 0) {
+    filterBy.lastLoginDate = mapLastLoginValuesToDateValues(filters.lastLogin);
+  }
+
+  if (filters.statusId?.length > 0) {
+    filterBy.statusId = filters.statusId;
+  }
+
+  const results = await searchUsersRaw({
+    searchCriteria: `${encodeURIComponent(criteria)}*`,
+    pageNumber: page,
+    sortBy: mapSupportUserSortByToSearchApi({ sortBy }),
+    sortDirection: sortAsc
+      ? UserSearchSortDirection.asc
+      : UserSearchSortDirection.desc,
+    filterBy,
+  });
 
   logger.audit(
     `${req.user.email} (id: ${req.user.sub}) searched for users in manage using criteria "${criteria}"`,
@@ -113,7 +119,7 @@ const search = async (req) => {
     sortOrder: sortAsc ? "asc" : "desc",
     numberOfPages: results.numberOfPages,
     totalNumberOfResults: results.totalNumberOfResults,
-    users: results.users,
+    users: results.users.map(mapSearchUserToSupportModel),
     services: showServices,
     selectedOrganisationCategories: filters.organisationCategories,
     selectedLastLoginIntervals: filters.lastLogin,

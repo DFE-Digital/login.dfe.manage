@@ -4,16 +4,17 @@ const {
 } = require("../../infrastructure/access");
 const { getServiceRaw } = require("login.dfe.api-client/services");
 const {
+  searchUserByIdRaw,
+  updateUserDetailsInSearchIndex,
+} = require("login.dfe.api-client/users");
+const {
   getUserDetails,
   waitForIndexToUpdate,
   getUserServiceRoles,
   getReturnUrl,
 } = require("./utils");
+const { mapSearchUserToSupportModel } = require("../../infrastructure/utils");
 const { getOrganisationByIdV2 } = require("../../infrastructure/organisations");
-const {
-  getSearchDetailsForUserById,
-  updateIndex,
-} = require("../../infrastructure/search");
 
 const logger = require("../../infrastructure/logger");
 
@@ -68,22 +69,16 @@ const post = async (req, res) => {
     );
   }
 
-  const getAllUserDetails = await getSearchDetailsForUserById(
-    req.params.uid,
-    req.id,
+  const getAllUserDetails = mapSearchUserToSupportModel(
+    await searchUserByIdRaw({ userId: req.params.uid }),
   );
-  const currentServiceDetails = getAllUserDetails.services;
-  const serviceRemoved = currentServiceDetails.findIndex(
-    (x) => x === req.params.sid,
+  const updatedServiceDetails = getAllUserDetails.services.filter(
+    (serviceId) => serviceId !== req.params.sid,
   );
-  const updatedServiceDetails = currentServiceDetails.filter(
-    (_, index) => index !== serviceRemoved,
-  );
-  await updateIndex(
-    req.params.uid,
-    { services: updatedServiceDetails },
-    req.id,
-  );
+  await updateUserDetailsInSearchIndex({
+    userId: req.params.uid,
+    servicesIds: updatedServiceDetails,
+  });
   await waitForIndexToUpdate(
     req.params.uid,
     (updated) => updated.services.length === updatedServiceDetails.length,

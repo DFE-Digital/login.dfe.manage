@@ -1,9 +1,16 @@
-const { searchForUsers } = require("../../infrastructure/search");
 const { getOrganisationByIdV2 } = require("../../infrastructure/organisations");
-const { mapUserRole } = require("../../infrastructure/utils");
+const {
+  mapUserRole,
+  mapSearchUserToSupportModel,
+} = require("../../infrastructure/utils");
 const { getUserServiceRoles } = require("./utils");
 const { dateFormat } = require("../helpers/dateFormatterHelper");
 const { getServiceRaw } = require("login.dfe.api-client/services");
+const {
+  UserSearchSortDirection,
+  mapSupportUserSortByToSearchApi,
+  searchUsersRaw,
+} = require("login.dfe.api-client/users");
 
 const search = async (req) => {
   const organisationId = req.params.oid;
@@ -25,15 +32,17 @@ const search = async (req) => {
     (paramsSource.sortDir ? paramsSource.sortDir : "asc").toLowerCase() ===
     "asc";
 
-  const results = await searchForUsers(
-    "*",
-    page,
-    sortBy,
-    sortAsc ? "asc" : "desc",
-    {
-      organisations: [organisationId],
+  const results = await searchUsersRaw({
+    searchCriteria: "*",
+    pageNumber: page,
+    sortBy: mapSupportUserSortByToSearchApi({ sortBy }),
+    sortDirection: sortAsc
+      ? UserSearchSortDirection.asc
+      : UserSearchSortDirection.desc,
+    filterBy: {
+      organisationIds: [organisationId],
     },
-  );
+  });
 
   return {
     page,
@@ -41,7 +50,7 @@ const search = async (req) => {
     sortOrder: sortAsc ? "asc" : "desc",
     numberOfPages: results.numberOfPages,
     totalNumberOfResults: results.totalNumberOfResults,
-    users: results.users,
+    users: results.users.map(mapSearchUserToSupportModel),
     sort: {
       name: {
         nextDirection: sortBy === "name" ? (sortAsc ? "desc" : "asc") : "asc",

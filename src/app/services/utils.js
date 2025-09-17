@@ -2,16 +2,19 @@ const {
   AUTHENTICATION_FLOWS,
   AUTHENTICATION_FLOWS_PATTERNS,
 } = require("../../constants/serviceConfigConstants");
-const { getSearchDetailsForUserById } = require("../../infrastructure/search");
 const { getUserRaw } = require("login.dfe.api-client/users");
 const { getInvitationRaw } = require("login.dfe.api-client/invitations");
 const { getServicesForUser } = require("../../infrastructure/access");
-const { mapUserStatus } = require("../../infrastructure/utils");
+const {
+  mapUserStatus,
+  mapSearchUserToSupportModel,
+} = require("../../infrastructure/utils");
 const { getOrganisationByIdV2 } = require("../../infrastructure/organisations");
 const { mapAsync } = require("../../utils/asyncHelpers");
 const config = require("../../infrastructure/config");
 const { getServiceRaw } = require("login.dfe.api-client/services");
 const { dateFormat } = require("../helpers/dateFormatterHelper");
+const { searchUserByIdRaw } = require("login.dfe.api-client/users");
 
 const mapUserToSupportModel = (user, userFromSearch) => ({
   id: user.sub,
@@ -54,7 +57,9 @@ const getUserDetailsById = async (uid, correlationId) => {
       deactivated: invitation.deactivated,
     };
   }
-  const userSearch = await getSearchDetailsForUserById(uid);
+  const userSearch = mapSearchUserToSupportModel(
+    await searchUserByIdRaw({ userId: uid }),
+  );
   const rawUser = await getUserRaw({ by: { id: uid } });
   const user = mapUserToSupportModel(rawUser, userSearch);
   const serviceDetails = await getServicesForUser(uid, correlationId);
@@ -339,7 +344,9 @@ const waitForIndexToUpdate = async (uid, updatedCheck) => {
   const abandonTime = Date.now() + 10000;
   let hasBeenUpdated = false;
   while (!hasBeenUpdated && Date.now() < abandonTime) {
-    const updated = await getSearchDetailsForUserById(uid);
+    const updated = mapSearchUserToSupportModel(
+      await searchUserByIdRaw({ userId: uid }),
+    );
     if (updatedCheck) {
       hasBeenUpdated = updatedCheck(updated);
     } else {
