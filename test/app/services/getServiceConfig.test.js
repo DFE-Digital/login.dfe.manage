@@ -5,7 +5,6 @@ jest.mock("./../../../src/infrastructure/config", () =>
 jest.mock("./../../../src/infrastructure/logger", () =>
   require("../../utils").loggerMockFactory(),
 );
-jest.mock("./../../../src/infrastructure/applications");
 jest.mock("../../../src/app/services/utils", () => {
   const actualUtilsFunctions = jest.requireActual(
     "../../../src/app/services/utils",

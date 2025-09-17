@@ -13,7 +13,6 @@ jest.mock("login.dfe.api-client/services", () => ({
 }));
 jest.mock("./../../../src/infrastructure/utils");
 jest.mock("./../../../src/infrastructure/organisations");
-jest.mock("./../../../src/infrastructure/applications");
 jest.mock("./../../../src/infrastructure/serviceMapping");
 jest.mock("./../../../src/infrastructure/audit");
 jest.mock("ioredis");

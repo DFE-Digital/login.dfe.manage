@@ -4,12 +4,12 @@ jest.mock("./../../../src/infrastructure/config", () =>
 jest.mock("./../../../src/infrastructure/logger", () =>
   require("./../../utils").loggerMockFactory(),
 );
-jest.mock("./../../../src/infrastructure/applications");
+jest.mock("login.dfe.api-client/services");
 
 const { getRequestMock, getResponseMock } = require("./../../utils");
 const getDeleteServiceBanner =
   require("./../../../src/app/services/deleteServiceBanner").get;
-const { getBannerById } = require("./../../../src/infrastructure/applications");
+const { getServiceBannerRaw } = require("login.dfe.api-client/services");
 const res = getResponseMock();
 
 describe("when getting the delete service banner", () => {
@@ -30,8 +30,8 @@ describe("when getting the delete service banner", () => {
       },
     });
 
-    getBannerById.mockReset();
-    getBannerById.mockReturnValue({
+    getServiceBannerRaw.mockReset();
+    getServiceBannerRaw.mockReturnValue({
       id: "bannerId",
       serviceId: "serviceId",
       name: "banner name",
@@ -44,10 +44,11 @@ describe("when getting the delete service banner", () => {
   it("then it should get the banner by id", async () => {
     await getDeleteServiceBanner(req, res);
 
-    expect(getBannerById.mock.calls).toHaveLength(1);
-    expect(getBannerById.mock.calls[0][0]).toBe("service1");
-    expect(getBannerById.mock.calls[0][1]).toBe("bannerId");
-    expect(getBannerById.mock.calls[0][2]).toBe("correlationId");
+    expect(getServiceBannerRaw.mock.calls).toHaveLength(1);
+    expect(getServiceBannerRaw).toHaveBeenCalledWith({
+      bannerId: "bannerId",
+      serviceId: "service1",
+    });
   });
 
   it("then it should return the delete service banner", async () => {

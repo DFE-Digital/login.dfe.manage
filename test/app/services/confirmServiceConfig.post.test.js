@@ -7,9 +7,9 @@ jest.mock("./../../../src/infrastructure/config", () =>
 jest.mock("./../../../src/infrastructure/logger", () =>
   mockUtils.loggerMockFactory(),
 );
-jest.mock("./../../../src/infrastructure/applications");
 jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
+  updateService: jest.fn(),
 }));
 
 jest.mock("../../../src/app/services/utils", () => {
@@ -37,7 +37,7 @@ const { getRequestMock, getResponseMock } = require("../../utils");
 const {
   postConfirmServiceConfig,
 } = require("../../../src/app/services/confirmServiceConfig");
-const { updateService } = require("../../../src/infrastructure/applications");
+
 const {
   getUserServiceRoles,
   checkClientId,
@@ -46,7 +46,10 @@ const logger = require("../../../src/infrastructure/logger");
 const {
   ERROR_MESSAGES,
 } = require("../../../src/constants/serviceConfigConstants");
-const { getServiceRaw } = require("login.dfe.api-client/services");
+const {
+  getServiceRaw,
+  updateService,
+} = require("login.dfe.api-client/services");
 
 const res = getResponseMock();
 
@@ -515,23 +518,24 @@ describe("when confirming service config changes in the review page", () => {
     await postConfirmServiceConfig(req, res);
 
     expect(updateService.mock.calls).toHaveLength(1);
-    expect(updateService.mock.calls[0][0]).toBe("service1");
-    expect(updateService.mock.calls[0][1]).toEqual({
-      apiSecret: "outshine-wringing-imparting-submitted",
-      clientId: "new-client-id",
-      clientSecret: "outshine-wringing-imparting-submitted",
-      grant_types: ["authorisation_code", "refresh_token"],
-      postResetUrl: "https://newpostreseturl.com",
-      post_logout_redirect_uris: [
-        "http://newlogouturl1.com",
-        "http://newlogouturl2.com",
-      ],
-      redirect_uris: ["https://www.redirected.com"],
-      response_types: ["id_token", "token"],
-      serviceHome: "https://newservicehome.com",
-      tokenEndpointAuthMethod: "client_secret_post",
+    expect(updateService).toHaveBeenCalledWith({
+      serviceId: "service1",
+      update: {
+        apiSecret: "outshine-wringing-imparting-submitted",
+        clientId: "new-client-id",
+        clientSecret: "outshine-wringing-imparting-submitted",
+        grantTypes: ["authorisation_code", "refresh_token"],
+        postResetUrl: "https://newpostreseturl.com",
+        postLogoutRedirectUris: [
+          "http://newlogouturl1.com",
+          "http://newlogouturl2.com",
+        ],
+        redirectUris: ["https://www.redirected.com"],
+        responseTypes: ["id_token", "token"],
+        serviceHome: "https://newservicehome.com",
+        tokenEndpointAuthMethod: "client_secret_post",
+      },
     });
-    expect(updateService.mock.calls[0][2]).toBe("correlationId");
   });
 
   it("then it should audit the service being edited and it should return a mix of explicit/expunged elements in the audit editedFields array, if a mix of secret/non-secret fields have been updated", async () => {

@@ -1,6 +1,6 @@
 const niceware = require("niceware");
 const UrlValidator = require("login.dfe.validation/src/urlValidator");
-const { updateService } = require("../../infrastructure/applications");
+const { updateService } = require("../../infrastructure/utils/services");
 const { getServiceRaw } = require("login.dfe.api-client/services");
 const logger = require("../../infrastructure/logger");
 const {
@@ -552,7 +552,7 @@ const postConfirmServiceConfig = async (req, res) => {
           : null,
     };
 
-    await updateService(req.params.sid, updatedService, req.id);
+    await updateService(req.params.sid, updatedService);
 
     logger.audit(
       `${req.user.email} (id: ${req.user.sub}) updated service configuration for service ${model.service.name} (id: ${req.params.sid})`,
