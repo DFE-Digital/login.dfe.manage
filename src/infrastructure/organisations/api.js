@@ -88,15 +88,6 @@ const callOrganisationsApi = async (endpoint, method, body, correlationId) => {
   }
 };
 
-const getInvitationOrganisations = async (invitationId, correlationId) => {
-  return await callOrganisationsApi(
-    `invitations/v2/${invitationId}`,
-    "GET",
-    undefined,
-    correlationId,
-  );
-};
-
 const searchOrgsAssociatedWithService = async (
   serviceId,
   criteria,
@@ -129,7 +120,6 @@ const getOrganisationById = async (id, correlationId) => {
 };
 
 module.exports = {
-  getInvitationOrganisations,
   getOrganisationById,
   searchOrgsAssociatedWithService,
 };

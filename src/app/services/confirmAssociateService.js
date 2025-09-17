@@ -6,7 +6,7 @@ const {
   addServiceToUser,
   getUserOrganisationsWithServicesRaw,
 } = require("login.dfe.api-client/users");
-const { addServiceToInvitation } = require("login.dfe.api-client/invitations");
+const { addServiceToInvitation, getInvitationOrganisationsRaw } = require("login.dfe.api-client/invitations");
 
 const { listRolesOfService } = require("../../infrastructure/access");
 const {
@@ -14,9 +14,7 @@ const {
   getUserServiceRoles,
   getReturnUrl,
 } = require("./utils");
-const {
-  getInvitationOrganisations,
-} = require("../../infrastructure/organisations");
+
 const logger = require("../../infrastructure/logger");
 
 const getModel = async (req) => {
@@ -69,7 +67,7 @@ const post = async (req, res) => {
     : undefined;
 
   const userOrganisations = invitationId
-    ? await getInvitationOrganisations(invitationId, req.id)
+    ? await getInvitationOrganisationsRaw({ invitationId })
     : await getUserOrganisationsWithServicesRaw({ userId: user.id });
   const organisationDetails = userOrganisations.find(
     (x) => x.organisation.id === organisation.id,
