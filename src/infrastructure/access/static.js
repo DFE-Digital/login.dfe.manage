@@ -47,23 +47,6 @@ const getAllInvitationServices = () =>
 
 const listRolesOfService = async () => Promise.resolve([]);
 
-const getPageOfPoliciesForService = async (sid, page) =>
-  Promise.resolve({
-    policies: {
-      id: "policyId",
-      applicationId: "serviceId",
-      name: "policy name",
-      status: {
-        id: "1",
-      },
-      conditions: [],
-      roles: [],
-    },
-    page,
-    totalNumberOfPages: 1,
-    totalNumberOfRecords: 1,
-  });
-
 const getPolicyById = async () => Promise.resolve();
 
 const updatePolicyById = async () => Promise.resolve();
@@ -79,7 +62,6 @@ module.exports = {
   getSingleUserService,
   getSingleInvitationService,
   listRolesOfService,
-  getPageOfPoliciesForService,
   getPolicyById,
   updatePolicyById,
   updateRole,

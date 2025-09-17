@@ -15,13 +15,13 @@ jest.mock("login.dfe.api-client/invitations", () => ({
 }));
 jest.mock("login.dfe.api-client/users", () => ({
   deleteUserServiceAccess: jest.fn(),
+  searchUserByIdRaw: jest.fn(),
+  updateUserDetailsInSearchIndex: jest.fn(),
 }));
 jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
 }));
-jest.mock("login.dfe.api-client/users");
 jest.mock("./../../../src/infrastructure/organisations");
-jest.mock("./../../../src/infrastructure/access");
 
 const { getRequestMock, getResponseMock } = require("../../utils");
 const { getUserDetails } = require("../../../src/app/services/utils");
