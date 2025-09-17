@@ -13,10 +13,12 @@ jest.mock("../../../src/app/services/utils", () =>
 jest.mock("login.dfe.api-client/users", () => ({
   updateUserServiceRoles: jest.fn(),
 }));
+jest.mock("login.dfe.api-client/invitations", () => ({
+  updateInvitationServiceRoles: jest.fn(),
+}));
 jest.mock("./../../../src/infrastructure/utils/banners");
 
 jest.mock("./../../../src/infrastructure/access", () => ({
-  updateInvitationService: jest.fn(),
   listRolesOfService: jest.fn(),
 }));
 
@@ -30,8 +32,8 @@ jest.mock("./../../../src/infrastructure/organisations", () => ({
 const logger = require("../../../src/infrastructure/logger");
 const { getRequestMock, getResponseMock } = require("../../utils");
 const {
-  updateInvitationService,
-} = require("../../../src/infrastructure/access");
+  updateInvitationServiceRoles,
+} = require("login.dfe.api-client/invitations");
 const { updateUserServiceRoles } = require("login.dfe.api-client/users");
 const { listRolesOfService } = require("../../../src/infrastructure/access");
 const {
@@ -93,7 +95,7 @@ describe("when editing a service for a user", () => {
     });
 
     updateUserServiceRoles.mockReset();
-    updateInvitationService.mockReset();
+    updateInvitationServiceRoles.mockReset();
 
     res.mockResetAll();
   });
@@ -103,12 +105,13 @@ describe("when editing a service for a user", () => {
 
     await postConfirmEditService(req, res);
 
-    expect(updateInvitationService.mock.calls).toHaveLength(1);
-    expect(updateInvitationService.mock.calls[0][0]).toBe("invite1");
-    expect(updateInvitationService.mock.calls[0][1]).toBe("service1");
-    expect(updateInvitationService.mock.calls[0][2]).toBe("org1");
-    expect(updateInvitationService.mock.calls[0][3]).toEqual(["role_id"]);
-    expect(updateInvitationService.mock.calls[0][4]).toBe("correlationId");
+    expect(updateInvitationServiceRoles.mock.calls).toHaveLength(1);
+    expect(updateInvitationServiceRoles).toHaveBeenCalledWith({
+      invitationId: "invite1",
+      organisationId: "org1",
+      serviceId: "service1",
+      serviceRoleIds: ["role_id"],
+    });
   });
 
   it("then it should edit service for user if request for user", async () => {

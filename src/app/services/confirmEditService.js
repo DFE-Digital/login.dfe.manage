@@ -1,9 +1,9 @@
 const { getServiceRaw } = require("login.dfe.api-client/services");
 const { updateUserServiceRoles } = require("login.dfe.api-client/users");
 const {
-  listRolesOfService,
-  updateInvitationService,
-} = require("../../infrastructure/access");
+  updateInvitationServiceRoles,
+} = require("login.dfe.api-client/invitations");
+const { listRolesOfService } = require("../../infrastructure/access");
 const {
   getUserDetails,
   getUserServiceRoles,
@@ -45,15 +45,14 @@ const getModel = async (req) => {
   };
 };
 
-const updateService = async (uid, sid, oid, selectedRoles, reqId) => {
+const updateService = async (uid, sid, oid, selectedRoles) => {
   const update = uid.startsWith("inv-")
-    ? await updateInvitationService(
-        uid.substr(4),
-        sid,
-        oid,
-        selectedRoles,
-        reqId,
-      )
+    ? await updateInvitationServiceRoles({
+        invitationId: uid.substr(4),
+        serviceId: sid,
+        organisationId: oid,
+        serviceRoleIds: selectedRoles,
+      })
     : updateUserServiceRoles({
         userId: uid,
         serviceId: sid,
@@ -79,7 +78,6 @@ const post = async (req, res) => {
     req.params.sid,
     req.params.oid,
     selectedRoles,
-    req.id,
   );
 
   logger.audit(
