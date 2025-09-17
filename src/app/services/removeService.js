@@ -1,6 +1,8 @@
-const { removeServiceFromInvitation } = require("../../infrastructure/access");
 const { getServiceRaw } = require("login.dfe.api-client/services");
 const { deleteUserServiceAccess } = require("login.dfe.api-client/users");
+const {
+  deleteServiceAccessFromInvitation,
+} = require("login.dfe.api-client/invitations");
 const {
   searchUserByIdRaw,
   updateUserDetailsInSearchIndex,
@@ -52,12 +54,11 @@ const post = async (req, res) => {
   const model = await getModel(req);
 
   if (req.params.uid.startsWith("inv-")) {
-    await removeServiceFromInvitation(
-      req.params.uid.substr(4),
-      req.params.sid,
-      req.params.oid,
-      req.id,
-    );
+    await deleteServiceAccessFromInvitation({
+      invitationId: req.params.uid.substr(4),
+      serviceId: req.params.sid,
+      organisationId: req.params.oid,
+    });
   } else {
     await deleteUserServiceAccess({
       userId: req.params.uid,
