@@ -47,8 +47,6 @@ const getAllInvitationServices = () =>
 
 const listRolesOfService = async () => Promise.resolve([]);
 
-const updateUserService = async () => Promise.resolve(null);
-
 const updateInvitationService = async () => Promise.resolve(null);
 
 const removeServiceFromUser = async () => Promise.resolve();
@@ -87,7 +85,6 @@ module.exports = {
   getSingleUserService,
   getSingleInvitationService,
   listRolesOfService,
-  updateUserService,
   updateInvitationService,
   removeServiceFromUser,
   removeServiceFromInvitation,
