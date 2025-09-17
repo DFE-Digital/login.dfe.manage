@@ -4,15 +4,15 @@ jest.mock("./../../../src/infrastructure/config", () =>
 jest.mock("./../../../src/infrastructure/logger", () =>
   require("./../../utils").loggerMockFactory(),
 );
-jest.mock("./../../../src/infrastructure/search");
 jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
 }));
+jest.mock("login.dfe.api-client/users");
 
-const { searchForUsers } = require("./../../../src/infrastructure/search");
 const { getRequestMock, getResponseMock } = require("./../../utils");
 const { post } = require("./../../../src/app/services/usersSearch");
 const { getServiceRaw } = require("login.dfe.api-client/services");
+const { searchUsersRaw } = require("login.dfe.api-client/users");
 
 describe("When posting users search ", () => {
   let req;
@@ -54,8 +54,8 @@ describe("When posting users search ", () => {
       },
     ];
 
-    searchForUsers.mockReset();
-    searchForUsers.mockReturnValue({
+    searchUsersRaw.mockReset();
+    searchUsersRaw.mockReturnValue({
       criteria: "test",
       page: 1,
       numberOfPages: 3,

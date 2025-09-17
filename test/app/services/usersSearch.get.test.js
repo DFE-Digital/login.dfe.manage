@@ -4,13 +4,13 @@ jest.mock("./../../../src/infrastructure/config", () =>
 jest.mock("./../../../src/infrastructure/logger", () =>
   require("./../../utils").loggerMockFactory(),
 );
-jest.mock("./../../../src/infrastructure/search");
 jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
 }));
+jest.mock("login.dfe.api-client/users");
 
-const { searchForUsers } = require("./../../../src/infrastructure/search");
 const { getServiceRaw } = require("login.dfe.api-client/services");
+const { searchUsersRaw } = require("login.dfe.api-client/users");
 const { getRequestMock, getResponseMock } = require("./../../utils");
 const { get } = require("./../../../src/app/services/usersSearch");
 
@@ -41,21 +41,18 @@ describe("When getting users search ", () => {
 
     usersSearchResult = [
       {
-        name: "Timmy Tester",
+        firstName: "Timmy",
+        lastName: "Tester",
         email: "timmy@tester.test",
-        organisation: {
-          name: "Testco",
-        },
+        primaryOrganisation: "Testco",
         organisations: [],
         lastLogin: new Date(2018, 0, 11, 11, 30, 57),
-        status: {
-          description: "Active",
-        },
+        statusId: 1,
       },
     ];
 
-    searchForUsers.mockReset();
-    searchForUsers.mockReturnValue({
+    searchUsersRaw.mockReset();
+    searchUsersRaw.mockReturnValue({
       criteria: "test",
       page: 1,
       numberOfPages: 3,
@@ -117,8 +114,22 @@ describe("When getting users search ", () => {
   it("then it should include users", async () => {
     await get(req, res);
 
+    console.log(res.render.mock.calls[0][1]);
+
     expect(res.render.mock.calls[0][1]).toMatchObject({
-      users: usersSearchResult,
+      users: [
+        {
+          name: "Timmy Tester",
+          organisation: {
+            name: "Testco",
+          },
+          status: {
+            id: 1,
+            description: "Active",
+            tagColor: "green",
+          },
+        },
+      ],
     });
   });
 });
