@@ -53,15 +53,6 @@ const listRolesOfService = async (sid, correlationId) => {
   return callApi("GET", `services/${sid}/roles`, correlationId, undefined);
 };
 
-const removeServiceFromUser = async (uid, sid, oid, correlationId) => {
-  return callApi(
-    "DELETE",
-    `users/${uid}/services/${sid}/organisations/${oid}`,
-    correlationId,
-    undefined,
-  );
-};
-
 const removeServiceFromInvitation = async (iid, sid, oid, correlationId) => {
   return callApi(
     "DELETE",
@@ -141,7 +132,6 @@ module.exports = {
   getSingleUserService,
   getSingleInvitationService,
   listRolesOfService,
-  removeServiceFromUser,
   removeServiceFromInvitation,
   getPageOfPoliciesForService,
   getPolicyById,

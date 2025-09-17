@@ -10,7 +10,9 @@ jest.mock("../../../src/app/services/utils", () =>
     "getReturnUrl",
   ]),
 );
-
+jest.mock("login.dfe.api-client/users", () => ({
+  deleteUserServiceAccess: jest.fn(),
+}));
 jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
 }));
@@ -30,8 +32,8 @@ const {
 } = require("login.dfe.api-client/users");
 const {
   removeServiceFromInvitation,
-  removeServiceFromUser,
 } = require("../../../src/infrastructure/access");
+const { deleteUserServiceAccess } = require("login.dfe.api-client/users");
 const postRemoveService =
   require("../../../src/app/services/removeService").post;
 
@@ -81,7 +83,7 @@ describe("when displaying the remove service access view", () => {
       services: ["service id"],
     });
 
-    removeServiceFromUser.mockReset();
+    deleteUserServiceAccess.mockReset();
     removeServiceFromInvitation.mockReset();
     updateUserDetailsInSearchIndex.mockReset();
   });
@@ -101,11 +103,12 @@ describe("when displaying the remove service access view", () => {
   it("then it should delete service for user if request for user", async () => {
     await postRemoveService(req, res);
 
-    expect(removeServiceFromUser.mock.calls).toHaveLength(1);
-    expect(removeServiceFromUser.mock.calls[0][0]).toBe("user1");
-    expect(removeServiceFromUser.mock.calls[0][1]).toBe("service1");
-    expect(removeServiceFromUser.mock.calls[0][2]).toBe("org1");
-    expect(removeServiceFromUser.mock.calls[0][3]).toBe("correlationId");
+    expect(deleteUserServiceAccess.mock.calls).toHaveLength(1);
+    expect(deleteUserServiceAccess).toHaveBeenCalledWith({
+      organisationId: "org1",
+      serviceId: "service1",
+      userId: "user1",
+    });
   });
 
   it("then a flash message is shown to the user", async () => {
