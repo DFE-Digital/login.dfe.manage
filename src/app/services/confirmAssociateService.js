@@ -2,10 +2,9 @@ const { NotificationClient } = require("login.dfe.jobs-client");
 const config = require("../../infrastructure/config");
 const { getServiceRaw } = require("login.dfe.api-client/services");
 const { addServiceToUser } = require("login.dfe.api-client/users");
-const {
-  listRolesOfService,
-  addInvitationService,
-} = require("../../infrastructure/access");
+const { addServiceToInvitation } = require("login.dfe.api-client/invitations");
+
+const { listRolesOfService } = require("../../infrastructure/access");
 const {
   getUserDetails,
   getUserServiceRoles,
@@ -79,13 +78,12 @@ const post = async (req, res) => {
   });
 
   if (invitationId) {
-    await addInvitationService(
-      invitationId,
-      service.id,
-      organisation.id,
-      selectedRoles,
-      req.id,
-    );
+    await addServiceToInvitation({
+      invitationId: invitationId,
+      serviceId: service.id,
+      organisationId: organisation.id,
+      serviceRoleIds: selectedRoles,
+    });
   } else {
     await addServiceToUser({
       userId: user.id,

@@ -49,14 +49,11 @@ const listRolesOfService = async () => Promise.resolve([]);
 
 const updateRole = async () => Promise.resolve();
 
-const addInvitationService = async () => Promise.resolve(null);
-
 module.exports = {
   getServicesForUser,
   getSingleUserService,
   getSingleInvitationService,
   listRolesOfService,
   updateRole,
-  addInvitationService,
   getAllInvitationServices,
 };

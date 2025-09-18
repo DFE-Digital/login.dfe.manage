@@ -11,9 +11,9 @@ jest.mock("../../../src/app/services/utils", () =>
   ]),
 );
 jest.mock("login.dfe.api-client/users");
+jest.mock("login.dfe.api-client/invitations");
 
 jest.mock("./../../../src/infrastructure/access", () => ({
-  addInvitationService: jest.fn(),
   listRolesOfService: jest.fn(),
 }));
 
@@ -35,11 +35,9 @@ const {
 
 const logger = require("../../../src/infrastructure/logger");
 const { getRequestMock, getResponseMock } = require("../../utils");
-const {
-  addInvitationService,
-  listRolesOfService,
-} = require("../../../src/infrastructure/access");
+const { listRolesOfService } = require("../../../src/infrastructure/access");
 const { addServiceToUser } = require("login.dfe.api-client/users");
+const { addServiceToInvitation } = require("login.dfe.api-client/invitations");
 
 const { getUserDetails } = require("../../../src/app/services/utils");
 const { getServiceRaw } = require("login.dfe.api-client/services");
@@ -165,7 +163,7 @@ describe("when confirm associating a service to user", () => {
     ]);
 
     addServiceToUser.mockReset();
-    addInvitationService.mockReset();
+    addServiceToInvitation.mockReset();
 
     sendServiceAddedStub = jest.fn();
     sendServiceRequestApprovedStub = jest.fn();
@@ -185,14 +183,13 @@ describe("when confirm associating a service to user", () => {
     });
     await postConfirmAssociateService(req, res);
 
-    expect(addInvitationService.mock.calls).toHaveLength(1);
-    expect(addInvitationService.mock.calls[0][0]).toBe("invite1");
-    expect(addInvitationService.mock.calls[0][1]).toBe("service1");
-    expect(addInvitationService.mock.calls[0][2]).toBe(
-      "88a1ed39-5a98-43da-b66e-78e564ea72b0",
-    );
-    expect(addInvitationService.mock.calls[0][3]).toEqual(["role_id"]);
-    expect(addInvitationService.mock.calls[0][4]).toBe("correlationId");
+    expect(addServiceToInvitation.mock.calls).toHaveLength(1);
+    expect(addServiceToInvitation).toHaveBeenCalledWith({
+      invitationId: "invite1",
+      organisationId: "88a1ed39-5a98-43da-b66e-78e564ea72b0",
+      serviceId: "service1",
+      serviceRoleIds: ["role_id"],
+    });
   });
 
   it("then it should associate service with user if request for user", async () => {
