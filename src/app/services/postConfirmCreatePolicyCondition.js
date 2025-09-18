@@ -1,12 +1,13 @@
-const {
-  getPolicyById,
-  updatePolicyById,
-} = require("../../infrastructure/access");
+const { updatePolicyById } = require("../../infrastructure/access");
+const { getServicePolicyRaw } = require("login.dfe.api-client/services");
 const logger = require("../../infrastructure/logger");
 
 const postConfirmCreatePolicyCondition = async (req, res) => {
   const model = req.session.createPolicyConditionData;
-  const policy = await getPolicyById(req.params.sid, req.params.pid, req.id);
+  const policy = await getServicePolicyRaw({
+    serviceId: req.params.sid,
+    policyId: req.params.pid,
+  });
   const conditionAndOperatorInPolicy = policy.conditions.find(
     (condition) =>
       condition.field === model.condition &&

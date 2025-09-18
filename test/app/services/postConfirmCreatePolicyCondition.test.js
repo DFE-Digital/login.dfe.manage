@@ -5,13 +5,12 @@ jest.mock("./../../../src/infrastructure/logger", () =>
   require("../../utils").loggerMockFactory(),
 );
 jest.mock("./../../../src/infrastructure/access");
+jest.mock("login.dfe.api-client/services");
 
 const { getRequestMock, getResponseMock } = require("../../utils");
 const postConfirmCreatePolicyCondition = require("../../../src/app/services/postConfirmCreatePolicyCondition");
-const {
-  getPolicyById,
-  updatePolicyById,
-} = require("../../../src/infrastructure/access");
+const { updatePolicyById } = require("../../../src/infrastructure/access");
+const { getServicePolicyRaw } = require("login.dfe.api-client/services");
 const res = getResponseMock();
 
 const policy = {
@@ -68,8 +67,8 @@ describe("when using the postConfirmCreatePolicyCondition function", () => {
     req = getRequestMock(clonedRequestBody);
 
     const clonedPolicy = structuredClone(policy);
-    getPolicyById.mockReset();
-    getPolicyById.mockReturnValue(clonedPolicy);
+    getServicePolicyRaw.mockReset();
+    getServicePolicyRaw.mockReturnValue(clonedPolicy);
 
     updatePolicyById.mockReset();
     updatePolicyById.mockReturnValue(undefined);

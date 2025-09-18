@@ -53,15 +53,6 @@ const listRolesOfService = async (sid, correlationId) => {
   return callApi("GET", `services/${sid}/roles`, correlationId, undefined);
 };
 
-const getPolicyById = async (sid, pid, correlationId) => {
-  return callApi(
-    "GET",
-    `services/${sid}/policies/${pid}`,
-    correlationId,
-    undefined,
-  );
-};
-
 const updatePolicyById = async (sid, pid, policyBody, correlationId) => {
   return callApi(
     "PATCH",
@@ -109,7 +100,6 @@ module.exports = {
   getSingleUserService,
   getSingleInvitationService,
   listRolesOfService,
-  getPolicyById,
   updatePolicyById,
   updateRole,
   addUserService,
