@@ -10,9 +10,9 @@ jest.mock("../../../src/app/services/utils", () =>
     "getReturnUrl",
   ]),
 );
+jest.mock("login.dfe.api-client/users");
 
 jest.mock("./../../../src/infrastructure/access", () => ({
-  addUserService: jest.fn(),
   addInvitationService: jest.fn(),
   listRolesOfService: jest.fn(),
 }));
@@ -37,9 +37,9 @@ const logger = require("../../../src/infrastructure/logger");
 const { getRequestMock, getResponseMock } = require("../../utils");
 const {
   addInvitationService,
-  addUserService,
   listRolesOfService,
 } = require("../../../src/infrastructure/access");
+const { addServiceToUser } = require("login.dfe.api-client/users");
 
 const { getUserDetails } = require("../../../src/app/services/utils");
 const { getServiceRaw } = require("login.dfe.api-client/services");
@@ -164,7 +164,7 @@ describe("when confirm associating a service to user", () => {
       },
     ]);
 
-    addUserService.mockReset();
+    addServiceToUser.mockReset();
     addInvitationService.mockReset();
 
     sendServiceAddedStub = jest.fn();
@@ -198,14 +198,13 @@ describe("when confirm associating a service to user", () => {
   it("then it should associate service with user if request for user", async () => {
     await postConfirmAssociateService(req, res);
 
-    expect(addUserService.mock.calls).toHaveLength(1);
-    expect(addUserService.mock.calls[0][0]).toBe("user1");
-    expect(addUserService.mock.calls[0][1]).toBe("service1");
-    expect(addUserService.mock.calls[0][2]).toBe(
-      "88a1ed39-5a98-43da-b66e-78e564ea72b0",
-    );
-    expect(addUserService.mock.calls[0][3]).toEqual(["role_id"]);
-    expect(addUserService.mock.calls[0][4]).toBe("correlationId");
+    expect(addServiceToUser.mock.calls).toHaveLength(1);
+    expect(addServiceToUser).toHaveBeenCalledWith({
+      organisationId: "88a1ed39-5a98-43da-b66e-78e564ea72b0",
+      serviceId: "service1",
+      serviceRoleIds: ["role_id"],
+      userId: "user1",
+    });
   });
 
   it("then it should send an email notification to user", async () => {

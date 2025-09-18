@@ -62,18 +62,6 @@ const updateRole = async (serviceId, roleId, roleBody, correlationId) => {
   );
 };
 
-const addUserService = async (uid, sid, oid, roles, correlationId) => {
-  const body = {
-    roles,
-  };
-  return callApi(
-    "PUT",
-    `users/${uid}/services/${sid}/organisations/${oid}`,
-    correlationId,
-    body,
-  );
-};
-
 const addInvitationService = async (iid, sid, oid, roles, correlationId) => {
   const body = {
     roles,
@@ -92,7 +80,6 @@ module.exports = {
   getSingleInvitationService,
   listRolesOfService,
   updateRole,
-  addUserService,
   addInvitationService,
   getAllInvitationServices,
 };
