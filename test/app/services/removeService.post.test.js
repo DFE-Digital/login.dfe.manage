@@ -10,13 +10,18 @@ jest.mock("../../../src/app/services/utils", () =>
     "getReturnUrl",
   ]),
 );
-
+jest.mock("login.dfe.api-client/invitations", () => ({
+  deleteServiceAccessFromInvitation: jest.fn(),
+}));
+jest.mock("login.dfe.api-client/users", () => ({
+  deleteUserServiceAccess: jest.fn(),
+  searchUserByIdRaw: jest.fn(),
+  updateUserDetailsInSearchIndex: jest.fn(),
+}));
 jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
 }));
-jest.mock("login.dfe.api-client/users");
 jest.mock("./../../../src/infrastructure/organisations");
-jest.mock("./../../../src/infrastructure/access");
 
 const { getRequestMock, getResponseMock } = require("../../utils");
 const { getUserDetails } = require("../../../src/app/services/utils");
@@ -29,9 +34,9 @@ const {
   updateUserDetailsInSearchIndex,
 } = require("login.dfe.api-client/users");
 const {
-  removeServiceFromInvitation,
-  removeServiceFromUser,
-} = require("../../../src/infrastructure/access");
+  deleteServiceAccessFromInvitation,
+} = require("login.dfe.api-client/invitations");
+const { deleteUserServiceAccess } = require("login.dfe.api-client/users");
 const postRemoveService =
   require("../../../src/app/services/removeService").post;
 
@@ -81,8 +86,8 @@ describe("when displaying the remove service access view", () => {
       services: ["service id"],
     });
 
-    removeServiceFromUser.mockReset();
-    removeServiceFromInvitation.mockReset();
+    deleteUserServiceAccess.mockReset();
+    deleteServiceAccessFromInvitation.mockReset();
     updateUserDetailsInSearchIndex.mockReset();
   });
 
@@ -91,21 +96,23 @@ describe("when displaying the remove service access view", () => {
 
     await postRemoveService(req, res);
 
-    expect(removeServiceFromInvitation.mock.calls).toHaveLength(1);
-    expect(removeServiceFromInvitation.mock.calls[0][0]).toBe("invite1");
-    expect(removeServiceFromInvitation.mock.calls[0][1]).toBe("service1");
-    expect(removeServiceFromInvitation.mock.calls[0][2]).toBe("org1");
-    expect(removeServiceFromInvitation.mock.calls[0][3]).toBe("correlationId");
+    expect(deleteServiceAccessFromInvitation.mock.calls).toHaveLength(1);
+    expect(deleteServiceAccessFromInvitation).toHaveBeenCalledWith({
+      invitationId: "invite1",
+      organisationId: "org1",
+      serviceId: "service1",
+    });
   });
 
   it("then it should delete service for user if request for user", async () => {
     await postRemoveService(req, res);
 
-    expect(removeServiceFromUser.mock.calls).toHaveLength(1);
-    expect(removeServiceFromUser.mock.calls[0][0]).toBe("user1");
-    expect(removeServiceFromUser.mock.calls[0][1]).toBe("service1");
-    expect(removeServiceFromUser.mock.calls[0][2]).toBe("org1");
-    expect(removeServiceFromUser.mock.calls[0][3]).toBe("correlationId");
+    expect(deleteUserServiceAccess.mock.calls).toHaveLength(1);
+    expect(deleteUserServiceAccess).toHaveBeenCalledWith({
+      organisationId: "org1",
+      serviceId: "service1",
+      userId: "user1",
+    });
   });
 
   it("then a flash message is shown to the user", async () => {

@@ -53,62 +53,6 @@ const listRolesOfService = async (sid, correlationId) => {
   return callApi("GET", `services/${sid}/roles`, correlationId, undefined);
 };
 
-const updateUserService = async (uid, sid, oid, roles, correlationId) => {
-  const body = {
-    roles,
-  };
-  return callApi(
-    "PATCH",
-    `/users/${uid}/services/${sid}/organisations/${oid}`,
-    correlationId,
-    body,
-  );
-};
-
-const updateInvitationService = async (iid, sid, oid, roles, correlationId) => {
-  const body = {
-    roles,
-  };
-  return callApi(
-    "PATCH",
-    `/invitations/${iid}/services/${sid}/organisations/${oid}`,
-    correlationId,
-    body,
-  );
-};
-
-const removeServiceFromUser = async (uid, sid, oid, correlationId) => {
-  return callApi(
-    "DELETE",
-    `users/${uid}/services/${sid}/organisations/${oid}`,
-    correlationId,
-    undefined,
-  );
-};
-
-const removeServiceFromInvitation = async (iid, sid, oid, correlationId) => {
-  return callApi(
-    "DELETE",
-    `invitations/${iid}/services/${sid}/organisations/${oid}`,
-    correlationId,
-    undefined,
-  );
-};
-
-const getPageOfPoliciesForService = async (
-  sid,
-  page,
-  pageSize,
-  correlationId,
-) => {
-  return callApi(
-    "GET",
-    `services/v2/${sid}/policies?page=${page}&pageSize=${pageSize}`,
-    correlationId,
-    undefined,
-  );
-};
-
 const getPolicyById = async (sid, pid, correlationId) => {
   return callApi(
     "GET",
@@ -165,11 +109,6 @@ module.exports = {
   getSingleUserService,
   getSingleInvitationService,
   listRolesOfService,
-  updateUserService,
-  updateInvitationService,
-  removeServiceFromUser,
-  removeServiceFromInvitation,
-  getPageOfPoliciesForService,
   getPolicyById,
   updatePolicyById,
   updateRole,
