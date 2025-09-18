@@ -47,8 +47,6 @@ const getAllInvitationServices = () =>
 
 const listRolesOfService = async () => Promise.resolve([]);
 
-const updatePolicyById = async () => Promise.resolve();
-
 const updateRole = async () => Promise.resolve();
 
 const addUserService = async () => Promise.resolve(null);
@@ -60,7 +58,6 @@ module.exports = {
   getSingleUserService,
   getSingleInvitationService,
   listRolesOfService,
-  updatePolicyById,
   updateRole,
   addInvitationService,
   addUserService,

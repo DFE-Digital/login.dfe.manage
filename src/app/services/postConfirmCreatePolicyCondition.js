@@ -1,5 +1,7 @@
-const { updatePolicyById } = require("../../infrastructure/access");
-const { getServicePolicyRaw } = require("login.dfe.api-client/services");
+const {
+  getServicePolicyRaw,
+  updateServicePolicyRaw,
+} = require("login.dfe.api-client/services");
 const logger = require("../../infrastructure/logger");
 
 const postConfirmCreatePolicyCondition = async (req, res) => {
@@ -40,7 +42,11 @@ const postConfirmCreatePolicyCondition = async (req, res) => {
     });
   }
 
-  await updatePolicyById(req.params.sid, req.params.pid, policy, req.id);
+  await updateServicePolicyRaw({
+    serviceId: req.params.sid,
+    policyId: req.params.pid,
+    policy,
+  });
 
   logger.audit(
     `${req.user.email} (id: ${req.user.sub}) added a policy condition for service ${req.params.sid} and policy ${req.params.pid}`,
