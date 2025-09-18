@@ -1,8 +1,10 @@
-const { api } = require("../../infrastructure/audit");
 const { getReturnUrl } = require("./utils");
 
 const postUpdateAuditLog = async (req, res) => {
-  await api.updateAuditLogs();
+  await fetch(`${process.env.AUDIT_HTTP_TRIGGER_URL}`, {
+    method: "POST",
+  });
+
   res.redirect(
     getReturnUrl(
       req.query,
