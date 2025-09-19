@@ -24,19 +24,6 @@ const callApi = async (method, endpoint, correlationId, body) => {
   }
 };
 
-const getServicesForUser = async (id, correlationId) => {
-  return callApi("GET", `/users/${id}/services`, correlationId, undefined);
-};
-
-const getSingleUserService = async (id, sid, oid, correlationId) => {
-  return callApi(
-    "GET",
-    `/users/${id}/services/${sid}/organisations/${oid}`,
-    correlationId,
-    undefined,
-  );
-};
-
 const updateRole = async (serviceId, roleId, roleBody, correlationId) => {
   return callApi(
     "PATCH",
@@ -47,7 +34,5 @@ const updateRole = async (serviceId, roleId, roleBody, correlationId) => {
 };
 
 module.exports = {
-  getServicesForUser,
-  getSingleUserService,
   updateRole,
 };
