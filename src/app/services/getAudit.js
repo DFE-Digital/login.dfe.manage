@@ -13,9 +13,9 @@ const {
 } = require("../../infrastructure/serviceMapping");
 const { getServiceRaw } = require("login.dfe.api-client/services");
 const {
-  getOrganisationById,
-  getUserOrganisations,
-} = require("../../infrastructure/organisations");
+  getUserOrganisationsWithServicesRaw,
+} = require("login.dfe.api-client/users");
+const { getOrganisationById } = require("../../infrastructure/organisations");
 
 let cachedServiceIds = {};
 let cachedServices = {};
@@ -164,7 +164,9 @@ const getAudit = async (req, res) => {
   cachedUsers = {};
 
   const user = await getCachedUserById(req.params.uid, req.id);
-  const userOrganisations = await getUserOrganisations(req.params.uid, req.id);
+  const userOrganisations = await getUserOrganisationsWithServicesRaw({
+    userId: req.params.uid,
+  });
   const manageRolesForService = await getUserServiceRoles(req);
   const currentService = await getServiceRaw({
     by: { serviceId: req.params.sid },

@@ -28,8 +28,10 @@ jest.mock("./../../../src/infrastructure/organisations");
 
 const { NotificationClient } = require("login.dfe.jobs-client");
 const {
+  getUserOrganisationsWithServicesRaw,
+} = require("login.dfe.api-client/users");
+const {
   getOrganisationByIdV2,
-  getUserOrganisations,
   getInvitationOrganisations,
 } = require("../../../src/infrastructure/organisations");
 
@@ -112,8 +114,8 @@ describe("when confirm associating a service to user", () => {
       name: "Great Big School",
     });
 
-    getUserOrganisations.mockReset();
-    getUserOrganisations.mockReturnValue([
+    getUserOrganisationsWithServicesRaw.mockReset();
+    getUserOrganisationsWithServicesRaw.mockReturnValue([
       {
         organisation: {
           id: "88a1ed39-5a98-43da-b66e-78e564ea72b0",

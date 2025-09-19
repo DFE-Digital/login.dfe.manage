@@ -7,7 +7,7 @@ jest.mock("../../../src/app/services/utils", () =>
     "getReturnUrl",
   ]),
 );
-
+jest.mock("login.dfe.api-client/users");
 jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
 }));

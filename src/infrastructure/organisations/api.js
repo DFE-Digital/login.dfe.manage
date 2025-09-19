@@ -157,15 +157,6 @@ const getOrganisationById = async (id, correlationId) => {
   );
 };
 
-const getUserOrganisations = async (userId, correlationId) => {
-  return await callOrganisationsApi(
-    `organisations/associated-with-user/${userId}`,
-    "GET",
-    undefined,
-    correlationId,
-  );
-};
-
 const getOrganisationByIdV2 = async (id, correlationId) => {
   return await callOrganisationsApi(
     `organisations/v2/${id}`,
@@ -191,7 +182,6 @@ module.exports = {
   getAllUserOrganisations,
   searchOrganisations,
   getOrganisationById,
-  getUserOrganisations,
   getOrganisationByIdV2,
   searchOrgsAssociatedWithService,
   getOrganisationCategories,
