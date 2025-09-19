@@ -13,9 +13,9 @@ const {
 const logger = require("../../infrastructure/logger");
 const { getServiceRaw } = require("login.dfe.api-client/services");
 const {
-  getServicesForUser,
-  getAllInvitationServices,
-} = require("../../infrastructure/access");
+  getInvitationServicesRaw,
+} = require("login.dfe.api-client/invitations");
+const { getServicesForUser } = require("../../infrastructure/access");
 
 const getApproverDetails = async (organisation) => {
   const allApproverIds = flatten(organisation.map((org) => org.approvers));
@@ -64,7 +64,7 @@ const getOrganisations = async (userId, correlationId) => {
       );
 
       const selectedUserServices = userId.startsWith("inv-")
-        ? await getAllInvitationServices(userId.substr(4), correlationId)
+        ? await getInvitationServicesRaw({ userInvitationId: userId.substr(4) })
         : await getServicesForUser(userId, correlationId);
 
       const userOrgServices =

@@ -21,26 +21,6 @@ const getServicesForUser = (id) => {
   return Promise.resolve(userServices);
 };
 
-const getAllInvitationServices = () =>
-  Promise.resolve([
-    {
-      invitationId: "D212N-12312-31231-312-56465",
-      serviceId: "D212N-12312-31231-312-56465",
-      organisationId: "D212N-12312-31231-312-56465",
-      roles: [
-        {
-          id: "D212N-12312-31231-312-56465",
-          name: "Test office",
-          code: "test_code",
-          numericId: "00000",
-          status: { id: 1 },
-        },
-      ],
-      identifiers: [],
-      accessGrantedOn: "2022-07-25T16:13:54.621Z",
-    },
-  ]);
-
 const listRolesOfService = async () => Promise.resolve([]);
 
 const updateRole = async () => Promise.resolve();
@@ -49,5 +29,4 @@ module.exports = {
   getServicesForUser,
   listRolesOfService,
   updateRole,
-  getAllInvitationServices,
 };
