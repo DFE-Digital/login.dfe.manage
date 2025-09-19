@@ -9,20 +9,19 @@ jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
   updateService: jest.fn(),
   getPaginatedServicesRaw: jest.fn(),
+  getServiceRolesRaw: jest.fn(),
 }));
 jest.mock("../../../src/app/services/utils");
 
 const { getRequestMock, getResponseMock } = require("../../utils");
 const postConfirmEditServiceInfo = require("../../../src/app/services/postConfirmEditServiceInfo");
-const {
-  listRolesOfService,
-  updateRole,
-} = require("../../../src/infrastructure/access");
+const { updateRole } = require("../../../src/infrastructure/access");
 const { getUserServiceRoles } = require("../../../src/app/services/utils");
 const {
   getServiceRaw,
   updateService,
   getPaginatedServicesRaw,
+  getServiceRolesRaw,
 } = require("login.dfe.api-client/services");
 const res = getResponseMock();
 
@@ -90,8 +89,8 @@ describe("when getting the post confirm edit service info page", () => {
     getPaginatedServicesRaw.mockReset();
     getPaginatedServicesRaw.mockReturnValue(getPaginatedServicesRawData);
 
-    listRolesOfService.mockReset();
-    listRolesOfService.mockReturnValue(listRolesOfServiceData);
+    getServiceRolesRaw.mockReset();
+    getServiceRolesRaw.mockReturnValue(listRolesOfServiceData);
 
     getUserServiceRoles.mockReset();
     getUserServiceRoles.mockReturnValue(["serviceid_serviceconfiguration"]);
@@ -102,7 +101,7 @@ describe("when getting the post confirm edit service info page", () => {
   it("should redirect to the confirm page on success", async () => {
     await postConfirmEditServiceInfo(req, res);
 
-    expect(listRolesOfService.mock.calls).toHaveLength(1);
+    expect(getServiceRolesRaw.mock.calls).toHaveLength(1);
     expect(updateRole.mock.calls).toHaveLength(1);
     expect(updateService.mock.calls).toHaveLength(1);
 
@@ -154,7 +153,7 @@ describe("when getting the post confirm edit service info page", () => {
     };
     await postConfirmEditServiceInfo(req, res);
 
-    expect(listRolesOfService.mock.calls).toHaveLength(1);
+    expect(getServiceRolesRaw.mock.calls).toHaveLength(1);
     expect(updateRole.mock.calls).toHaveLength(1);
     expect(updateService.mock.calls).toHaveLength(1);
 

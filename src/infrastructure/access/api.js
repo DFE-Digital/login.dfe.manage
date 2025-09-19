@@ -37,10 +37,6 @@ const getSingleUserService = async (id, sid, oid, correlationId) => {
   );
 };
 
-const listRolesOfService = async (sid, correlationId) => {
-  return callApi("GET", `services/${sid}/roles`, correlationId, undefined);
-};
-
 const updateRole = async (serviceId, roleId, roleBody, correlationId) => {
   return callApi(
     "PATCH",
@@ -53,6 +49,5 @@ const updateRole = async (serviceId, roleId, roleBody, correlationId) => {
 module.exports = {
   getServicesForUser,
   getSingleUserService,
-  listRolesOfService,
   updateRole,
 };
