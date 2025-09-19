@@ -2,66 +2,6 @@ const jwtStrategy = require("login.dfe.jwt-strategies");
 const config = require("./../config");
 const { fetchApi } = require("login.dfe.async-retry");
 
-const mapOrgSortByToSearchApi = (supportSortBy) => {
-  switch (supportSortBy.toLowerCase()) {
-    case "name":
-      return "name";
-    case "legalname":
-      return "legalname";
-    case "type":
-      return "category";
-    case "urn":
-      return "urn";
-    case "uid":
-      return "uid";
-    case "upin":
-      return "upin";
-    case "ukprn":
-      return "ukprn";
-    case "status":
-      return "status";
-    default:
-      throw new Error(`Unexpected user sort field ${supportSortBy}`);
-  }
-};
-
-const buildOrgSearchUri = (baseUri, options) => {
-  const {
-    criteria,
-    pageNumber,
-    sortBy,
-    sortDirection,
-    filterByCategories,
-    filterByStatus,
-  } = options;
-
-  const uriParams = [`search=${criteria}`, `page=${pageNumber}`];
-
-  if (sortBy) {
-    uriParams.push(`sortBy=${mapOrgSortByToSearchApi(sortBy)}`);
-  }
-
-  if (sortDirection) {
-    uriParams.push(`sortDirection=${sortDirection}`);
-  }
-
-  if (filterByCategories && filterByCategories.length > 0) {
-    const categoryParams = filterByCategories.map(
-      (category) => `filtercategory=${category}`,
-    );
-    uriParams.push(...categoryParams);
-  }
-
-  if (filterByStatus && filterByStatus.length > 0) {
-    const statusParams = filterByStatus.map(
-      (status) => `filterstatus=${status}`,
-    );
-    uriParams.push(...statusParams);
-  }
-
-  return `${baseUri}?${uriParams.join("&")}`;
-};
-
 const callOrganisationsApi = async (endpoint, method, body, correlationId) => {
   const token = await jwtStrategy(
     config.organisations.service,
@@ -88,28 +28,6 @@ const callOrganisationsApi = async (endpoint, method, body, correlationId) => {
   }
 };
 
-const searchOrgsAssociatedWithService = async (
-  serviceId,
-  criteria,
-  pageNumber,
-  sortBy,
-  sortDirection,
-  correlationId,
-  filterByCategories,
-  filterByStatus,
-) => {
-  const baseUri = `organisations/associated-with-service/${serviceId}`;
-  const uri = buildOrgSearchUri(baseUri, {
-    criteria,
-    filterByCategories,
-    pageNumber,
-    sortBy,
-    sortDirection,
-    filterByStatus,
-  });
-  return callOrganisationsApi(uri, "GET", undefined, correlationId);
-};
-
 const getOrganisationById = async (id, correlationId) => {
   return await callOrganisationsApi(
     `organisations/${id}`,
@@ -121,5 +39,4 @@ const getOrganisationById = async (id, correlationId) => {
 
 module.exports = {
   getOrganisationById,
-  searchOrgsAssociatedWithService,
 };

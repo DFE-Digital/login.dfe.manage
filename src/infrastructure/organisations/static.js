@@ -17,18 +17,6 @@ const getPageOfOrganisations = async (pageNumber) => {
   });
 };
 
-const searchOrgsAssociatedWithService = async (
-  serviceId,
-  criteria,
-  pageNumber,
-  sortBy,
-  sortDirection,
-  correlationId,
-) => {
-  return getPageOfOrganisations(pageNumber, correlationId);
-};
-
 module.exports = {
   getOrganisationById,
-  searchOrgsAssociatedWithService,
 };

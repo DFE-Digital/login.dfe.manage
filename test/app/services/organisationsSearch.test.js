@@ -10,12 +10,10 @@ jest.mock("login.dfe.api-client/services", () => ({
 }));
 jest.mock("login.dfe.api-client/organisations");
 
-const {
-  searchOrgsAssociatedWithService,
-} = require("../../../src/infrastructure/organisations");
 const { getRequestMock, getResponseMock } = require("../../utils");
 const {
   searchOrganisationsRaw,
+  searchOrganisationsAssociatedWithServiceRaw,
 } = require("login.dfe.api-client/organisations");
 const search = require("../../../src/app/services/organisationsSearch");
 
@@ -160,7 +158,9 @@ describe("when searching for all organisations", () => {
 
 describe("when searching for organisations associated to current service", () => {
   beforeEach(() => {
-    searchOrgsAssociatedWithService.mockReset().mockReturnValue(orgsResult);
+    searchOrganisationsAssociatedWithServiceRaw
+      .mockReset()
+      .mockReturnValue(orgsResult);
   });
 
   [
@@ -220,17 +220,18 @@ describe("when searching for organisations associated to current service", () =>
 
       await action(req, res);
 
-      expect(searchOrgsAssociatedWithService).toHaveBeenCalledTimes(1);
-      expect(searchOrgsAssociatedWithService).toHaveBeenCalledWith(
-        "serviceId",
-        "org1",
-        2,
-        "name",
-        "asc",
-        "correlationId",
-        [],
-        [],
+      expect(searchOrganisationsAssociatedWithServiceRaw).toHaveBeenCalledTimes(
+        1,
       );
+      expect(searchOrganisationsAssociatedWithServiceRaw).toHaveBeenCalledWith({
+        serviceId: "serviceId",
+        organisationName: "org1",
+        pageNumber: 2,
+        categories: [],
+        status: [],
+        sortBy: "name",
+        sortDirection: "asc",
+      });
     });
 
     it(`then it should search for orgs associated to current service and with no criteria if none specified (${method} / ${dataLocation})`, async () => {
@@ -255,17 +256,18 @@ describe("when searching for organisations associated to current service", () =>
 
       await action(req, res);
 
-      expect(searchOrgsAssociatedWithService).toHaveBeenCalledTimes(1);
-      expect(searchOrgsAssociatedWithService).toHaveBeenCalledWith(
-        "serviceId",
-        "",
-        2,
-        "name",
-        "asc",
-        "correlationId",
-        [],
-        [],
+      expect(searchOrganisationsAssociatedWithServiceRaw).toHaveBeenCalledTimes(
+        1,
       );
+      expect(searchOrganisationsAssociatedWithServiceRaw).toHaveBeenCalledWith({
+        serviceId: "serviceId",
+        organisationName: "",
+        pageNumber: 2,
+        categories: [],
+        status: [],
+        sortBy: "name",
+        sortDirection: "asc",
+      });
     });
 
     it(`then it should request page 1 if no page specified (${method} / ${dataLocation})`, async () => {
@@ -290,17 +292,18 @@ describe("when searching for organisations associated to current service", () =>
 
       await action(req, res);
 
-      expect(searchOrgsAssociatedWithService).toHaveBeenCalledTimes(1);
-      expect(searchOrgsAssociatedWithService).toHaveBeenCalledWith(
-        "serviceId",
-        "org1",
+      expect(searchOrganisationsAssociatedWithServiceRaw).toHaveBeenCalledTimes(
         1,
-        "name",
-        "asc",
-        req.id,
-        [],
-        [],
       );
+      expect(searchOrganisationsAssociatedWithServiceRaw).toHaveBeenCalledWith({
+        serviceId: "serviceId",
+        organisationName: "org1",
+        pageNumber: 1,
+        categories: [],
+        status: [],
+        sortBy: "name",
+        sortDirection: "asc",
+      });
     });
   });
 });
