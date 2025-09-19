@@ -14,6 +14,7 @@ jest.mock("../../../src/app/services/utils", () =>
 jest.mock("login.dfe.policy-engine");
 jest.mock("./../../../src/infrastructure/access");
 jest.mock("login.dfe.api-client/organisations");
+jest.mock("login.dfe.api-client/users");
 jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
 }));
@@ -21,9 +22,9 @@ jest.mock("login.dfe.api-client/services", () => ({
 const PolicyEngine = require("login.dfe.policy-engine");
 const { getRequestMock, getResponseMock } = require("../../utils");
 const {
-  getSingleUserService,
   getSingleInvitationService,
 } = require("../../../src/infrastructure/access");
+const { getUserServiceRaw } = require("login.dfe.api-client/users");
 const { getServiceRaw } = require("login.dfe.api-client/services");
 const { getUserDetails } = require("../../../src/app/services/utils");
 const { getOrganisationRaw } = require("login.dfe.api-client/organisations");
@@ -54,8 +55,8 @@ describe("when displaying the edit service view", () => {
       });
     PolicyEngine.mockReset().mockImplementation(() => policyEngine);
 
-    getSingleUserService.mockReset();
-    getSingleUserService.mockReturnValue({
+    getUserServiceRaw.mockReset();
+    getUserServiceRaw.mockReturnValue({
       id: "service1",
       dateActivated: "10/10/2018",
       name: "service name",
@@ -101,11 +102,12 @@ describe("when displaying the edit service view", () => {
   it("then it should get the selected user service if req for user", async () => {
     await getEditService(req, res);
 
-    expect(getSingleUserService.mock.calls).toHaveLength(1);
-    expect(getSingleUserService.mock.calls[0][0]).toBe("user1");
-    expect(getSingleUserService.mock.calls[0][1]).toBe("service1");
-    expect(getSingleUserService.mock.calls[0][2]).toBe("org1");
-    expect(getSingleUserService.mock.calls[0][3]).toBe("correlationId");
+    expect(getUserServiceRaw.mock.calls).toHaveLength(1);
+    expect(getUserServiceRaw).toHaveBeenCalledWith({
+      organisationId: "org1",
+      serviceId: "service1",
+      userId: "user1",
+    });
   });
 
   it("then it should get the selected invitation service if req for inv", async () => {

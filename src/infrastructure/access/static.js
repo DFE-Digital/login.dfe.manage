@@ -21,8 +21,6 @@ const getServicesForUser = (id) => {
   return Promise.resolve(userServices);
 };
 
-const getSingleUserService = () => Promise.resolve([]);
-
 const getSingleInvitationService = () => Promise.resolve([]);
 
 const getAllInvitationServices = () =>
@@ -51,7 +49,6 @@ const updateRole = async () => Promise.resolve();
 
 module.exports = {
   getServicesForUser,
-  getSingleUserService,
   getSingleInvitationService,
   listRolesOfService,
   updateRole,
