@@ -12,8 +12,8 @@ jest.mock("../../../src/app/services/utils", () =>
 );
 
 jest.mock("login.dfe.policy-engine");
-jest.mock("./../../../src/infrastructure/access");
 jest.mock("login.dfe.api-client/organisations");
+jest.mock("login.dfe.api-client/invitations");
 jest.mock("login.dfe.api-client/users");
 jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
@@ -21,9 +21,7 @@ jest.mock("login.dfe.api-client/services", () => ({
 
 const PolicyEngine = require("login.dfe.policy-engine");
 const { getRequestMock, getResponseMock } = require("../../utils");
-const {
-  getSingleInvitationService,
-} = require("../../../src/infrastructure/access");
+const { getInvitationServiceRaw } = require("login.dfe.api-client/invitations");
 const { getUserServiceRaw } = require("login.dfe.api-client/users");
 const { getServiceRaw } = require("login.dfe.api-client/services");
 const { getUserDetails } = require("../../../src/app/services/utils");
@@ -63,8 +61,8 @@ describe("when displaying the edit service view", () => {
       status: "active",
     });
 
-    getSingleInvitationService.mockReset();
-    getSingleInvitationService.mockReturnValue({
+    getInvitationServiceRaw.mockReset();
+    getInvitationServiceRaw.mockReturnValue({
       id: "service1",
       dateActivated: "10/10/2018",
       name: "service name",
@@ -114,11 +112,12 @@ describe("when displaying the edit service view", () => {
     req.params.uid = "inv-user1";
     await getEditService(req, res);
 
-    expect(getSingleInvitationService.mock.calls).toHaveLength(1);
-    expect(getSingleInvitationService.mock.calls[0][0]).toBe("user1");
-    expect(getSingleInvitationService.mock.calls[0][1]).toBe("service1");
-    expect(getSingleInvitationService.mock.calls[0][2]).toBe("org1");
-    expect(getSingleInvitationService.mock.calls[0][3]).toBe("correlationId");
+    expect(getInvitationServiceRaw.mock.calls).toHaveLength(1);
+    expect(getInvitationServiceRaw).toHaveBeenCalledWith({
+      invitationId: "user1",
+      organisationId: "org1",
+      serviceId: "service1",
+    });
   });
 
   it("then it should get user details", async () => {
