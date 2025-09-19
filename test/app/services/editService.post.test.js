@@ -12,7 +12,7 @@ jest.mock("../../../src/app/services/utils", () =>
 );
 
 jest.mock("./../../../src/infrastructure/access");
-jest.mock("./../../../src/infrastructure/organisations");
+jest.mock("login.dfe.api-client/organisations");
 jest.mock("login.dfe.policy-engine");
 jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
@@ -25,9 +25,7 @@ const {
   getSingleUserService,
   getSingleInvitationService,
 } = require("../../../src/infrastructure/access");
-const {
-  getOrganisationByIdV2,
-} = require("../../../src/infrastructure/organisations");
+const { getOrganisationRaw } = require("login.dfe.api-client/organisations");
 
 const policyEngine = {
   validate: jest.fn(),
@@ -82,8 +80,8 @@ describe("when selecting the roles for a service", () => {
         response_types: ["code"],
       },
     });
-    getOrganisationByIdV2.mockReset();
-    getOrganisationByIdV2.mockReturnValue({
+    getOrganisationRaw.mockReset();
+    getOrganisationRaw.mockReturnValue({
       id: "org-1",
       name: "organisation one",
     });

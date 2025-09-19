@@ -5,13 +5,13 @@ const {
   getSingleInvitationService,
 } = require("../../infrastructure/access");
 const { getServiceRaw } = require("login.dfe.api-client/services");
+const { getOrganisationRaw } = require("login.dfe.api-client/organisations");
 const {
   getUserDetails,
   getUserServiceRoles,
   getReturnUrl,
   getReturnOrgId,
 } = require("./utils");
-const { getOrganisationByIdV2 } = require("../../infrastructure/organisations");
 
 const policyEngine = new PolicyEngine(config);
 
@@ -46,7 +46,9 @@ const getSingleServiceForUser = async (
 
 const getViewModel = async (req) => {
   const user = await getUserDetails(req);
-  const organisation = await getOrganisationByIdV2(req.params.oid, req.id);
+  const organisation = await getOrganisationRaw({
+    by: { organisationId: req.params.oid },
+  });
   const userService = await getSingleServiceForUser(
     req.params.uid,
     req.params.oid,

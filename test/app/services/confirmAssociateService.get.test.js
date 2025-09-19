@@ -17,15 +17,11 @@ jest.mock("../../../src/infrastructure/access", () => ({
 jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
 }));
-jest.mock("../../../src/infrastructure/organisations", () => ({
-  getOrganisationByIdV2: jest.fn(),
-}));
+jest.mock("login.dfe.api-client/organisations");
 
 const { getRequestMock, getResponseMock } = require("../../utils");
 const { listRolesOfService } = require("../../../src/infrastructure/access");
-const {
-  getOrganisationByIdV2,
-} = require("../../../src/infrastructure/organisations");
+const { getOrganisationRaw } = require("login.dfe.api-client/organisations");
 const { getUserDetails } = require("../../../src/app/services/utils");
 const { getServiceRaw } = require("login.dfe.api-client/services");
 const getConfirmAssociateService =
@@ -76,8 +72,8 @@ describe("when displaying the confirm associate service view", () => {
       name: "John Doe",
     });
 
-    getOrganisationByIdV2.mockReset();
-    getOrganisationByIdV2.mockReturnValue({
+    getOrganisationRaw.mockReset();
+    getOrganisationRaw.mockReturnValue({
       id: "org1",
       name: "org name",
     });
@@ -103,9 +99,10 @@ describe("when displaying the confirm associate service view", () => {
   it("then it should get the org details", async () => {
     await getConfirmAssociateService(req, res);
 
-    expect(getOrganisationByIdV2.mock.calls).toHaveLength(1);
-    expect(getOrganisationByIdV2.mock.calls[0][0]).toBe("org1");
-    expect(getOrganisationByIdV2.mock.calls[0][1]).toBe("correlationId");
+    expect(getOrganisationRaw.mock.calls).toHaveLength(1);
+    expect(getOrganisationRaw).toHaveBeenCalledWith({
+      by: { organisationId: "org1" },
+    });
   });
 
   it("then it should return the confirm associate services view", async () => {

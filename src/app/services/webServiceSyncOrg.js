@@ -1,9 +1,11 @@
-const { getOrganisationByIdV2 } = require("../../infrastructure/organisations");
+const { getOrganisationRaw } = require("login.dfe.api-client/organisations");
 const { getUserServiceRoles } = require("./utils");
 const { wsSyncCall } = require("./wsSynchFunCall");
 
 const get = async (req, res) => {
-  const organisation = await getOrganisationByIdV2(req.params.oid, req.id);
+  const organisation = await getOrganisationRaw({
+    by: { organisationId: req.params.oid },
+  });
   const manageRolesForService = await getUserServiceRoles(req);
 
   return res.render("services/views/webServiceSyncOrg", {
