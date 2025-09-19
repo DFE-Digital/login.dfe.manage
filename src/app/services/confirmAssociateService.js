@@ -1,7 +1,10 @@
 const { NotificationClient } = require("login.dfe.jobs-client");
 const config = require("../../infrastructure/config");
 const { getServiceRaw } = require("login.dfe.api-client/services");
-const { addServiceToUser } = require("login.dfe.api-client/users");
+const {
+  addServiceToUser,
+  getUserOrganisationsWithServicesRaw,
+} = require("login.dfe.api-client/users");
 const { addServiceToInvitation } = require("login.dfe.api-client/invitations");
 
 const { listRolesOfService } = require("../../infrastructure/access");
@@ -12,7 +15,6 @@ const {
 } = require("./utils");
 const {
   getOrganisationByIdV2,
-  getUserOrganisations,
   getInvitationOrganisations,
 } = require("../../infrastructure/organisations");
 const logger = require("../../infrastructure/logger");
@@ -63,16 +65,19 @@ const post = async (req, res) => {
   const invitationId = user.id.startsWith("inv-")
     ? user.id.substr(4)
     : undefined;
+
   const userOrganisations = invitationId
     ? await getInvitationOrganisations(invitationId, req.id)
-    : await getUserOrganisations(user.id, req.id);
+    : await getUserOrganisationsWithServicesRaw({ userId: user.id });
   const organisationDetails = userOrganisations.find(
     (x) => x.organisation.id === organisation.id,
   );
+
   const userOrgPermission = {
     id: organisationDetails.role.id,
     name: organisationDetails.role.name,
   };
+
   const notificationClient = new NotificationClient({
     connectionString: config.notifications.connectionString,
   });
