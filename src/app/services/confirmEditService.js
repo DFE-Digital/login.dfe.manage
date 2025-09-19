@@ -1,5 +1,6 @@
 const { getServiceRaw } = require("login.dfe.api-client/services");
 const { updateUserServiceRoles } = require("login.dfe.api-client/users");
+const { getOrganisationRaw } = require("login.dfe.api-client/organisations");
 const {
   updateInvitationServiceRoles,
 } = require("login.dfe.api-client/invitations");
@@ -9,7 +10,6 @@ const {
   getUserServiceRoles,
   getReturnUrl,
 } = require("./utils");
-const { getOrganisationByIdV2 } = require("../../infrastructure/organisations");
 const logger = require("../../infrastructure/logger");
 
 const getModel = async (req) => {
@@ -21,7 +21,9 @@ const getModel = async (req) => {
   const roleDetails = allRolesForService.filter((x) =>
     selectedRoleIds.find((y) => y.toLowerCase() === x.id.toLowerCase()),
   );
-  const organisation = await getOrganisationByIdV2(req.params.oid, req.id);
+  const organisation = await getOrganisationRaw({
+    by: { organisationId: req.params.oid },
+  });
   const user = await getUserDetails(req);
   const manageRolesForService = await getUserServiceRoles(req);
 

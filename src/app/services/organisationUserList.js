@@ -1,4 +1,4 @@
-const { getOrganisationByIdV2 } = require("../../infrastructure/organisations");
+const { getOrganisationRaw } = require("login.dfe.api-client/organisations");
 const {
   mapUserRole,
   mapSearchUserToSupportModel,
@@ -74,7 +74,9 @@ const search = async (req) => {
 };
 
 const render = async (req, res) => {
-  const organisation = await getOrganisationByIdV2(req.params.oid, req.id);
+  const organisation = await getOrganisationRaw({
+    by: { organisationId: req.params.oid },
+  });
   const manageRolesForService = await getUserServiceRoles(req);
   const service = await getServiceRaw({
     by: { serviceId: req.params.sid },
