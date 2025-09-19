@@ -157,14 +157,6 @@ const getOrganisationById = async (id, correlationId) => {
   );
 };
 
-const getOrganisationCategories = async (correlationId) =>
-  callOrganisationsApi(
-    "organisations/categories",
-    "GET",
-    undefined,
-    correlationId,
-  );
-
 const listOrganisationStatus = async (correlationId) =>
   callOrganisationsApi("organisations/states", "GET", undefined, correlationId);
 
@@ -174,6 +166,5 @@ module.exports = {
   searchOrganisations,
   getOrganisationById,
   searchOrgsAssociatedWithService,
-  getOrganisationCategories,
   listOrganisationStatus,
 };

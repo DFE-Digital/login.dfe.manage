@@ -22,7 +22,7 @@ const {
 const { dateFormat } = require("../helpers/dateFormatterHelper");
 const {
   getOrganisationCategories,
-} = require("../../infrastructure/organisations");
+} = require("login.dfe.api-client/organisations");
 
 const clearNewUserSessionData = (req) => {
   if (req.session.user) {
@@ -147,7 +147,7 @@ const search = async (req) => {
 };
 
 const getFiltersModel = async (req) => {
-  const { method, body, query, id } = req;
+  const { method, body, query } = req;
   const paramsSource = getParamsSource(method, body, query);
 
   const showFilters =
@@ -164,7 +164,7 @@ const getFiltersModel = async (req) => {
       paramsSource.organisationCategories,
     );
 
-    organisationCategories = (await getOrganisationCategories(id)).map(
+    organisationCategories = (await getOrganisationCategories()).map(
       (category) => ({
         id: category.id,
         name: category.name,
