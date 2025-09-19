@@ -1,10 +1,10 @@
 const {
   searchOrganisations,
   searchOrgsAssociatedWithService,
-  listOrganisationStatus,
 } = require("../../infrastructure/organisations");
 const { getServiceRaw } = require("login.dfe.api-client/services");
 const {
+  getOrganisationStatuses,
   getOrganisationCategories,
 } = require("login.dfe.api-client/organisations");
 const {
@@ -19,7 +19,7 @@ const {
 const logger = require("../../infrastructure/logger");
 
 const getFiltersModel = async (req, organisationCategories, orgStatuses) => {
-  const { method, body, query, id } = req;
+  const { method, body, query } = req;
   const paramsSource = getParamsSource(method, body, query);
 
   const showFilters =
@@ -70,7 +70,7 @@ const getFiltersModel = async (req, organisationCategories, orgStatuses) => {
         ),
       }));
     } else {
-      organisationStatuses = (await listOrganisationStatus(id)).map(
+      organisationStatuses = (await getOrganisationStatuses()).map(
         (status) => ({
           id: status.id,
           name: status.name,
