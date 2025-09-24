@@ -11,9 +11,7 @@ jest.mock("login.dfe.api-client/services");
 const { getRequestMock, getResponseMock } = require("../../utils");
 const postCreatePolicyCondition = require("../../../src/app/services/postCreatePolicyCondition");
 const { getServicePolicyRaw } = require("login.dfe.api-client/services");
-const {
-  getOrganisationLegacyRaw,
-} = require("login.dfe.api-client/organisations");
+const { getOrganisationRaw } = require("login.dfe.api-client/organisations");
 const res = getResponseMock();
 
 const policy = {
@@ -87,8 +85,8 @@ describe("when posting the create policy condition page", () => {
     getServicePolicyRaw.mockReset();
     getServicePolicyRaw.mockReturnValue(policy);
 
-    getOrganisationLegacyRaw.mockReset();
-    getOrganisationLegacyRaw.mockResolvedValue(organisation);
+    getOrganisationRaw.mockReset();
+    getOrganisationRaw.mockResolvedValue(organisation);
 
     res.mockResetAll();
   });
@@ -313,8 +311,8 @@ describe("when posting the create policy condition page", () => {
   });
 
   it("should return a validation error when the organisation id provided does not exist", async () => {
-    getOrganisationLegacyRaw.mockReset();
-    getOrganisationLegacyRaw.mockReturnValue(undefined);
+    getOrganisationRaw.mockReset();
+    getOrganisationRaw.mockReturnValue(undefined);
     const testRequestBody = JSON.parse(JSON.stringify(requestBody));
     testRequestBody.body.condition = "organisation.id";
     testRequestBody.body.value = "ad73ad54-1bb7-4f8a-a446-45703ee1aacc";

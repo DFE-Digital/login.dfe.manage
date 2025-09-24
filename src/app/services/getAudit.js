@@ -15,7 +15,7 @@ const { getServiceRaw } = require("login.dfe.api-client/services");
 const {
   getUserOrganisationsWithServicesRaw,
 } = require("login.dfe.api-client/users");
-const { getOrganisationLegacyRaw } = require("login.dfe.api-client/organisations");
+const { getOrganisationRaw } = require("login.dfe.api-client/organisations");
 
 let cachedServiceIds = {};
 let cachedServices = {};
@@ -116,8 +116,10 @@ const describeAuditEvent = async (audit, req) => {
     const organisationId =
       audit.editedFields &&
       audit.editedFields.find((x) => x.name === "new_organisation");
-    const organisation = await getOrganisationLegacyRaw({
-      organisationId: organisationId.oldValue,
+    const organisation = await getOrganisationRaw({
+      by: {
+        organisationId: organisationId.oldValue,
+      },
     });
     const viewedUser = await getCachedUserById(audit.editedUser, req.id);
     return `Deleted organisation: ${organisation.name} for user  ${viewedUser.firstName} ${viewedUser.lastName}`;
@@ -126,8 +128,10 @@ const describeAuditEvent = async (audit, req) => {
     const organisationId =
       audit.editedFields &&
       audit.editedFields.find((x) => x.name === "new_organisation");
-    const organisation = await getOrganisationLegacyRaw({
-      organisationId: organisationId.newValue,
+    const organisation = await getOrganisationRaw({
+      by: {
+        organisationId: organisationId.newValue,
+      },
     });
     const viewedUser = await getCachedUserById(audit.editedUser, req.id);
     return `Added organisation: ${organisation.name} for user ${viewedUser.firstName} ${viewedUser.lastName}`;
@@ -212,8 +216,10 @@ const getAudit = async (req, res) => {
       }
     }
     if (audit.organisationId) {
-      organisation = await getOrganisationLegacyRaw({
-        organisationId: audit.organisationId,
+      organisation = await getOrganisationRaw({
+        by: {
+          organisationId: audit.organisationId,
+        },
       });
     }
 

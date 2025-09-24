@@ -1,7 +1,5 @@
 const { getServicePolicyRaw } = require("login.dfe.api-client/services");
-const {
-  getOrganisationLegacyRaw,
-} = require("login.dfe.api-client/organisations");
+const { getOrganisationRaw } = require("login.dfe.api-client/organisations");
 const { getUserServiceRoles } = require("./utils");
 const { validate: validateUUID } = require("uuid");
 const logger = require("../../infrastructure/logger");
@@ -103,8 +101,9 @@ const validate = async (req, currentPolicyConditions) => {
   }
 
   if (model.condition === "organisation.id") {
-    const organisationId = model.value;
-    const organisation = await getOrganisationLegacyRaw({ organisationId });
+    const organisation = await getOrganisationRaw({
+      by: { organisationId: model.value },
+    });
     if (!organisation) {
       model.validationMessages.value = "Organisation id does not exist";
     }
