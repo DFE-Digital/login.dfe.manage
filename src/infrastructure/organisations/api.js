@@ -28,15 +28,5 @@ const callOrganisationsApi = async (endpoint, method, body, correlationId) => {
   }
 };
 
-const getOrganisationById = async (id, correlationId) => {
-  return await callOrganisationsApi(
-    `organisations/${id}`,
-    "GET",
-    undefined,
-    correlationId,
-  );
-};
-
 module.exports = {
-  getOrganisationById,
 };
