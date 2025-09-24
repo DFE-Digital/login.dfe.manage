@@ -1,8 +1,11 @@
-const { getPolicyById } = require("../../infrastructure/access");
 const { getUserServiceRoles } = require("./utils");
+const { getServicePolicyRaw } = require("login.dfe.api-client/services");
 
 const getCreatePolicyCondition = async (req, res) => {
-  const policy = await getPolicyById(req.params.sid, req.params.pid, req.id);
+  const policy = await getServicePolicyRaw({
+    serviceId: req.params.sid,
+    policyId: req.params.pid,
+  });
   const manageRolesForService = await getUserServiceRoles(req);
 
   return res.render("services/views/createPolicyCondition", {

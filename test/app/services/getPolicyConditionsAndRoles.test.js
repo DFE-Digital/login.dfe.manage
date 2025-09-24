@@ -9,12 +9,13 @@ jest.mock("../../../src/infrastructure/access");
 
 jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
+  getServicePolicyRaw: jest.fn(),
 }));
 
 const { getRequestMock, getResponseMock } = require("../../utils");
 const getPolicyConditions = require("../../../src/app/services/getPolicyConditionsAndRoles");
 const { getServiceRaw } = require("login.dfe.api-client/services");
-const { getPolicyById } = require("../../../src/infrastructure/access");
+const { getServicePolicyRaw } = require("login.dfe.api-client/services");
 
 const res = getResponseMock();
 
@@ -44,8 +45,8 @@ describe("When displaying the selected policy's conditions and roles", () => {
       status: "active",
     });
 
-    getPolicyById.mockReset();
-    getPolicyById.mockReturnValue({
+    getServicePolicyRaw.mockReset();
+    getServicePolicyRaw.mockReturnValue({
       applicationId: "service1",
       conditions: [
         {
@@ -95,10 +96,11 @@ describe("When displaying the selected policy's conditions and roles", () => {
   it("then it should get the policy by id", async () => {
     await getPolicyConditions(req, res);
 
-    expect(getPolicyById.mock.calls).toHaveLength(1);
-    expect(getPolicyById.mock.calls[0][0]).toBe("service1");
-    expect(getPolicyById.mock.calls[0][1]).toBe("policy1");
-    expect(getPolicyById.mock.calls[0][2]).toBe("correlationId");
+    expect(getServicePolicyRaw.mock.calls).toHaveLength(1);
+    expect(getServicePolicyRaw).toHaveBeenCalledWith({
+      policyId: "policy1",
+      serviceId: "service1",
+    });
   });
 
   it("then it should include the mapped policy", async () => {
@@ -123,7 +125,7 @@ describe("When displaying the selected policy's conditions and roles", () => {
   });
 
   it("then it should return the roles in the policy sorted by name", async () => {
-    getPolicyById.mockReturnValue({
+    getServicePolicyRaw.mockReturnValue({
       id: "conditionId",
       name: "condition name",
       applicationId: "service1",
@@ -160,7 +162,7 @@ describe("When displaying the selected policy's conditions and roles", () => {
   });
 
   it("then it should return the condition fields in the policy sorted by friendlyField", async () => {
-    getPolicyById.mockReturnValue({
+    getServicePolicyRaw.mockReturnValue({
       id: "conditionId",
       name: "condition name",
       applicationId: "service1",
@@ -201,7 +203,7 @@ describe("When displaying the selected policy's conditions and roles", () => {
   });
 
   it("then it should return the values for a numeric condition sorted numerically", async () => {
-    getPolicyById.mockReturnValue({
+    getServicePolicyRaw.mockReturnValue({
       id: "conditionId",
       name: "condition name",
       applicationId: "service1",
@@ -243,7 +245,7 @@ describe("When displaying the selected policy's conditions and roles", () => {
   });
 
   it("then it should return the values for an alphanumeric condition values sorted lexicographically", async () => {
-    getPolicyById.mockReturnValue({
+    getServicePolicyRaw.mockReturnValue({
       id: "conditionId",
       name: "condition name",
       applicationId: "service1",

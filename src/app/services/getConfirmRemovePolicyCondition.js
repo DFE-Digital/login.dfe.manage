@@ -1,4 +1,4 @@
-const { getPolicyById } = require("../../infrastructure/access");
+const { getServicePolicyRaw } = require("login.dfe.api-client/services");
 const {
   getUserServiceRoles,
   getFriendlyFieldName,
@@ -12,11 +12,10 @@ const getConfirmRemovePolicyCondition = async (req, res) => {
   const correlationId = req.id;
   const manageRolesForService = await getUserServiceRoles(req);
 
-  const policy = await getPolicyById(
-    req.params.sid,
-    req.params.pid,
-    correlationId,
-  );
+  const policy = await getServicePolicyRaw({
+    serviceId: req.params.sid,
+    policyId: req.params.pid,
+  });
 
   const friendlyValue = await getFriendlyValues(
     condition,

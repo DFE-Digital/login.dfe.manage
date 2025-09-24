@@ -1,7 +1,7 @@
 const {
-  getPolicyById,
-  updatePolicyById,
-} = require("../../infrastructure/access");
+  getServicePolicyRaw,
+  updateServicePolicyRaw,
+} = require("login.dfe.api-client/services");
 const logger = require("../../infrastructure/logger");
 
 const postConfirmRemovePolicyCondition = async (req, res) => {
@@ -9,7 +9,11 @@ const postConfirmRemovePolicyCondition = async (req, res) => {
   const operator = req.body.operator;
   const value = req.body.value;
 
-  const policy = await getPolicyById(req.params.sid, req.params.pid, req.id);
+  const policy = await getServicePolicyRaw({
+    serviceId: req.params.sid,
+    policyId: req.params.pid,
+  });
+
   const conditionOperatorAndValueInPolicy = policy.conditions.find(
     (policyCondition) =>
       policyCondition.field === condition &&
@@ -42,7 +46,11 @@ const postConfirmRemovePolicyCondition = async (req, res) => {
     return res.redirect("conditionsAndRoles");
   }
 
-  await updatePolicyById(req.params.sid, req.params.pid, policy, req.id);
+  await updateServicePolicyRaw({
+    serviceId: req.params.sid,
+    policyId: req.params.pid,
+    policy,
+  });
 
   logger.audit(
     `${req.user.email} (id: ${req.user.sub}) removed a policy condition for service ${req.params.sid} and policy ${req.params.pid}`,

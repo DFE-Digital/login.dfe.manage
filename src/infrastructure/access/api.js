@@ -53,24 +53,6 @@ const listRolesOfService = async (sid, correlationId) => {
   return callApi("GET", `services/${sid}/roles`, correlationId, undefined);
 };
 
-const getPolicyById = async (sid, pid, correlationId) => {
-  return callApi(
-    "GET",
-    `services/${sid}/policies/${pid}`,
-    correlationId,
-    undefined,
-  );
-};
-
-const updatePolicyById = async (sid, pid, policyBody, correlationId) => {
-  return callApi(
-    "PATCH",
-    `services/${sid}/policies/${pid}`,
-    correlationId,
-    policyBody,
-  );
-};
-
 const updateRole = async (serviceId, roleId, roleBody, correlationId) => {
   return callApi(
     "PATCH",
@@ -80,39 +62,11 @@ const updateRole = async (serviceId, roleId, roleBody, correlationId) => {
   );
 };
 
-const addUserService = async (uid, sid, oid, roles, correlationId) => {
-  const body = {
-    roles,
-  };
-  return callApi(
-    "PUT",
-    `users/${uid}/services/${sid}/organisations/${oid}`,
-    correlationId,
-    body,
-  );
-};
-
-const addInvitationService = async (iid, sid, oid, roles, correlationId) => {
-  const body = {
-    roles,
-  };
-  return callApi(
-    "PUT",
-    `invitations/${iid}/services/${sid}/organisations/${oid}`,
-    correlationId,
-    body,
-  );
-};
-
 module.exports = {
   getServicesForUser,
   getSingleUserService,
   getSingleInvitationService,
   listRolesOfService,
-  getPolicyById,
-  updatePolicyById,
   updateRole,
-  addUserService,
-  addInvitationService,
   getAllInvitationServices,
 };

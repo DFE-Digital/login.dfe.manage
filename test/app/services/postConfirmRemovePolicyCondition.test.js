@@ -4,14 +4,14 @@ jest.mock("./../../../src/infrastructure/config", () =>
 jest.mock("./../../../src/infrastructure/logger", () =>
   require("../../utils").loggerMockFactory(),
 );
-jest.mock("./../../../src/infrastructure/access");
+jest.mock("login.dfe.api-client/services");
 
 const { getRequestMock, getResponseMock } = require("../../utils");
 const postConfirmRemovePolicyCondition = require("../../../src/app/services/postConfirmRemovePolicyCondition");
 const {
-  getPolicyById,
-  updatePolicyById,
-} = require("../../../src/infrastructure/access");
+  getServicePolicyRaw,
+  updateServicePolicyRaw,
+} = require("login.dfe.api-client/services");
 const res = getResponseMock();
 
 const policy = {
@@ -66,11 +66,11 @@ describe("when using the postConfirmRemovePolicyCondition function", () => {
     req = getRequestMock(clonedRequestBody);
 
     const clonedPolicy = structuredClone(policy);
-    getPolicyById.mockReset();
-    getPolicyById.mockReturnValue(clonedPolicy);
+    getServicePolicyRaw.mockReset();
+    getServicePolicyRaw.mockReturnValue(clonedPolicy);
 
-    updatePolicyById.mockReset();
-    updatePolicyById.mockReturnValue(undefined);
+    updateServicePolicyRaw.mockReset();
+    updateServicePolicyRaw.mockReturnValue(undefined);
 
     res.mockResetAll();
   });
@@ -93,9 +93,41 @@ describe("when using the postConfirmRemovePolicyCondition function", () => {
 
   it("should remove a policy condition entirely when only 1 value in array", async () => {
     await postConfirmRemovePolicyCondition(req, res);
-    // 3 unique conditions in the mocked policy. Should be 2 after we remove condition
-    expect(updatePolicyById.mock.calls[0][2].conditions.length).toBe(2);
     expect(res.redirect.mock.calls.length).toBe(1);
+    expect(updateServicePolicyRaw).toHaveBeenCalledWith({
+      policy: {
+        applicationId: "32A923EE-B729-44B1-BB52-1789FD08862A",
+        conditions: [
+          {
+            field: "organisation.status.id",
+            operator: "is",
+            value: ["1", "3", "4"],
+          },
+          {
+            field: "organisation.category.id",
+            operator: "is",
+            value: ["001"],
+          },
+        ],
+        id: "6C8172B6-011B-4526-B04D-E2809A3D71A2",
+        name: "Test Service - Test Policy",
+        roles: [
+          {
+            code: "CheckRecord_School",
+            id: "717E2ECB-8B76-402C-A142-15DD486CBE95",
+            name: "School",
+            numericId: "22997",
+            status: ["1"],
+          },
+        ],
+        status: {
+          id: 1,
+        },
+      },
+      policyId: "policy-1",
+      serviceId: "service-1",
+    });
+
     expect(res.redirect.mock.calls[0][0]).toBe("conditionsAndRoles");
   });
 
@@ -105,14 +137,44 @@ describe("when using the postConfirmRemovePolicyCondition function", () => {
     testReq.body.value = "1";
     await postConfirmRemovePolicyCondition(testReq, res);
 
-    // 3 unique conditions in the mocked policy. Should remain 3 as the new value should be removed
-    // from the existing array
-    expect(updatePolicyById.mock.calls[0][2].conditions.length).toBe(3);
-    const testCondition = updatePolicyById.mock.calls[0][2].conditions.find(
-      (condition) => condition.field === "organisation.status.id",
-    );
-    expect(testCondition.value).toStrictEqual(["3", "4"]);
-    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(updateServicePolicyRaw).toHaveBeenCalledWith({
+      policy: {
+        applicationId: "32A923EE-B729-44B1-BB52-1789FD08862A",
+        conditions: [
+          {
+            field: "organisation.status.id",
+            operator: "is",
+            value: ["3", "4"],
+          },
+          {
+            field: "organisation.type.id",
+            operator: "is",
+            value: ["57"],
+          },
+          {
+            field: "organisation.category.id",
+            operator: "is",
+            value: ["001"],
+          },
+        ],
+        id: "6C8172B6-011B-4526-B04D-E2809A3D71A2",
+        name: "Test Service - Test Policy",
+        roles: [
+          {
+            code: "CheckRecord_School",
+            id: "717E2ECB-8B76-402C-A142-15DD486CBE95",
+            name: "School",
+            numericId: "22997",
+            status: ["1"],
+          },
+        ],
+        status: {
+          id: 1,
+        },
+      },
+      policyId: "policy-1",
+      serviceId: "service-1",
+    });
     expect(res.redirect.mock.calls[0][0]).toBe("conditionsAndRoles");
   });
 
@@ -121,7 +183,7 @@ describe("when using the postConfirmRemovePolicyCondition function", () => {
     testReq.body.value = "10000";
     await postConfirmRemovePolicyCondition(testReq, res);
 
-    expect(updatePolicyById.mock.calls.length).toBe(0);
+    expect(updateServicePolicyRaw.mock.calls.length).toBe(0);
     expect(res.flash.mock.calls).toHaveLength(1);
     expect(res.flash).toHaveBeenCalledWith(
       "info",

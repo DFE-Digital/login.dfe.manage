@@ -1,5 +1,7 @@
-const { getPolicyById } = require("../../infrastructure/access");
-const { getServiceRaw } = require("login.dfe.api-client/services");
+const {
+  getServiceRaw,
+  getServicePolicyRaw,
+} = require("login.dfe.api-client/services");
 const {
   doesUserHaveRole,
   getFriendlyFieldName,
@@ -32,7 +34,10 @@ const getPolicyConditions = async (req, res) => {
   const service = await getServiceRaw({
     by: { serviceId: req.params.sid },
   });
-  const policy = await getPolicyById(req.params.sid, req.params.pid, req.id);
+  const policy = await getServicePolicyRaw({
+    serviceId: req.params.sid,
+    policyId: req.params.pid,
+  });
   const manageRolesForService = await getUserServiceRoles(req);
   const canUserModifyPolicyConditions = doesUserHaveRole(
     req,
