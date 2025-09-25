@@ -24,7 +24,6 @@ jest.mock("login.dfe.jobs-client", () => ({
 jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
 }));
-jest.mock("./../../../src/infrastructure/organisations");
 jest.mock("login.dfe.api-client/organisations");
 
 const { NotificationClient } = require("login.dfe.jobs-client");
@@ -37,7 +36,10 @@ const logger = require("../../../src/infrastructure/logger");
 const { getRequestMock, getResponseMock } = require("../../utils");
 const { listRolesOfService } = require("../../../src/infrastructure/access");
 const { addServiceToUser } = require("login.dfe.api-client/users");
-const { addServiceToInvitation, getInvitationOrganisationsRaw } = require("login.dfe.api-client/invitations");
+const {
+  addServiceToInvitation,
+  getInvitationOrganisationsRaw,
+} = require("login.dfe.api-client/invitations");
 
 const { getUserDetails } = require("../../../src/app/services/utils");
 const { getServiceRaw } = require("login.dfe.api-client/services");
