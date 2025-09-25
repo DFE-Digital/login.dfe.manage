@@ -8,29 +8,46 @@ jest.mock("../../../src/app/services/utils", () =>
   ]),
 );
 
-jest.mock("../../../src/infrastructure/audit", () => ({
-  api: {
-    updateAuditLogs: jest.fn(),
-  },
-}));
-
-const { updateAuditLogs } = require("../../../src/infrastructure/audit").api;
 const { getRequestMock, getResponseMock } = require("../../utils");
 const postUpdateAuditLog = require("../../../src/app/services/postUpdateAuditLog");
+
+const unmockedFetch = globalThis.fetch;
 
 describe("When requesting to update a user's audit log", () => {
   let req;
   const res = getResponseMock();
 
   beforeEach(() => {
-    updateAuditLogs.mockReset();
     req = getRequestMock();
     res.mockResetAll();
+
+    const mockedFetch = jest.fn().mockResolvedValue({
+      status: 200,
+      statusText: "OK",
+      ok: true,
+    });
+    globalThis.fetch = mockedFetch;
   });
 
-  it("calls the audit API updateAuditLogs method", async () => {
+  afterAll(() => {
+    globalThis.fetch = unmockedFetch;
+  });
+
+  it("calls fetch with expected URL", async () => {
+    const mockedFetch = jest.fn().mockResolvedValue({
+      status: 200,
+      statusText: "OK",
+      ok: true,
+    });
+    globalThis.fetch = mockedFetch;
+
+    process.env.AUDIT_HTTP_TRIGGER_URL = "https://localhost/update-audit";
+
     await postUpdateAuditLog(req, res);
-    expect(updateAuditLogs).toHaveBeenCalled();
+
+    expect(mockedFetch).toHaveBeenCalledWith("https://localhost/update-audit", {
+      method: "POST",
+    });
   });
 
   it("should redirect to the user's audit list without a returnOrg query string, if the returnOrg ID is not set", async () => {

@@ -16,6 +16,7 @@ jest.mock("login.dfe.api-client/services", () => ({
   getServiceRolesRaw: jest.fn(),
 }));
 jest.mock("login.dfe.api-client/organisations");
+jest.mock("login.dfe.api-client/organisations");
 
 const { getRequestMock, getResponseMock } = require("../../utils");
 const { getOrganisationRaw } = require("login.dfe.api-client/organisations");
