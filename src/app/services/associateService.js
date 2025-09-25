@@ -1,18 +1,20 @@
 const PolicyEngine = require("login.dfe.policy-engine");
 const config = require("../../infrastructure/config");
 const { getServiceRaw } = require("login.dfe.api-client/services");
+const { getOrganisationRaw } = require("login.dfe.api-client/organisations");
 const {
   getUserDetails,
   getUserServiceRoles,
   getReturnUrl,
 } = require("./utils");
-const { getOrganisationByIdV2 } = require("../../infrastructure/organisations");
 
 const policyEngine = new PolicyEngine(config);
 
 const getViewModel = async (req) => {
   const user = await getUserDetails(req);
-  const organisation = await getOrganisationByIdV2(req.params.oid, req.id);
+  const organisation = await getOrganisationRaw({
+    by: { organisationId: req.params.oid },
+  });
   const service = await getServiceRaw({
     by: { serviceId: req.params.sid },
   });

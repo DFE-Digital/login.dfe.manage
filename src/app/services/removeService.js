@@ -1,5 +1,6 @@
 const { getServiceRaw } = require("login.dfe.api-client/services");
 const { deleteUserServiceAccess } = require("login.dfe.api-client/users");
+const { getOrganisationRaw } = require("login.dfe.api-client/organisations");
 const {
   deleteServiceAccessFromInvitation,
 } = require("login.dfe.api-client/invitations");
@@ -14,7 +15,6 @@ const {
   getReturnUrl,
 } = require("./utils");
 const { mapSearchUserToSupportModel } = require("../../infrastructure/utils");
-const { getOrganisationByIdV2 } = require("../../infrastructure/organisations");
 
 const logger = require("../../infrastructure/logger");
 
@@ -23,7 +23,9 @@ const getModel = async (req) => {
     by: { serviceId: req.params.sid },
   });
   const user = await getUserDetails(req);
-  const organisation = await getOrganisationByIdV2(req.params.oid, req.id);
+  const organisation = await getOrganisationRaw({
+    by: { organisationId: req.params.oid },
+  });
   const manageRolesForService = await getUserServiceRoles(req);
 
   return {

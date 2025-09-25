@@ -25,9 +25,7 @@ jest.mock("./../../../src/infrastructure/access", () => ({
 jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
 }));
-jest.mock("./../../../src/infrastructure/organisations", () => ({
-  getOrganisationByIdV2: jest.fn(),
-}));
+jest.mock("login.dfe.api-client/organisations");
 
 const logger = require("../../../src/infrastructure/logger");
 const { getRequestMock, getResponseMock } = require("../../utils");
@@ -36,9 +34,7 @@ const {
 } = require("login.dfe.api-client/invitations");
 const { updateUserServiceRoles } = require("login.dfe.api-client/users");
 const { listRolesOfService } = require("../../../src/infrastructure/access");
-const {
-  getOrganisationByIdV2,
-} = require("../../../src/infrastructure/organisations");
+const { getOrganisationRaw } = require("login.dfe.api-client/organisations");
 const { getUserDetails } = require("../../../src/app/services/utils");
 const { getServiceRaw } = require("login.dfe.api-client/services");
 const postConfirmEditService =
@@ -88,8 +84,8 @@ describe("when editing a service for a user", () => {
       id: "user1",
     });
 
-    getOrganisationByIdV2.mockReset();
-    getOrganisationByIdV2.mockReturnValue({
+    getOrganisationRaw.mockReset();
+    getOrganisationRaw.mockReturnValue({
       id: "org1",
       name: "org name",
     });

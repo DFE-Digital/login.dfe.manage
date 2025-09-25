@@ -8,12 +8,10 @@ jest.mock("login.dfe.jobs-client", () => ({
   ServiceNotificationsClient: jest.fn(),
 }));
 jest.mock("./../../../src/app/services/utils");
-jest.mock("./../../../src/infrastructure/organisations");
+jest.mock("login.dfe.api-client/organisations");
 
 const { getRequestMock, getResponseMock } = require("./../../utils");
-const {
-  getOrganisationByIdV2,
-} = require("./../../../src/infrastructure/organisations");
+const { getOrganisationRaw } = require("login.dfe.api-client/organisations");
 const { ServiceNotificationsClient } = require("login.dfe.jobs-client");
 const webServiceSyncOrg = require("./../../../src/app/services/webServiceSyncOrg");
 
@@ -27,7 +25,7 @@ describe("when syncing organisation for sync", function () {
   let req;
 
   beforeEach(() => {
-    getOrganisationByIdV2.mockReset().mockReturnValue(orgResult);
+    getOrganisationRaw.mockReset().mockReturnValue(orgResult);
 
     serviceNotificationsClient.notifyOrganisationUpdated.mockReset();
     ServiceNotificationsClient.mockReset().mockImplementation(

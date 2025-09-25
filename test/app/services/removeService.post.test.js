@@ -21,13 +21,11 @@ jest.mock("login.dfe.api-client/users", () => ({
 jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
 }));
-jest.mock("./../../../src/infrastructure/organisations");
+jest.mock("login.dfe.api-client/organisations");
 
 const { getRequestMock, getResponseMock } = require("../../utils");
 const { getUserDetails } = require("../../../src/app/services/utils");
-const {
-  getOrganisationByIdV2,
-} = require("../../../src/infrastructure/organisations");
+const { getOrganisationRaw } = require("login.dfe.api-client/organisations");
 const { getServiceRaw } = require("login.dfe.api-client/services");
 const {
   searchUserByIdRaw,
@@ -60,8 +58,8 @@ describe("when displaying the remove service access view", () => {
       name: "service name",
       status: "active",
     });
-    getOrganisationByIdV2.mockReset();
-    getOrganisationByIdV2.mockReturnValue({
+    getOrganisationRaw.mockReset();
+    getOrganisationRaw.mockReturnValue({
       id: "org-1",
       name: "organisation one",
     });

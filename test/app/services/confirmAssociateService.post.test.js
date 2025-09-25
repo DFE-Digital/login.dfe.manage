@@ -25,13 +25,16 @@ jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
 }));
 jest.mock("./../../../src/infrastructure/organisations");
+jest.mock("login.dfe.api-client/organisations");
 
 const { NotificationClient } = require("login.dfe.jobs-client");
 const {
-  getOrganisationByIdV2,
-  getUserOrganisations,
+  getUserOrganisationsWithServicesRaw,
+} = require("login.dfe.api-client/users");
+const {
   getInvitationOrganisations,
 } = require("../../../src/infrastructure/organisations");
+const { getOrganisationRaw } = require("login.dfe.api-client/organisations");
 
 const logger = require("../../../src/infrastructure/logger");
 const { getRequestMock, getResponseMock } = require("../../utils");
@@ -106,14 +109,14 @@ describe("when confirm associating a service to user", () => {
       },
     ]);
 
-    getOrganisationByIdV2.mockReset();
-    getOrganisationByIdV2.mockReturnValue({
+    getOrganisationRaw.mockReset();
+    getOrganisationRaw.mockReturnValue({
       id: "88a1ed39-5a98-43da-b66e-78e564ea72b0",
       name: "Great Big School",
     });
 
-    getUserOrganisations.mockReset();
-    getUserOrganisations.mockReturnValue([
+    getUserOrganisationsWithServicesRaw.mockReset();
+    getUserOrganisationsWithServicesRaw.mockReturnValue([
       {
         organisation: {
           id: "88a1ed39-5a98-43da-b66e-78e564ea72b0",

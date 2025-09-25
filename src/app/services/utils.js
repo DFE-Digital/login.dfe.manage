@@ -9,7 +9,7 @@ const {
   mapUserStatus,
   mapSearchUserToSupportModel,
 } = require("../../infrastructure/utils");
-const { getOrganisationByIdV2 } = require("../../infrastructure/organisations");
+const { getOrganisationRaw } = require("login.dfe.api-client/organisations");
 const { mapAsync } = require("../../utils/asyncHelpers");
 const config = require("../../infrastructure/config");
 const { getServiceRaw } = require("login.dfe.api-client/services");
@@ -111,11 +111,10 @@ const getFriendlyUser = async (userId) => {
   return `${user.given_name} ${user.family_name} (${user.email})`;
 };
 
-const getFriendlyOrganisation = async (organisationId, correlationId) => {
-  const organisation = await getOrganisationByIdV2(
-    organisationId,
-    correlationId,
-  );
+const getFriendlyOrganisation = async (organisationId) => {
+  const organisation = await getOrganisationRaw({
+    by: { organisationId: organisationId },
+  });
   if (!organisation) {
     return organisationId;
   }

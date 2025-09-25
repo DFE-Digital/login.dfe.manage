@@ -1,10 +1,12 @@
 const {
   searchOrganisations,
   searchOrgsAssociatedWithService,
-  getOrganisationCategories,
-  listOrganisationStatus,
 } = require("../../infrastructure/organisations");
 const { getServiceRaw } = require("login.dfe.api-client/services");
+const {
+  getOrganisationStatuses,
+  getOrganisationCategories,
+} = require("login.dfe.api-client/organisations");
 const {
   getUserServiceRoles,
   unpackMultiSelect,
@@ -17,7 +19,7 @@ const {
 const logger = require("../../infrastructure/logger");
 
 const getFiltersModel = async (req, organisationCategories, orgStatuses) => {
-  const { method, body, query, id } = req;
+  const { method, body, query } = req;
   const paramsSource = getParamsSource(method, body, query);
 
   const showFilters =
@@ -46,7 +48,7 @@ const getFiltersModel = async (req, organisationCategories, orgStatuses) => {
         isSelected: isSelected(selectedOrganisationTypes, category.id),
       }));
     } else {
-      organisationTypes = (await getOrganisationCategories(id)).map(
+      organisationTypes = (await getOrganisationCategories()).map(
         (category) => ({
           id: category.id,
           name: category.name,
@@ -68,7 +70,7 @@ const getFiltersModel = async (req, organisationCategories, orgStatuses) => {
         ),
       }));
     } else {
-      organisationStatuses = (await listOrganisationStatus(id)).map(
+      organisationStatuses = (await getOrganisationStatuses()).map(
         (status) => ({
           id: status.id,
           name: status.name,

@@ -4,7 +4,7 @@ jest.mock("./../../../src/infrastructure/config", () =>
 jest.mock("./../../../src/infrastructure/logger", () =>
   require("../../utils").loggerMockFactory(),
 );
-jest.mock("./../../../src/infrastructure/organisations");
+jest.mock("login.dfe.api-client/organisations");
 jest.mock("login.dfe.api-client/services");
 
 jest.mock("login.dfe.api-client/users", () => {
@@ -17,9 +17,7 @@ jest.mock("login.dfe.api-client/users", () => {
   };
 });
 
-const {
-  getOrganisationByIdV2,
-} = require("../../../src/infrastructure/organisations");
+const { getOrganisationRaw } = require("login.dfe.api-client/organisations");
 const { getRequestMock, getResponseMock } = require("../../utils");
 const organisationUserList = require("../../../src/app/services/organisationUserList");
 
@@ -49,7 +47,7 @@ const usersResult = {
 
 describe("when displaying organisation users", () => {
   beforeEach(() => {
-    getOrganisationByIdV2.mockReset().mockReturnValue(orgResult);
+    getOrganisationRaw.mockReset().mockReturnValue(orgResult);
 
     searchUsersRaw.mockReset().mockReturnValue(usersResult);
   });
@@ -501,8 +499,10 @@ describe("when displaying organisation users", () => {
 
       await action(req, res);
 
-      expect(getOrganisationByIdV2).toHaveBeenCalledTimes(1);
-      expect(getOrganisationByIdV2).toHaveBeenCalledWith(orgResult.id, req.id);
+      expect(getOrganisationRaw).toHaveBeenCalledTimes(1);
+      expect(getOrganisationRaw).toHaveBeenCalledWith({
+        by: { organisationId: "org-1" },
+      });
     });
   });
 });

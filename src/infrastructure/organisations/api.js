@@ -157,43 +157,10 @@ const getOrganisationById = async (id, correlationId) => {
   );
 };
 
-const getUserOrganisations = async (userId, correlationId) => {
-  return await callOrganisationsApi(
-    `organisations/associated-with-user/${userId}`,
-    "GET",
-    undefined,
-    correlationId,
-  );
-};
-
-const getOrganisationByIdV2 = async (id, correlationId) => {
-  return await callOrganisationsApi(
-    `organisations/v2/${id}`,
-    "GET",
-    undefined,
-    correlationId,
-  );
-};
-
-const getOrganisationCategories = async (correlationId) =>
-  callOrganisationsApi(
-    "organisations/categories",
-    "GET",
-    undefined,
-    correlationId,
-  );
-
-const listOrganisationStatus = async (correlationId) =>
-  callOrganisationsApi("organisations/states", "GET", undefined, correlationId);
-
 module.exports = {
   getInvitationOrganisations,
   getAllUserOrganisations,
   searchOrganisations,
   getOrganisationById,
-  getUserOrganisations,
-  getOrganisationByIdV2,
   searchOrgsAssociatedWithService,
-  getOrganisationCategories,
-  listOrganisationStatus,
 };
