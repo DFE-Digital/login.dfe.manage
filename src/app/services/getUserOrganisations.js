@@ -1,10 +1,12 @@
 const flatten = require("lodash/flatten");
 const uniq = require("lodash/uniq");
 const {
-  getAllUserOrganisations,
-  getInvitationOrganisations,
-} = require("../../infrastructure/organisations");
-const { getUsersRaw } = require("login.dfe.api-client/users");
+  getUsersRaw,
+  getUserOrganisationsWithServicesRaw,
+} = require("login.dfe.api-client/users");
+const {
+  getInvitationOrganisationsRaw,
+} = require("login.dfe.api-client/invitations");
 const {
   getUserDetails,
   getUserServiceRoles,
@@ -24,17 +26,15 @@ const getApproverDetails = async (organisation) => {
     return [];
   }
   const approverDetails = await getUsersRaw({
-    by: {
-      userIds: distinctApproverIds,
-    },
+    by: { userIds: distinctApproverIds },
   });
   return approverDetails;
 };
 
 const getOrganisations = async (userId, correlationId) => {
   const orgMapping = userId.startsWith("inv-")
-    ? await getInvitationOrganisations(userId.substr(4), correlationId)
-    : await getAllUserOrganisations(userId, correlationId);
+    ? await getInvitationOrganisationsRaw({ invitationId: userId.substr(4) })
+    : await getUserOrganisationsWithServicesRaw({ userId });
   if (!orgMapping) {
     return [];
   }

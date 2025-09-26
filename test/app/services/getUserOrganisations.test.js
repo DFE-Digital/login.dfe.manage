@@ -10,18 +10,20 @@ jest.mock("../../../src/app/services/utils", () =>
   ]),
 );
 jest.mock("login.dfe.api-client/services");
-jest.mock("./../../../src/infrastructure/organisations");
 jest.mock("login.dfe.api-client/users");
+jest.mock("login.dfe.api-client/invitations");
 jest.mock("../../../src/infrastructure/access");
 
 const logger = require("../../../src/infrastructure/logger");
 const { getRequestMock, getResponseMock } = require("../../utils");
 const getUserOrganisations = require("../../../src/app/services/getUserOrganisations");
 const {
-  getAllUserOrganisations,
-  getInvitationOrganisations,
-} = require("../../../src/infrastructure/organisations");
-const { getUsersRaw } = require("login.dfe.api-client/users");
+  getUsersRaw,
+  getUserOrganisationsWithServicesRaw,
+} = require("login.dfe.api-client/users");
+const {
+  getInvitationOrganisationsRaw,
+} = require("login.dfe.api-client/invitations");
 const { getUserDetails } = require("../../../src/app/services/utils");
 const { getServicesForUser } = require("../../../src/infrastructure/access");
 
@@ -100,8 +102,8 @@ describe("when getting users organisation details", () => {
       },
     ]);
 
-    getAllUserOrganisations.mockReset();
-    getAllUserOrganisations.mockReturnValue([
+    getUserOrganisationsWithServicesRaw.mockReset();
+    getUserOrganisationsWithServicesRaw.mockReturnValue([
       {
         organisation: {
           id: "88a1ed39-5a98-43da-b66e-78e564ea72b0",
@@ -140,8 +142,8 @@ describe("when getting users organisation details", () => {
       },
     ]);
 
-    getInvitationOrganisations.mockReset();
-    getInvitationOrganisations.mockReturnValue([
+    getInvitationOrganisationsRaw.mockReset();
+    getInvitationOrganisationsRaw.mockReturnValue([
       {
         organisation: {
           id: "88a1ed39-5a98-43da-b66e-78e564ea72b0",
@@ -204,9 +206,10 @@ describe("when getting users organisation details", () => {
   it("then it should get organisations mapping for user where they have the service", async () => {
     await getUserOrganisations(req, res);
 
-    expect(getAllUserOrganisations.mock.calls).toHaveLength(1);
-    expect(getAllUserOrganisations.mock.calls[0][0]).toBe("user1");
-    expect(getAllUserOrganisations.mock.calls[0][1]).toBe("correlationId");
+    expect(getUserOrganisationsWithServicesRaw.mock.calls).toHaveLength(1);
+    expect(getUserOrganisationsWithServicesRaw).toHaveBeenCalledWith({
+      userId: "user1",
+    });
 
     expect(res.render.mock.calls[0][1].organisations).toHaveLength(2);
     expect(res.render.mock.calls[0][1].organisations[0]).toMatchObject({
@@ -226,9 +229,10 @@ describe("when getting users organisation details", () => {
 
     await getUserOrganisations(req, res);
 
-    expect(getInvitationOrganisations.mock.calls).toHaveLength(1);
-    expect(getInvitationOrganisations.mock.calls[0][0]).toBe("invitation1");
-    expect(getInvitationOrganisations.mock.calls[0][1]).toBe("correlationId");
+    expect(getInvitationOrganisationsRaw.mock.calls).toHaveLength(1);
+    expect(getInvitationOrganisationsRaw).toHaveBeenCalledWith({
+      invitationId: "invitation1",
+    });
 
     expect(res.render.mock.calls[0][1].organisations).toHaveLength(2);
     expect(res.render.mock.calls[0][1].organisations[0]).toMatchObject({

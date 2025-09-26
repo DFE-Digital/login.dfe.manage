@@ -114,8 +114,6 @@ describe("When getting users search ", () => {
   it("then it should include users", async () => {
     await get(req, res);
 
-    console.log(res.render.mock.calls[0][1]);
-
     expect(res.render.mock.calls[0][1]).toMatchObject({
       users: [
         {
