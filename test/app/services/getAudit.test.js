@@ -10,10 +10,10 @@ jest.mock("../../../src/app/services/utils", () =>
 jest.mock("login.dfe.api-client/users");
 jest.mock("login.dfe.api-client/services");
 jest.mock("./../../../src/infrastructure/utils");
-jest.mock("./../../../src/infrastructure/organisations");
 jest.mock("./../../../src/infrastructure/serviceMapping");
 jest.mock("./../../../src/infrastructure/audit");
 jest.mock("ioredis");
+jest.mock("login.dfe.api-client/organisations");
 
 const {
   getUserDetails,

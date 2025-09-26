@@ -21,22 +21,21 @@ jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
   getServiceRolesRaw: jest.fn(),
 }));
-jest.mock("./../../../src/infrastructure/organisations");
 jest.mock("login.dfe.api-client/organisations");
 
 const { NotificationClient } = require("login.dfe.jobs-client");
 const {
   getUserOrganisationsWithServicesRaw,
 } = require("login.dfe.api-client/users");
-const {
-  getInvitationOrganisations,
-} = require("../../../src/infrastructure/organisations");
 const { getOrganisationRaw } = require("login.dfe.api-client/organisations");
 
 const logger = require("../../../src/infrastructure/logger");
 const { getRequestMock, getResponseMock } = require("../../utils");
 const { addServiceToUser } = require("login.dfe.api-client/users");
-const { addServiceToInvitation } = require("login.dfe.api-client/invitations");
+const {
+  addServiceToInvitation,
+  getInvitationOrganisationsRaw,
+} = require("login.dfe.api-client/invitations");
 
 const { getUserDetails } = require("../../../src/app/services/utils");
 const {
@@ -138,8 +137,8 @@ describe("when confirm associating a service to user", () => {
       },
     ]);
 
-    getInvitationOrganisations.mockReset();
-    getInvitationOrganisations.mockReturnValue([
+    getInvitationOrganisationsRaw.mockReset();
+    getInvitationOrganisationsRaw.mockReturnValue([
       {
         invitationId: "E89DF8C6-BED4-480D-9F02-34D177E86DAD",
         organisation: {
