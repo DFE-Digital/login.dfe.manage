@@ -2,6 +2,7 @@ const flatten = require("lodash/flatten");
 const uniq = require("lodash/uniq");
 const {
   getUsersRaw,
+  getUserServicesRaw,
   getUserOrganisationsWithServicesRaw,
 } = require("login.dfe.api-client/users");
 const {
@@ -15,9 +16,8 @@ const {
 const logger = require("../../infrastructure/logger");
 const { getServiceRaw } = require("login.dfe.api-client/services");
 const {
-  getServicesForUser,
-  getAllInvitationServices,
-} = require("../../infrastructure/access");
+  getInvitationServicesRaw,
+} = require("login.dfe.api-client/invitations");
 
 const getApproverDetails = async (organisation) => {
   const allApproverIds = flatten(organisation.map((org) => org.approvers));
@@ -31,7 +31,7 @@ const getApproverDetails = async (organisation) => {
   return approverDetails;
 };
 
-const getOrganisations = async (userId, correlationId) => {
+const getOrganisations = async (userId) => {
   const orgMapping = userId.startsWith("inv-")
     ? await getInvitationOrganisationsRaw({ invitationId: userId.substr(4) })
     : await getUserOrganisationsWithServicesRaw({ userId });
@@ -64,8 +64,8 @@ const getOrganisations = async (userId, correlationId) => {
       );
 
       const selectedUserServices = userId.startsWith("inv-")
-        ? await getAllInvitationServices(userId.substr(4), correlationId)
-        : await getServicesForUser(userId, correlationId);
+        ? await getInvitationServicesRaw({ userInvitationId: userId.substr(4) })
+        : await getUserServicesRaw({ userId });
 
       const userOrgServices =
         selectedUserServices?.filter(
@@ -104,7 +104,7 @@ const getOrganisations = async (userId, correlationId) => {
 const getUserOrganisations = async (req, res) => {
   const user = await getUserDetails(req);
 
-  const organisations = await getOrganisations(user.id, req.id);
+  const organisations = await getOrganisations(user.id);
   const visibleOrganisations = organisations
     .filter((o) => o.status?.id !== 0)
     .map((org) => {

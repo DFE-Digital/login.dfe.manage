@@ -1,4 +1,4 @@
-const { getSingleUserService } = require("../access");
+const { getUserServiceRaw } = require("login.dfe.api-client/users");
 const config = require("../config");
 
 const isLoggedIn = (req, res, next) => {
@@ -72,12 +72,11 @@ const setUserContext = async (req, res, next) => {
   if (req.user) {
     res.locals.user = req.user;
     res.locals.displayName = getUserDisplayName(req.user);
-    req.userServices = await getSingleUserService(
-      req.user.sub,
-      config.access.identifiers.service,
-      config.access.identifiers.organisation,
-      req.id,
-    );
+    req.userServices = await getUserServiceRaw({
+      userId: req.user.sub,
+      serviceId: config.access.identifiers.service,
+      organisationId: config.access.identifiers.organisation,
+    });
   }
   next();
 };

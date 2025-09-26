@@ -10,9 +10,9 @@ jest.mock("../../../src/app/services/utils", () =>
     "getReturnUrl",
   ]),
 );
-
-jest.mock("./../../../src/infrastructure/access");
+jest.mock("login.dfe.api-client/users");
 jest.mock("login.dfe.api-client/organisations");
+jest.mock("login.dfe.api-client/invitations");
 jest.mock("login.dfe.policy-engine");
 jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
@@ -21,11 +21,9 @@ jest.mock("login.dfe.api-client/services", () => ({
 const { getServiceRaw } = require("login.dfe.api-client/services");
 const PolicyEngine = require("login.dfe.policy-engine");
 const { getRequestMock, getResponseMock } = require("../../utils");
-const {
-  getSingleUserService,
-  getSingleInvitationService,
-} = require("../../../src/infrastructure/access");
+const { getInvitationServiceRaw } = require("login.dfe.api-client/invitations");
 const { getOrganisationRaw } = require("login.dfe.api-client/organisations");
+const { getUserServiceRaw } = require("login.dfe.api-client/users");
 
 const policyEngine = {
   validate: jest.fn(),
@@ -47,16 +45,16 @@ describe("when selecting the roles for a service", () => {
     req.body = {
       role: ["role1"],
     };
-    getSingleUserService.mockReset();
-    getSingleUserService.mockReturnValue({
+    getUserServiceRaw.mockReset();
+    getUserServiceRaw.mockReturnValue({
       id: "service1",
       dateActivated: "10/10/2018",
       name: "service name",
       status: "active",
     });
 
-    getSingleInvitationService.mockReset();
-    getSingleInvitationService.mockReturnValue({
+    getInvitationServiceRaw.mockReset();
+    getInvitationServiceRaw.mockReturnValue({
       id: "service1",
       dateActivated: "10/10/2018",
       name: "service name",

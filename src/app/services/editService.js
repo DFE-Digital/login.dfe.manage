@@ -1,11 +1,9 @@
 const PolicyEngine = require("login.dfe.policy-engine");
 const config = require("../../infrastructure/config");
-const {
-  getSingleUserService,
-  getSingleInvitationService,
-} = require("../../infrastructure/access");
+const { getUserServiceRaw } = require("login.dfe.api-client/users");
 const { getServiceRaw } = require("login.dfe.api-client/services");
 const { getOrganisationRaw } = require("login.dfe.api-client/organisations");
+const { getInvitationServiceRaw } = require("login.dfe.api-client/invitations");
 const {
   getUserDetails,
   getUserServiceRoles,
@@ -15,25 +13,14 @@ const {
 
 const policyEngine = new PolicyEngine(config);
 
-const getSingleServiceForUser = async (
-  userId,
-  organisationId,
-  serviceId,
-  correlationId,
-) => {
+const getSingleServiceForUser = async (userId, organisationId, serviceId) => {
   const userService = userId.startsWith("inv-")
-    ? await getSingleInvitationService(
-        userId.substr(4),
+    ? await getInvitationServiceRaw({
+        invitationId: userId.substr(4),
         serviceId,
         organisationId,
-        correlationId,
-      )
-    : await getSingleUserService(
-        userId,
-        serviceId,
-        organisationId,
-        correlationId,
-      );
+      })
+    : await getUserServiceRaw({ userId, serviceId, organisationId });
   const application = await getServiceRaw({
     by: { serviceId: userService.serviceId },
   });
@@ -53,7 +40,6 @@ const getViewModel = async (req) => {
     req.params.uid,
     req.params.oid,
     req.params.sid,
-    req.id,
   );
   const policyResult = await policyEngine.getPolicyApplicationResultsForUser(
     req.params.uid.startsWith("inv-") ? undefined : req.params.uid,

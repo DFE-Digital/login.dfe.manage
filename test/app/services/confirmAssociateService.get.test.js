@@ -11,19 +11,19 @@ jest.mock("../../../src/app/services/utils", () =>
   ]),
 );
 
-jest.mock("../../../src/infrastructure/access", () => ({
-  listRolesOfService: jest.fn(),
-}));
 jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
+  getServiceRolesRaw: jest.fn(),
 }));
 jest.mock("login.dfe.api-client/organisations");
 
 const { getRequestMock, getResponseMock } = require("../../utils");
-const { listRolesOfService } = require("../../../src/infrastructure/access");
 const { getOrganisationRaw } = require("login.dfe.api-client/organisations");
 const { getUserDetails } = require("../../../src/app/services/utils");
-const { getServiceRaw } = require("login.dfe.api-client/services");
+const {
+  getServiceRaw,
+  getServiceRolesRaw,
+} = require("login.dfe.api-client/services");
 const getConfirmAssociateService =
   require("../../../src/app/services/confirmAssociateService").get;
 
@@ -54,8 +54,8 @@ describe("when displaying the confirm associate service view", () => {
       status: "active",
     });
 
-    listRolesOfService.mockReset();
-    listRolesOfService.mockReturnValue([
+    getServiceRolesRaw.mockReset();
+    getServiceRolesRaw.mockReturnValue([
       {
         code: "role_code",
         id: "role_id",
@@ -91,9 +91,8 @@ describe("when displaying the confirm associate service view", () => {
   it("then it should get the selected roles details", async () => {
     await getConfirmAssociateService(req, res);
 
-    expect(listRolesOfService.mock.calls).toHaveLength(1);
-    expect(listRolesOfService.mock.calls[0][0]).toBe("service1");
-    expect(listRolesOfService.mock.calls[0][1]).toBe("correlationId");
+    expect(getServiceRolesRaw.mock.calls).toHaveLength(1);
+    expect(getServiceRolesRaw).toHaveBeenCalledWith({ serviceId: "service1" });
   });
 
   it("then it should get the org details", async () => {

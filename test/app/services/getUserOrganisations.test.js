@@ -19,13 +19,13 @@ const { getRequestMock, getResponseMock } = require("../../utils");
 const getUserOrganisations = require("../../../src/app/services/getUserOrganisations");
 const {
   getUsersRaw,
+  getUserServicesRaw,
   getUserOrganisationsWithServicesRaw,
 } = require("login.dfe.api-client/users");
 const {
   getInvitationOrganisationsRaw,
 } = require("login.dfe.api-client/invitations");
 const { getUserDetails } = require("../../../src/app/services/utils");
-const { getServicesForUser } = require("../../../src/infrastructure/access");
 
 const res = getResponseMock();
 
@@ -50,8 +50,8 @@ describe("when getting users organisation details", () => {
       id: "user1",
     });
 
-    getServicesForUser.mockReset();
-    getServicesForUser.mockReturnValue([
+    getUserServicesRaw.mockReset();
+    getUserServicesRaw.mockReturnValue([
       {
         userId: "user1",
         serviceId: "service1",

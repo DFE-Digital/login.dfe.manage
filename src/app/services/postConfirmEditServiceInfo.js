@@ -2,12 +2,10 @@ const logger = require("../../infrastructure/logger");
 const { updateService } = require("../../infrastructure/utils/services");
 const {
   getServiceRaw,
+  getServiceRolesRaw,
   getPaginatedServicesRaw,
 } = require("login.dfe.api-client/services");
-const {
-  listRolesOfService,
-  updateRole,
-} = require("../../infrastructure/access");
+const { updateRole } = require("../../infrastructure/access");
 const config = require("../../infrastructure/config");
 
 const postConfirmEditServiceInfo = async (req, res) => {
@@ -59,10 +57,9 @@ const postConfirmEditServiceInfo = async (req, res) => {
     );
     // Check for internal manage roles and update service name to new one
     const manageServiceId = config.access.identifiers.service;
-    const rolesOfService = await listRolesOfService(
-      manageServiceId,
-      correlationId,
-    );
+    const rolesOfService = await getServiceRolesRaw({
+      serviceId: manageServiceId,
+    });
     // Internal manage role codes are in the form of 'serviceId_role' (e.g., service-id_serviceconfig)
     const roles = rolesOfService.filter((role) =>
       role.code.toLowerCase().startsWith(serviceId.toLowerCase()),
