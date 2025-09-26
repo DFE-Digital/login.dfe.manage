@@ -19,6 +19,7 @@ const { getRequestMock, getResponseMock } = require("../../utils");
 const getUserOrganisations = require("../../../src/app/services/getUserOrganisations");
 const {
   getUsersRaw,
+  getUserServicesRaw,
   getUserOrganisationsWithServicesRaw,
 } = require("login.dfe.api-client/users");
 const {

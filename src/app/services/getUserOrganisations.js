@@ -2,6 +2,7 @@ const flatten = require("lodash/flatten");
 const uniq = require("lodash/uniq");
 const {
   getUsersRaw,
+  getUserServicesRaw,
   getUserOrganisationsWithServicesRaw,
 } = require("login.dfe.api-client/users");
 const {
@@ -30,7 +31,7 @@ const getApproverDetails = async (organisation) => {
   return approverDetails;
 };
 
-const getOrganisations = async (userId, correlationId) => {
+const getOrganisations = async (userId) => {
   const orgMapping = userId.startsWith("inv-")
     ? await getInvitationOrganisationsRaw({ invitationId: userId.substr(4) })
     : await getUserOrganisationsWithServicesRaw({ userId });
@@ -103,7 +104,7 @@ const getOrganisations = async (userId, correlationId) => {
 const getUserOrganisations = async (req, res) => {
   const user = await getUserDetails(req);
 
-  const organisations = await getOrganisations(user.id, req.id);
+  const organisations = await getOrganisations(user.id);
   const visibleOrganisations = organisations
     .filter((o) => o.status?.id !== 0)
     .map((org) => {
