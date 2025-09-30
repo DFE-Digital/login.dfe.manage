@@ -1,10 +1,12 @@
-const { getServiceRaw } = require("login.dfe.api-client/services");
+const {
+  getServiceRaw,
+  getServiceRolesRaw,
+} = require("login.dfe.api-client/services");
 const { updateUserServiceRoles } = require("login.dfe.api-client/users");
 const { getOrganisationRaw } = require("login.dfe.api-client/organisations");
 const {
   updateInvitationServiceRoles,
 } = require("login.dfe.api-client/invitations");
-const { listRolesOfService } = require("../../infrastructure/access");
 const {
   getUserDetails,
   getUserServiceRoles,
@@ -16,7 +18,9 @@ const getModel = async (req) => {
   const service = await getServiceRaw({
     by: { serviceId: req.params.sid },
   });
-  const allRolesForService = await listRolesOfService(req.params.sid, req.id);
+  const allRolesForService = await getServiceRolesRaw({
+    serviceId: req.params.sid,
+  });
   const selectedRoleIds = req.session.service.roles;
   const roleDetails = allRolesForService.filter((x) =>
     selectedRoleIds.find((y) => y.toLowerCase() === x.id.toLowerCase()),

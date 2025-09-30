@@ -2,9 +2,11 @@ const {
   AUTHENTICATION_FLOWS,
   AUTHENTICATION_FLOWS_PATTERNS,
 } = require("../../constants/serviceConfigConstants");
-const { getUserRaw } = require("login.dfe.api-client/users");
+const {
+  getUserRaw,
+  getUserServicesRaw,
+} = require("login.dfe.api-client/users");
 const { getInvitationRaw } = require("login.dfe.api-client/invitations");
-const { getServicesForUser } = require("../../infrastructure/access");
 const {
   mapUserStatus,
   mapSearchUserToSupportModel,
@@ -40,7 +42,7 @@ const mapUserToSupportModel = (user, userFromSearch) => ({
   pendingEmail: userFromSearch.pendingEmail,
 });
 
-const getUserDetailsById = async (uid, correlationId) => {
+const getUserDetailsById = async (uid) => {
   if (uid.startsWith("inv-")) {
     const invitation = await getInvitationRaw({ by: { id: uid.substr(4) } });
     return {
@@ -62,7 +64,7 @@ const getUserDetailsById = async (uid, correlationId) => {
   );
   const rawUser = await getUserRaw({ by: { id: uid } });
   const user = mapUserToSupportModel(rawUser, userSearch);
-  const serviceDetails = await getServicesForUser(uid, correlationId);
+  const serviceDetails = await getUserServicesRaw({ userId: uid });
 
   const ktsDetails = serviceDetails
     ? serviceDetails.find(
@@ -99,8 +101,7 @@ const getUserDetailsById = async (uid, correlationId) => {
   };
 };
 
-const getUserDetails = async (req) =>
-  getUserDetailsById(req.params.uid, req.id);
+const getUserDetails = async (req) => getUserDetailsById(req.params.uid);
 
 const getFriendlyUser = async (userId) => {
   const user = await getUserRaw({ by: { id: userId } });

@@ -17,15 +17,11 @@ jest.mock("login.dfe.api-client/invitations", () => ({
   updateInvitationServiceRoles: jest.fn(),
 }));
 jest.mock("./../../../src/infrastructure/utils/banners");
-
-jest.mock("./../../../src/infrastructure/access", () => ({
-  listRolesOfService: jest.fn(),
-}));
-
+jest.mock("login.dfe.api-client/organisations");
 jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
+  getServiceRolesRaw: jest.fn(),
 }));
-jest.mock("login.dfe.api-client/organisations");
 
 const logger = require("../../../src/infrastructure/logger");
 const { getRequestMock, getResponseMock } = require("../../utils");
@@ -33,10 +29,12 @@ const {
   updateInvitationServiceRoles,
 } = require("login.dfe.api-client/invitations");
 const { updateUserServiceRoles } = require("login.dfe.api-client/users");
-const { listRolesOfService } = require("../../../src/infrastructure/access");
 const { getOrganisationRaw } = require("login.dfe.api-client/organisations");
 const { getUserDetails } = require("../../../src/app/services/utils");
-const { getServiceRaw } = require("login.dfe.api-client/services");
+const {
+  getServiceRaw,
+  getServiceRolesRaw,
+} = require("login.dfe.api-client/services");
 const postConfirmEditService =
   require("../../../src/app/services/confirmEditService").post;
 
@@ -67,8 +65,8 @@ describe("when editing a service for a user", () => {
       status: "active",
     });
 
-    listRolesOfService.mockReset();
-    listRolesOfService.mockReturnValue([
+    getServiceRolesRaw.mockReset();
+    getServiceRolesRaw.mockReturnValue([
       {
         code: "role_code",
         id: "role_id",

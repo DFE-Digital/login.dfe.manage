@@ -13,16 +13,13 @@ jest.mock("../../../src/app/services/utils", () =>
 jest.mock("login.dfe.api-client/users");
 jest.mock("login.dfe.api-client/invitations");
 
-jest.mock("./../../../src/infrastructure/access", () => ({
-  listRolesOfService: jest.fn(),
-}));
-
 jest.mock("login.dfe.jobs-client", () => ({
   NotificationClient: jest.fn(),
 }));
 
 jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
+  getServiceRolesRaw: jest.fn(),
 }));
 jest.mock("login.dfe.api-client/organisations");
 
@@ -34,7 +31,6 @@ const { getOrganisationRaw } = require("login.dfe.api-client/organisations");
 
 const logger = require("../../../src/infrastructure/logger");
 const { getRequestMock, getResponseMock } = require("../../utils");
-const { listRolesOfService } = require("../../../src/infrastructure/access");
 const { addServiceToUser } = require("login.dfe.api-client/users");
 const {
   addServiceToInvitation,
@@ -42,7 +38,10 @@ const {
 } = require("login.dfe.api-client/invitations");
 
 const { getUserDetails } = require("../../../src/app/services/utils");
-const { getServiceRaw } = require("login.dfe.api-client/services");
+const {
+  getServiceRaw,
+  getServiceRolesRaw,
+} = require("login.dfe.api-client/services");
 const postConfirmAssociateService =
   require("../../../src/app/services/confirmAssociateService").post;
 
@@ -96,8 +95,8 @@ describe("when confirm associating a service to user", () => {
       status: "active",
     });
 
-    listRolesOfService.mockReset();
-    listRolesOfService.mockReturnValue([
+    getServiceRolesRaw.mockReset();
+    getServiceRolesRaw.mockReturnValue([
       {
         code: "role_code",
         id: "role_id",
@@ -209,9 +208,8 @@ describe("when confirm associating a service to user", () => {
   it("then it should send an email notification to user", async () => {
     await postConfirmAssociateService(req, res);
 
-    expect(listRolesOfService.mock.calls).toHaveLength(1);
-    expect(listRolesOfService.mock.calls[0][0]).toBe("service1");
-    expect(listRolesOfService.mock.calls[0][1]).toBe("correlationId");
+    expect(getServiceRolesRaw.mock.calls).toHaveLength(1);
+    expect(getServiceRolesRaw).toHaveBeenCalledWith({ serviceId: "service1" });
 
     expect(sendServiceRequestApprovedStub.mock.calls).toHaveLength(1);
     expect(sendServiceRequestApprovedStub.mock.calls[0][0]).toBe(
