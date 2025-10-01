@@ -81,24 +81,17 @@ describe("when using the getConfirmCreatePolicyCondition function", () => {
     );
   });
 
-  it("should include csrf token in model", async () => {
-    await getConfirmCreatePolicyCondition(req, res);
-
-    expect(res.render.mock.calls[0][1]).toMatchObject({
-      csrfToken: "token",
-    });
-  });
-
   it("should include the following in the model on success", async () => {
     await getConfirmCreatePolicyCondition(req, res);
 
-    expect(res.render.mock.calls[0][1]).toMatchObject({
+    expect(res.render.mock.calls[0][1]).toStrictEqual({
       condition: "organisation.urn",
       operator: "is",
       value: "123456",
       backLink: "/services/service-1/policies/policy-1/create-policy-condition",
       cancelLink:
         "/services/service-1/policies/policy-1/create-policy-condition",
+      serviceId: "service-1",
       csrfToken: "token",
       currentNavigation: "policies",
       policy: policy,

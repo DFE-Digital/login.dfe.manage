@@ -172,6 +172,7 @@ describe("when posting the create policy condition page", () => {
     expect(res.render.mock.calls[0][1]).toMatchObject({
       backLink: "/services/service-1/policies/policy-1/conditionsAndRoles",
       cancelLink: "/services/service-1/policies/policy-1/conditionsAndRoles",
+      serviceId: "service-1",
       csrfToken: "token",
       currentNavigation: "policies",
       policy: policy,

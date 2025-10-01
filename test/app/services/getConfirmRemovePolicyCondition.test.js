@@ -86,18 +86,10 @@ describe("when using the getConfirmRemovePolicyCondition function", () => {
     );
   });
 
-  it("should include csrf token in model", async () => {
-    await getConfirmRemovePolicyCondition(req, res);
-
-    expect(res.render.mock.calls[0][1]).toMatchObject({
-      csrfToken: "token",
-    });
-  });
-
   it("should include the following in the model on success", async () => {
     await getConfirmRemovePolicyCondition(req, res);
 
-    expect(res.render.mock.calls[0][1]).toMatchObject({
+    expect(res.render.mock.calls[0][1]).toStrictEqual({
       condition: "organisation.urn",
       operator: "is",
       value: "123456",
@@ -105,6 +97,7 @@ describe("when using the getConfirmRemovePolicyCondition function", () => {
       friendlyValue: ["123456"],
       backLink: "/services/service-1/policies/policy-1/conditionsAndRoles",
       cancelLink: "/services/service-1/policies/policy-1/conditionsAndRoles",
+      serviceId: "service-1",
       csrfToken: "token",
       currentNavigation: "policies",
       policy: policy,

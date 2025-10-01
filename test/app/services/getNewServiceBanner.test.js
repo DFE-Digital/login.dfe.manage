@@ -48,14 +48,6 @@ describe("when getting the create new service banner view", () => {
     expect(res.render.mock.calls[0][0]).toBe("services/views/newServiceBanner");
   });
 
-  it("then it should include csrf token", async () => {
-    await getNewServiceBanner(req, res);
-
-    expect(res.render.mock.calls[0][1]).toMatchObject({
-      csrfToken: "token",
-    });
-  });
-
   it("then it should get the banner by id if editing banner", async () => {
     await getNewServiceBanner(req, res);
 
@@ -66,7 +58,7 @@ describe("when getting the create new service banner view", () => {
     });
   });
 
-  it("then it should include the banner being edited details", async () => {
+  it("then it should include the banner being edited details and csrf token", async () => {
     await getNewServiceBanner(req, res);
 
     expect(res.render.mock.calls[0][1]).toMatchObject({
@@ -74,6 +66,7 @@ describe("when getting the create new service banner view", () => {
       name: "banner name",
       bannerTitle: "banner title",
       message: "banner message",
+      csrfToken: "token",
     });
   });
 
