@@ -73,14 +73,6 @@ describe("When displaying the selected policy's conditions and roles", () => {
     );
   });
 
-  it("then it should include csrf token", async () => {
-    await getPolicyConditions(req, res);
-
-    expect(res.render.mock.calls[0][1]).toMatchObject({
-      csrfToken: "token",
-    });
-  });
-
   it("then it should get the service by id", async () => {
     await getPolicyConditions(req, res);
 
@@ -100,10 +92,11 @@ describe("When displaying the selected policy's conditions and roles", () => {
     });
   });
 
-  it("then it should include the mapped policy", async () => {
+  it("then it should include the mapped policy and csrf token", async () => {
     await getPolicyConditions(req, res);
 
     expect(res.render.mock.calls[0][1]).toMatchObject({
+      csrfToken: "token",
       policy: {
         applicationId: "service1",
         conditions: [

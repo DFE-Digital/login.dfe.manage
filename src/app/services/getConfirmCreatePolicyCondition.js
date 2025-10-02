@@ -21,6 +21,7 @@ const getConfirmCreatePolicyCondition = async (req, res) => {
     policy,
     cancelLink: `/services/${req.params.sid}/policies/${req.params.pid}/create-policy-condition`,
     backLink: `/services/${req.params.sid}/policies/${req.params.pid}/create-policy-condition`,
+    serviceId: req.params.sid,
     currentNavigation: "policies",
     userRoles: manageRolesForService,
   });

@@ -163,26 +163,18 @@ describe("when getting the Review service config changes page", () => {
     );
   });
 
-  it("then it should include csrf token in model", async () => {
+  it("then it should include correct data in model", async () => {
     await getConfirmServiceConfig(req, res);
 
     expect(res.render.mock.calls[0][1]).toMatchObject({
       csrfToken: "token",
+      backLink: "/services/service1/service-configuration",
+      cancelLink: "/services/service1",
+      currentNavigation: "configuration",
+      service: {
+        name: "service one",
+      },
     });
-  });
-
-  it("then it should set the back link correctly in the model", async () => {
-    await getConfirmServiceConfig(req, res);
-
-    expect(res.render.mock.calls[0][1].backLink).toBe(
-      "/services/service1/service-configuration",
-    );
-  });
-
-  it("then it should set the cancel link correctly in the model", async () => {
-    await getConfirmServiceConfig(req, res);
-
-    expect(res.render.mock.calls[0][1].cancelLink).toBe("/services/service1");
   });
 
   it("then it should include user roles in the model", async () => {
@@ -191,24 +183,6 @@ describe("when getting the Review service config changes page", () => {
 
     await getConfirmServiceConfig(req, res);
     expect(res.render.mock.calls[0][1].userRoles).toEqual(mockRoles);
-  });
-
-  it('then it should set currentNavigation to "configuration"', async () => {
-    await getConfirmServiceConfig(req, res);
-
-    expect(res.render.mock.calls[0][1].currentNavigation).toEqual(
-      "configuration",
-    );
-  });
-
-  it("then it should include the service name in the model", async () => {
-    await getConfirmServiceConfig(req, res);
-
-    expect(res.render.mock.calls[0][1]).toMatchObject({
-      service: {
-        name: "service one",
-      },
-    });
   });
 
   it("then it should include sorted serviceChanges, with the right description and the right change link in the model", async () => {

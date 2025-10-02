@@ -79,18 +79,11 @@ describe("when displaying the remove service access view", () => {
     expect(res.render.mock.calls[0][0]).toBe("services/views/removeService");
   });
 
-  it("then it should include csrf token", async () => {
+  it("then it should include the service details and csrf token", async () => {
     await getRemoveService(req, res);
 
     expect(res.render.mock.calls[0][1]).toMatchObject({
       csrfToken: "token",
-    });
-  });
-
-  it("then it should include the service details", async () => {
-    await getRemoveService(req, res);
-
-    expect(res.render.mock.calls[0][1]).toMatchObject({
       service: {
         id: "service1",
         dateActivated: "10/10/2018",

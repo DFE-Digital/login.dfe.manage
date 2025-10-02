@@ -100,18 +100,11 @@ describe("when getting the list of service banners page", () => {
     expect(res.render.mock.calls[0][0]).toBe("services/views/serviceBanners");
   });
 
-  it("then it should include csrf token in model", async () => {
+  it("then it should include the service banners list in the model and csrf token", async () => {
     await getServiceBanners(req, res);
 
     expect(res.render.mock.calls[0][1]).toMatchObject({
       csrfToken: "token",
-    });
-  });
-
-  it("then it should include the service banners list in the model", async () => {
-    await getServiceBanners(req, res);
-
-    expect(res.render.mock.calls[0][1]).toMatchObject({
       serviceBanners: [
         {
           serviceId: "serviceid",

@@ -127,6 +127,7 @@ const postCreatePolicyCondition = async (req, res) => {
       policy,
       cancelLink: `/services/${req.params.sid}/policies/${req.params.pid}/conditionsAndRoles`,
       backLink: `/services/${req.params.sid}/policies/${req.params.pid}/conditionsAndRoles`,
+      serviceId: req.params.sid,
       currentNavigation: "policies",
       userRoles: manageRolesForService,
     });
@@ -150,6 +151,7 @@ const postCreatePolicyCondition = async (req, res) => {
         policy,
         cancelLink: `/services/${req.params.sid}/policies/${req.params.pid}/conditionsAndRoles`,
         backLink: `/services/${req.params.sid}/policies/${req.params.pid}/conditionsAndRoles`,
+        serviceId: req.params.sid,
         currentNavigation: "policies",
         userRoles: manageRolesForService,
       });
