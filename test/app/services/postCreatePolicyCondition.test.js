@@ -160,6 +160,51 @@ describe("when posting the create policy condition page", () => {
     );
   });
 
+  it("should redirect to the confirm page on success with IsOnAPAR with correct value", async () => {
+    const testRequestBody = JSON.parse(JSON.stringify(requestBody));
+    testRequestBody.body.condition = "organisation.IsOnAPAR";
+    testRequestBody.body.value = "YES";
+    testRequestBody.session = { save: jest.fn((cb) => cb()) };
+    const testReq = getRequestMock(testRequestBody);
+
+    await postCreatePolicyCondition(testReq, res);
+
+    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toBe(
+      "confirm-create-policy-condition",
+    );
+  });
+
+  it("should redirect to the confirm page on success with phaseOfEducation with correct value", async () => {
+    const testRequestBody = JSON.parse(JSON.stringify(requestBody));
+    testRequestBody.body.condition = "organisation.phaseOfEducation.id";
+    testRequestBody.body.value = "1";
+    testRequestBody.session = { save: jest.fn((cb) => cb()) };
+    const testReq = getRequestMock(testRequestBody);
+
+    await postCreatePolicyCondition(testReq, res);
+
+    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toBe(
+      "confirm-create-policy-condition",
+    );
+  });
+
+  it("should redirect to the confirm page on success with localAuthority with correct value", async () => {
+    const testRequestBody = JSON.parse(JSON.stringify(requestBody));
+    testRequestBody.body.condition = "organisation.localAuthority.id";
+    testRequestBody.body.value = "201";
+    testRequestBody.session = { save: jest.fn((cb) => cb()) };
+    const testReq = getRequestMock(testRequestBody);
+
+    await postCreatePolicyCondition(testReq, res);
+
+    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toBe(
+      "confirm-create-policy-condition",
+    );
+  });
+
   it("should return a validation error when the condition is missing", async () => {
     const testRequestBody = JSON.parse(JSON.stringify(requestBody));
     testRequestBody.body.condition = "";
@@ -280,6 +325,46 @@ describe("when posting the create policy condition page", () => {
 
     expect(res.render.mock.calls[0][1].validationMessages).toMatchObject({
       value: "organisation.category.id can only be a 3 digit number",
+    });
+  });
+
+  it("should return a validation error when the IsOnAPAR is incorrect", async () => {
+    const testRequestBody = JSON.parse(JSON.stringify(requestBody));
+    testRequestBody.body.condition = "organisation.IsOnAPAR";
+    testRequestBody.body.value = "Yup";
+    const testReq = getRequestMock(testRequestBody);
+
+    await postCreatePolicyCondition(testReq, res);
+
+    expect(res.render.mock.calls[0][1].validationMessages).toMatchObject({
+      value: "organisation.IsOnAPAR can only be YES or NO",
+    });
+  });
+
+  it("should return a validation error when the phaseOfEducation is incorrect", async () => {
+    const testRequestBody = JSON.parse(JSON.stringify(requestBody));
+    testRequestBody.body.condition = "organisation.phaseOfEducation.id";
+    testRequestBody.body.value = "10";
+    const testReq = getRequestMock(testRequestBody);
+
+    await postCreatePolicyCondition(testReq, res);
+
+    expect(res.render.mock.calls[0][1].validationMessages).toMatchObject({
+      value:
+        "organisation.phaseOfEducation.id can only be a number between 0 and 7 inclusive",
+    });
+  });
+
+  it("should return a validation error when the localAuthority is incorrect", async () => {
+    const testRequestBody = JSON.parse(JSON.stringify(requestBody));
+    testRequestBody.body.condition = "organisation.localAuthority.id";
+    testRequestBody.body.value = "1234";
+    const testReq = getRequestMock(testRequestBody);
+
+    await postCreatePolicyCondition(testReq, res);
+
+    expect(res.render.mock.calls[0][1].validationMessages).toMatchObject({
+      value: "organisation.localAuthority.id can only be a 3 digit number",
     });
   });
 
