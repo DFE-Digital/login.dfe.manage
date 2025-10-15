@@ -101,17 +101,17 @@ describe("mapLastLoginValuesToDateValues utility function", () => {
     expect(result).toStrictEqual([1758672000000]);
   });
 
-  it("returns the number of milliseconds since the epoch, minus a week, when lastMonth is provided", () => {
+  it("returns the number of milliseconds since the epoch, minus a month, when lastMonth is provided", () => {
     const result = mapLastLoginValuesToDateValues(["lastMonth"]);
     expect(result).toStrictEqual([1756684800000]);
   });
 
-  it("returns the number of milliseconds since the epoch, minus a week, when last3Months is provided", () => {
+  it("returns the number of milliseconds since the epoch, minus 3 months, when last3Months is provided", () => {
     const result = mapLastLoginValuesToDateValues(["last3Months"]);
     expect(result).toStrictEqual([1751328000000]);
   });
 
-  it("returns the number of milliseconds since the epoch, minus a week, when last6Months is provided", () => {
+  it("returns the number of milliseconds since the epoch, minus 6 months, when last6Months is provided", () => {
     const result = mapLastLoginValuesToDateValues(["last6Months"]);
     expect(result).toStrictEqual([1743465600000]);
   });
