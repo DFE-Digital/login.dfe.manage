@@ -133,6 +133,17 @@ const getFriendlyOrganisation = async (organisationId) => {
   return `${organisation.name} (${identifiers})`;
 };
 
+const getFriendlyOrganisationUkprn = async (ukprn) => {
+  const organisation = await getOrganisationRaw({
+    by: { type: "UKPRN", identifierValue: ukprn },
+  });
+  if (!organisation) {
+    return ukprn;
+  }
+
+  return `${organisation.ukprn} (Name: ${organisation.name})`;
+};
+
 const getFriendlyOrganisationCategory = async (categoryId) => {
   const categories = [
     { id: "001", name: "Establishment" },
@@ -307,6 +318,10 @@ const getFriendlyValues = async (fieldName, values, correlationId) => {
       valueConverter: getFriendlyOrganisationCategory,
     },
     { source: "organisation.id", valueConverter: getFriendlyOrganisation },
+    {
+      source: "organisation.ukprn",
+      valueConverter: getFriendlyOrganisationUkprn,
+    },
     {
       source: "organisation.phaseOfEducation.id",
       valueConverter: getFriendlyOrganisationPhaseOfEducation,
