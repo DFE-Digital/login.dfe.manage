@@ -66,6 +66,26 @@ const validate = async (req, currentPolicyConditions) => {
           "organisation.category.id can only be a 3 digit number";
       }
     }
+    if (model.condition === "organisation.IsOnAPAR") {
+      if (model.value !== "YES" && model.value !== "NO") {
+        model.validationMessages.value =
+          "organisation.IsOnAPAR can only be YES or NO";
+      }
+    }
+    if (model.condition === "organisation.phaseOfEducation.id") {
+      const categoryRegex = /^[0-7]$/i;
+      if (!categoryRegex.test(model.value)) {
+        model.validationMessages.value =
+          "organisation.phaseOfEducation.id can only be a number between 0 and 7 inclusive";
+      }
+    }
+    if (model.condition === "organisation.localAuthority.id") {
+      const categoryRegex = /^\d{3}$/i;
+      if (!categoryRegex.test(model.value)) {
+        model.validationMessages.value =
+          "organisation.localAuthority.id can only be a 3 digit number";
+      }
+    }
   }
 
   // Ensure all 3 fields are populated and have sensible values before doing more
