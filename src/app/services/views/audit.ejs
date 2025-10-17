@@ -60,6 +60,7 @@
                     <%
                         for (let i = 0; i < locals.audits.length; i++) {
                             const audit = locals.audits[i];
+                            const org = audit.organisation;
                     %>
                         <tr class="govuk-table__row">
                             <td class="govuk-table__cell govuk-!-font-size-16">
@@ -72,7 +73,12 @@
                                 <%= audit.service ? audit.service.name : '' %>
                             </td>
                             <td class="govuk-table__cell govuk-!-font-size-16">
-                                <%= audit.organisation ? audit.organisation.name: '' %>
+                                <%= org ? org.ukprn
+                                            ? `${org.name} (UKPRN: ${org.ukprn})`
+                                            : org.urn
+                                            ? `${org.name} (URN: ${org.urn})`
+                                            : `${org.name}`
+                                        : '' %>
                             </td>
                             <td class="govuk-table__cell govuk-!-font-size-16">
                                 <%= audit.result ? 'Success' : 'Failure' %>
