@@ -80,10 +80,9 @@ const validate = async (req, currentPolicyConditions) => {
       }
     }
     if (model.condition === "organisation.localAuthority.id") {
-      const categoryRegex = /^\d{3}$/i;
-      if (!categoryRegex.test(model.value)) {
+      if (!validateUUID(model.value)) {
         model.validationMessages.value =
-          "organisation.localAuthority.id can only be a 3 digit number";
+          "organisation.localAuthority.id needs to be a valid uuid";
       }
     }
   }

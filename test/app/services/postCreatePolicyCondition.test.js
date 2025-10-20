@@ -193,7 +193,7 @@ describe("when posting the create policy condition page", () => {
   it("should redirect to the confirm page on success with localAuthority with correct value", async () => {
     const testRequestBody = JSON.parse(JSON.stringify(requestBody));
     testRequestBody.body.condition = "organisation.localAuthority.id";
-    testRequestBody.body.value = "201";
+    testRequestBody.body.value = "ae7a214e-4e1a-413f-a700-212f00b6255d";
     testRequestBody.session = { save: jest.fn((cb) => cb()) };
     const testReq = getRequestMock(testRequestBody);
 
@@ -358,13 +358,13 @@ describe("when posting the create policy condition page", () => {
   it("should return a validation error when the localAuthority is incorrect", async () => {
     const testRequestBody = JSON.parse(JSON.stringify(requestBody));
     testRequestBody.body.condition = "organisation.localAuthority.id";
-    testRequestBody.body.value = "1234";
+    testRequestBody.body.value = "not-a-uuid";
     const testReq = getRequestMock(testRequestBody);
 
     await postCreatePolicyCondition(testReq, res);
 
     expect(res.render.mock.calls[0][1].validationMessages).toMatchObject({
-      value: "organisation.localAuthority.id can only be a 3 digit number",
+      value: "organisation.localAuthority.id needs to be a valid uuid",
     });
   });
 
