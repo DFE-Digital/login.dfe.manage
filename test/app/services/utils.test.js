@@ -1,6 +1,7 @@
 const {
   getReturnOrgId,
   doesUserHaveRole,
+  mapLastLoginValuesToDateValues,
 } = require("../../../src/app/services/utils");
 const { getRequestMock } = require("../../utils");
 
@@ -89,5 +90,44 @@ describe("doesUserHaveRole utility function", () => {
   it("returns false if code is present in userServices.roles", () => {
     const result = doesUserHaveRole(req, "not-in-user-services");
     expect(result).toBe(false);
+  });
+});
+
+describe("mapLastLoginValuesToDateValues utility function", () => {
+  jest.useFakeTimers().setSystemTime(new Date("2025-10-01"));
+
+  it("returns the number of milliseconds since the epoch, minus a week, when lastWeek is provided", () => {
+    const result = mapLastLoginValuesToDateValues(["lastWeek"]);
+    expect(result).toStrictEqual([1758672000000]);
+  });
+
+  it("returns the number of milliseconds since the epoch, minus a month, when lastMonth is provided", () => {
+    const result = mapLastLoginValuesToDateValues(["lastMonth"]);
+    expect(result).toStrictEqual([1756684800000]);
+  });
+
+  it("returns the number of milliseconds since the epoch, minus 3 months, when last3Months is provided", () => {
+    const result = mapLastLoginValuesToDateValues(["last3Months"]);
+    expect(result).toStrictEqual([1751328000000]);
+  });
+
+  it("returns the number of milliseconds since the epoch, minus 6 months, when last6Months is provided", () => {
+    const result = mapLastLoginValuesToDateValues(["last6Months"]);
+    expect(result).toStrictEqual([1743465600000]);
+  });
+
+  it("returns 1 when onePlusYear is provided", () => {
+    const result = mapLastLoginValuesToDateValues(["onePlusYear"]);
+    expect(result).toStrictEqual([1]);
+  });
+
+  it("returns 0 when never is provided", () => {
+    const result = mapLastLoginValuesToDateValues(["never"]);
+    expect(result).toStrictEqual([0]);
+  });
+
+  it("returns null when an unexpected valued is provided", () => {
+    const result = mapLastLoginValuesToDateValues(["invalidValue"]);
+    expect(result).toStrictEqual([null]);
   });
 });
