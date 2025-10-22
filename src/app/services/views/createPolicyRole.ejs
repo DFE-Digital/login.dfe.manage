@@ -1,0 +1,41 @@
+<div class="govuk-width-container govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <h1 class="govuk-heading-l">
+                Create Role for <%= locals.policy.name %>
+            </h1>
+            <form method="post" class="prevent-form-double-submission" id="form-new-policy-role">
+                <input type="hidden" name="_csrf" value="<%=csrfToken%>" />
+            
+                <fieldset class="govuk-fieldset" id="fieldset-new-policy-role">
+                    <legend class="govuk-visually-hidden">Create policy role for <%= locals.policy.name %></legend>
+                
+                    <div class="govuk-form-group <%= (locals.validationMessages.name !== undefined) ? 'govuk-form-group--error' : '' %>">
+                        <label class="govuk-label govuk-label--s" for="name">Role name</label>
+                    <% if (locals.validationMessages.name !== undefined) { %>
+                        <p id="validation-name" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span> <%=locals.validationMessages.name%>
+                        </p>
+                    <% } %>
+                        <input type="text" id="name" name="name" value="<%=locals.name%>" class="govuk-textarea govuk-!-width-three-quarters" rows="4" maxlength="400"<% if (locals.validationMessages.name) { %> aria-invalid="true" aria-describedby="validation-name" <% } %>>
+                    </div>
+
+                    <div class="govuk-form-group <%= (locals.validationMessages.code !== undefined) ? 'govuk-form-group--error' : '' %>">
+                        <label class="govuk-label govuk-label--s" for="bannerTitle">Role code</label>
+                        <% if (locals.validationMessages.code !== undefined) { %>
+                        <p id="validation-code" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span> <%=locals.validationMessages.code%>
+                        </p>
+                        <% } %>
+                        <input type="text" id="code" name="code" value="<%=locals.code%>" class="govuk-textarea govuk-!-width-three-quarters" rows="4" maxlength="400"<% if (locals.validationMessages.code) { %> aria-invalid="true" aria-describedby="validation-code" <% } %>>
+                    </div>
+
+                    <div class="govuk-button-group">
+                        <button type="submit" class="govuk-button" data-module="govuk-button">Continue</button>
+                        <a href="<%=locals.cancelLink%>" class="govuk-button govuk-button--secondary">Cancel</a>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>

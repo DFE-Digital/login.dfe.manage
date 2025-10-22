@@ -1,18 +1,16 @@
 const { getUserServiceRoles } = require("./utils");
 const { getServicePolicyRaw } = require("login.dfe.api-client/services");
 
-const getCreatePolicyCondition = async (req, res) => {
+const getCreatePolicyRole = async (req, res) => {
   const policy = await getServicePolicyRaw({
     serviceId: req.params.sid,
     policyId: req.params.pid,
   });
-  console.log("req.params.sid: ", req.params.sid);
-  console.log("req.params.pid: ", req.params.pid);
-  console.log("policy: ", policy);
+  console.log("policy", policy);
   const manageRolesForService = await getUserServiceRoles(req);
   console.log("manageRolesForService: ", manageRolesForService);
 
-  return res.render("services/views/createPolicyCondition", {
+  return res.render("services/views/createPolicyRole", {
     validationMessages: {},
     csrfToken: req.csrfToken(),
     policy,
@@ -24,4 +22,4 @@ const getCreatePolicyCondition = async (req, res) => {
   });
 };
 
-module.exports = getCreatePolicyCondition;
+module.exports = getCreatePolicyRole;
