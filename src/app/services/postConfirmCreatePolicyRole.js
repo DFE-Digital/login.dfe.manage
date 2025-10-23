@@ -1,6 +1,7 @@
 const {
   getServicePolicyRaw,
   updateServicePolicyRaw,
+  createServiceRole,
 } = require("login.dfe.api-client/services");
 const logger = require("../../infrastructure/logger");
 
@@ -10,21 +11,21 @@ const postConfirmCreatePolicyRole = async (req, res) => {
     postConfirmCreatePolicyRole,
   );
   const model = req.session.createPolicyRoleData;
+
   const policy = await getServicePolicyRaw({
     serviceId: req.params.sid,
     policyId: req.params.pid,
   });
-  // console.log("policy: ", policy);
-  // console.log("model: ", model);
+  console.log("policy: ", policy);
+  console.log("model: ", model);
 
   logger.info(
-    `${model.roleName}: [code: ${model.roleCode}] not found in policy, , pushing new record to array`,
+    `${model.roleName}: [code: ${model.roleCode}] not found in policy, pushing new record to array`,
     { correlationId: req.id },
   );
-  policy.roles.push({
-    name: model.roleName,
-    code: model.roleCode,
-  });
+  const role = createServiceRole(model);
+
+  policy.roles.push(role);
 
   await updateServicePolicyRaw({
     serviceId: req.params.sid,

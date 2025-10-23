@@ -6,6 +6,7 @@ const logger = require("../../infrastructure/logger");
 
 const validate = async (req) => {
   const model = {
+    appId: req.params.sid || "",
     roleName: req.body.name || "",
     roleCode: req.body.code || "",
     validationMessages: {},
