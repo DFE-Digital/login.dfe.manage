@@ -5,69 +5,50 @@ const {
 const logger = require("../../infrastructure/logger");
 
 const postConfirmCreatePolicyRole = async (req, res) => {
-  // model
-  // const model = req.session.createPolicyConditionData;
+  console.log(
+    "!!! postConfirmCreatePolicyRole !!! ",
+    postConfirmCreatePolicyRole,
+  );
+  const model = req.session.createPolicyRoleData;
   const policy = await getServicePolicyRaw({
     serviceId: req.params.sid,
     policyId: req.params.pid,
   });
-  console.log("policy: ", policy);
-  // const conditionAndOperatorInPolicy = policy.conditions.find(
-  //   (condition) =>
-  //     condition.field === model.condition &&
-  //     condition.operator === model.operator,
-  // );
+  // console.log("policy: ", policy);
+  // console.log("model: ", model);
 
-  // if (conditionAndOperatorInPolicy) {
-  //   // Add value to existing field if field and operator already present
-  //   for (const condition of policy.conditions) {
-  //     if (
-  //       condition.field === model.condition &&
-  //       condition.operator === model.operator
-  //     ) {
-  //       logger.info(
-  //         `[${model.condition}] and [${model.operator}] found in policy, pushing value into existing condition`,
-  //         { correlationId: req.id },
-  //       );
-  //       condition.value.push(model.value);
-  //     }
-  //   }
-  // } else {
-  //   logger.info(
-  //     `[${model.condition}] and [${model.operator}] not found in policy, pushing new record to array`,
-  //     { correlationId: req.id },
-  //   );
-  //   policy.conditions.push({
-  //     field: model.condition,
-  //     operator: model.operator,
-  //     value: [model.value],
-  //   });
-  // }
+  logger.info(
+    `${model.roleName}: [code: ${model.roleCode}] not found in policy, , pushing new record to array`,
+    { correlationId: req.id },
+  );
+  policy.roles.push({
+    name: model.roleName,
+    code: model.roleCode,
+  });
 
-  // await updateServicePolicyRaw({
-  //   serviceId: req.params.sid,
-  //   policyId: req.params.pid,
-  //   policy,
-  // });
+  await updateServicePolicyRaw({
+    serviceId: req.params.sid,
+    policyId: req.params.pid,
+    policy,
+  });
 
-  // logger.audit(
-  //   `${req.user.email} (id: ${req.user.sub}) added a policy condition for service ${req.params.sid} and policy ${req.params.pid}`,
-  //   {
-  //     type: "manage",
-  //     subType: "policy-condition-added",
-  //     userId: req.user.sub,
-  //     userEmail: req.user.email,
-  //     field: model.condition,
-  //     operator: model.operator,
-  //     value: model.value,
-  //   },
-  // );
+  logger.audit(
+    `${req.user.email} (id: ${req.user.sub}) added a policy role for service ${req.params.sid} and policy ${req.params.pid}`,
+    {
+      type: "manage",
+      subType: "policy-role-added",
+      userId: req.user.sub,
+      userEmail: req.user.email,
+      name: model.roleName,
+      code: model.roleCode,
+    },
+  );
 
-  // req.session.createPolicyConditionData = undefined;
-  // res.flash(
-  //   "info",
-  //   `Policy condition ${model.condition} ${model.operator} ${model.value} successfully added`,
-  // );
+  req.session.createPolicyRoleData = undefined;
+  res.flash(
+    "info",
+    `Policy role ${model.roleName} ${model.roleCode} successfully added`,
+  );
 
   return res.redirect("conditionsAndRoles");
 };
