@@ -1,7 +1,4 @@
 const { getServicePolicyRaw } = require("login.dfe.api-client/services");
-// const { getOrganisationRaw } = require("login.dfe.api-client/organisations");
-// const { getUserServiceRoles } = require("./utils");
-// const { validate: validateUUID } = require("uuid");
 const logger = require("../../infrastructure/logger");
 
 const validate = async (req) => {
@@ -35,13 +32,13 @@ const validate = async (req) => {
     policyId: req.params.pid,
   });
 
-  //* CHECK FOR EXISTING ROLE
   const roleInPolicy = policy.roles.find(
     (role) => role.name === model.roleName && role.code === model.roleCode,
   );
 
   if (roleInPolicy) {
-    model.validationMessages.roleExists = "This role already exists";
+    model.validationMessages.roleExists =
+      "This role already exists for this policy";
     logger.info(
       `${model.roleName}: [code: ${model.roleCode}] found in policy`,
       { correlationId: req.id },
@@ -52,16 +49,11 @@ const validate = async (req) => {
 };
 
 const postCreatePolicyRole = async (req, res) => {
-  console.log("postCreatePolicyRole: ", req.params.sid);
-  console.log("postCreatePolicyRole: ", req.params.pid);
-  console.log("REQ.BODY: ", req.body.name);
-  console.log("REQ.BODY: ", req.body.code);
   const policy = await getServicePolicyRaw({
     serviceId: req.params.sid,
     policyId: req.params.pid,
   });
   const model = await validate(req);
-  // const manageRolesForService = await getUserServiceRoles(req);
 
   if (Object.keys(model.validationMessages).length > 0) {
     return res.render("services/views/createPolicyRole", {
@@ -71,12 +63,10 @@ const postCreatePolicyRole = async (req, res) => {
       cancelLink: `/services/${req.params.sid}/policies/${req.params.pid}/conditionsAndRoles`,
       backLink: `/services/${req.params.sid}/policies/${req.params.pid}/conditionsAndRoles`,
       serviceId: req.params.sid,
-      // currentNavigation: "policies",
-      // userRoles: manageRolesForService,
+      currentNavigation: "policies",
     });
   }
 
-  //! CONTINUE FROM HERE
   logger.info(
     "Validation passed.  Saving new policy role to session for confirmation",
     { correlationId: req.id },
@@ -97,7 +87,6 @@ const postCreatePolicyRole = async (req, res) => {
         backLink: `/services/${req.params.sid}/policies/${req.params.pid}/conditionsAndRoles`,
         serviceId: req.params.sid,
         currentNavigation: "policies",
-        // userRoles: manageRolesForService,
       });
     }
     return res.redirect("confirm-create-policy-role");

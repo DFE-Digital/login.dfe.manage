@@ -6,11 +6,7 @@ const getCreatePolicyCondition = async (req, res) => {
     serviceId: req.params.sid,
     policyId: req.params.pid,
   });
-  console.log("req.params.sid: ", req.params.sid);
-  console.log("req.params.pid: ", req.params.pid);
-  console.log("policy: ", policy);
   const manageRolesForService = await getUserServiceRoles(req);
-  console.log("manageRolesForService: ", manageRolesForService);
 
   return res.render("services/views/createPolicyCondition", {
     validationMessages: {},
