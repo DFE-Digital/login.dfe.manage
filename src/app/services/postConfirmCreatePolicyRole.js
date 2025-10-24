@@ -33,8 +33,21 @@ const postConfirmCreatePolicyRole = async (req, res) => {
       `${model.roleName}: [code: ${model.roleCode}] not found in service, pushing new record to array`,
       { correlationId: req.id },
     );
-    const newRole = await createServiceRole(model);
-    policy.roles.push(newRole);
+    try {
+      const newRole = await createServiceRole(model);
+      policy.roles.push(newRole);
+    } catch (err) {
+      logger.error(
+        `Error creating service role: ${model.roleName} [code: ${model.roleCode}]`,
+        { correlationId: req.id, error: err.message },
+      );
+      req.session.createPolicyRoleData = model;
+      res.flash(
+        "error",
+        `Failed to create policy role ${model.roleName}. Please try again.`,
+      );
+      return res.redirect("confirm-create-policy-role");
+    }
   }
 
   await updateServicePolicyRaw({

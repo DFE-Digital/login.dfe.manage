@@ -227,4 +227,17 @@ describe("when using the postConfirmCreatePolicyRole function", () => {
       "Policy role New Test Role new_test_role successfully added",
     );
   });
+
+  it("should handle errors when creating a new role fails", async () => {
+    createServiceRole.mockRejectedValue(new Error("API Error"));
+
+    await postConfirmCreatePolicyRole(req, res);
+
+    expect(res.flash).toHaveBeenCalledWith(
+      "error",
+      "Failed to create policy role New Test Role. Please try again.",
+    );
+    expect(res.redirect).toHaveBeenCalledWith("confirm-create-policy-role");
+    expect(req.session.createPolicyRoleData).toBeDefined();
+  });
 });
