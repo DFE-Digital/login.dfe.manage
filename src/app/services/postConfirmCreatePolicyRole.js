@@ -46,7 +46,7 @@ const postConfirmCreatePolicyRole = async (req, res) => {
         "error",
         `Failed to create policy role ${model.roleName}. Please try again.`,
       );
-      return res.redirect("confirm-create-policy-role");
+      return res.redirect("conditionsAndRoles");
     }
   }
 
