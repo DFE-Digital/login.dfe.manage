@@ -32,11 +32,11 @@ const validate = async (req) => {
     policyId: req.params.pid,
   });
 
-  const roleInPolicy = policy.roles.find(
+  const existingRoleInPolicy = policy.roles.find(
     (role) => role.name === model.roleName && role.code === model.roleCode,
   );
 
-  if (roleInPolicy) {
+  if (existingRoleInPolicy) {
     model.validationMessages.roleExists =
       "This role already exists for this policy";
     logger.info(
@@ -68,7 +68,7 @@ const postCreatePolicyRole = async (req, res) => {
   }
 
   logger.info(
-    "Validation passed.  Saving new policy role to session for confirmation",
+    "Validation passed. Saving new policy role to session for confirmation",
     { correlationId: req.id },
   );
   req.session.createPolicyRoleData = model;

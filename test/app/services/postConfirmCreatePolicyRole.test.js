@@ -237,7 +237,8 @@ describe("when using the postConfirmCreatePolicyRole function", () => {
       "error",
       "Failed to create policy role New Test Role. Please try again.",
     );
-    expect(res.redirect).toHaveBeenCalledWith("confirm-create-policy-role");
+    expect(res.redirect).toHaveBeenCalledWith("conditionsAndRoles");
     expect(req.session.createPolicyRoleData).toBeDefined();
+    expect(req.session.createPolicyRoleData.roleName).toBe("New Test Role");
   });
 });
