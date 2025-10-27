@@ -18,7 +18,7 @@
         <div class="govuk-grid-column-three-quarters">
             <%- include('policySummary'); %>
         </div>
-        <%  if (locals.canUserModifyPolicyConditions) { %>
+        <%  if (locals.canUserModifyPolicyConditionsAndRoles) { %>
             <a class="govuk-link" href="create-policy-condition">
                 Create Policy Condition
             </a>
@@ -72,7 +72,7 @@
                             <% if (condition.mappedValues.length === 1) { %>
                                 <td class="govuk-table__cell govuk-table__cell--numeric">
                                     <%= condition.mappedValues[0].friendlyValue %>
-                                    <%  if (locals.canUserModifyPolicyConditions) { %>
+                                    <%  if (locals.canUserModifyPolicyConditionsAndRoles) { %>
                                     <a href="confirm-remove-policy-condition?condition=<%= condition.field %>&operator=<%= condition.operator %>&value=<%= condition.mappedValues[0].value %>">Remove</a>
                                     <% } %>
                                 </td>
@@ -90,7 +90,7 @@
                                         %>
                                             <p>
                                                 <%= selectedCondition.friendlyValue %>
-                                                <%  if (locals.canUserModifyPolicyConditions) { %>
+                                                <%  if (locals.canUserModifyPolicyConditionsAndRoles) { %>
                                                 <a href="confirm-remove-policy-condition?condition=<%= condition.field %>&operator=<%= condition.operator %>&value=<%= selectedCondition.value %>">Remove</a>
                                                 <% } %>
                                             </p>
@@ -111,8 +111,11 @@
                             <tr class="govuk-table__row sortable">
                                 <th scope="col" class="govuk-table__header width-40">Name</th>
                                 <th scope="col" class="govuk-table__header width-20">Code</th>
-                                <th scope="col" class="govuk-table__header width-30">ID</th>
+                                <th scope="col" class="govuk-table__header width-20">ID</th>
                                 <th scope="col" class="govuk-table__header width-10 govuk-table__header--numeric">Status</th>
+                                <%  if (locals.canUserModifyPolicyConditionsAndRoles) { %>
+                                    <th scope="col" class="govuk-table__header width-10"></th>
+                                <% } %>
                             </tr>
                         </thead>
                         <tbody class="govuk-table__body">
@@ -132,6 +135,9 @@
                                 <td class="govuk-table__cell"><%= role.code %></td>
                                 <td class="govuk-table__cell"><%= role.numericId %></td>
                                 <td class="govuk-table__cell govuk-table__cell--numeric"><%= role.status ? role.status.id : '' %></td>
+                                <%  if (locals.canUserModifyPolicyConditionsAndRoles) { %>
+                                    <td class="govuk-table__cell"><a href="confirm-remove-policy-role?name=<%=role.name%>&code=<%=role.code%>">Remove</a></td>
+                                <% } %>
                             </tr>
                         <% } %>
                         </tbody>
