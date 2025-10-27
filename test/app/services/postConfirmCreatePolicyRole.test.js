@@ -154,6 +154,10 @@ describe("when using the postConfirmCreatePolicyRole function", () => {
 
     expect(res.redirect.mock.calls.length).toBe(1);
     expect(res.redirect.mock.calls[0][0]).toBe("conditionsAndRoles");
+    expect(res.flash).toHaveBeenCalledWith(
+      "info",
+      "Policy role New Test Role new_test_role successfully added",
+    );
   });
 
   it("should add an existing role to the policy when the role already exists in the service", async () => {
@@ -211,6 +215,22 @@ describe("when using the postConfirmCreatePolicyRole function", () => {
     });
 
     expect(res.redirect.mock.calls[0][0]).toBe("conditionsAndRoles");
+    expect(res.flash).toHaveBeenCalledWith(
+      "info",
+      "Policy role Existing Role existing_role successfully added",
+    );
+  });
+
+  it("should show a different flash message when the added role name differs from the model name", async () => {
+    req.session.createPolicyRoleData.roleName = "Different Name";
+    req.session.createPolicyRoleData.roleCode = "existing_role";
+
+    await postConfirmCreatePolicyRole(req, res);
+
+    expect(res.flash).toHaveBeenCalledWith(
+      "info",
+      "A role with this code existing_role and the name Existing Role existed for this service. Existing Role has been successfully added to the policy",
+    );
   });
 
   it("should clear the session data after successfully adding the role", async () => {
@@ -230,6 +250,7 @@ describe("when using the postConfirmCreatePolicyRole function", () => {
 
   it("should handle errors when creating a new role fails", async () => {
     createServiceRole.mockRejectedValue(new Error("API Error"));
+    req.session.save = jest.fn((callback) => callback());
 
     await postConfirmCreatePolicyRole(req, res);
 

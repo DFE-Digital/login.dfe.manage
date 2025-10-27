@@ -13,16 +13,16 @@ const addRoleToPolicy = async (
   correlationId,
 ) => {
   const existingRole = allServiceRoles.find(
-    (role) => role.name === model.roleName && role.code === model.roleCode,
+    (role) => role.code === model.roleCode,
   );
 
   if (existingRole) {
     logger.info(
-      `${model.roleName}: [code: ${model.roleCode}] found in service, adding existing role to policy`,
+      `A role with [code: ${model.roleCode}] found in service, with name "${existingRole.name}". Adding existing role to policy`,
       { correlationId },
     );
     policy.roles.push(existingRole);
-    return;
+    return existingRole;
   }
 
   logger.info(
@@ -32,6 +32,7 @@ const addRoleToPolicy = async (
 
   const newRole = await createServiceRole(model);
   policy.roles.push(newRole);
+  return newRole;
 };
 
 const handleRoleCreationError = (error, model, req, res) => {
@@ -41,12 +42,28 @@ const handleRoleCreationError = (error, model, req, res) => {
   );
 
   req.session.createPolicyRoleData = model;
-  res.flash(
-    "error",
-    `Failed to create policy role ${model.roleName}. Please try again.`,
-  );
-
-  return res.redirect("conditionsAndRoles");
+  req.session.save((error) => {
+    if (error) {
+      // Any error saving to session should hopefully be temporary. Assuming this, we log the error
+      // and just display an error message saying to try again.
+      logger.error("An error occurred when saving to the session", error);
+      model.validationMessages.role =
+        "Something went wrong submitting data, please try again";
+      return res.render("services/views/createPolicyRole", {
+        ...model,
+        csrfToken: req.csrfToken(),
+        cancelLink: `/services/${req.params.sid}/policies/${req.params.pid}/conditionsAndRoles`,
+        backLink: `/services/${req.params.sid}/policies/${req.params.pid}/conditionsAndRoles`,
+        serviceId: req.params.sid,
+        currentNavigation: "policies",
+      });
+    }
+    res.flash(
+      "error",
+      `Failed to create policy role ${model.roleName}. Please try again.`,
+    );
+    return res.redirect("conditionsAndRoles");
+  });
 };
 
 const postConfirmCreatePolicyRole = async (req, res) => {
@@ -61,8 +78,10 @@ const postConfirmCreatePolicyRole = async (req, res) => {
     serviceId: req.params.sid,
   });
 
+  let addedRole;
+
   try {
-    await addRoleToPolicy(policy, model, allServiceRoles, req.id);
+    addedRole = await addRoleToPolicy(policy, model, allServiceRoles, req.id);
   } catch (error) {
     return handleRoleCreationError(error, model, req, res);
   }
@@ -86,11 +105,17 @@ const postConfirmCreatePolicyRole = async (req, res) => {
   );
 
   req.session.createPolicyRoleData = undefined;
-  res.flash(
-    "info",
-    `Policy role ${model.roleName} ${model.roleCode} successfully added`,
-  );
-
+  if (addedRole.name !== model.roleName) {
+    res.flash(
+      "info",
+      `A role with this code ${addedRole.code} and the name ${addedRole.name} existed for this service. ${addedRole.name} has been successfully added to the policy`,
+    );
+  } else {
+    res.flash(
+      "info",
+      `Policy role ${model.roleName} ${model.roleCode} successfully added`,
+    );
+  }
   return res.redirect("conditionsAndRoles");
 };
 
