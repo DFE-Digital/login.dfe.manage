@@ -63,7 +63,9 @@ const postConfirmRemovePolicyRole = async (req, res) => {
   });
 
   if (!roleUsedInOtherPolicies) {
+    model.id = roleInPolicy.id;
     // call delete end point
+    await deleteServiceRole(model);
   }
 
   logger.audit(
