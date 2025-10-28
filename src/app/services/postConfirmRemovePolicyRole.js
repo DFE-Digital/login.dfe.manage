@@ -23,6 +23,8 @@ const postConfirmRemovePolicyRole = async (req, res) => {
     (role) => role.name === model.roleName && role.code === model.roleCode,
   );
 
+  console.log("roleInPolicy: ", roleInPolicy);
+
   if (!roleInPolicy) {
     logger.info(
       `[${model.roleName}] [${model.roleCode}] not found in existing policy`,
@@ -35,34 +37,33 @@ const postConfirmRemovePolicyRole = async (req, res) => {
     return res.redirect("conditionsAndRoles");
   }
 
-  //* Check if more than one role exists in other policies for this service.
+  // Check if more than one role exists in other policies for this service. If it does, update the policy. If not, then delete the role completely.
   const allServicePolicies = await getServicePoliciesRaw({
     serviceId: req.params.sid,
   });
 
-  /*
-  todo - extracts all service roles into one array, then checks for matches by name and code.
-    */
+  // extracts all service roles into one array, then checks for matches.
   const matchingRoles = allServicePolicies
     .flatMap((serviceRole) => serviceRole.roles)
-    .filter(
-      (role) => role.name === model.roleName && role.code === model.roleCode,
-    );
+    .filter((role) => role.id === roleInPolicy.id);
 
-  const hasDuplicates = matchingRoles.length > 1;
+  console.log("matchingRoles: ", matchingRoles);
+
+  const roleUsedInOtherPolicies = matchingRoles.length > 1;
+  console.log("roleUsedInOtherPolicies: ", roleUsedInOtherPolicies);
 
   //todo if has duplicates remove from policy, splice from arr & update ... happy days
-  if (roleInPolicy && hasDuplicates) {
-    const roleIndex = policy.roles.indexOf(roleInPolicy);
-    policy.roles.splice(roleIndex, 1);
+  const roleIndex = policy.roles.indexOf(roleInPolicy);
+  policy.roles.splice(roleIndex, 1);
 
-    await updateServicePolicyRaw({
-      serviceId: req.params.sid,
-      policyId: req.params.pid,
-      policy,
-    });
-  } else {
-    //todo call delete role end point?
+  await updateServicePolicyRaw({
+    serviceId: req.params.sid,
+    policyId: req.params.pid,
+    policy,
+  });
+
+  if (!roleUsedInOtherPolicies) {
+    // call delete end point
   }
 
   logger.audit(
