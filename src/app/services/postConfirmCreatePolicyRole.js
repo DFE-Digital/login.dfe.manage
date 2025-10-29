@@ -13,7 +13,7 @@ const addRoleToPolicy = async (
   correlationId,
 ) => {
   const existingRole = allServiceRoles.find(
-    (role) => role.code === model.roleCode,
+    (role) => role.code.toUpperCase() === model.roleCode.toUpperCase(),
   );
 
   if (existingRole) {
@@ -108,7 +108,7 @@ const postConfirmCreatePolicyRole = async (req, res) => {
   if (addedRole.name !== model.roleName) {
     res.flash(
       "info",
-      `A role with this code ${addedRole.code} and the name ${addedRole.name} existed for this service. ${addedRole.name} has been successfully added to the policy`,
+      `A role with this code ${addedRole.code} and the name ${addedRole.name} already exist for this service. ${addedRole.name} has been successfully added to the policy`,
     );
   } else {
     res.flash(
