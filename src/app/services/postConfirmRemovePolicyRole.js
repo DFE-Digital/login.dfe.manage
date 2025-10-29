@@ -2,7 +2,7 @@ const {
   getServicePolicyRaw,
   getServicePoliciesRaw,
   updateServicePolicyRaw,
-  getServiceRolesRaw,
+  deleteServiceRole,
 } = require("login.dfe.api-client/services");
 const logger = require("../../infrastructure/logger");
 
@@ -22,7 +22,6 @@ const postConfirmRemovePolicyRole = async (req, res) => {
   const roleInPolicy = policy.roles.find(
     (role) => role.name === model.roleName && role.code === model.roleCode,
   );
-
   console.log("roleInPolicy: ", roleInPolicy);
 
   if (!roleInPolicy) {
@@ -37,22 +36,20 @@ const postConfirmRemovePolicyRole = async (req, res) => {
     return res.redirect("conditionsAndRoles");
   }
 
-  // Check if more than one role exists in other policies for this service. If it does, update the policy. If not, then delete the role completely.
+  /* Check if the role exists in other policies for this service. 
+  If it does, remove the role and update the policy. 
+  If not, remove the role and delete the role completely. */
   const allServicePolicies = await getServicePoliciesRaw({
     serviceId: req.params.sid,
   });
 
-  // extracts all service roles into one array, then checks for matches.
-  const matchingRoles = allServicePolicies
+  // extracts all service roles into one array, then checks to see in role exists more than once.
+  const roleInMultiplePolicies = allServicePolicies
     .flatMap((serviceRole) => serviceRole.roles)
     .filter((role) => role.id === roleInPolicy.id);
 
-  console.log("matchingRoles: ", matchingRoles);
+  const roleUsedInOtherPolicies = roleInMultiplePolicies.length > 1;
 
-  const roleUsedInOtherPolicies = matchingRoles.length > 1;
-  console.log("roleUsedInOtherPolicies: ", roleUsedInOtherPolicies);
-
-  //todo if has duplicates remove from policy, splice from arr & update ... happy days
   const roleIndex = policy.roles.indexOf(roleInPolicy);
   policy.roles.splice(roleIndex, 1);
 
@@ -63,9 +60,7 @@ const postConfirmRemovePolicyRole = async (req, res) => {
   });
 
   if (!roleUsedInOtherPolicies) {
-    model.id = roleInPolicy.id;
-    // call delete end point
-    await deleteServiceRole(model);
+    await deleteServiceRole(policy.serviceId, roleInPolicy.id);
   }
 
   logger.audit(
