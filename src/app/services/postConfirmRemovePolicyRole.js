@@ -2,7 +2,7 @@ const {
   getServicePolicyRaw,
   getServicePoliciesRaw,
   updateServicePolicyRaw,
-  deleteServiceRole,
+  deleteServiceRoleRaw,
 } = require("login.dfe.api-client/services");
 const logger = require("../../infrastructure/logger");
 
@@ -48,7 +48,10 @@ const postConfirmRemovePolicyRole = async (req, res) => {
     .flatMap((serviceRole) => serviceRole.roles)
     .filter((role) => role.id === roleInPolicy.id);
 
+  console.log("roleInMultiplePolicies: ", roleInMultiplePolicies);
+
   const roleUsedInOtherPolicies = roleInMultiplePolicies.length > 1;
+  console.log("roleUsedInOtherPolicies: ", roleUsedInOtherPolicies);
 
   const roleIndex = policy.roles.indexOf(roleInPolicy);
   policy.roles.splice(roleIndex, 1);
@@ -60,7 +63,13 @@ const postConfirmRemovePolicyRole = async (req, res) => {
   });
 
   if (!roleUsedInOtherPolicies) {
-    await deleteServiceRole(policy.serviceId, roleInPolicy.id);
+    console.log("ATTEMPTING TO DELETE WITH deleteServiceRoleRaw ");
+    logger.info(
+      `[${policy.applicationId}] [${roleInPolicy.id}] is the last role in all policies in this service. Calling deleteServiceRoleRaw.`,
+      { correlationId: req.id },
+    );
+    console.log("policy.serviceId: ", policy.applicationId);
+    await deleteServiceRoleRaw(policy.applicationId, roleInPolicy.id);
   }
 
   logger.audit(
