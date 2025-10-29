@@ -229,7 +229,7 @@ describe("when using the postConfirmCreatePolicyRole function", () => {
 
     expect(res.flash).toHaveBeenCalledWith(
       "info",
-      "A role with this code existing_role and the name Existing Role existed for this service. Existing Role has been successfully added to the policy",
+      "A role with this code existing_role and the name Existing Role already exist for this service. Existing Role has been successfully added to the policy",
     );
   });
 
