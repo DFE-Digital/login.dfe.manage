@@ -17,17 +17,17 @@
                             <span class="govuk-visually-hidden">Error:</span> <%=locals.validationMessages.name%>
                         </p>
                     <% } %>
-                        <input type="text" id="name" name="name" value="<%=locals.name%>" class="govuk-textarea govuk-!-width-three-quarters" rows="4" maxlength="125"<% if (locals.validationMessages.name) { %> aria-invalid="true" aria-describedby="validation-name" <% } %>>
+                        <input type="text" id="name" name="name" value="<%=locals.name%>" class="govuk-input govuk-!-width-three-quarters" maxlength="125"<% if (locals.validationMessages.name) { %> aria-invalid="true" aria-describedby="validation-name" <% } %>>
                     </div>
 
                     <div class="govuk-form-group <%= (locals.validationMessages.code !== undefined) ? 'govuk-form-group--error' : '' %>">
-                        <label class="govuk-label govuk-label--s" for="bannerTitle">Role code</label>
+                        <label class="govuk-label govuk-label--s" for="code">Role code</label>
                         <% if (locals.validationMessages.code !== undefined) { %>
                         <p id="validation-code" class="govuk-error-message">
                             <span class="govuk-visually-hidden">Error:</span> <%=locals.validationMessages.code%>
                         </p>
                         <% } %>
-                        <input type="text" id="code" name="code" value="<%=locals.code%>" class="govuk-textarea govuk-!-width-three-quarters" rows="4" maxlength="50"<% if (locals.validationMessages.code) { %> aria-invalid="true" aria-describedby="validation-code" <% } %>>
+                        <input type="text" id="code" name="code" value="<%=locals.code%>" class="govuk-input govuk-!-width-three-quarters" maxlength="50"<% if (locals.validationMessages.code) { %> aria-invalid="true" aria-describedby="validation-code" <% } %>>
                     </div>
 
                     <div class="govuk-button-group">
