@@ -19,9 +19,18 @@
             <%- include('policySummary'); %>
         </div>
         <%  if (locals.canUserModifyPolicyConditions) { %>
-            <a class="govuk-link" href="create-policy-condition">
-                Create Policy Condition
-            </a>
+            <ul class="govuk-list">
+                <li>
+                    <a class="govuk-link" href="create-policy-condition">
+                        Create Policy Condition
+                    </a>
+                </li>
+                <li>
+                    <a class="govuk-link" href="create-policy-role">
+                        Create Policy Role
+                    </a>
+                </li>
+            </ul>
         <% } %>
     </div>
     <div class="govuk-grid-row govuk-!-margin-top-6">
