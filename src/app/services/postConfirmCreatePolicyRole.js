@@ -35,18 +35,18 @@ const addRoleToPolicy = async (
   return newRole;
 };
 
-const handleRoleCreationError = (error, model, req, res) => {
-  logger.error(
-    `Error creating service role: ${model.roleName} [code: ${model.roleCode}]`,
-    { correlationId: req.id, error: error.message },
-  );
+const handlePolicyUpdateError = (error, model, req, res, errorMessage) => {
+  logger.error(errorMessage, {
+    correlationId: req.id,
+    error: error.message,
+  });
 
   req.session.createPolicyRoleData = model;
-  req.session.save((error) => {
-    if (error) {
+  return req.session.save((saveError) => {
+    if (saveError) {
       // Any error saving to session should hopefully be temporary. Assuming this, we log the error
       // and just display an error message saying to try again.
-      logger.error("An error occurred when saving to the session", error);
+      logger.error("An error occurred when saving to the session", saveError);
       model.validationMessages.role =
         "Something went wrong submitting data, please try again";
       return res.render("services/views/createPolicyRole", {
@@ -58,10 +58,7 @@ const handleRoleCreationError = (error, model, req, res) => {
         currentNavigation: "policies",
       });
     }
-    res.flash(
-      "error",
-      `Failed to create policy role ${model.roleName}. Please try again.`,
-    );
+    res.flash("error", "Failed to update policy. Please try again.");
     return res.redirect("conditionsAndRoles");
   });
 };
@@ -83,14 +80,30 @@ const postConfirmCreatePolicyRole = async (req, res) => {
   try {
     addedRole = await addRoleToPolicy(policy, model, allServiceRoles, req.id);
   } catch (error) {
-    return handleRoleCreationError(error, model, req, res);
+    return handlePolicyUpdateError(
+      error,
+      model,
+      req,
+      res,
+      `Error creating service role: ${model.roleName} [code: ${model.roleCode}]`,
+    );
   }
 
-  await updateServicePolicyRaw({
-    serviceId: req.params.sid,
-    policyId: req.params.pid,
-    policy,
-  });
+  try {
+    await updateServicePolicyRaw({
+      serviceId: req.params.sid,
+      policyId: req.params.pid,
+      policy,
+    });
+  } catch (error) {
+    return handlePolicyUpdateError(
+      error,
+      model,
+      req,
+      res,
+      `Error updating service policy ${req.params.pid} for service ${req.params.sid}`,
+    );
+  }
 
   logger.audit(
     `${req.user.email} (id: ${req.user.sub}) added a policy role for service ${req.params.sid} and policy ${req.params.pid}`,
