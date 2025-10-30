@@ -14,6 +14,7 @@ const {
   createServiceRole,
   getServiceRolesRaw,
 } = require("login.dfe.api-client/services");
+const logger = require("../../../src/infrastructure/logger");
 const res = getResponseMock();
 
 const existingServiceRoles = [
@@ -261,5 +262,51 @@ describe("when using the postConfirmCreatePolicyRole function", () => {
     expect(res.redirect).toHaveBeenCalledWith("conditionsAndRoles");
     expect(req.session.createPolicyRoleData).toBeDefined();
     expect(req.session.createPolicyRoleData.roleName).toBe("New Test Role");
+  });
+
+  it("should handle errors when getServicePolicyRaw fails", async () => {
+    const mockError = new Error("Policy Fetch Error");
+    getServicePolicyRaw.mockRejectedValue(mockError);
+
+    await postConfirmCreatePolicyRole(req, res);
+
+    expect(logger.error).toHaveBeenCalledWith(
+      "Error retrieving service policy policy-1",
+      {
+        correlationId: "correlationId",
+        error: mockError,
+      },
+    );
+
+    expect(res.flash).toHaveBeenCalledWith(
+      "error",
+      "Failed to retrieve policy. Please try again.",
+    );
+    expect(res.redirect).toHaveBeenCalledWith(
+      "/services/service-1/policies/policy-1/conditionsAndRoles",
+    );
+  });
+
+  it("should handle errors when getServiceRolesRaw fails", async () => {
+    const mockError = new Error("Roles Fetch Error");
+    getServiceRolesRaw.mockRejectedValue(mockError);
+
+    await postConfirmCreatePolicyRole(req, res);
+
+    expect(logger.error).toHaveBeenCalledWith(
+      "Error retrieving service roles for service service-1",
+      {
+        correlationId: "correlationId",
+        error: mockError,
+      },
+    );
+
+    expect(res.flash).toHaveBeenCalledWith(
+      "error",
+      "Failed to retrieve service roles. Please try again.",
+    );
+    expect(res.redirect).toHaveBeenCalledWith(
+      "/services/service-1/policies/policy-1/conditionsAndRoles",
+    );
   });
 });

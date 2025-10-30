@@ -9,6 +9,7 @@ jest.mock("login.dfe.api-client/services");
 const { getRequestMock, getResponseMock } = require("../../utils");
 const getCreatePolicyRole = require("../../../src/app/services/getCreatePolicyRole");
 const { getServicePolicyRaw } = require("login.dfe.api-client/services");
+const logger = require("../../../src/infrastructure/logger");
 const res = getResponseMock();
 
 const policy = {
@@ -81,5 +82,29 @@ describe("when calling the getCreatePolicyRole function", () => {
       serviceId: "service-id",
       policyId: "policy-id",
     });
+  });
+
+  it("should handle errors when getServicePolicyRaw fails", async () => {
+    const mockError = new Error("API Error");
+    getServicePolicyRaw.mockRejectedValue(mockError);
+
+    await getCreatePolicyRole(req, res);
+
+    (expect(logger.error).toHaveBeenCalledWith(
+      "Error retrieving service policy",
+      {
+        correlationId: "correlationId",
+        serviceId: "service-id",
+        policyId: "policy-id",
+        error: mockError,
+      },
+    ),
+      expect(res.flash).toHaveBeenCalledWith(
+        "error",
+        "An error occurred while retrieving the policy. Please try again.",
+      ));
+    expect(res.redirect).toHaveBeenCalledWith(
+      "/services/service-id/policies/policy-id/conditionsAndRoles",
+    );
   });
 });

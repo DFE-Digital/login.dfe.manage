@@ -38,7 +38,7 @@ const addRoleToPolicy = async (
 const handlePolicyUpdateError = (error, model, req, res, errorMessage) => {
   logger.error(errorMessage, {
     correlationId: req.id,
-    error: error.message,
+    error: error,
   });
 
   req.session.createPolicyRoleData = model;
@@ -66,14 +66,42 @@ const handlePolicyUpdateError = (error, model, req, res, errorMessage) => {
 const postConfirmCreatePolicyRole = async (req, res) => {
   const model = req.session.createPolicyRoleData;
 
-  const policy = await getServicePolicyRaw({
-    serviceId: req.params.sid,
-    policyId: req.params.pid,
-  });
+  let policy;
+  let allServiceRoles;
 
-  const allServiceRoles = await getServiceRolesRaw({
-    serviceId: req.params.sid,
-  });
+  try {
+    policy = await getServicePolicyRaw({
+      serviceId: req.params.sid,
+      policyId: req.params.pid,
+    });
+  } catch (error) {
+    logger.error(`Error retrieving service policy ${req.params.pid}`, {
+      correlationId: req.id,
+      error: error,
+    });
+    res.flash("error", "Failed to retrieve policy. Please try again.");
+    return res.redirect(
+      `/services/${req.params.sid}/policies/${req.params.pid}/conditionsAndRoles`,
+    );
+  }
+
+  try {
+    allServiceRoles = await getServiceRolesRaw({
+      serviceId: req.params.sid,
+    });
+  } catch (error) {
+    logger.error(
+      `Error retrieving service roles for service ${req.params.sid}`,
+      {
+        correlationId: req.id,
+        error: error,
+      },
+    );
+    res.flash("error", "Failed to retrieve service roles. Please try again.");
+    return res.redirect(
+      `/services/${req.params.sid}/policies/${req.params.pid}/conditionsAndRoles`,
+    );
+  }
 
   let addedRole;
 
