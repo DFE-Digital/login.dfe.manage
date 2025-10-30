@@ -256,7 +256,7 @@ describe("when using the postConfirmCreatePolicyRole function", () => {
 
     expect(res.flash).toHaveBeenCalledWith(
       "error",
-      "Failed to create policy role New Test Role. Please try again.",
+      "Failed to update policy. Please try again.",
     );
     expect(res.redirect).toHaveBeenCalledWith("conditionsAndRoles");
     expect(req.session.createPolicyRoleData).toBeDefined();

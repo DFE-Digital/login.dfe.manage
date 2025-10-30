@@ -47,8 +47,8 @@ describe("when using postCreatePolicyRole", () => {
         pid: "policy-id",
       },
       body: {
-        name: "test name",
-        code: "test-code",
+        roleName: "test name",
+        roleCode: "test-code",
       },
       session: {
         save: jest.fn((cb) => cb()),
@@ -71,7 +71,7 @@ describe("when using postCreatePolicyRole", () => {
   });
 
   it("should return a validation error when the role name is missing", async () => {
-    req.body.name = "";
+    req.body.roleName = "";
 
     await postCreatePolicyRole(req, res);
 
@@ -87,7 +87,7 @@ describe("when using postCreatePolicyRole", () => {
   });
 
   it("should return a validation error when the role code is missing", async () => {
-    req.body.code = "";
+    req.body.roleCode = "";
 
     await postCreatePolicyRole(req, res);
 
@@ -97,7 +97,7 @@ describe("when using postCreatePolicyRole", () => {
   });
 
   it("should return a validation error when the role name exceeds 125 characters", async () => {
-    req.body.name = "a".repeat(126);
+    req.body.roleName = "a".repeat(126);
 
     await postCreatePolicyRole(req, res);
 
@@ -107,7 +107,7 @@ describe("when using postCreatePolicyRole", () => {
   });
 
   it("should return a validation error when the role code exceeds 50 characters", async () => {
-    req.body.code = "a".repeat(51);
+    req.body.roleCode = "a".repeat(51);
 
     await postCreatePolicyRole(req, res);
 
@@ -117,8 +117,8 @@ describe("when using postCreatePolicyRole", () => {
   });
 
   it("should return a validation error when the role already exists in the policy", async () => {
-    req.body.name = "School";
-    req.body.code = "CheckRecord_School";
+    req.body.roleName = "School";
+    req.body.roleCode = "CheckRecord_School";
 
     await postCreatePolicyRole(req, res);
 
