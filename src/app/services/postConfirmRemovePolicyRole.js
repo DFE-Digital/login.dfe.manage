@@ -6,6 +6,17 @@ const {
 } = require("login.dfe.api-client/services");
 const logger = require("../../infrastructure/logger");
 
+const handleApiError = (error, req, res, errorMessage, flashMessage) => {
+  logger.error(errorMessage, {
+    correlationId: req.id,
+    error: error,
+  });
+  res.flash("error", flashMessage);
+  return res.redirect(
+    `/services/${req.params.sid}/policies/${req.params.pid}/conditionsAndRoles`,
+  );
+};
+
 const postConfirmRemovePolicyRole = async (req, res) => {
   const model = {
     appId: req.params.sid || "",
@@ -13,16 +24,26 @@ const postConfirmRemovePolicyRole = async (req, res) => {
     roleCode: req.body.code || "",
     validationMessages: {},
   };
+  let policy;
 
-  const policy = await getServicePolicyRaw({
-    serviceId: req.params.sid,
-    policyId: req.params.pid,
-  });
+  try {
+    policy = await getServicePolicyRaw({
+      serviceId: req.params.sid,
+      policyId: req.params.pid,
+    });
+  } catch (error) {
+    return handleApiError(
+      error,
+      req,
+      res,
+      `Error retrieving service policy ${req.params.pid}`,
+      "Failed to retrieve policy. Please try again.",
+    );
+  }
 
   const roleInPolicy = policy.roles.find(
     (role) => role.name === model.roleName && role.code === model.roleCode,
   );
-  console.log("roleInPolicy: ", roleInPolicy);
 
   if (!roleInPolicy) {
     logger.info(
@@ -39,37 +60,64 @@ const postConfirmRemovePolicyRole = async (req, res) => {
   /* Check if the role exists in other policies for this service. 
   If it does, remove the role and update the policy. 
   If not, remove the role and delete the role completely. */
-  const allServicePolicies = await getServicePoliciesRaw({
-    serviceId: req.params.sid,
-  });
+  let allServicePolicies;
+  let roleInMultiplePolicies;
 
-  // extracts all service roles into one array, then checks to see in role exists more than once.
-  const roleInMultiplePolicies = allServicePolicies
-    .flatMap((serviceRole) => serviceRole.roles)
-    .filter((role) => role.id === roleInPolicy.id);
+  try {
+    allServicePolicies = await getServicePoliciesRaw({
+      serviceId: req.params.sid,
+    });
 
-  console.log("roleInMultiplePolicies: ", roleInMultiplePolicies);
-
-  const roleUsedInOtherPolicies = roleInMultiplePolicies.length > 1;
-  console.log("roleUsedInOtherPolicies: ", roleUsedInOtherPolicies);
+    roleInMultiplePolicies = allServicePolicies
+      .flatMap((serviceRole) => serviceRole.roles)
+      .filter((role) => role.id === roleInPolicy.id);
+  } catch (error) {
+    return handleApiError(
+      error,
+      req,
+      res,
+      `Error retrieving service policies for service ${req.params.sid}`,
+      "Failed to retrieve service policies. Please try again.",
+    );
+  }
 
   const roleIndex = policy.roles.indexOf(roleInPolicy);
   policy.roles.splice(roleIndex, 1);
 
-  await updateServicePolicyRaw({
-    serviceId: req.params.sid,
-    policyId: req.params.pid,
-    policy,
-  });
+  try {
+    await updateServicePolicyRaw({
+      serviceId: req.params.sid,
+      policyId: req.params.pid,
+      policy,
+    });
+  } catch (error) {
+    return handleApiError(
+      error,
+      req,
+      res,
+      `Error updating policy ${req.params.pid}`,
+      "Failed to update policy. Please try again.",
+    );
+  }
+
+  const roleUsedInOtherPolicies = roleInMultiplePolicies.length > 1;
 
   if (!roleUsedInOtherPolicies) {
-    console.log("ATTEMPTING TO DELETE WITH deleteServiceRoleRaw ");
     logger.info(
-      `[${policy.applicationId}] [${roleInPolicy.id}] is the last role in all policies in this service. Calling deleteServiceRoleRaw.`,
+      `[${policy.applicationId}] [${roleInPolicy.id}] does not exist in any other policies for this service. Calling deleteServiceRoleRaw.`,
       { correlationId: req.id },
     );
-    console.log("policy.serviceId: ", policy.applicationId);
-    await deleteServiceRoleRaw(policy.applicationId, roleInPolicy.id);
+    try {
+      await deleteServiceRoleRaw(policy.applicationId, roleInPolicy.id);
+    } catch (error) {
+      return handleApiError(
+        error,
+        req,
+        res,
+        `Error deleting role ${roleInPolicy.id}`,
+        "Failed to delete role. Please try again.",
+      );
+    }
   }
 
   logger.audit(
