@@ -77,8 +77,12 @@ const {
 const getPolicyConditions = require("./getPolicyConditionsAndRoles");
 const getCreatePolicyCondition = require("./getCreatePolicyCondition");
 const postCreatePolicyCondition = require("./postCreatePolicyCondition");
+const getCreatePolicyRole = require("./getCreatePolicyRole");
+const postCreatePolicyRole = require("./postCreatePolicyRole");
 const getConfirmCreatePolicyCondition = require("./getConfirmCreatePolicyCondition");
 const postConfirmCreatePolicyCondition = require("./postConfirmCreatePolicyCondition");
+const getConfirmCreatePolicyRole = require("./getConfirmCreatePolicyRole");
+const postConfirmCreatePolicyRole = require("./postConfirmCreatePolicyRole");
 const getConfirmRemovePolicyCondition = require("./getConfirmRemovePolicyCondition");
 const postConfirmRemovePolicyCondition = require("./postConfirmRemovePolicyCondition");
 const getConfirmRemovePolicyRole = require("./getConfirmRemovePolicyRole");
@@ -451,6 +455,21 @@ const services = (csrf) => {
     hasGenericRole("internalServiceConfigurationManager"),
     asyncWrapper(postCreatePolicyCondition),
   );
+  router.get(
+    "/:sid/policies/:pid/create-policy-role",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("internalServiceConfigurationManager"),
+    asyncWrapper(getCreatePolicyRole),
+  );
+
+  router.post(
+    "/:sid/policies/:pid/create-policy-role",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("internalServiceConfigurationManager"),
+    asyncWrapper(postCreatePolicyRole),
+  );
 
   router.get(
     "/:sid/policies/:pid/confirm-create-policy-condition",
@@ -466,6 +485,22 @@ const services = (csrf) => {
     isManageUserForService,
     hasGenericRole("internalServiceConfigurationManager"),
     asyncWrapper(postConfirmCreatePolicyCondition),
+  );
+
+  router.get(
+    "/:sid/policies/:pid/confirm-create-policy-role",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("internalServiceConfigurationManager"),
+    asyncWrapper(getConfirmCreatePolicyRole),
+  );
+
+  router.post(
+    "/:sid/policies/:pid/confirm-create-policy-role",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("internalServiceConfigurationManager"),
+    asyncWrapper(postConfirmCreatePolicyRole),
   );
 
   router.get(
