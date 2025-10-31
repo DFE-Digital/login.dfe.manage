@@ -39,7 +39,7 @@ const getPolicyConditions = async (req, res) => {
     policyId: req.params.pid,
   });
   const manageRolesForService = await getUserServiceRoles(req);
-  const canUserModifyPolicyConditions = doesUserHaveRole(
+  const canUserModifyPolicyConditionsAndRoles = doesUserHaveRole(
     req,
     "internalServiceConfigurationManager",
   );
@@ -67,7 +67,7 @@ const getPolicyConditions = async (req, res) => {
     backLink: `/services/${req.params.sid}/policies`,
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
-    canUserModifyPolicyConditions,
+    canUserModifyPolicyConditionsAndRoles,
     currentNavigation: "policies",
   });
 };
