@@ -121,10 +121,12 @@
                                 <th scope="col" class="govuk-table__header width-40">Name</th>
                                 <th scope="col" class="govuk-table__header width-20">Code</th>
                                 <th scope="col" class="govuk-table__header width-20">ID</th>
-                                <th scope="col" class="govuk-table__header width-10 govuk-table__header--numeric">Status</th>
                                 <%  if (locals.canUserModifyPolicyConditionsAndRoles) { %>
+                                    <th scope="col" class="govuk-table__header width-10 govuk-table__header--numeric">Status</th>
                                     <th scope="col" class="govuk-table__header width-10"></th>
-                                <% } %>
+                                <% } else {%>
+                                    <th scope="col" class="govuk-table__header width-20 govuk-table__header--numeric">Status</th>
+                                <% }%>
                             </tr>
                         </thead>
                         <tbody class="govuk-table__body">
