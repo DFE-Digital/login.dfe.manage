@@ -1,0 +1,38 @@
+<div class="govuk-width-container govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <h1 class="govuk-heading-l text-break">
+                Review new policy role for <%= locals.policy.name %>
+            </h1>
+            <p class="govuk-body">Review these details before confirming.</p>
+
+            <dl class="govuk-summary-list">
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Role name   
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        <p class="govuk-body"><%=locals.roleName%></p>
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Role code
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        <p class="govuk-body"><%= locals.roleCode%></p>
+                    </dd>
+                </div>
+            </dl>
+
+            <form method="post">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
+                <div class="govuk-button-group">
+                    <button type="submit" class="govuk-button" data-module="govuk-button">Save role</button>
+                    <a href="<%= locals.cancelLink %>" class="govuk-button govuk-button--secondary">Cancel</a>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
