@@ -22,6 +22,7 @@ const configSchema = require("./infrastructure/config/schema");
 const config = require("./infrastructure/config");
 const logger = require("./infrastructure/logger");
 const { setupApi } = require("login.dfe.api-client/api/setup");
+const { setupEncryption } = require("login.dfe.api-client/encryption");
 
 const redisClient = new Redis(config.serviceMapping.params.connectionString);
 
@@ -58,6 +59,14 @@ setupApi({
     },
     search: {
       baseUri: config.search.service.url,
+    },
+  },
+});
+
+setupEncryption({
+  providers: {
+    AES256_GCM_V1: {
+      key: config.encryption.Aes256GcmV1Key,
     },
   },
 });

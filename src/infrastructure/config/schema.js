@@ -68,6 +68,12 @@ const serviceMappingSchema = new SimpleSchema({
   key2SuccessServiceId: patterns.uuid,
 });
 
+const encryptionSchema = new SimpleSchema({
+  Aes256GcmV1Key: {
+    type: String,
+  },
+});
+
 const schema = new SimpleSchema({
   loggerSettings: schemas.loggerSettings,
   hostingEnvironment: schemas.hostingEnvironment,
@@ -81,6 +87,7 @@ const schema = new SimpleSchema({
   audit: auditSchema,
   serviceMapping: serviceMappingSchema,
   assets: schemas.assets,
+  encryption: encryptionSchema,
 });
 
 

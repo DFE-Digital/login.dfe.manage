@@ -20,6 +20,7 @@ const {
   checkClientId,
   _unescape,
 } = require("./utils");
+const { decrypt } = require("login.dfe.api-client/encryption");
 
 const buildServiceModelFromObject = (service, sessionService = {}) => {
   let tokenEndpointAuthMethod = null;
@@ -106,6 +107,11 @@ const buildCurrentServiceModel = async (req) => {
     const service = await getServiceRaw({
       by: { serviceId: req.params.sid },
     });
+    if (service?.relyingParty?.api_secret) {
+      service.relyingParty.api_secret = decrypt(
+        service.relyingParty.api_secret,
+      );
+    }
     const currentServiceModel = buildServiceModelFromObject(
       service,
       sessionService,

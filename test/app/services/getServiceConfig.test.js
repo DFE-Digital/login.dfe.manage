@@ -1,7 +1,10 @@
 jest.mock("./../../../src/infrastructure/config", () =>
   require("../../utils").configMockFactory(),
 );
-
+jest.mock("login.dfe.api-client/encryption", () => ({
+  encrypt: jest.fn((text) => text),
+  decrypt: jest.fn((text) => text),
+}));
 jest.mock("./../../../src/infrastructure/logger", () =>
   require("../../utils").loggerMockFactory(),
 );
