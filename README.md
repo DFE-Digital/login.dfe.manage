@@ -1,16 +1,20 @@
 # DfE Sign-in Manage
 
-[![tested with jest](https://img.shields.io/badge/tested_with-jest-99424f.svg)](https://github.com/facebook/jest) [![jest](https://jestjs.io/img/jest-badge.svg)](https://github.com/facebook/jest)
+**DfE Sign-in manage** provides functionality for service administrators to configure and maintain their services within the DfE Sign-in platform. This application enables service teams to manage services as part of the wider **login.dfe** project.
 
-Application for service teams to manage their services.
+## Environment Configuration
+
+### Development prerequisites
+
+Before setting up your local environment, review the [Development Prerequisites documentation](https://dfe-secureaccess.atlassian.net/wiki/spaces/NSA/pages/4643454992/Development+prerequisites) available on confluence. This guide outlines the required tools, dependencies, and permissions needed to work on DfE Sign-in services.
+
+### Local environment
+
+To set up your local environment run the PowerShell tokenization script provided in the **login.dfe.dsi-config** repository to generate local environment values for connecting to the DfE Sign-in dev environment.
+
+This script will create or update the necessary local configuration files (e.g., .env) used by this service.
 
 ## Getting Started
-
-### Prerequisites
-
-- [Node.js](https://nodejs.org/)
-- [npm](https://www.npmjs.com/)
-- [Docker](https://www.docker.com/)
 
 Install deps
 
@@ -43,9 +47,3 @@ https://localhost:41015/
 ```
 npm run test
 ```
-
-## Environment Configuration
-
-To set up your local environment run the PowerShell tokenization script provided in the **login.dfe.dsi-config** repository to generate local environment values for connecting to the DfE Sign-in dev environment.
-
-This script will create or update the necessary local configuration files (e.g., .env) used by this service.
