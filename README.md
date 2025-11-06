@@ -6,6 +6,12 @@ Application for service teams to manage their services.
 
 ## Getting Started
 
+### Prerequisites
+
+- [Node.js](https://nodejs.org/)
+- [npm](https://www.npmjs.com/)
+- [Docker](https://www.docker.com/)
+
 Install deps
 
 ```
@@ -37,3 +43,9 @@ https://localhost:41015/
 ```
 npm run test
 ```
+
+## Environment Configuration
+
+To set up your local environment run the PowerShell tokenization script provided in the **login.dfe.dsi-config** repository to generate local environment values for connecting to the DfE Sign-in dev environment.
+
+This script will create or update the necessary local configuration files (e.g., .env) used by this service.
