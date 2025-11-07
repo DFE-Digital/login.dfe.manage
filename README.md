@@ -1,6 +1,6 @@
 # DfE Sign-in Manage
 
-**DfE Sign-in manage** provides functionality for service administrators to configure and maintain their services within the DfE Sign-in platform. This application enables service teams to manage services as part of the wider **login.dfe** project.
+**DfE Sign-in manage** service enables administrators to configure and maintain their services on the DfE Sign-in platform, including the management of banners, users, policies, and related settings. This service is part of the wider **login.dfe** project.
 
 ## Environment Configuration
 
