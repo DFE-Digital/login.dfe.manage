@@ -108,7 +108,14 @@ const postConfirmRemovePolicyRole = async (req, res) => {
       { correlationId: req.id },
     );
     try {
-      await deleteServiceRoleRaw(policy.applicationId, roleInPolicy.id);
+      /*
+      ‘Tidying up user_service_roles, invitations and requests data is difficult when multiple policies are using a role as we don’t record what policy granted the role for the user. The best we can currently do is clean it all up once the last role is deleted.  In the future, we should tidy up this data when a role is unlinked from a policy'
+      */
+      await deleteServiceRoleRaw({
+        serviceId: policy.applicationId,
+        roleId: roleInPolicy.id,
+        roleCode: model.roleCode,
+      });
     } catch (error) {
       return handleApiError(
         error,
