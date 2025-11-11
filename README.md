@@ -1,12 +1,12 @@
 # DfE Sign-in Manage
 
-**DfE Sign-in manage** service enables administrators to configure and maintain their services on the DfE Sign-in platform, including the management of banners, users, policies, and related settings. This service is part of the wider **login.dfe** project.
+**DfE Sign-in Manage** service enables administrators to configure and maintain their services on the DfE Sign-in platform, including the management of banners, users, policies, and related settings. This service is part of the wider **login.dfe** project.
 
 ## Environment Configuration
 
 ### Development prerequisites
 
-Before setting up your local environment, review the [Development Prerequisites documentation](https://dfe-secureaccess.atlassian.net/wiki/spaces/NSA/pages/4643454992/Development+prerequisites) available on confluence. This guide outlines the required tools, dependencies, and permissions needed to work on DfE Sign-in services.
+Before setting up your local environment, review the [Development Prerequisites documentation](https://dfe-secureaccess.atlassian.net/wiki/spaces/NSA/pages/4643454992/Development+prerequisites) available on Confluence. This guide outlines the required tools, dependencies, and permissions needed to work on DfE Sign-in services.
 
 ### Local environment
 
@@ -24,7 +24,7 @@ Once completed, your local environment will be configured to connect to the DfE 
 
 ## Getting Started
 
-Install deps
+Install dependencies
 
 ```
 npm install
@@ -32,13 +32,13 @@ npm install
 
 ### Run application
 
-This application requires redis to run. If running locally, the easiest way is to create an instance of redis using docker:
+This application requires Redis to run. If running locally, the easiest way is to create an instance of Redis using Docker:
 
 ```
 docker run -d -p 6379:6379 redis
 ```
 
-Once redis is running, start it with:
+Once Redis is running, start it with:
 
 ```
 npm run dev
