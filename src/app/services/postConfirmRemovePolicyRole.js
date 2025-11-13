@@ -114,7 +114,6 @@ const postConfirmRemovePolicyRole = async (req, res) => {
       await deleteServiceRoleRaw({
         serviceId: policy.applicationId,
         roleId: roleInPolicy.id,
-        roleCode: model.roleCode,
       });
     } catch (error) {
       return handleApiError(

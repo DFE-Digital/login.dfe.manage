@@ -178,7 +178,6 @@ describe("when using the postConfirmRemovePolicyRole function", () => {
     });
 
     expect(deleteServiceRoleRaw).toHaveBeenCalledWith({
-      roleCode: "CheckRecord_School",
       roleId: "717E2ECB-8B76-402C-A142-15DD486CBE95",
       serviceId: "32A923EE-B729-44B1-BB52-1789FD08862A",
     });
