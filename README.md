@@ -1,5 +1,65 @@
 # DfE Sign-in Manage
 
-[![tested with jest](https://img.shields.io/badge/tested_with-jest-99424f.svg)](https://github.com/facebook/jest) [![jest](https://jestjs.io/img/jest-badge.svg)](https://github.com/facebook/jest)
+**DfE Sign-in Manage** service enables administrators to configure and maintain their services on the DfE Sign-in platform, including the management of banners, users, policies, and related settings. This service is part of the wider **login.dfe** project.
 
-Application for service teams to manage their services.
+## Getting Started
+
+### Install Dependencies
+
+```
+npm install
+```
+
+Additionally, this app requires Redis as a backing service. The easiest way is to create an instance of Redis using Docker:
+
+```
+docker run -d -p 6379:6379 redis
+```
+
+### Run application
+
+Start the application with:
+
+```
+npm run dev
+```
+
+Once the application has started, you can view it in the browser by going to:
+
+```
+https://localhost:41015
+```
+
+### Run Tests
+
+Run all tests with:
+
+```
+npm run test
+```
+
+### Code Quality and Formatting
+
+Run ESLint:
+
+```
+npm run lint
+```
+
+Automatically fix lint issues:
+
+```
+npm run lint:fix
+```
+
+### Development Checks
+
+Run linting and tests together:
+
+```
+npm run dev:checks
+```
+
+### Pre-commit Hooks
+
+Pre-commit hooks are handled automatically via Husky. No additional setup is required.
