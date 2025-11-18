@@ -1,5 +1,9 @@
 const mockUtils = require("../../utils");
 
+jest.mock("login.dfe.api-client/encryption", () => ({
+  encrypt: jest.fn((text) => text),
+  decrypt: jest.fn((text) => text),
+}));
 jest.mock("login.dfe.validation");
 jest.mock("./../../../src/infrastructure/config", () =>
   mockUtils.configMockFactory(),

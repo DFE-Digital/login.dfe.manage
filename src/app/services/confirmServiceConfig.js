@@ -18,6 +18,7 @@ const {
   SERVICE_CONFIG_CHANGES_SUMMARY_DETAILS,
   TOKEN_ENDPOINT_AUTH_METHOD,
 } = require("../../constants/serviceConfigConstants");
+const { encrypt } = require("login.dfe.api-client/encryption");
 
 const getServiceConfigMapping = (key, sid) => {
   const mapping = { ...SERVICE_CONFIG_CHANGES_SUMMARY_DETAILS[key] };
@@ -544,7 +545,9 @@ const postConfirmServiceConfig = async (req, res) => {
       post_logout_redirect_uris: model.service.postLogoutRedirectUris,
       grant_types: model.service.grantTypes,
       response_types: model.service.responseTypes,
-      apiSecret: model.service.apiSecret,
+      apiSecret: model.service.apiSecret
+        ? encrypt(model.service.apiSecret)
+        : model.service.apiSecret,
       // If tokenEndpointAuthMethod isn't 'client_secret_post', store NULL in the DB.
       tokenEndpointAuthMethod:
         model.service.tokenEndpointAuthMethod === CLIENT_SECRET_POST
