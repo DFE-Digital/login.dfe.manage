@@ -163,6 +163,9 @@ const config = {
   assets: {
     url: process.env.CDN_HOST_NAME,
     version: process.env.CDN_ASSETS_VERSION
+  },
+  encryption: {
+    Aes256GcmV1Key: process.env.ENCRYPT_AES256GCM_KEY,
   }
 }
 
