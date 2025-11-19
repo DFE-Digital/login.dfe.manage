@@ -177,10 +177,10 @@ describe("when using the postConfirmRemovePolicyRole function", () => {
       }),
     });
 
-    expect(deleteServiceRoleRaw).toHaveBeenCalledWith(
-      "32A923EE-B729-44B1-BB52-1789FD08862A",
-      "717E2ECB-8B76-402C-A142-15DD486CBE95",
-    );
+    expect(deleteServiceRoleRaw).toHaveBeenCalledWith({
+      roleId: "717E2ECB-8B76-402C-A142-15DD486CBE95",
+      serviceId: "32A923EE-B729-44B1-BB52-1789FD08862A",
+    });
 
     expect(logger.info).toHaveBeenCalledWith(
       "[32A923EE-B729-44B1-BB52-1789FD08862A] [717E2ECB-8B76-402C-A142-15DD486CBE95] does not exist in any other policies for this service. Calling deleteServiceRoleRaw.",
