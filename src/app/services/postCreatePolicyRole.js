@@ -33,7 +33,7 @@ const validate = async (req) => {
   });
 
   const existingRoleInPolicy = policy.roles.find(
-    (role) => role.name === model.roleName && role.code === model.roleCode,
+    (role) => role.code === model.roleCode,
   );
 
   if (existingRoleInPolicy) {
