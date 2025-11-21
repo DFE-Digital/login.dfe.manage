@@ -33,12 +33,11 @@ const validate = async (req) => {
   });
 
   const existingRoleInPolicy = policy.roles.find(
-    (role) => role.name === model.roleName && role.code === model.roleCode,
+    (role) => role.code === model.roleCode,
   );
 
   if (existingRoleInPolicy) {
-    model.validationMessages.roleExists =
-      "This role already exists for this policy";
+    model.validationMessages.roleExists = `A role with the code '${model.roleCode}' already exists for this policy`;
     logger.info(
       `${model.roleName}: [code: ${model.roleCode}] found in policy`,
       { correlationId: req.id },
