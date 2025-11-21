@@ -123,7 +123,8 @@ describe("when using postCreatePolicyRole", () => {
     await postCreatePolicyRole(req, res);
 
     expect(res.render.mock.calls[0][1].validationMessages).toMatchObject({
-      roleExists: "This role already exists for this policy",
+      roleExists:
+        "A role with the code 'CheckRecord_School' already exists for this policy",
     });
   });
 
