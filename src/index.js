@@ -23,6 +23,7 @@ const config = require("./infrastructure/config");
 const logger = require("./infrastructure/logger");
 const { setupApi } = require("login.dfe.api-client/api/setup");
 const { setupEncryption } = require("login.dfe.api-client/encryption");
+const packageConfig = require("../package.json");
 
 const redisClient = new Redis(config.serviceMapping.params.connectionString);
 
@@ -103,6 +104,7 @@ const init = async () => {
   const imgSources = [self, "data:", "blob:", allowedOrigin];
   const fontSources = [self, "data:", allowedOrigin];
   const defaultSources = [self, allowedOrigin];
+  const defaultConnectSources = [self, allowedOrigin];
 
   if (config.hostingEnvironment.env === "dev") {
     scriptSources.push("localhost:*");
@@ -120,7 +122,7 @@ const init = async () => {
           styleSrc: styleSources,
           imgSrc: imgSources,
           fontSrc: fontSources,
-          connectSrc: [self],
+          connectSrc: defaultConnectSources,
           formAction: [self, "*"],
         },
       },
@@ -136,10 +138,11 @@ const init = async () => {
 
   logger.info("helmet setup complete");
 
-  let assetsUrl = config.assets.url;
-  assetsUrl = assetsUrl.endsWith("/")
-    ? assetsUrl.substr(0, assetsUrl.length - 1)
-    : assetsUrl;
+  const assetsVersion = packageConfig?.assets?.version;
+  const baseAssetsUrl = config.assets.url.replace(/\/$/, "");
+  const assetsUrl = assetsVersion
+    ? `${baseAssetsUrl}/${assetsVersion}`
+    : baseAssetsUrl;
   Object.assign(app.locals, {
     urls: {
       accessibilityStatementUrl:
@@ -158,9 +161,6 @@ const init = async () => {
         config.hostingEnvironment.environmentBannerMessage,
     },
     gaTrackingId: config.hostingEnvironment.gaTrackingId,
-    assets: {
-      version: config.assets.version,
-    },
   });
 
   if (config.hostingEnvironment.env !== "dev") {
@@ -247,7 +247,6 @@ const init = async () => {
     {
       help: config.hostingEnvironment.helpUrl,
       assets: assetsUrl,
-      assetsVersion: config.assets.version,
     },
     config.hostingEnvironment.env === "dev",
   );
