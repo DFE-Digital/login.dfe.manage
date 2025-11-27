@@ -4,8 +4,8 @@ const logger = require("../../infrastructure/logger");
 const validate = async (req) => {
   const model = {
     appId: req.params.sid || "",
-    roleName: req.body.roleName || "",
-    roleCode: req.body.roleCode || "",
+    roleName: req.body.roleName.trim() || "",
+    roleCode: req.body.roleCode.trim() || "",
     validationMessages: {},
   };
 
