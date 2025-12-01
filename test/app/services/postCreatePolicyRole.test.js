@@ -70,6 +70,72 @@ describe("when using postCreatePolicyRole", () => {
     expect(res.redirect.mock.calls[0][0]).toBe("confirm-create-policy-role");
   });
 
+  it("should trim whitespace from role name before validation", async () => {
+    req.body.roleName = "  test name  ";
+
+    await postCreatePolicyRole(req, res);
+
+    expect(req.session.createPolicyRoleData).toMatchObject({
+      appId: "service-id",
+      roleName: "test name",
+      roleCode: "test-code",
+      validationMessages: {},
+    });
+    expect(res.redirect.mock.calls[0][0]).toBe("confirm-create-policy-role");
+  });
+
+  it("should trim whitespace from role code before validation", async () => {
+    req.body.roleCode = "  test-code  ";
+
+    await postCreatePolicyRole(req, res);
+
+    expect(req.session.createPolicyRoleData).toMatchObject({
+      appId: "service-id",
+      roleName: "test name",
+      roleCode: "test-code",
+      validationMessages: {},
+    });
+    expect(res.redirect.mock.calls[0][0]).toBe("confirm-create-policy-role");
+  });
+
+  it("should return validation error when role name is only whitespace", async () => {
+    req.body.roleName = "   ";
+
+    await postCreatePolicyRole(req, res);
+
+    expect(res.render.mock.calls[0][1].validationMessages).toMatchObject({
+      roleName: "Please enter a role name",
+    });
+  });
+
+  it("should return validation error when role code is only whitespace", async () => {
+    req.body.roleCode = "   ";
+
+    await postCreatePolicyRole(req, res);
+
+    expect(res.render.mock.calls[0][1].validationMessages).toMatchObject({
+      roleCode: "Please enter a role code",
+    });
+  });
+
+  it("should trim whitespace before checking role name length", async () => {
+    req.body.roleName = "  " + "a".repeat(125) + "  ";
+
+    await postCreatePolicyRole(req, res);
+
+    expect(req.session.createPolicyRoleData.roleName).toBe("a".repeat(125));
+    expect(res.redirect.mock.calls[0][0]).toBe("confirm-create-policy-role");
+  });
+
+  it("should trim whitespace before checking role code length", async () => {
+    req.body.roleCode = "  " + "a".repeat(50) + "  ";
+
+    await postCreatePolicyRole(req, res);
+
+    expect(req.session.createPolicyRoleData.roleCode).toBe("a".repeat(50));
+    expect(res.redirect.mock.calls[0][0]).toBe("confirm-create-policy-role");
+  });
+
   it("should return a validation error when the role name is missing", async () => {
     req.body.roleName = "";
 
@@ -123,7 +189,8 @@ describe("when using postCreatePolicyRole", () => {
     await postCreatePolicyRole(req, res);
 
     expect(res.render.mock.calls[0][1].validationMessages).toMatchObject({
-      roleExists: "This role already exists for this policy",
+      roleExists:
+        "Role with code: CheckRecord_School already exists for this policy",
     });
   });
 
