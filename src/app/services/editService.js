@@ -44,10 +44,10 @@ const getViewModel = async (req) => {
   const policyResult = await policyEngine.getPolicyApplicationResultsForUser(
     req.params.uid.startsWith("inv-") ? undefined : req.params.uid,
     req.params.oid,
-    req.params.sid,
+    [req.params.sid],
     req.id,
   );
-  const serviceRoles = policyResult.rolesAvailableToUser;
+  const serviceRoles = policyResult[0].rolesAvailableToUser;
   const manageRolesForService = await getUserServiceRoles(req);
 
   return {

@@ -48,9 +48,11 @@ describe("when displaying the edit service view", () => {
 
     policyEngine.getPolicyApplicationResultsForUser
       .mockReset()
-      .mockReturnValue({
-        rolesAvailableToUser: [],
-      });
+      .mockReturnValue([
+        {
+          rolesAvailableToUser: [],
+        },
+      ]);
     PolicyEngine.mockReset().mockImplementation(() => policyEngine);
 
     getUserServiceRaw.mockReset();

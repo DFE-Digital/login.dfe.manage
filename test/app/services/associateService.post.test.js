@@ -48,9 +48,11 @@ describe("when associating a service with user", () => {
 
     policyEngine.getPolicyApplicationResultsForUser
       .mockReset()
-      .mockReturnValue({
-        rolesAvailableToUser: ["role1", "role2"],
-      });
+      .mockReturnValue([
+        {
+          rolesAvailableToUser: ["role1", "role2"],
+        },
+      ]);
     PolicyEngine.mockReset().mockImplementation(() => policyEngine);
 
     // Require needed on beforeEach as Policy Engine is instantiated outside of route action.
