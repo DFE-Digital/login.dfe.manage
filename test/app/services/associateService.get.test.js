@@ -68,7 +68,11 @@ describe("when displaying the associate service view", () => {
       .mockReset()
       .mockReturnValue([
         {
-          rolesAvailableToUser: ["role1", "role2"],
+          rolesAvailableToUser: [
+            { id: "role1", name: "Role Z" },
+            { id: "role2", name: "Role B" },
+            { id: "role3", name: "Role A" },
+          ],
         },
       ]);
     PolicyEngine.mockReset().mockImplementation(() => policyEngine);
@@ -137,10 +141,14 @@ describe("when displaying the associate service view", () => {
     });
   });
 
-  it("then it should include the roles available to the user", async () => {
+  it("then it should include the roles available to the user in alphabetical order", async () => {
     await getAssociateService(req, res);
     expect(res.render.mock.calls[0][1]).toMatchObject({
-      serviceRoles: ["role1", "role2"],
+      serviceRoles: [
+        { id: "role3", name: "Role A" },
+        { id: "role2", name: "Role B" },
+        { id: "role1", name: "Role Z" },
+      ],
     });
   });
 
