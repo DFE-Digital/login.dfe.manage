@@ -14,6 +14,10 @@ const getEditServiceInfo = require("./getEditServiceInfo");
 const postEditServiceInfo = require("./postEditServiceInfo");
 const getConfirmEditServiceInfo = require("./getConfirmEditServiceInfo");
 const postConfirmEditServiceInfo = require("./postConfirmEditServiceInfo");
+const getCreateNewPolicyName = require("./createNewPolicy/getCreateNewPolicyName");
+const postCreateNewPolicyName = require("./createNewPolicy/postCreateNewPolicyName");
+const getCreateNewPolicyRole = require("./createNewPolicy/getCreateNewPolicyRole");
+const postCreateNewPolicyRole = require("./createNewPolicy/postCreateNewPolicyRole");
 const { getServiceConfig, postServiceConfig } = require("./serviceConfig");
 const {
   getConfirmServiceConfig,
@@ -533,6 +537,39 @@ const services = (csrf) => {
     isManageUserForService,
     hasGenericRole("internalServiceConfigurationManager"),
     asyncWrapper(postConfirmRemovePolicyRole),
+  );
+
+  // Create new policy
+  router.get(
+    "/:sid/policies/create-new-policy-name",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("internalServiceConfigurationManager"),
+    asyncWrapper(getCreateNewPolicyName),
+  );
+
+  router.post(
+    "/:sid/policies/create-new-policy-name",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("internalServiceConfigurationManager"),
+    asyncWrapper(postCreateNewPolicyName),
+  );
+
+  router.get(
+    "/:sid/policies/create-new-policy-role",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("internalServiceConfigurationManager"),
+    asyncWrapper(getCreateNewPolicyRole),
+  );
+
+  router.post(
+    "/:sid/policies/create-new-policy-role",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("internalServiceConfigurationManager"),
+    asyncWrapper(postCreateNewPolicyRole),
   );
 
   return router;
