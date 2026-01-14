@@ -70,8 +70,7 @@ const postCreateNewPolicyRole = async (req, res) => {
         userRoles: manageRolesForService,
       });
     }
-    // Only temporary, will redirect to conditions page in a future card
-    return res.redirect("policies");
+    return res.redirect("create-new-policy-condition");
   });
 };
 

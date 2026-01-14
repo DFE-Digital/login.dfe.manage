@@ -51,7 +51,7 @@ describe("when using postCreateNewPolicyRole", () => {
     await postCreateNewPolicyRole(req, res);
 
     expect(res.redirect.mock.calls.length).toBe(1);
-    expect(res.redirect.mock.calls[0][0]).toBe("policies");
+    expect(res.redirect.mock.calls[0][0]).toBe("create-new-policy-condition");
   });
 
   it("should trim whitespace from role name before validation", async () => {
@@ -67,7 +67,7 @@ describe("when using postCreateNewPolicyRole", () => {
         validationMessages: {},
       },
     });
-    expect(res.redirect.mock.calls[0][0]).toBe("policies");
+    expect(res.redirect.mock.calls[0][0]).toBe("create-new-policy-condition");
   });
 
   it("should trim whitespace from role code before validation", async () => {
@@ -83,7 +83,7 @@ describe("when using postCreateNewPolicyRole", () => {
         validationMessages: {},
       },
     });
-    expect(res.redirect.mock.calls[0][0]).toBe("policies");
+    expect(res.redirect.mock.calls[0][0]).toBe("create-new-policy-condition");
   });
 
   it("should return validation error when role name is only whitespace", async () => {
@@ -112,7 +112,7 @@ describe("when using postCreateNewPolicyRole", () => {
     await postCreateNewPolicyRole(req, res);
 
     expect(req.session.createNewPolicy.role.roleName).toBe("a".repeat(125));
-    expect(res.redirect.mock.calls[0][0]).toBe("policies");
+    expect(res.redirect.mock.calls[0][0]).toBe("create-new-policy-condition");
   });
 
   it("should trim whitespace before checking role code length", async () => {
@@ -121,7 +121,7 @@ describe("when using postCreateNewPolicyRole", () => {
     await postCreateNewPolicyRole(req, res);
 
     expect(req.session.createNewPolicy.role.roleCode).toBe("a".repeat(50));
-    expect(res.redirect.mock.calls[0][0]).toBe("policies");
+    expect(res.redirect.mock.calls[0][0]).toBe("create-new-policy-condition");
   });
 
   it("should return a validation error when the role name is missing", async () => {
