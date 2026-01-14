@@ -25,6 +25,20 @@
     }
     %>
 
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+        </div>
+        <%  if (locals.canUserModifyPolicyConditionsAndRoles) { %>
+            <ul class="govuk-list">
+                <li>
+                    <a class="govuk-link" href="policies/create-new-policy-name">
+                        Create Policy
+                    </a>
+                </li>
+            </ul>
+        <% } %>
+    </div>
+
     <div class="govuk-grid-row govuk-!-margin-top-6">
         <div class="govuk-grid-column-full">
             <%- include('../../layouts/pagination', paginationModel); %>

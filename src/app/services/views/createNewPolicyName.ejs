@@ -1,0 +1,31 @@
+<div class="govuk-width-container govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <h1 class="govuk-heading-l">
+                Create new policy
+            </h1>
+            <form method="post" class="prevent-form-double-submission" id="form-new-policy-role">
+                <input type="hidden" name="_csrf" value="<%=csrfToken%>" />
+            
+                <fieldset class="govuk-fieldset" id="fieldset-new-policy-role">
+                    <legend class="govuk-visually-hidden">Create policy for <%= locals.service.name %></legend>
+                
+                    <div class="govuk-form-group <%= (locals.model.validationMessages.name !== undefined) ? 'govuk-form-group--error' : '' %>">
+                        <label class="govuk-label govuk-label--s" for="name">Policy name</label>
+                    <% if (locals.model.validationMessages.name !== undefined) { %>
+                        <p id="validation-name" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span> <%=locals.model.validationMessages.name%>
+                        </p>
+                    <% } %>
+                        <input type="text" id="name" name="name" value="<%=locals.name%>" class="govuk-input govuk-!-width-three-quarters" maxlength="125"<% if (locals.model.validationMessages.name) { %> aria-invalid="true" aria-describedby="validation-name" <% } %>>
+                    </div>
+
+                    <div class="govuk-button-group">
+                        <button type="submit" class="govuk-button" data-module="govuk-button">Continue</button>
+                        <a href="<%=locals.cancelLink%>" class="govuk-button govuk-button--secondary">Cancel</a>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>
