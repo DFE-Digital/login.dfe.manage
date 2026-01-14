@@ -9,14 +9,28 @@ jest.mock("login.dfe.api-client/services");
 
 const { getRequestMock, getResponseMock } = require("../../../utils");
 const postCreateNewPolicyName = require("../../../../src/app/services/createNewPolicy/postCreateNewPolicyName");
-const { getServiceRaw } = require("login.dfe.api-client/services");
+const {
+  getServiceRaw,
+  getServicePoliciesRaw,
+} = require("login.dfe.api-client/services");
 const res = getResponseMock();
 
 // Fields removed for brevity.
 const service = {
-  id: "service1",
+  id: "service-1",
   name: "Service One",
 };
+
+const servicePolicies = [
+  {
+    id: "3FD58D08-13DE-4AAE-9C86-C5B207128B12",
+    name: "Existing policy 1",
+    applicationId: "service-1",
+    status: { id: 1 },
+    conditions: [],
+    roles: [],
+  },
+];
 
 describe("when using postCreateNewPolicyName", () => {
   let req;
@@ -24,7 +38,7 @@ describe("when using postCreateNewPolicyName", () => {
   beforeEach(() => {
     const requestBody = {
       params: {
-        sid: "service-id",
+        sid: "service-1",
       },
       body: {
         name: "Test policy",
@@ -38,6 +52,9 @@ describe("when using postCreateNewPolicyName", () => {
 
     getServiceRaw.mockReset();
     getServiceRaw.mockResolvedValue(service);
+
+    getServicePoliciesRaw.mockReset();
+    getServicePoliciesRaw.mockResolvedValue(servicePolicies);
 
     res.mockResetAll();
   });
@@ -86,9 +103,9 @@ describe("when using postCreateNewPolicyName", () => {
     await postCreateNewPolicyName(req, res);
 
     expect(res.render.mock.calls[0][1]).toMatchObject({
-      backLink: `/services/service-id/policies`,
-      cancelLink: `/services/service-id/policies`,
-      serviceId: "service-id",
+      backLink: `/services/service-1/policies`,
+      cancelLink: `/services/service-1/policies`,
+      serviceId: "service-1",
       csrfToken: "token",
       currentNavigation: "policies",
       model: {
@@ -97,13 +114,23 @@ describe("when using postCreateNewPolicyName", () => {
     });
   });
 
-  it("should return a validation error when the role name exceeds 125 characters", async () => {
+  it("should return a validation error when the name exceeds 125 characters", async () => {
     req.body.name = "a".repeat(126);
 
     await postCreateNewPolicyName(req, res);
 
     expect(res.render.mock.calls[0][1].model.validationMessages).toMatchObject({
       name: "Name must be 125 characters or less",
+    });
+  });
+
+  it("should return a validation error when the name matches an existing policy", async () => {
+    req.body.name = "Existing policy 1";
+
+    await postCreateNewPolicyName(req, res);
+
+    expect(res.render.mock.calls[0][1].model.validationMessages).toMatchObject({
+      name: "Policy name must be unique and cannot already exist in DfE Sign-in",
     });
   });
 

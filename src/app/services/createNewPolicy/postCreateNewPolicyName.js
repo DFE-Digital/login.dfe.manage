@@ -1,4 +1,7 @@
-const { getServiceRaw } = require("login.dfe.api-client/services");
+const {
+  getServiceRaw,
+  getServicePoliciesRaw,
+} = require("login.dfe.api-client/services");
 const { getUserServiceRoles } = require("../utils");
 const logger = require("../../../infrastructure/logger");
 
@@ -13,12 +16,19 @@ const validate = async (req) => {
   } else if (model.name.length > 125) {
     model.validationMessages.name = "Name must be 125 characters or less";
   } else {
-    // Get all policies for service
-    // Does name match any existing policy name
-    // if (nameMatchesExistingPolicy) {
-    //   model.validationMessages.name =
-    //     "Policy name must be unique and cannot already exist in DfE Sign-in";
-    // }
+    const servicePolicies = await getServicePoliciesRaw({
+      serviceId: req.params.sid,
+      page: 1,
+      pageSize: 300,
+    });
+    console.log(servicePolicies);
+    const existingNameInPolicy = servicePolicies.find(
+      (policy) => policy.name === model.name,
+    );
+    if (existingNameInPolicy) {
+      model.validationMessages.name =
+        "Policy name must be unique and cannot already exist in DfE Sign-in";
+    }
   }
 
   return model;
