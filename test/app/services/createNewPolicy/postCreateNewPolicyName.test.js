@@ -59,7 +59,7 @@ describe("when using postCreateNewPolicyName", () => {
     res.mockResetAll();
   });
 
-  it("should redirect to the confirm page on success", async () => {
+  it("should redirect to the create-new-policy-role page on success", async () => {
     await postCreateNewPolicyName(req, res);
 
     expect(res.redirect.mock.calls.length).toBe(1);
@@ -97,7 +97,7 @@ describe("when using postCreateNewPolicyName", () => {
     expect(res.redirect.mock.calls[0][0]).toBe("create-new-policy-role");
   });
 
-  it("should return a validation error when the role name is missing", async () => {
+  it("should return a validation error when the name is missing", async () => {
     req.body.name = "";
 
     await postCreateNewPolicyName(req, res);

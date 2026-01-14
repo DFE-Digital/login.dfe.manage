@@ -10,17 +10,17 @@ const res = getResponseMock();
 
 // Fields removed for brevity.
 const service = {
-  id: "service1",
+  id: "service-1",
   name: "Service One",
 };
 
-describe("when calling the getCreatePolicyRole function", () => {
+describe("when calling the getCreateNewPolicyRole function", () => {
   let req;
 
   beforeEach(() => {
     req = getRequestMock({
       params: {
-        sid: "service-id",
+        sid: "service-1",
       },
       session: {
         createNewPolicy: {
@@ -35,7 +35,7 @@ describe("when calling the getCreatePolicyRole function", () => {
     res.mockResetAll();
   });
 
-  it("should return the createPolicyRole view", async () => {
+  it("should return the createNewPolicyRole view", async () => {
     await getCreateNewPolicyRole(req, res);
 
     expect(res.render.mock.calls.length).toBe(1);
@@ -50,7 +50,7 @@ describe("when calling the getCreatePolicyRole function", () => {
     expect(res.render.mock.calls[0][1]).toStrictEqual({
       backLink: `/services/${req.params.sid}/policies/create-new-policy-name`,
       cancelLink: `/services/${req.params.sid}/policies`,
-      serviceId: "service-id",
+      serviceId: "service-1",
       csrfToken: "token",
       currentNavigation: "policies",
       model: {
@@ -66,7 +66,7 @@ describe("when calling the getCreatePolicyRole function", () => {
 
     expect(getServiceRaw).toHaveBeenCalledWith({
       by: {
-        serviceId: "service-id",
+        serviceId: "service-1",
       },
     });
   });
@@ -74,11 +74,11 @@ describe("when calling the getCreatePolicyRole function", () => {
   it("should redirect to policies if there is no data in the session", async () => {
     req = getRequestMock({
       params: {
-        sid: "service-id",
+        sid: "service-1",
       },
     });
     await getCreateNewPolicyRole(req, res);
 
-    expect(res.redirect.mock.calls[0][0]).toBe("/services/service-id/policies");
+    expect(res.redirect.mock.calls[0][0]).toBe("/services/service-1/policies");
   });
 });

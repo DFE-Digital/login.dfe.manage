@@ -24,7 +24,7 @@ describe("when using postCreateNewPolicyRole", () => {
   beforeEach(() => {
     const requestBody = {
       params: {
-        sid: "service-id",
+        sid: "service-1",
       },
       body: {
         roleName: "test name",
@@ -46,7 +46,8 @@ describe("when using postCreateNewPolicyRole", () => {
     res.mockResetAll();
   });
 
-  it("should redirect to the confirm page on success", async () => {
+  // This will redirect to the conditions page once implemented
+  it("should redirect to the policies page on success", async () => {
     await postCreateNewPolicyRole(req, res);
 
     expect(res.redirect.mock.calls.length).toBe(1);
@@ -129,9 +130,9 @@ describe("when using postCreateNewPolicyRole", () => {
     await postCreateNewPolicyRole(req, res);
 
     expect(res.render.mock.calls[0][1]).toMatchObject({
-      backLink: `/services/service-id/policies/create-new-policy-name`,
-      cancelLink: `/services/service-id/policies`,
-      serviceId: "service-id",
+      backLink: `/services/service-1/policies/create-new-policy-name`,
+      cancelLink: `/services/service-1/policies`,
+      serviceId: "service-1",
       csrfToken: "token",
       currentNavigation: "policies",
       model: {

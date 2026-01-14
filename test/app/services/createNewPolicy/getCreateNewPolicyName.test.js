@@ -10,17 +10,17 @@ const res = getResponseMock();
 
 // Fields removed for brevity.
 const service = {
-  id: "service1",
+  id: "service-1",
   name: "Service One",
 };
 
-describe("when calling the getCreatePolicyName function", () => {
+describe("when calling the getCreateNewPolicyName function", () => {
   let req;
 
   beforeEach(() => {
     req = getRequestMock({
       params: {
-        sid: "service-id",
+        sid: "service-1",
       },
     });
 
@@ -30,7 +30,7 @@ describe("when calling the getCreatePolicyName function", () => {
     res.mockResetAll();
   });
 
-  it("should return the createPolicyRole view", async () => {
+  it("should return the createNewPolicyName view", async () => {
     await getCreateNewPolicyName(req, res);
 
     expect(res.render.mock.calls.length).toBe(1);
@@ -45,7 +45,7 @@ describe("when calling the getCreatePolicyName function", () => {
     expect(res.render.mock.calls[0][1]).toStrictEqual({
       backLink: `/services/${req.params.sid}/policies`,
       cancelLink: `/services/${req.params.sid}/policies`,
-      serviceId: "service-id",
+      serviceId: "service-1",
       csrfToken: "token",
       currentNavigation: "policies",
       model: {
@@ -61,7 +61,7 @@ describe("when calling the getCreatePolicyName function", () => {
 
     expect(getServiceRaw).toHaveBeenCalledWith({
       by: {
-        serviceId: "service-id",
+        serviceId: "service-1",
       },
     });
   });
