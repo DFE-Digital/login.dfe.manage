@@ -21,7 +21,6 @@ const validate = async (req) => {
       page: 1,
       pageSize: 300,
     });
-    console.log(servicePolicies);
     const existingNameInPolicy = servicePolicies.find(
       (policy) => policy.name === model.name,
     );

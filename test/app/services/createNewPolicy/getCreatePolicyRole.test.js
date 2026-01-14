@@ -70,4 +70,15 @@ describe("when calling the getCreatePolicyRole function", () => {
       },
     });
   });
+
+  it("should redirect to policies if there is no data in the session", async () => {
+    req = getRequestMock({
+      params: {
+        sid: "service-id",
+      },
+    });
+    await getCreateNewPolicyRole(req, res);
+
+    expect(res.redirect.mock.calls[0][0]).toBe("/services/service-id/policies");
+  });
 });
