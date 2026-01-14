@@ -31,7 +31,7 @@ const validate = async (req) => {
   return model;
 };
 
-const postEditServiceInfo = async (req, res) => {
+const postCreateNewPolicyRole = async (req, res) => {
   const service = await getServiceRaw({
     by: { serviceId: req.params.sid },
   });
@@ -75,4 +75,4 @@ const postEditServiceInfo = async (req, res) => {
   });
 };
 
-module.exports = postEditServiceInfo;
+module.exports = postCreateNewPolicyRole;

@@ -1,7 +1,7 @@
 const { getServiceRaw } = require("login.dfe.api-client/services");
 const { getUserServiceRoles } = require("../utils");
 
-const getCreatePolicyName = async (req, res) => {
+const getCreateNewPolicyName = async (req, res) => {
   const model = {
     validationMessages: {},
   };
@@ -22,4 +22,4 @@ const getCreatePolicyName = async (req, res) => {
   });
 };
 
-module.exports = getCreatePolicyName;
+module.exports = getCreateNewPolicyName;

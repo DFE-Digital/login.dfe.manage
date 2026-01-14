@@ -1,7 +1,7 @@
 const { getServiceRaw } = require("login.dfe.api-client/services");
 const { getUserServiceRoles } = require("../utils");
 
-const getCreatePolicyRole = async (req, res) => {
+const getCreateNewPolicyRole = async (req, res) => {
   if (!req.session.createNewPolicy) {
     return res.redirect(`/services/${req.params.sid}/policies`);
   }
@@ -23,4 +23,4 @@ const getCreatePolicyRole = async (req, res) => {
   });
 };
 
-module.exports = getCreatePolicyRole;
+module.exports = getCreateNewPolicyRole;
