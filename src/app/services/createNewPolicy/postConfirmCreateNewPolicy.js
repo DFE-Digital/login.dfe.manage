@@ -7,6 +7,11 @@ const postConfirmCreateNewPolicy = async (req, res) => {
 
   const model = req.session.createNewPolicy;
 
+  // Note:  The endpoint to create a policy can support multiple roles and conditions
+  // on creation.  We only did 1 so we could deliver the MVP of this feature, but a future
+  // iteration of this feature could allow multiple roles and conditions to be added when
+  // the policy is being created.
+
   // Hitting the endpoint to create the policy will be done in a future card
   // try {
   logger.info("Hit new policy endpoint", model);

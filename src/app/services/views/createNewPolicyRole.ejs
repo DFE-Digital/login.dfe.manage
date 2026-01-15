@@ -1,8 +1,9 @@
 <div class="govuk-width-container govuk-main-wrapper">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-three-quarters">
-            <h1 class="govuk-heading-l">
-                Create Role for <%= locals.policyName %>
+            <h1 class="govuk-heading-xl govuk-!-margin-top-0 text-break">
+                <span class="govuk-caption-xl"><%=locals.service.name%></span>
+                Create policy role for <%= locals.policyName %>
             </h1>
             <form method="post" class="prevent-form-double-submission" id="form-new-policy-role">
                 <input type="hidden" name="_csrf" value="<%=csrfToken%>" />
