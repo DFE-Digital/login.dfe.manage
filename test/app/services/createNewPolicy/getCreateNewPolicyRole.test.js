@@ -53,9 +53,10 @@ describe("when calling the getCreateNewPolicyRole function", () => {
       serviceId: "service-1",
       csrfToken: "token",
       currentNavigation: "policies",
-      model: {
-        name: "Test Policy",
-      },
+      policyName: "Test Policy",
+      roleCode: undefined,
+      roleName: undefined,
+      validationMessages: {},
       service,
       userRoles: [],
     });

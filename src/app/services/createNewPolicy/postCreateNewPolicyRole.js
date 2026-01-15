@@ -40,7 +40,10 @@ const postCreateNewPolicyRole = async (req, res) => {
 
   if (Object.keys(model.validationMessages).length > 0) {
     return res.render("services/views/createNewPolicyRole", {
-      model,
+      policyName: req.session.createNewPolicy.name,
+      roleName: model.roleName,
+      roleCode: model.roleCode,
+      validationMessages: model.validationMessages,
       csrfToken: req.csrfToken(),
       service,
       backLink: `/services/${req.params.sid}/policies/create-new-policy-name`,
@@ -60,7 +63,10 @@ const postCreateNewPolicyRole = async (req, res) => {
       model.validationMessages.roleName =
         "Something went wrong submitting data, please try again";
       return res.render("services/views/createNewPolicyRole", {
-        model,
+        policyName: req.session.createNewPolicy.name,
+        roleName: model.roleName,
+        roleCode: model.roleCode,
+        validationMessages: model.validationMessages,
         csrfToken: req.csrfToken(),
         service,
         backLink: `/services/${req.params.sid}/policies/create-new-policy-name`,

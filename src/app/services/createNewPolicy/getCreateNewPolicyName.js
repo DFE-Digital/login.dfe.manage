@@ -2,7 +2,7 @@ const { getServiceRaw } = require("login.dfe.api-client/services");
 const { getUserServiceRoles } = require("../utils");
 
 const getCreateNewPolicyName = async (req, res) => {
-  const model = {
+  const model = req.session.createNewPolicy || {
     validationMessages: {},
   };
   const service = await getServiceRaw({

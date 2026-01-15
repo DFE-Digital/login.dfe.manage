@@ -91,7 +91,7 @@ describe("when using postCreateNewPolicyRole", () => {
 
     await postCreateNewPolicyRole(req, res);
 
-    expect(res.render.mock.calls[0][1].model.validationMessages).toMatchObject({
+    expect(res.render.mock.calls[0][1].validationMessages).toMatchObject({
       roleName: "Please enter a role name",
     });
   });
@@ -101,7 +101,7 @@ describe("when using postCreateNewPolicyRole", () => {
 
     await postCreateNewPolicyRole(req, res);
 
-    expect(res.render.mock.calls[0][1].model.validationMessages).toMatchObject({
+    expect(res.render.mock.calls[0][1].validationMessages).toMatchObject({
       roleCode: "Please enter a role code",
     });
   });
@@ -130,13 +130,16 @@ describe("when using postCreateNewPolicyRole", () => {
     await postCreateNewPolicyRole(req, res);
 
     expect(res.render.mock.calls[0][1]).toMatchObject({
+      policyName: "Test policy",
       backLink: `/services/service-1/policies/create-new-policy-name`,
       cancelLink: `/services/service-1/policies`,
       serviceId: "service-1",
       csrfToken: "token",
       currentNavigation: "policies",
-      model: {
-        validationMessages: { roleName: "Please enter a role name" },
+      roleName: "",
+      roleCode: "test-code",
+      validationMessages: {
+        roleName: "Please enter a role name",
       },
     });
   });
@@ -146,7 +149,7 @@ describe("when using postCreateNewPolicyRole", () => {
 
     await postCreateNewPolicyRole(req, res);
 
-    expect(res.render.mock.calls[0][1].model.validationMessages).toMatchObject({
+    expect(res.render.mock.calls[0][1].validationMessages).toMatchObject({
       roleCode: "Please enter a role code",
     });
   });
@@ -156,7 +159,7 @@ describe("when using postCreateNewPolicyRole", () => {
 
     await postCreateNewPolicyRole(req, res);
 
-    expect(res.render.mock.calls[0][1].model.validationMessages).toMatchObject({
+    expect(res.render.mock.calls[0][1].validationMessages).toMatchObject({
       roleName: "Role name must be 125 characters or less",
     });
   });
@@ -166,7 +169,7 @@ describe("when using postCreateNewPolicyRole", () => {
 
     await postCreateNewPolicyRole(req, res);
 
-    expect(res.render.mock.calls[0][1].model.validationMessages).toMatchObject({
+    expect(res.render.mock.calls[0][1].validationMessages).toMatchObject({
       roleCode: "Role code must be 50 characters or less",
     });
   });
@@ -179,7 +182,7 @@ describe("when using postCreateNewPolicyRole", () => {
 
     await postCreateNewPolicyRole(req, res);
 
-    expect(res.render.mock.calls[0][1].model.validationMessages).toMatchObject({
+    expect(res.render.mock.calls[0][1].validationMessages).toMatchObject({
       roleName: "Something went wrong submitting data, please try again",
     });
   });

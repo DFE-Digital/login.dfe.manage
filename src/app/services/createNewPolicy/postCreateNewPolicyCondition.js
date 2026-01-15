@@ -104,7 +104,11 @@ const postCreateNewPolicyCondition = async (req, res) => {
 
   if (Object.keys(model.validationMessages).length > 0) {
     return res.render("services/views/createNewPolicyCondition", {
-      model,
+      policyName: req.session.createNewPolicy.name,
+      condition: model.condition,
+      operator: model.operator,
+      value: model.value,
+      validationMessages: model.validationMessages,
       csrfToken: req.csrfToken(),
       service,
       backLink: `/services/${req.params.sid}/policies/create-new-policy-role`,
@@ -124,7 +128,11 @@ const postCreateNewPolicyCondition = async (req, res) => {
       model.validationMessages.roleName =
         "Something went wrong submitting data, please try again";
       return res.render("services/views/createNewPolicyCondition", {
-        model,
+        policyName: req.session.createNewPolicy.name,
+        condition: model.condition,
+        operator: model.operator,
+        value: model.value,
+        validationMessages: model.validationMessages,
         csrfToken: req.csrfToken(),
         service,
         backLink: `/services/${req.params.sid}/policies/create-new-policy-role`,

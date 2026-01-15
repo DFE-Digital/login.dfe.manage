@@ -53,7 +53,16 @@ const postCreateNewPolicyName = async (req, res) => {
     });
   }
 
-  req.session.createNewPolicy = model;
+  // If existing data in session then we'll overlay our changes onto the existing
+  // data.  If no data in session, we'll set it as the current model.
+  if (req.session.createNewPolicy) {
+    const createNewPolicyData = req.session.createNewPolicy;
+    Object.assign(createNewPolicyData, model);
+    req.session.createNewPolicy = createNewPolicyData;
+  } else {
+    req.session.createNewPolicy = model;
+  }
+
   req.session.save((error) => {
     if (error) {
       // Any error saving to session should hopefully be temporary. Assuming this, we log the error

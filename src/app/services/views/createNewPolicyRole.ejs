@@ -2,32 +2,32 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-three-quarters">
             <h1 class="govuk-heading-l">
-                Create Role for <%= locals.model.name %>
+                Create Role for <%= locals.policyName %>
             </h1>
             <form method="post" class="prevent-form-double-submission" id="form-new-policy-role">
                 <input type="hidden" name="_csrf" value="<%=csrfToken%>" />
             
                 <fieldset class="govuk-fieldset" id="fieldset-new-policy-role">
-                    <legend class="govuk-visually-hidden">Create policy role for <%= locals.model.name %></legend>
+                    <legend class="govuk-visually-hidden">Create policy role for <%= locals.name %></legend>
                 
-                    <div class="govuk-form-group <%= (locals.model.validationMessages.roleName !== undefined) ? 'govuk-form-group--error' : '' %>">
+                    <div class="govuk-form-group <%= (locals.validationMessages.roleName !== undefined) ? 'govuk-form-group--error' : '' %>">
                         <label class="govuk-label govuk-label--s" for="roleName">Role name</label>
-                    <% if (locals.model.validationMessages.roleName !== undefined) { %>
+                    <% if (locals.validationMessages.roleName !== undefined) { %>
                         <p id="validation-roleName" class="govuk-error-message">
-                            <span class="govuk-visually-hidden">Error:</span> <%=locals.model.validationMessages.roleName%>
+                            <span class="govuk-visually-hidden">Error:</span> <%=locals.validationMessages.roleName%>
                         </p>
                     <% } %>
-                        <input type="text" id="roleName" name="roleName" value="<%=locals.model.roleName%>" class="govuk-input govuk-!-width-three-quarters" maxlength="200"<% if (locals.model.validationMessages.roleName) { %> aria-invalid="true" aria-describedby="validation-roleName" <% } %>>
+                        <input type="text" id="roleName" name="roleName" value="<%=locals.roleName%>" class="govuk-input govuk-!-width-three-quarters" maxlength="200"<% if (locals.validationMessages.roleName) { %> aria-invalid="true" aria-describedby="validation-roleName" <% } %>>
                     </div>
 
-                    <div class="govuk-form-group <%= (locals.model.validationMessages.roleCode !== undefined) ? 'govuk-form-group--error' : '' %>">
+                    <div class="govuk-form-group <%= (locals.validationMessages.roleCode !== undefined) ? 'govuk-form-group--error' : '' %>">
                         <label class="govuk-label govuk-label--s" for="roleCode">Role code</label>
-                        <% if (locals.model.validationMessages.roleCode !== undefined) { %>
+                        <% if (locals.validationMessages.roleCode !== undefined) { %>
                         <p id="validation-roleCode" class="govuk-error-message">
-                            <span class="govuk-visually-hidden">Error:</span> <%=locals.model.validationMessages.roleCode%>
+                            <span class="govuk-visually-hidden">Error:</span> <%=locals.validationMessages.roleCode%>
                         </p>
                         <% } %>
-                        <input type="text" id="roleCode" name="roleCode" value="<%=locals.model.roleCode%>" class="govuk-input govuk-!-width-three-quarters" maxlength="100"<% if (locals.model.validationMessages.roleCode) { %> aria-invalid="true" aria-describedby="validation-roleCode" <% } %>>
+                        <input type="text" id="roleCode" name="roleCode" value="<%=locals.roleCode%>" class="govuk-input govuk-!-width-three-quarters" maxlength="100"<% if (locals.validationMessages.roleCode) { %> aria-invalid="true" aria-describedby="validation-roleCode" <% } %>>
                     </div>
 
                     <div class="govuk-button-group">

@@ -13,7 +13,12 @@ const getCreatePolicyCondition = async (req, res) => {
 
   return res.render("services/views/createNewPolicyCondition", {
     csrfToken: req.csrfToken(),
+    policyName: req.session.createNewPolicy.name,
+    condition: model.condition?.condition,
+    operator: model.condition?.operator,
+    value: model.condition?.value,
     model,
+    validationMessages: {},
     service,
     backLink: `/services/${req.params.sid}/policies/create-new-policy-role`,
     cancelLink: `/services/${req.params.sid}/policies`,

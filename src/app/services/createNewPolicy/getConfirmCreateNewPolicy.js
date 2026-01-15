@@ -11,13 +11,11 @@ const getConfirmCreateNewPolicy = async (req, res) => {
   });
   const manageRolesForService = await getUserServiceRoles(req);
 
-  console.log(model);
-
   return res.render("services/views/confirmCreateNewPolicy", {
     csrfToken: req.csrfToken(),
     model,
     service,
-    backLink: `/services/${req.params.sid}/policies`,
+    backLink: `/services/${req.params.sid}/policies/create-new-policy-condition`,
     cancelLink: `/services/${req.params.sid}/policies`,
     currentNavigation: "policies",
     serviceId: req.params.sid,
