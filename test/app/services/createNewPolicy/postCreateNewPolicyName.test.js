@@ -154,4 +154,47 @@ describe("when using postCreateNewPolicyName", () => {
       validationMessages: {},
     });
   });
+
+  it("should overwrite the policy name data to session if it was already present", async () => {
+    const requestBody = {
+      params: {
+        sid: "service-1",
+      },
+      body: {
+        name: "A new policy name",
+      },
+      session: {
+        createNewPolicy: {
+          name: "An old policy name",
+          role: {
+            roleName: "Test role",
+            roleCode: "Test code",
+          },
+          condition: {
+            condition: "organisation.urn",
+            operator: "is",
+            value: "123456",
+          },
+        },
+        save: jest.fn((cb) => cb()),
+      },
+    };
+
+    req = getRequestMock(requestBody);
+    await postCreateNewPolicyName(req, res);
+
+    expect(req.session.createNewPolicy).toMatchObject({
+      name: "A new policy name",
+      validationMessages: {},
+      role: {
+        roleName: "Test role",
+        roleCode: "Test code",
+      },
+      condition: {
+        condition: "organisation.urn",
+        operator: "is",
+        value: "123456",
+      },
+    });
+  });
 });

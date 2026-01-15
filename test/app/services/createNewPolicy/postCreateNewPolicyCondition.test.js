@@ -100,6 +100,19 @@ describe("when using postCreateNewPolicyCondition", () => {
     expect(res.redirect.mock.calls[0][0]).toBe("confirm-create-new-policy");
   });
 
+  it("should redirect to the confirm page on success with category", async () => {
+    const testRequestBody = JSON.parse(JSON.stringify(requestBody));
+    testRequestBody.body.condition = "organisation.category.id";
+    testRequestBody.body.value = "001";
+    testRequestBody.session = session;
+    const testReq = getRequestMock(testRequestBody);
+
+    await postCreateNewPolicyCondition(testReq, res);
+
+    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toBe("confirm-create-new-policy");
+  });
+
   it("should redirect to the confirm page on success with id that exists", async () => {
     const testRequestBody = JSON.parse(JSON.stringify(requestBody));
     testRequestBody.body.condition = "organisation.id";

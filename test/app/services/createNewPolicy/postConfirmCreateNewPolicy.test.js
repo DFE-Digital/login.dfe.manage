@@ -1,6 +1,9 @@
 jest.mock("./../../../../src/infrastructure/config", () =>
   require("../../../utils").configMockFactory(),
 );
+jest.mock("../../../../src/infrastructure/logger", () =>
+  require("../../../utils").loggerMockFactory(),
+);
 jest.mock("login.dfe.api-client/services");
 
 const { getRequestMock, getResponseMock } = require("../../../utils");
