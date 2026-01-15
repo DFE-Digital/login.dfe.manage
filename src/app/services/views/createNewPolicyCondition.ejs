@@ -2,32 +2,57 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-three-quarters">
             <h1 class="govuk-heading-l">
-                Create Role for <%= locals.model.name %>
+                Create condition for <%= locals.model.name %>
             </h1>
             <form method="post" class="prevent-form-double-submission" id="form-new-policy-role">
                 <input type="hidden" name="_csrf" value="<%=csrfToken%>" />
             
-                <fieldset class="govuk-fieldset" id="fieldset-new-policy-role">
-                    <legend class="govuk-visually-hidden">Create policy role for <%= locals.model.name %></legend>
+                <fieldset class="govuk-fieldset" id="fieldset-new-policy-condition">
+                    <legend class="govuk-visually-hidden">Create policy condition for <%= locals.model.name %></legend>
                 
-                    <div class="govuk-form-group <%= (locals.model.validationMessages.roleName !== undefined) ? 'govuk-form-group--error' : '' %>">
-                        <label class="govuk-label govuk-label--s" for="roleName">Role name</label>
-                    <% if (locals.model.validationMessages.roleName !== undefined) { %>
-                        <p id="validation-roleName" class="govuk-error-message">
-                            <span class="govuk-visually-hidden">Error:</span> <%=locals.model.validationMessages.roleName%>
+                    <div class="govuk-form-group <%= (locals.model.validationMessages.condition !== undefined) ? 'govuk-form-group--error' : '' %>">
+                        <label class="govuk-label govuk-label--s" for="condition">Condition</label>
+                    <% if (locals.model.validationMessages.condition !== undefined) { %>
+                        <p id="validation-condition" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span> <%=locals.model.validationMessages.condition%>
                         </p>
                     <% } %>
-                        <input type="text" id="roleName" name="roleName" value="<%=locals.roleName%>" class="govuk-input govuk-!-width-three-quarters" maxlength="200"<% if (locals.model.validationMessages.roleName) { %> aria-invalid="true" aria-describedby="validation-roleName" <% } %>>
+                        <select class="govuk-select <%= (locals.model.validationMessages.condition !== undefined) ? 'govuk-select--error' : '' %>" id="condition" name="condition">
+                            <option value="" <%= (locals.model.condition === undefined) ? 'selected' : '' %>>Select condition</option>
+                            <option value="organisation.urn" <%= (locals.model.condition === "organisation.urn") ? 'selected' : '' %>>organisation.urn</option>
+                            <option value="organisation.ukprn" <%= (locals.model.condition === "organisation.ukprn") ? 'selected' : '' %>>organisation.ukprn</option>
+                            <option value="organisation.id" <%= (locals.model.condition === "organisation.id") ? 'selected' : '' %>>organisation.id</option>
+                            <option value="organisation.type.id" <%= (locals.model.condition === "organisation.type.id") ? 'selected' : '' %>>organisation.type.id</option>
+                            <option value="organisation.status.id" <%= (locals.model.condition === "organisation.status.id") ? 'selected' : '' %>>organisation.status.id</option>
+                            <option value="organisation.category.id" <%= (locals.model.condition === "organisation.category.id") ? 'selected' : '' %>>organisation.category.id</option>
+                            <option value="organisation.IsOnAPAR" <%= (locals.model.condition === "organisation.IsOnAPAR") ? 'selected' : '' %>>organisation.IsOnAPAR</option>
+                            <option value="organisation.phaseOfEducation.id" <%= (locals.model.condition === "organisation.phaseOfEducation.id") ? 'selected' : '' %>>organisation.phaseOfEducation.id</option>
+                            <option value="organisation.localAuthority.id" <%= (locals.model.condition === "organisation.localAuthority.id") ? 'selected' : '' %>>organisation.localAuthority.id</option>
+                        </select>
                     </div>
 
-                    <div class="govuk-form-group <%= (locals.model.validationMessages.roleCode !== undefined) ? 'govuk-form-group--error' : '' %>">
-                        <label class="govuk-label govuk-label--s" for="roleCode">Role code</label>
-                        <% if (locals.model.validationMessages.roleCode !== undefined) { %>
-                        <p id="validation-roleCode" class="govuk-error-message">
-                            <span class="govuk-visually-hidden">Error:</span> <%=locals.model.validationMessages.roleCode%>
+                    <div class="govuk-form-group <%= (locals.model.validationMessages.operator !== undefined) ? 'govuk-form-group--error' : '' %>">
+                        <label class="govuk-label govuk-label--s" for="bannerTitle">Operator</label>
+                        <% if (locals.model.validationMessages.operator !== undefined) { %>
+                        <p id="validation-operator" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span> <%=locals.model.validationMessages.operator%>
                         </p>
                         <% } %>
-                        <input type="text" id="roleCode" name="roleCode" value="<%=locals.roleCode%>" class="govuk-input govuk-!-width-three-quarters" maxlength="100"<% if (locals.model.validationMessages.roleCode) { %> aria-invalid="true" aria-describedby="validation-roleCode" <% } %>>
+                        <select class="govuk-select <%= (locals.model.validationMessages.operator !== undefined) ? 'govuk-select--error' : '' %>" id="operator" name="operator">
+                            <option value="" <%= (locals.model.operator === undefined) ? 'selected' : '' %>>Select operator</option>
+                            <option value="is" <%= (locals.model.operator === "is") ? 'selected' : '' %>>is</option>
+                            <option value="is_not" <%= (locals.model.operator === "is_not") ? 'selected' : '' %>>is_not</option>
+                        </select>
+                    </div>
+
+                    <div class="govuk-form-group <%= (locals.model.validationMessages.value !== undefined) ? 'govuk-form-group--error' : '' %>">
+                        <label class="govuk-label govuk-label--s" for="value">Value</label>
+                    <% if (locals.model.validationMessages.value !== undefined) { %>
+                        <p id="validation-value" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span> <%=locals.model.validationMessages.value%>
+                        </p>
+                    <% } %>
+                        <input type="text" id="value" name="value" value="<%=locals.model.value%>" class="govuk-textarea govuk-!-width-three-quarters" rows="4" maxlength="400"<% if (locals.model.validationMessages.value) { %> aria-invalid="true" aria-describedby="validation-value" <% } %>>
                     </div>
 
                     <div class="govuk-button-group">

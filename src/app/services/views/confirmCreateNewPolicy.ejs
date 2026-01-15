@@ -1,41 +1,96 @@
 <div class="govuk-width-container govuk-main-wrapper">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-three-quarters">
-            <h1 class="govuk-heading-l">
-                Create Role for <%= locals.model.name %>
-            </h1>
-            <form method="post" class="prevent-form-double-submission" id="form-new-policy-role">
-                <input type="hidden" name="_csrf" value="<%=csrfToken%>" />
-            
-                <fieldset class="govuk-fieldset" id="fieldset-new-policy-role">
-                    <legend class="govuk-visually-hidden">Create policy role for <%= locals.model.name %></legend>
-                
-                    <div class="govuk-form-group <%= (locals.model.validationMessages.roleName !== undefined) ? 'govuk-form-group--error' : '' %>">
-                        <label class="govuk-label govuk-label--s" for="roleName">Role name</label>
-                    <% if (locals.model.validationMessages.roleName !== undefined) { %>
-                        <p id="validation-roleName" class="govuk-error-message">
-                            <span class="govuk-visually-hidden">Error:</span> <%=locals.model.validationMessages.roleName%>
-                        </p>
-                    <% } %>
-                        <input type="text" id="roleName" name="roleName" value="<%=locals.roleName%>" class="govuk-input govuk-!-width-three-quarters" maxlength="200"<% if (locals.model.validationMessages.roleName) { %> aria-invalid="true" aria-describedby="validation-roleName" <% } %>>
-                    </div>
+        <h1 class="govuk-heading-l">Review new policy</h1>
+        <p class="govuk-body">
+            Review these details before creating the new policy.  
+            You will be able to add additional roles andconditions to the policy once it has been created.
+        </p>
+        <h2 class="govuk-heading-m">Review new policy details</h2>
+        <dl class="govuk-summary-list govuk-!-margin-bottom-9">
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Name
+            </dt>
+            <dd class="govuk-summary-list__value">
+              <%= model.name %>
+            </dd>
+            <dd class="govuk-summary-list__actions">
+              <a class="govuk-link" href="create-new-policy-name">Change<span class="govuk-visually-hidden"> name</span></a>
+            </dd>
+          </div>
+        </dl>
+        <h2 class="govuk-heading-m">Role</h2>
+        <dl class="govuk-summary-list govuk-!-margin-bottom-9">
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Name
+            </dt>
+            <dd class="govuk-summary-list__value">
+                <%= model.role.roleName %>
+            </dd>
+            <dd class="govuk-summary-list__actions">
+              <a class="govuk-link" href="create-new-policy-role">Change<span class="govuk-visually-hidden"> role name</span></a>
+            </dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Code
+            </dt>
+            <dd class="govuk-summary-list__value">
+                <%= model.role.roleCode %>
+            </dd>
+            <dd class="govuk-summary-list__actions">
+              <a class="govuk-link" href="create-new-policy-role">Change<span class="govuk-visually-hidden"> role code</span></a>
+            </dd>
+          </div>
+        </dl>
 
-                    <div class="govuk-form-group <%= (locals.model.validationMessages.roleCode !== undefined) ? 'govuk-form-group--error' : '' %>">
-                        <label class="govuk-label govuk-label--s" for="roleCode">Role code</label>
-                        <% if (locals.model.validationMessages.roleCode !== undefined) { %>
-                        <p id="validation-roleCode" class="govuk-error-message">
-                            <span class="govuk-visually-hidden">Error:</span> <%=locals.model.validationMessages.roleCode%>
-                        </p>
-                        <% } %>
-                        <input type="text" id="roleCode" name="roleCode" value="<%=locals.roleCode%>" class="govuk-input govuk-!-width-three-quarters" maxlength="100"<% if (locals.model.validationMessages.roleCode) { %> aria-invalid="true" aria-describedby="validation-roleCode" <% } %>>
-                    </div>
-
-                    <div class="govuk-button-group">
-                        <button type="submit" class="govuk-button" data-module="govuk-button">Continue</button>
-                        <a href="<%=locals.cancelLink%>" class="govuk-button govuk-button--secondary">Cancel</a>
-                    </div>
-                </fieldset>
-            </form>
+        <h2 class="govuk-heading-m">Condition</h2>
+        <dl class="govuk-summary-list govuk-!-margin-bottom-9">
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Condition
+            </dt>
+            <dd class="govuk-summary-list__value">
+                <%= model.condition.condition %>
+            </dd>
+            <dd class="govuk-summary-list__actions">
+              <a class="govuk-link" href="create-new-policy-condition">Change<span class="govuk-visually-hidden"> condition</span></a>
+            </dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Operator
+            </dt>
+            <dd class="govuk-summary-list__value">
+                <%= model.condition.operator %>
+            </dd>
+            <dd class="govuk-summary-list__actions">
+              <a class="govuk-link" href="create-new-policy-condition">Change<span class="govuk-visually-hidden"> condition operator</span></a>
+            </dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Value
+            </dt>
+            <dd class="govuk-summary-list__value">
+                <%= model.condition.value %>
+            </dd>
+            <dd class="govuk-summary-list__actions">
+              <a class="govuk-link" href="create-new-policy-condition">Change<span class="govuk-visually-hidden"> condition value</span></a>
+            </dd>
+          </div>
+        </dl>
+        <form method="post">
+          <input type="hidden" name="_csrf" value="<%=csrfToken%>" />
+          <div class="govuk-button-group">
+            <button type="submit" class="govuk-button" data-module="govuk-button">
+              Create service
+            </button>
+            <a class="govuk-button govuk-button--secondary" href="<%= locals.cancelLink %>">Cancel</a>
+          </div>
+        </form>
         </div>
     </div>
 </div>

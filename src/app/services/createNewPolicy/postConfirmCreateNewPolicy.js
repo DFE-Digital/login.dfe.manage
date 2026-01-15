@@ -1,43 +1,16 @@
-const {
-  getServiceRaw,
-  getServicePoliciesRaw,
-} = require("login.dfe.api-client/services");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const { getUserServiceRoles } = require("../utils");
-//const logger = require("../../../infrastructure/logger");
-
-const validate = async (req) => {
-  const model = {
-    name: (req.body.name || "").trim(),
-    validationMessages: {},
-  };
-
-  if (!model.name) {
-    model.validationMessages.name = "Enter a name";
-  } else if (model.name.length > 125) {
-    model.validationMessages.name = "Name must be 125 characters or less";
-  } else {
-    const servicePolicies = await getServicePoliciesRaw({
-      serviceId: req.params.sid,
-      page: 1,
-      pageSize: 300,
-    });
-    const existingNameInPolicy = servicePolicies.find(
-      (policy) => policy.name === model.name,
-    );
-    if (existingNameInPolicy) {
-      model.validationMessages.name =
-        "Policy name must be unique and cannot already exist in DfE Sign-in";
-    }
-  }
-
-  return model;
-};
+const logger = require("../../../infrastructure/logger");
 
 const postConfirmCreateNewPolicy = async (req, res) => {
+  if (!req.session.createNewPolicy) {
+    return res.redirect("policies");
+  }
+
+  const model = req.session.createNewPolicy;
   const service = await getServiceRaw({
     by: { serviceId: req.params.sid },
   });
-  const model = await validate(req);
   const manageRolesForService = await getUserServiceRoles(req);
 
   if (Object.keys(model.validationMessages).length > 0) {
@@ -53,13 +26,14 @@ const postConfirmCreateNewPolicy = async (req, res) => {
     });
   }
 
-  // try {
-  // Call createServicePolicy endpoint
-  // } catch (e) {
-  // Handle exception
-  //}
+  try {
+    logger.info("Hit new policy endpoint", model);
+  } catch (e) {
+    logger.error("Something bad happened", e);
+    return res.redirect("policies");
+  }
 
-  // res.flash("new policy has been created")
+  res.flash("info", "new policy has been created");
   return res.redirect("policies");
 };
 

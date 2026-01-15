@@ -115,7 +115,7 @@ const postCreateNewPolicyCondition = async (req, res) => {
     });
   }
 
-  req.session.createNewPolicy.role = model;
+  req.session.createNewPolicy.condition = model;
   req.session.save((error) => {
     if (error) {
       // Any error saving to session should hopefully be temporary. Assuming this, we log the error
@@ -134,8 +134,7 @@ const postCreateNewPolicyCondition = async (req, res) => {
         userRoles: manageRolesForService,
       });
     }
-    // Only temporary, will redirect to conditions page in a future card
-    return res.redirect("policies");
+    return res.redirect("confirm-create-new-policy");
   });
 };
 

@@ -11,6 +11,8 @@ const getConfirmCreateNewPolicy = async (req, res) => {
   });
   const manageRolesForService = await getUserServiceRoles(req);
 
+  console.log(model);
+
   return res.render("services/views/confirmCreateNewPolicy", {
     csrfToken: req.csrfToken(),
     model,

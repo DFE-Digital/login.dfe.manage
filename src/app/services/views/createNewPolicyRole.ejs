@@ -17,7 +17,7 @@
                             <span class="govuk-visually-hidden">Error:</span> <%=locals.model.validationMessages.roleName%>
                         </p>
                     <% } %>
-                        <input type="text" id="roleName" name="roleName" value="<%=locals.roleName%>" class="govuk-input govuk-!-width-three-quarters" maxlength="200"<% if (locals.model.validationMessages.roleName) { %> aria-invalid="true" aria-describedby="validation-roleName" <% } %>>
+                        <input type="text" id="roleName" name="roleName" value="<%=locals.model.roleName%>" class="govuk-input govuk-!-width-three-quarters" maxlength="200"<% if (locals.model.validationMessages.roleName) { %> aria-invalid="true" aria-describedby="validation-roleName" <% } %>>
                     </div>
 
                     <div class="govuk-form-group <%= (locals.model.validationMessages.roleCode !== undefined) ? 'govuk-form-group--error' : '' %>">
@@ -27,7 +27,7 @@
                             <span class="govuk-visually-hidden">Error:</span> <%=locals.model.validationMessages.roleCode%>
                         </p>
                         <% } %>
-                        <input type="text" id="roleCode" name="roleCode" value="<%=locals.roleCode%>" class="govuk-input govuk-!-width-three-quarters" maxlength="100"<% if (locals.model.validationMessages.roleCode) { %> aria-invalid="true" aria-describedby="validation-roleCode" <% } %>>
+                        <input type="text" id="roleCode" name="roleCode" value="<%=locals.model.roleCode%>" class="govuk-input govuk-!-width-three-quarters" maxlength="100"<% if (locals.model.validationMessages.roleCode) { %> aria-invalid="true" aria-describedby="validation-roleCode" <% } %>>
                     </div>
 
                     <div class="govuk-button-group">
