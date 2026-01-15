@@ -17,7 +17,6 @@ const getCreatePolicyCondition = async (req, res) => {
     condition: model.condition?.condition,
     operator: model.condition?.operator,
     value: model.condition?.value,
-    model,
     validationMessages: {},
     service,
     backLink: `/services/${req.params.sid}/policies/create-new-policy-role`,

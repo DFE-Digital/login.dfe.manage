@@ -7,14 +7,15 @@ const postConfirmCreateNewPolicy = async (req, res) => {
 
   const model = req.session.createNewPolicy;
 
-  try {
-    logger.info("Hit new policy endpoint", model);
-  } catch (e) {
-    logger.error("Something bad happened", e);
-    return res.redirect(`/services/${req.params.sid}/policies`);
-  }
+  // Hitting the endpoint to create the policy will be done in a future card
+  // try {
+  logger.info("Hit new policy endpoint", model);
+  // } catch (e) {
+  //   logger.error("Something bad happened", e);
+  //   return res.redirect(`/services/${req.params.sid}/policies`);
+  // }
 
-  res.flash("info", `'${model.name} policy was successfully created`);
+  res.flash("info", `'${model.name}' policy was successfully created`);
   req.session.createNewPolicy = undefined;
   return res.redirect(`/services/${req.params.sid}/policies`);
 };
