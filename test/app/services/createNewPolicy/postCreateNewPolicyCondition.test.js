@@ -6,10 +6,12 @@ jest.mock("./../../../../src/infrastructure/logger", () =>
 );
 
 jest.mock("login.dfe.api-client/services");
+jest.mock("login.dfe.api-client/organisations");
 
 const { getRequestMock, getResponseMock } = require("../../../utils");
 const postCreateNewPolicyCondition = require("../../../../src/app/services/createNewPolicy/postCreateNewPolicyCondition");
 const { getServiceRaw } = require("login.dfe.api-client/services");
+const { getOrganisationRaw } = require("login.dfe.api-client/organisations");
 const res = getResponseMock();
 
 const session = {
@@ -27,6 +29,17 @@ const session = {
 const service = {
   id: "service1",
   name: "Service One",
+};
+
+const organisation = {
+  name: "Test name",
+  address: "Test address",
+  ukprn: "12345678",
+  category: {
+    id: "008",
+  },
+  upin: "123456",
+  urn: "123456",
 };
 
 const requestBody = {
@@ -50,6 +63,9 @@ describe("when using postCreateNewPolicyCondition", () => {
 
     getServiceRaw.mockReset();
     getServiceRaw.mockResolvedValue(service);
+
+    getOrganisationRaw.mockReset();
+    getOrganisationRaw.mockResolvedValue(organisation);
 
     res.mockResetAll();
   });
@@ -324,6 +340,21 @@ describe("when using postCreateNewPolicyCondition", () => {
 
     expect(res.render.mock.calls[0][1].validationMessages).toMatchObject({
       value: "organisation.localAuthority.id needs to be a valid uuid",
+    });
+  });
+
+  it("should return a validation error when the organisation id provided does not exist", async () => {
+    getOrganisationRaw.mockReset();
+    getOrganisationRaw.mockReturnValue(undefined);
+    const testRequestBody = JSON.parse(JSON.stringify(requestBody));
+    testRequestBody.body.condition = "organisation.id";
+    testRequestBody.body.value = "ad73ad54-1bb7-4f8a-a446-45703ee1aacc";
+    const testReq = getRequestMock(testRequestBody);
+
+    await postCreateNewPolicyCondition(testReq, res);
+
+    expect(res.render.mock.calls[0][1].validationMessages).toMatchObject({
+      value: "Organisation id does not exist",
     });
   });
 
