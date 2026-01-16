@@ -2,7 +2,7 @@ const {
   getServiceRaw,
   getPaginatedServicePoliciesRaw,
 } = require("login.dfe.api-client/services");
-const { getUserServiceRoles } = require("./utils");
+const { doesUserHaveRole, getUserServiceRoles } = require("./utils");
 
 const viewModel = async (req) => {
   const paramsSource = req.method === "POST" ? req.body : req.query;
@@ -20,6 +20,10 @@ const viewModel = async (req) => {
     pageSize: 25,
   });
   const manageRolesForService = await getUserServiceRoles(req);
+  const canUserModifyPolicyConditionsAndRoles = doesUserHaveRole(
+    req,
+    "internalServiceConfigurationManager",
+  );
 
   return {
     csrfToken: req.csrfToken(),
@@ -31,6 +35,7 @@ const viewModel = async (req) => {
     numberOfPages: servicePolicies.totalNumberOfPages,
     serviceId: req.params.sid,
     userRoles: manageRolesForService,
+    canUserModifyPolicyConditionsAndRoles,
     currentNavigation: "policies",
   };
 };
