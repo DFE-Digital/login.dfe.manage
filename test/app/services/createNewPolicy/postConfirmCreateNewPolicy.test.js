@@ -1,17 +1,21 @@
 jest.mock("./../../../../src/infrastructure/config", () =>
   require("../../../utils").configMockFactory(),
 );
-jest.mock("../../../../src/infrastructure/logger", () =>
-  require("../../../utils").loggerMockFactory(),
-);
+const mockUtils = require("../../../utils");
+const mockLogger = mockUtils.loggerMockFactory();
+jest.mock("./../../../src/infrastructure/logger", () => mockLogger);
+
 jest.mock("login.dfe.api-client/services");
 
 const { getRequestMock, getResponseMock } = require("../../../utils");
+const { createServicePolicy } = require("login.dfe.api-client/services");
 const postConfirmCreateNewPolicy = require("../../../../src/app/services/createNewPolicy/postConfirmCreateNewPolicy");
 const res = getResponseMock();
 
 describe("when calling the postConfirmCreateNewPolicy function", () => {
   let req;
+
+  const policyId = "policy-1";
 
   beforeEach(() => {
     req = getRequestMock({
@@ -35,15 +39,42 @@ describe("when calling the postConfirmCreateNewPolicy function", () => {
     });
 
     res.mockResetAll();
+
+    createServicePolicy.mockReset();
+    createServicePolicy.mockResolvedValue(policyId);
   });
 
   it("should flash and then redirect on success", async () => {
     await postConfirmCreateNewPolicy(req, res);
 
+    expect(mockLogger.info).toHaveBeenCalledTimes(1);
+    expect(mockLogger.info.mock.calls[0][0]).toBe(
+      "New policy created with id [policy-1]",
+    );
     expect(res.flash.mock.calls.length).toBe(1);
     expect(res.flash.mock.calls[0][0]).toBe("info");
     expect(res.flash.mock.calls[0][1]).toBe(
       "'Test Policy' policy was successfully created",
+    );
+    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toBe(`/services/service-1/policies`);
+  });
+
+  it("should log an error, flash a message and redirect on failure", async () => {
+    const errorMessage = "Error creating policy";
+    createServicePolicy.mockImplementation(() => {
+      throw new Error(errorMessage);
+    });
+    await postConfirmCreateNewPolicy(req, res);
+
+    expect(mockLogger.error).toHaveBeenCalledTimes(1);
+    expect(mockLogger.error.mock.calls[0][0]).toBe(
+      "New policy created with id [policy-1]",
+    );
+    expect(res.flash.mock.calls.length).toBe(1);
+    expect(res.flash.mock.calls[0][0]).toBe("error");
+    expect(res.flash.mock.calls[0][1]).toBe(
+      "Something went wrong creating the policy",
     );
     expect(res.redirect.mock.calls.length).toBe(1);
     expect(res.redirect.mock.calls[0][0]).toBe(`/services/service-1/policies`);
