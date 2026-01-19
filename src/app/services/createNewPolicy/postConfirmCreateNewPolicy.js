@@ -30,7 +30,7 @@ const postConfirmCreateNewPolicy = async (req, res) => {
       // Possible enhancement to this endpoint to have it return the id of the existing one
       // instead of returning a 409?
       const result = await getServiceRolesRaw({
-        serviceId: req.params.serviceId,
+        serviceId: req.params.sid,
       });
       const existingRole = result.find(
         (role) =>
@@ -55,7 +55,11 @@ const postConfirmCreateNewPolicy = async (req, res) => {
         value: [model.condition.value],
       },
     ],
-    roles: [createdRoleId],
+    roles: [
+      {
+        id: createdRoleId,
+      },
+    ],
   };
 
   // Note:  The endpoint to create a policy can support multiple roles and conditions
