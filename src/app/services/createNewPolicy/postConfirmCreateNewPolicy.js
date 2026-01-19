@@ -12,10 +12,13 @@ const postConfirmCreateNewPolicy = async (req, res) => {
 
   const model = req.session.createNewPolicy;
 
+  const roleName = model.role.roleName;
+  const roleCode = model.role.roleCode;
+
   const rolePayload = {
     appId: req.params.sid,
-    roleName: model.role.roleName,
-    roleCode: model.role.roleCode,
+    roleName: roleName,
+    roleCode: roleCode,
   };
 
   let createdRoleId = undefined;
@@ -29,15 +32,22 @@ const postConfirmCreateNewPolicy = async (req, res) => {
       // Role already exists, so we'll find the id of the one that exists already.
       // Possible enhancement to this endpoint to have it return the id of the existing one
       // instead of returning a 409?
-      const result = await getServiceRolesRaw({
-        serviceId: req.params.sid,
-      });
-      const existingRole = result.find(
-        (role) =>
-          role.name === model.role.roleName &&
-          role.code === model.role.roleCode,
-      );
-      createdRoleId = existingRole.id;
+      try {
+        logger.info(
+          `Role with name [${roleName}] and code [${roleCode}] exists.  Finding id for role.`,
+        );
+        const result = await getServiceRolesRaw({
+          serviceId: req.params.sid,
+        });
+        const existingRole = result.find(
+          (role) => role.name === roleName && role.code === roleCode,
+        );
+        createdRoleId = existingRole.id;
+      } catch (e) {
+        logger.error("Something went wrong getting the service roles", e);
+        res.flash("error", "Something went wrong creating the policy");
+        return res.redirect(`/services/${req.params.sid}/policies`);
+      }
     } else {
       logger.error("Something went wrong creating the role", e);
       res.flash("error", "Something went wrong creating the policy");

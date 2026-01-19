@@ -1,14 +1,18 @@
-jest.mock("./../../../../src/infrastructure/config", () =>
+jest.mock("../../../../src/infrastructure/config", () =>
   require("../../../utils").configMockFactory(),
 );
 const mockUtils = require("../../../utils");
 const mockLogger = mockUtils.loggerMockFactory();
-jest.mock("./../../../src/infrastructure/logger", () => mockLogger);
+jest.mock("../../../../src/infrastructure/logger", () => mockLogger);
 
 jest.mock("login.dfe.api-client/services");
 
 const { getRequestMock, getResponseMock } = require("../../../utils");
-const { createServicePolicy } = require("login.dfe.api-client/services");
+const {
+  createServicePolicy,
+  createServiceRole,
+  getServiceRolesRaw,
+} = require("login.dfe.api-client/services");
 const postConfirmCreateNewPolicy = require("../../../../src/app/services/createNewPolicy/postConfirmCreateNewPolicy");
 const res = getResponseMock();
 
@@ -16,6 +20,15 @@ describe("when calling the postConfirmCreateNewPolicy function", () => {
   let req;
 
   const policyId = "policy-1";
+
+  const createRoleResponse = {
+    id: "role-1",
+  };
+
+  const getServiceRolesResponse = [
+    { id: "role-1", name: "Role one", code: "Role one code" },
+    { id: "role-2", name: "Role two", code: "Role two code" },
+  ];
 
   beforeEach(() => {
     req = getRequestMock({
@@ -40,12 +53,41 @@ describe("when calling the postConfirmCreateNewPolicy function", () => {
 
     res.mockResetAll();
 
+    createServiceRole.mockReset();
+    createServiceRole.mockResolvedValue(createRoleResponse);
+
     createServicePolicy.mockReset();
     createServicePolicy.mockResolvedValue(policyId);
+
+    getServiceRolesRaw.mockReset();
+    getServiceRolesRaw.mockResolvedValue(getServiceRolesResponse);
   });
 
-  it("should flash and then redirect on success", async () => {
+  it("should flash and then redirect on success when newly creating a role", async () => {
     await postConfirmCreateNewPolicy(req, res);
+
+    expect(mockLogger.info).toHaveBeenCalledTimes(1);
+    expect(mockLogger.info.mock.calls[0][0]).toBe(
+      "New policy created with id [policy-1]",
+    );
+    expect(res.flash.mock.calls.length).toBe(1);
+    expect(res.flash.mock.calls[0][0]).toBe("info");
+    expect(res.flash.mock.calls[0][1]).toBe(
+      "'Test Policy' policy was successfully created",
+    );
+    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toBe(`/services/service-1/policies`);
+  });
+
+  it("should flash and then redirect on success when role exists", async () => {
+    createServiceRole.mockImplementation(() => {
+      const error = new Error("Role already exists");
+      error.statusCode = 409;
+      throw error;
+    });
+    await postConfirmCreateNewPolicy(req, res);
+
+    expect(getServiceRolesRaw.mock.calls.length).toBe(1);
 
     expect(mockLogger.info).toHaveBeenCalledTimes(1);
     expect(mockLogger.info.mock.calls[0][0]).toBe(
