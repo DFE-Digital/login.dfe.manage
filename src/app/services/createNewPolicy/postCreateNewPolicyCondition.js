@@ -43,6 +43,13 @@ const validate = async (req) => {
       if (!validateUUID(model.value)) {
         model.validationMessages.value =
           "organisation.id needs to be a valid uuid";
+      } else {
+        const organisation = await getOrganisationRaw({
+          by: { organisationId: model.value },
+        });
+        if (!organisation) {
+          model.validationMessages.value = "Organisation id does not exist";
+        }
       }
     }
     if (model.condition === "organisation.type.id") {
@@ -83,15 +90,6 @@ const validate = async (req) => {
       if (!validateUUID(model.value)) {
         model.validationMessages.value =
           "organisation.localAuthority.id needs to be a valid uuid";
-      }
-    }
-
-    if (model.condition === "organisation.id") {
-      const organisation = await getOrganisationRaw({
-        by: { organisationId: model.value },
-      });
-      if (!organisation) {
-        model.validationMessages.value = "Organisation id does not exist";
       }
     }
   }
