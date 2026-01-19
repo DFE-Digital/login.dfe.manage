@@ -167,7 +167,7 @@ const init = async () => {
     app.set("trust proxy", 1);
   }
 
-  let expiryInMinutes = 30;
+  let expiryInMinutes = 20;
   const sessionExpiry = parseInt(
     config.hostingEnvironment.sessionCookieExpiryInMinutes,
   );

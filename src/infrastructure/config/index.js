@@ -35,7 +35,7 @@ const config = {
     hstsMaxAge: 86400,
     applicationInsights: process.env.APPLICATIONINSIGHTS_CONNECTION_STRING,
     sessionSecret: process.env.SESSION_ENCRYPTION_SECRET_MNG,
-    sessionCookieExpiryInMinutes: 480,
+    sessionCookieExpiryInMinutes: 20,
     gaTrackingId: process.env.GOOGLE_ANALYTICS_ID,
     accessibilityStatementUrl: process.env.ACCESSIBILITY_STATEMENT_URL,
     interactionsUrl: "https://" + process.env.STANDALONE_INTERACTIONS_HOST_NAME,
