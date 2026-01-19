@@ -34,7 +34,7 @@ const postConfirmCreateNewPolicy = async (req, res) => {
     name: model.name,
     conditions: [
       {
-        condition: model.condition.condition,
+        field: model.condition.condition,
         operator: model.condition.operator,
         value: [model.condition.value],
       },
