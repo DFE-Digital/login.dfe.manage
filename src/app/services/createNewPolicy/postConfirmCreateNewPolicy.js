@@ -1,6 +1,7 @@
 const {
   createServicePolicy,
   createServiceRole,
+  getServiceRolesRaw,
 } = require("login.dfe.api-client/services");
 const logger = require("../../../infrastructure/logger");
 
@@ -24,9 +25,24 @@ const postConfirmCreateNewPolicy = async (req, res) => {
     createdRoleId = response.id;
     logger.info(`New role created with id [${response.id}]`);
   } catch (e) {
-    logger.error("Something went wrong creating the role", e);
-    res.flash("error", "Something went wrong creating the policy");
-    return res.redirect(`/services/${req.params.sid}/policies`);
+    if (e.statusCode === 409) {
+      // Role already exists, so we'll find the id of the one that exists already.
+      // Possible enhancement to this endpoint to have it return the id of the existing one
+      // instead of returning a 409?
+      const result = await getServiceRolesRaw({
+        serviceId: req.params.serviceId,
+      });
+      const existingRole = result.find(
+        (role) =>
+          role.name === model.role.roleName &&
+          role.code === model.role.roleCode,
+      );
+      createdRoleId = existingRole.id;
+    } else {
+      logger.error("Something went wrong creating the role", e);
+      res.flash("error", "Something went wrong creating the policy");
+      return res.redirect(`/services/${req.params.sid}/policies`);
+    }
   }
 
   const payload = {
