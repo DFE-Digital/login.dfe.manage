@@ -19,14 +19,16 @@ const res = getResponseMock();
 describe("when calling the postConfirmCreateNewPolicy function", () => {
   let req;
 
-  const policyId = "policy-1";
+  const createPolicyResponse = {
+    id: "policy-1",
+  };
 
   const createRoleResponse = {
     id: "role-1",
   };
 
   const getServiceRolesResponse = [
-    { id: "role-1", name: "Role one", code: "Role one code" },
+    { id: "role-1", name: "Test role", code: "Test code" },
     { id: "role-2", name: "Role two", code: "Role two code" },
   ];
 
@@ -57,7 +59,7 @@ describe("when calling the postConfirmCreateNewPolicy function", () => {
     createServiceRole.mockResolvedValue(createRoleResponse);
 
     createServicePolicy.mockReset();
-    createServicePolicy.mockResolvedValue(policyId);
+    createServicePolicy.mockResolvedValue(createPolicyResponse);
 
     getServiceRolesRaw.mockReset();
     getServiceRolesRaw.mockResolvedValue(getServiceRolesResponse);
@@ -66,8 +68,11 @@ describe("when calling the postConfirmCreateNewPolicy function", () => {
   it("should flash and then redirect on success when newly creating a role", async () => {
     await postConfirmCreateNewPolicy(req, res);
 
-    expect(mockLogger.info).toHaveBeenCalledTimes(1);
+    expect(mockLogger.info).toHaveBeenCalledTimes(2);
     expect(mockLogger.info.mock.calls[0][0]).toBe(
+      "New role created with id [role-1]",
+    );
+    expect(mockLogger.info.mock.calls[1][0]).toBe(
       "New policy created with id [policy-1]",
     );
     expect(res.flash.mock.calls.length).toBe(1);
@@ -89,8 +94,11 @@ describe("when calling the postConfirmCreateNewPolicy function", () => {
 
     expect(getServiceRolesRaw.mock.calls.length).toBe(1);
 
-    expect(mockLogger.info).toHaveBeenCalledTimes(1);
+    expect(mockLogger.info).toHaveBeenCalledTimes(2);
     expect(mockLogger.info.mock.calls[0][0]).toBe(
+      "Role with name [Test role] and code [Test code] exists.  Finding id for role.",
+    );
+    expect(mockLogger.info.mock.calls[1][0]).toBe(
       "New policy created with id [policy-1]",
     );
     expect(res.flash.mock.calls.length).toBe(1);
@@ -104,15 +112,17 @@ describe("when calling the postConfirmCreateNewPolicy function", () => {
 
   it("should log an error, flash a message and redirect on failure", async () => {
     const errorMessage = "Error creating policy";
+    const error = new Error(errorMessage);
     createServicePolicy.mockImplementation(() => {
-      throw new Error(errorMessage);
+      throw error;
     });
     await postConfirmCreateNewPolicy(req, res);
 
     expect(mockLogger.error).toHaveBeenCalledTimes(1);
     expect(mockLogger.error.mock.calls[0][0]).toBe(
-      "New policy created with id [policy-1]",
+      "Something went wrong creating the policy",
     );
+    expect(mockLogger.error.mock.calls[0][1]).toBe(error);
     expect(res.flash.mock.calls.length).toBe(1);
     expect(res.flash.mock.calls[0][0]).toBe("error");
     expect(res.flash.mock.calls[0][1]).toBe(
