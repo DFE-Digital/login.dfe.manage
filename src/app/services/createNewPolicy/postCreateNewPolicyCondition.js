@@ -6,9 +6,9 @@ const logger = require("../../../infrastructure/logger");
 
 const validate = async (req) => {
   const model = {
-    condition: req.body.condition || "",
-    operator: req.body.operator || "",
-    value: req.body.value || "",
+    condition: (req.body.condition || "").trim(),
+    operator: (req.body.operator || "").trim(),
+    value: (req.body.value || "").trim(),
     validationMessages: {},
   };
 
