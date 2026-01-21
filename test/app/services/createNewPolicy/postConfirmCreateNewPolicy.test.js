@@ -110,7 +110,7 @@ describe("when calling the postConfirmCreateNewPolicy function", () => {
     expect(res.redirect.mock.calls[0][0]).toBe(`/services/service-1/policies`);
   });
 
-  it("should log an error, flash a message and redirect on failure", async () => {
+  it("should log an error, flash a message and redirect on createServicePolicy failure", async () => {
     const errorMessage = "Error creating policy";
     const error = new Error(errorMessage);
     createServicePolicy.mockImplementation(() => {
@@ -121,6 +121,56 @@ describe("when calling the postConfirmCreateNewPolicy function", () => {
     expect(mockLogger.error).toHaveBeenCalledTimes(1);
     expect(mockLogger.error.mock.calls[0][0]).toBe(
       "Something went wrong creating the policy",
+    );
+    expect(mockLogger.error.mock.calls[0][1]).toBe(error);
+    expect(res.flash.mock.calls.length).toBe(1);
+    expect(res.flash.mock.calls[0][0]).toBe("error");
+    expect(res.flash.mock.calls[0][1]).toBe(
+      "Something went wrong creating the policy",
+    );
+    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toBe(`/services/service-1/policies`);
+  });
+
+  it("should log an error, flash a message and redirect on createServiceRole failure", async () => {
+    const errorMessage = "Error creating policy";
+    const error = new Error(errorMessage);
+    createServiceRole.mockImplementation(() => {
+      throw error;
+    });
+    await postConfirmCreateNewPolicy(req, res);
+
+    expect(mockLogger.error).toHaveBeenCalledTimes(1);
+    expect(mockLogger.error.mock.calls[0][0]).toBe(
+      "Something went wrong creating the role",
+    );
+    expect(mockLogger.error.mock.calls[0][1]).toBe(error);
+    expect(res.flash.mock.calls.length).toBe(1);
+    expect(res.flash.mock.calls[0][0]).toBe("error");
+    expect(res.flash.mock.calls[0][1]).toBe(
+      "Something went wrong creating the policy",
+    );
+    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toBe(`/services/service-1/policies`);
+  });
+
+  it("should log an error, flash a message and redirect on getServiceRolesRaw failure", async () => {
+    createServiceRole.mockImplementation(() => {
+      const error = new Error("Role already exists");
+      error.statusCode = 409;
+      throw error;
+    });
+
+    const errorMessage = "Error creating policy";
+    const error = new Error(errorMessage);
+    getServiceRolesRaw.mockImplementation(() => {
+      throw error;
+    });
+    await postConfirmCreateNewPolicy(req, res);
+
+    expect(mockLogger.error).toHaveBeenCalledTimes(1);
+    expect(mockLogger.error.mock.calls[0][0]).toBe(
+      "Something went wrong getting the service roles",
     );
     expect(mockLogger.error.mock.calls[0][1]).toBe(error);
     expect(res.flash.mock.calls.length).toBe(1);
