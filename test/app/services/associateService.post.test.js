@@ -50,7 +50,11 @@ describe("when associating a service with user", () => {
       .mockReset()
       .mockReturnValue([
         {
-          rolesAvailableToUser: ["role1", "role2"],
+          rolesAvailableToUser: [
+            { id: "role1", name: "Role Z" },
+            { id: "role2", name: "Role B" },
+            { id: "role3", name: "Role A" },
+          ],
         },
       ]);
     PolicyEngine.mockReset().mockImplementation(() => policyEngine);
