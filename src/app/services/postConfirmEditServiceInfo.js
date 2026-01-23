@@ -1,11 +1,11 @@
 const logger = require("../../infrastructure/logger");
 const { updateService } = require("../../infrastructure/utils/services");
 const {
+  updateRole,
   getServiceRaw,
   getServiceRolesRaw,
   getPaginatedServicesRaw,
 } = require("login.dfe.api-client/services");
-const { updateRole } = require("../../infrastructure/access");
 const config = require("../../infrastructure/config");
 
 const postConfirmEditServiceInfo = async (req, res) => {
@@ -78,7 +78,11 @@ const postConfirmEditServiceInfo = async (req, res) => {
         const roleSecondHalf = role.name.split("-").at(-1);
         const updatedRoleName = model.name + " -" + roleSecondHalf;
         try {
-          await updateRole(manageServiceId, role.id, { name: updatedRoleName });
+          await updateRole({
+            serviceId: manageServiceId,
+            roleId: role.id,
+            name: updatedRoleName,
+          });
         } catch (e) {
           // Error happening here isn't fatal, so we'll continue but log an error and flash a message to the user.
           roleFailedToUpdate = true;
