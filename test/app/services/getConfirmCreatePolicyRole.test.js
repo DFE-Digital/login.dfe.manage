@@ -53,6 +53,17 @@ describe("when using the getConfirmCreatePolicyRole function", () => {
           validationMessages: {},
         },
       },
+      userServices: {
+        roles: [
+          {
+            id: "E6B7C861-7D76-4D75-BA23-26E4A89B9E4E",
+            name: "Test service - Service Configuration",
+            code: "service-1_serviceconfig",
+            numericId: "23413",
+            status: { id: 1 },
+          },
+        ],
+      },
     });
 
     getServicePolicyRaw.mockReset();
@@ -82,6 +93,7 @@ describe("when using the getConfirmCreatePolicyRole function", () => {
       csrfToken: "token",
       currentNavigation: "policies",
       policy: policy,
+      userRoles: ["serviceconfig"],
     });
   });
 
