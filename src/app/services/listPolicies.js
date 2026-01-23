@@ -40,7 +40,14 @@ const viewModel = async (req) => {
   };
 };
 
+const clearSessionData = (req) => {
+  if (req.session.createNewPolicy) {
+    req.session.createNewPolicy = undefined;
+  }
+};
+
 const get = async (req, res) => {
+  clearSessionData(req);
   const model = await viewModel(req);
   return res.render("services/views/listPolicies", model);
 };

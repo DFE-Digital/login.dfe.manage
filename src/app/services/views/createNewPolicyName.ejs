@@ -20,7 +20,7 @@
                     <span class="govuk-visually-hidden">Error:</span> <%=locals.model.validationMessages.name%>
                 </p>
             <% } %>
-                <input type="text" id="name" name="name" value="<%=locals.model.name%>" class="govuk-input govuk-!-width-three-quarters" maxlength="125"<% if (locals.model.validationMessages.name) { %> aria-invalid="true" aria-describedby="validation-name" <% } %>>
+                <input type="text" id="name" name="name" value="<%=locals.model.name%>" class="govuk-input govuk-!-width-three-quarters" <% if (locals.model.validationMessages.name) { %> aria-invalid="true" aria-describedby="validation-name" <% } %>>
             </div>
 
             <div class="govuk-button-group">
