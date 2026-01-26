@@ -52,7 +52,7 @@
                             <span class="govuk-visually-hidden">Error:</span> <%=locals.validationMessages.value%>
                         </p>
                     <% } %>
-                        <input type="text" id="value" name="value" value="<%=locals.value%>" class="govuk-textarea govuk-!-width-three-quarters" rows="4" maxlength="400"<% if (locals.validationMessages.value) { %> aria-invalid="true" aria-describedby="validation-value" <% } %>>
+                        <input type="text" id="value" name="value" value="<%=locals.value%>" class="govuk-textarea govuk-!-width-three-quarters" rows="4" <% if (locals.validationMessages.value) { %> aria-invalid="true" aria-describedby="validation-value" <% } %>>
                     </div>
 
                     <div class="govuk-button-group">
