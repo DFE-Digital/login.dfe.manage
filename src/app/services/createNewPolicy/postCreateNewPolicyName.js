@@ -42,8 +42,9 @@ const postCreateNewPolicyName = async (req, res) => {
 
   if (Object.keys(model.validationMessages).length > 0) {
     return res.render("services/views/createNewPolicyName", {
-      model,
       csrfToken: req.csrfToken(),
+      name: model.name,
+      validationMessages: model.validationMessages,
       service,
       backLink: `/services/${req.params.sid}/policies`,
       cancelLink: `/services/${req.params.sid}/policies`,
@@ -72,7 +73,8 @@ const postCreateNewPolicyName = async (req, res) => {
         "Something went wrong submitting data, please try again";
       return res.render("services/views/createNewPolicyName", {
         csrfToken: req.csrfToken(),
-        model,
+        name: model.name,
+        validationMessages: model.validationMessages,
         service,
         backLink: `/services/${req.params.sid}/policies`,
         cancelLink: `/services/${req.params.sid}/policies`,

@@ -83,7 +83,7 @@ describe("when using postCreateNewPolicyName", () => {
 
     await postCreateNewPolicyName(req, res);
 
-    expect(res.render.mock.calls[0][1].model.validationMessages).toMatchObject({
+    expect(res.render.mock.calls[0][1].validationMessages).toMatchObject({
       name: "Enter a name",
     });
   });
@@ -108,9 +108,7 @@ describe("when using postCreateNewPolicyName", () => {
       serviceId: "service-1",
       csrfToken: "token",
       currentNavigation: "policies",
-      model: {
-        validationMessages: { name: "Enter a name" },
-      },
+      validationMessages: { name: "Enter a name" },
     });
   });
 
@@ -119,7 +117,7 @@ describe("when using postCreateNewPolicyName", () => {
 
     await postCreateNewPolicyName(req, res);
 
-    expect(res.render.mock.calls[0][1].model.validationMessages).toMatchObject({
+    expect(res.render.mock.calls[0][1].validationMessages).toMatchObject({
       name: "Name must be 125 characters or less",
     });
   });
@@ -129,7 +127,7 @@ describe("when using postCreateNewPolicyName", () => {
 
     await postCreateNewPolicyName(req, res);
 
-    expect(res.render.mock.calls[0][1].model.validationMessages).toMatchObject({
+    expect(res.render.mock.calls[0][1].validationMessages).toMatchObject({
       name: "Policy name must be unique and cannot already exist in DfE Sign-in",
     });
   });
@@ -141,7 +139,7 @@ describe("when using postCreateNewPolicyName", () => {
 
     await postCreateNewPolicyName(req, res);
 
-    expect(res.render.mock.calls[0][1].model.validationMessages).toMatchObject({
+    expect(res.render.mock.calls[0][1].validationMessages).toMatchObject({
       name: "Something went wrong submitting data, please try again",
     });
   });

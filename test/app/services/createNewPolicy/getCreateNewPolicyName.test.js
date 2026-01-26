@@ -43,14 +43,13 @@ describe("when calling the getCreateNewPolicyName function", () => {
     await getCreateNewPolicyName(req, res);
 
     expect(res.render.mock.calls[0][1]).toStrictEqual({
+      name: "",
+      validationMessages: {},
       backLink: `/services/${req.params.sid}/policies`,
       cancelLink: `/services/${req.params.sid}/policies`,
       serviceId: "service-1",
       csrfToken: "token",
       currentNavigation: "policies",
-      model: {
-        validationMessages: {},
-      },
       service,
       userRoles: [],
     });

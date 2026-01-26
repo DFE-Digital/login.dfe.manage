@@ -2,9 +2,7 @@ const { getServiceRaw } = require("login.dfe.api-client/services");
 const { getUserServiceRoles } = require("../utils");
 
 const getCreateNewPolicyName = async (req, res) => {
-  const model = req.session.createNewPolicy || {
-    validationMessages: {},
-  };
+  const name = req.session.createNewPolicy?.name || "";
   const service = await getServiceRaw({
     by: { serviceId: req.params.sid },
   });
@@ -12,7 +10,8 @@ const getCreateNewPolicyName = async (req, res) => {
 
   return res.render("services/views/createNewPolicyName", {
     csrfToken: req.csrfToken(),
-    model,
+    name,
+    validationMessages: {},
     service,
     backLink: `/services/${req.params.sid}/policies`,
     cancelLink: `/services/${req.params.sid}/policies`,
