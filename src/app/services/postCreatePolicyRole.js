@@ -1,9 +1,10 @@
 const { getServicePolicyRaw } = require("login.dfe.api-client/services");
+const { getUserServiceRoles } = require("./utils");
 const logger = require("../../infrastructure/logger");
 
 const validate = async (req) => {
   const model = {
-    appId: req.params.sid || "",
+    appId: req.params.sid,
     roleName: req.body.roleName.trim() || "",
     roleCode: req.body.roleCode.trim() || "",
     validationMessages: {},
@@ -53,6 +54,7 @@ const postCreatePolicyRole = async (req, res) => {
     policyId: req.params.pid,
   });
   const model = await validate(req);
+  const manageRolesForService = await getUserServiceRoles(req);
 
   if (Object.keys(model.validationMessages).length > 0) {
     return res.render("services/views/createPolicyRole", {
@@ -63,6 +65,7 @@ const postCreatePolicyRole = async (req, res) => {
       backLink: `/services/${req.params.sid}/policies/${req.params.pid}/conditionsAndRoles`,
       serviceId: req.params.sid,
       currentNavigation: "policies",
+      userRoles: manageRolesForService,
     });
   }
 
@@ -86,6 +89,7 @@ const postCreatePolicyRole = async (req, res) => {
         backLink: `/services/${req.params.sid}/policies/${req.params.pid}/conditionsAndRoles`,
         serviceId: req.params.sid,
         currentNavigation: "policies",
+        userRoles: manageRolesForService,
       });
     }
     return res.redirect("confirm-create-policy-role");

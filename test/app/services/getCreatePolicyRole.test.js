@@ -43,8 +43,19 @@ describe("when calling the getCreatePolicyRole function", () => {
   beforeEach(() => {
     req = getRequestMock({
       params: {
-        sid: "service-id",
+        sid: "service-1",
         pid: "policy-id",
+      },
+      userServices: {
+        roles: [
+          {
+            id: "E6B7C861-7D76-4D75-BA23-26E4A89B9E4E",
+            name: "Test service - Service Configuration",
+            code: "service-1_serviceconfig",
+            numericId: "23413",
+            status: { id: 1 },
+          },
+        ],
       },
     });
 
@@ -65,13 +76,14 @@ describe("when calling the getCreatePolicyRole function", () => {
     await getCreatePolicyRole(req, res);
 
     expect(res.render.mock.calls[0][1]).toStrictEqual({
-      backLink: "/services/service-id/policies/policy-id/conditionsAndRoles",
-      cancelLink: "/services/service-id/policies/policy-id/conditionsAndRoles",
-      serviceId: "service-id",
+      backLink: "/services/service-1/policies/policy-id/conditionsAndRoles",
+      cancelLink: "/services/service-1/policies/policy-id/conditionsAndRoles",
+      serviceId: "service-1",
       csrfToken: "token",
       currentNavigation: "policies",
       policy: policy,
       validationMessages: {},
+      userRoles: ["serviceconfig"],
     });
   });
 
@@ -79,7 +91,7 @@ describe("when calling the getCreatePolicyRole function", () => {
     await getCreatePolicyRole(req, res);
 
     expect(getServicePolicyRaw).toHaveBeenCalledWith({
-      serviceId: "service-id",
+      serviceId: "service-1",
       policyId: "policy-id",
     });
   });
@@ -94,7 +106,7 @@ describe("when calling the getCreatePolicyRole function", () => {
       "Error retrieving service policy",
       {
         correlationId: "correlationId",
-        serviceId: "service-id",
+        serviceId: "service-1",
         policyId: "policy-id",
         error: mockError,
       },
@@ -104,7 +116,7 @@ describe("when calling the getCreatePolicyRole function", () => {
         "An error occurred while retrieving the policy. Please try again.",
       ));
     expect(res.redirect).toHaveBeenCalledWith(
-      "/services/service-id/policies/policy-id/conditionsAndRoles",
+      "/services/service-1/policies/policy-id/conditionsAndRoles",
     );
   });
 });
