@@ -4,6 +4,7 @@ const {
   createServiceRole,
   getServiceRolesRaw,
 } = require("login.dfe.api-client/services");
+const { getUserServiceRoles } = require("./utils");
 const logger = require("../../infrastructure/logger");
 
 const addRoleToPolicy = async (
@@ -35,11 +36,18 @@ const addRoleToPolicy = async (
   return newRole;
 };
 
-const handlePolicyUpdateError = (error, model, req, res, errorMessage) => {
+const handlePolicyUpdateError = async (
+  error,
+  model,
+  req,
+  res,
+  errorMessage,
+) => {
   logger.error(errorMessage, {
     correlationId: req.id,
     error: error,
   });
+  const manageRolesForService = await getUserServiceRoles(req);
 
   req.session.createPolicyRoleData = model;
   return req.session.save((saveError) => {
@@ -56,6 +64,7 @@ const handlePolicyUpdateError = (error, model, req, res, errorMessage) => {
         backLink: `/services/${req.params.sid}/policies/${req.params.pid}/conditionsAndRoles`,
         serviceId: req.params.sid,
         currentNavigation: "policies",
+        userRoles: manageRolesForService,
       });
     }
     res.flash("error", "Failed to update policy. Please try again.");
@@ -108,7 +117,7 @@ const postConfirmCreatePolicyRole = async (req, res) => {
   try {
     addedRole = await addRoleToPolicy(policy, model, allServiceRoles, req.id);
   } catch (error) {
-    return handlePolicyUpdateError(
+    return await handlePolicyUpdateError(
       error,
       model,
       req,
@@ -124,7 +133,7 @@ const postConfirmCreatePolicyRole = async (req, res) => {
       policy,
     });
   } catch (error) {
-    return handlePolicyUpdateError(
+    return await handlePolicyUpdateError(
       error,
       model,
       req,

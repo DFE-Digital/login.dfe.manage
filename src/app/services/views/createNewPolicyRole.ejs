@@ -1,14 +1,15 @@
 <div class="govuk-width-container govuk-main-wrapper">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-three-quarters">
-            <h1 class="govuk-heading-l">
-                Create Role for <%= locals.policy.name %>
+            <h1 class="govuk-heading-xl govuk-!-margin-top-0 text-break">
+                <span class="govuk-caption-xl"><%=locals.service.name%></span>
+                Create policy role for <%= locals.policyName %>
             </h1>
             <form method="post" class="prevent-form-double-submission" id="form-new-policy-role">
                 <input type="hidden" name="_csrf" value="<%=csrfToken%>" />
             
                 <fieldset class="govuk-fieldset" id="fieldset-new-policy-role">
-                    <legend class="govuk-visually-hidden">Create policy role for <%= locals.policy.name %></legend>
+                    <legend class="govuk-visually-hidden">Create policy role for <%= locals.name %></legend>
                 
                     <div class="govuk-form-group <%= (locals.validationMessages.roleName !== undefined) ? 'govuk-form-group--error' : '' %>">
                         <label class="govuk-label govuk-label--s" for="roleName">Role name</label>
