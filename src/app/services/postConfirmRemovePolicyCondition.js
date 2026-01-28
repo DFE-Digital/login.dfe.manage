@@ -14,6 +14,17 @@ const postConfirmRemovePolicyCondition = async (req, res) => {
     policyId: req.params.pid,
   });
 
+  if (policy.conditions.length === 1) {
+    logger.error(
+      `The last policy condition for policy [${req.params.pid}] cannot be deleted`,
+    );
+    res.flash(
+      "error",
+      `The last policy condition for a policy cannot be deleted`,
+    );
+    return res.redirect("conditionsAndRoles");
+  }
+
   const conditionOperatorAndValueInPolicy = policy.conditions.find(
     (policyCondition) =>
       policyCondition.field === condition &&
@@ -46,11 +57,20 @@ const postConfirmRemovePolicyCondition = async (req, res) => {
     return res.redirect("conditionsAndRoles");
   }
 
-  await updateServicePolicyRaw({
-    serviceId: req.params.sid,
-    policyId: req.params.pid,
-    policy,
-  });
+  try {
+    await updateServicePolicyRaw({
+      serviceId: req.params.sid,
+      policyId: req.params.pid,
+      policy,
+    });
+  } catch (e) {
+    logger.error("Something went wrong when updating the service policy", e);
+    res.flash(
+      "error",
+      "Something went wrong when removing the policy. Check the logs for more details",
+    );
+    return res.redirect("conditionsAndRoles");
+  }
 
   logger.audit(
     `${req.user.email} (id: ${req.user.sub}) removed a policy condition for service ${req.params.sid} and policy ${req.params.pid}`,
