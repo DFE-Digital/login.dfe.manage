@@ -34,7 +34,7 @@ const getAddedAndRemovedValues = (oldValue, newValue) => {
 
   if (Array.isArray(oldValue) && Array.isArray(newValue)) {
     addedValues = newValue.filter((v) => !oldValue.includes(v));
-    removedValues = oldValue.filter((v) => !newValue.includes(v));
+    removedValues = oldValue.filter((v) => v && !newValue.includes(v));
   } else if (typeof oldValue === "string" && typeof newValue === "string") {
     if (oldValue !== newValue) {
       addedValues = newValue === "" ? [] : [newValue];
@@ -99,8 +99,9 @@ const buildCurrentServiceModel = async (req) => {
 const validate = async (req, currentService) => {
   try {
     const manageRolesForService = await getUserServiceRoles(req);
-
-    const { serviceConfigurationChanges } = req.session;
+    const { sid } = req.params;
+    const serviceConfigurationChanges =
+      req.session.serviceConfigurationChanges[sid];
 
     const grantTypes = processConfigurationTypes(
       serviceConfigurationChanges.grantTypes?.newValue,
@@ -144,10 +145,10 @@ const validate = async (req, currentService) => {
         clientSecret: serviceConfigurationChanges?.clientSecret?.secretNewValue,
         tokenEndpointAuthMethod,
       },
-      backLink: `/services/${req.params.sid}/service-configuration`,
-      cancelLink: `/services/${req.params.sid}`,
+      backLink: `/services/${sid}/service-configuration`,
+      cancelLink: `/services/${sid}`,
       validationMessages: {},
-      serviceId: req.params.sid,
+      serviceId: sid,
       userRoles: manageRolesForService,
       currentNavigation: "configuration",
     };
@@ -444,7 +445,7 @@ const validate = async (req, currentService) => {
 
 const getConfirmServiceConfig = async (req, res) => {
   const { sid } = req.params;
-  if (!req.session.serviceConfigurationChanges) {
+  if (!req.session.serviceConfigurationChanges[sid]) {
     return res.redirect(`/services/${sid}/service-configuration`);
   }
   try {
@@ -452,8 +453,8 @@ const getConfirmServiceConfig = async (req, res) => {
     const currentService = await buildCurrentServiceModel(req);
 
     const authFlowTypeValue =
-      req.session.serviceConfigurationChanges?.authFlowType;
-    const serviceConfigChanges = req.session.serviceConfigurationChanges;
+      req.session.serviceConfigurationChanges[sid]?.authFlowType;
+    const serviceConfigChanges = req.session.serviceConfigurationChanges[sid];
 
     const changedServiceParams = { ...serviceConfigChanges };
     delete changedServiceParams.authFlowType;
@@ -479,10 +480,10 @@ const getConfirmServiceConfig = async (req, res) => {
     return res.render("services/views/confirmServiceConfig", {
       csrfToken: req.csrfToken(),
       service: currentService,
-      backLink: `/services/${req.params.sid}/service-configuration`,
-      cancelLink: `/services/${req.params.sid}`,
+      backLink: `/services/${sid}/service-configuration`,
+      cancelLink: `/services/${sid}`,
       validationMessages: {},
-      serviceId: req.params.sid,
+      serviceId: sid,
       userRoles: manageRolesForService,
       currentNavigation: "configuration",
       serviceChanges: fixedServiceChanges,
@@ -494,7 +495,7 @@ const getConfirmServiceConfig = async (req, res) => {
 
 const postConfirmServiceConfig = async (req, res) => {
   try {
-    if (!req.session.serviceConfigurationChanges) {
+    if (!req.session.serviceConfigurationChanges[req.params.sid]) {
       return res.redirect(`/services/${req.params.sid}/service-configuration`);
     }
 
@@ -506,8 +507,10 @@ const postConfirmServiceConfig = async (req, res) => {
       return res.render("services/views/confirmServiceConfig", model);
     }
 
-    // excluding the authFlowType from the req.session.serviceConfigurationChanges object
-    const serviceConfigChanges = { ...req.session.serviceConfigurationChanges };
+    // excluding the authFlowType from the req.session.serviceConfigurationChanges[req.params.sid] object
+    const serviceConfigChanges = {
+      ...req.session.serviceConfigurationChanges[req.params.sid],
+    };
     delete serviceConfigChanges.authFlowType;
 
     const editedFields = Object.entries(serviceConfigChanges)

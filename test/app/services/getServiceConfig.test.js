@@ -176,35 +176,37 @@ describe("when getting the service config page", () => {
   it("should persist user-modified service configuration values during an amend operation on the review page", async () => {
     req.query.action = ACTIONS.AMEND_CHANGES;
     req.session.serviceConfigurationChanges = {
-      clientSecret: {
-        secretNewValue: "new-secret",
-        newValue: "EXPUNGED",
-        oldValue: "EXPUNGED",
-      },
-      serviceHome: {
-        newValue: "https://new.servicehome.com",
-        oldValue: "https://old.servicehome.com",
-      },
-      postResetUrl: {
-        newValue: "https://new.postreset.com",
-        oldValue: "https://old.postreset.com",
-      },
-      redirectUris: {
-        newValue: "https://new.redirect.com",
-        oldValue: "https://old.redirect.com",
-      },
-      postLogoutRedirectUris: {
-        newValue: "https://new.logout.com",
-        oldValue: "https://old.logout.com",
-      },
-      grantTypes: {
-        newValue: ["refresh_token", "authorization_code"],
-        oldValue: ["implicit"],
-      },
-      responseTypes: { newValue: ["code", "id_token"], oldValue: ["code"] },
-      apiSecret: {
-        secretNewValue: "new-api-secret",
-        oldValue: "old-api-secret",
+      [req.params.sid]: {
+        clientSecret: {
+          secretNewValue: "new-secret",
+          newValue: "EXPUNGED",
+          oldValue: "EXPUNGED",
+        },
+        serviceHome: {
+          newValue: "https://new.servicehome.com",
+          oldValue: "https://old.servicehome.com",
+        },
+        postResetUrl: {
+          newValue: "https://new.postreset.com",
+          oldValue: "https://old.postreset.com",
+        },
+        redirectUris: {
+          newValue: "https://new.redirect.com",
+          oldValue: "https://old.redirect.com",
+        },
+        postLogoutRedirectUris: {
+          newValue: "https://new.logout.com",
+          oldValue: "https://old.logout.com",
+        },
+        grantTypes: {
+          newValue: ["refresh_token", "authorization_code"],
+          oldValue: ["implicit"],
+        },
+        responseTypes: { newValue: ["code", "id_token"], oldValue: ["code"] },
+        apiSecret: {
+          secretNewValue: "new-api-secret",
+          oldValue: "old-api-secret",
+        },
       },
     };
 
@@ -230,9 +232,11 @@ describe("when getting the service config page", () => {
   it("should persist the user-modified value of tokenEndpointAuthMethod during an amend operation on the review page", async () => {
     req.query.action = ACTIONS.AMEND_CHANGES;
     req.session.serviceConfigurationChanges = {
-      tokenEndpointAuthMethod: {
-        newValue: "client_secret_post",
-        oldValue: "client_secret_basic",
+      [req.params.sid]: {
+        tokenEndpointAuthMethod: {
+          newValue: "client_secret_post",
+          oldValue: "client_secret_basic",
+        },
       },
     };
 

@@ -517,12 +517,14 @@ describe("when editing the AUTH flow service configuration", () => {
 
     // ASSERT
     expect(res.redirect.mock.calls).toHaveLength(1);
-    expect(req.session.serviceConfigurationChanges.authFlowType).toEqual(
-      "authorisationCodeFlow",
-    );
+    expect(
+      req.session.serviceConfigurationChanges[req.params.sid].authFlowType,
+    ).toEqual("authorisationCodeFlow");
 
     // Move this out to its own test for verifying what has been changed
-    expect(req.session.serviceConfigurationChanges.grantTypes).toEqual({
+    expect(
+      req.session.serviceConfigurationChanges[req.params.sid].grantTypes,
+    ).toEqual({
       newValue: ["authorization_code"],
       oldValue: ["authorization_code", "implicit"],
     });
@@ -537,10 +539,12 @@ describe("when editing the AUTH flow service configuration", () => {
 
     // ASSERT
     expect(res.redirect.mock.calls).toHaveLength(1);
-    expect(req.session.serviceConfigurationChanges.authFlowType).toEqual(
-      "authorisationCodeFlow",
-    );
-    expect(req.session.serviceConfigurationChanges.grantTypes).toEqual({
+    expect(
+      req.session.serviceConfigurationChanges[req.params.sid].authFlowType,
+    ).toEqual("authorisationCodeFlow");
+    expect(
+      req.session.serviceConfigurationChanges[req.params.sid].grantTypes,
+    ).toEqual({
       newValue: ["authorization_code", "refresh_token"],
       oldValue: ["authorization_code", "implicit"],
     });
@@ -555,10 +559,12 @@ describe("when editing the AUTH flow service configuration", () => {
 
     // ASSERT
     expect(res.redirect.mock.calls).toHaveLength(1);
-    expect(req.session.serviceConfigurationChanges.authFlowType).toEqual(
-      "authorisationCodeFlow",
-    );
-    expect(req.session.serviceConfigurationChanges.grantTypes).toEqual({
+    expect(
+      req.session.serviceConfigurationChanges[req.params.sid].authFlowType,
+    ).toEqual("authorisationCodeFlow");
+    expect(
+      req.session.serviceConfigurationChanges[req.params.sid].grantTypes,
+    ).toEqual({
       newValue: ["authorization_code"],
       oldValue: ["authorization_code", "implicit"],
     });
@@ -572,11 +578,12 @@ describe("when editing the AUTH flow service configuration", () => {
 
     // ASSERT
     expect(res.redirect.mock.calls).toHaveLength(1);
-    expect(req.session.serviceConfigurationChanges.authFlowType).toEqual(
-      "authorisationCodeFlow",
-    );
     expect(
-      req.session.serviceConfigurationChanges.tokenEndpointAuthMethod,
+      req.session.serviceConfigurationChanges[req.params.sid].authFlowType,
+    ).toEqual("authorisationCodeFlow");
+    expect(
+      req.session.serviceConfigurationChanges[req.params.sid]
+        .tokenEndpointAuthMethod,
     ).toEqual({
       newValue: "client_secret_post",
       oldValue: "client_secret_basic",
@@ -592,11 +599,12 @@ describe("when editing the AUTH flow service configuration", () => {
 
     // ASSERT
     expect(res.redirect.mock.calls).toHaveLength(1);
-    expect(req.session.serviceConfigurationChanges.authFlowType).toEqual(
-      "authorisationCodeFlow",
-    );
     expect(
-      req.session.serviceConfigurationChanges.tokenEndpointAuthMethod,
+      req.session.serviceConfigurationChanges[req.params.sid].authFlowType,
+    ).toEqual("authorisationCodeFlow");
+    expect(
+      req.session.serviceConfigurationChanges[req.params.sid]
+        .tokenEndpointAuthMethod,
     ).toBe(undefined);
   });
 
@@ -610,11 +618,12 @@ describe("when editing the AUTH flow service configuration", () => {
 
     // ASSERT
     expect(res.redirect.mock.calls).toHaveLength(1);
-    expect(req.session.serviceConfigurationChanges.authFlowType).toEqual(
-      "hybridFlow",
-    );
     expect(
-      req.session.serviceConfigurationChanges.tokenEndpointAuthMethod,
+      req.session.serviceConfigurationChanges[req.params.sid].authFlowType,
+    ).toEqual("hybridFlow");
+    expect(
+      req.session.serviceConfigurationChanges[req.params.sid]
+        .tokenEndpointAuthMethod,
     ).toBe(undefined);
   });
 
@@ -627,11 +636,12 @@ describe("when editing the AUTH flow service configuration", () => {
 
     // ASSERT
     expect(res.redirect.mock.calls).toHaveLength(1);
-    expect(req.session.serviceConfigurationChanges.authFlowType).toEqual(
-      "hybridFlow",
-    );
     expect(
-      req.session.serviceConfigurationChanges.tokenEndpointAuthMethod,
+      req.session.serviceConfigurationChanges[req.params.sid].authFlowType,
+    ).toEqual("hybridFlow");
+    expect(
+      req.session.serviceConfigurationChanges[req.params.sid]
+        .tokenEndpointAuthMethod,
     ).toEqual({
       newValue: "client_secret_post",
       oldValue: "client_secret_basic",
@@ -727,10 +737,12 @@ describe("when editing the HYBRID flow service configuration", () => {
 
     // ASSERT
     expect(res.redirect.mock.calls).toHaveLength(1);
-    expect(req.session.serviceConfigurationChanges.authFlowType).toEqual(
-      "hybridFlow",
-    );
-    expect(req.session.serviceConfigurationChanges.grantTypes).toEqual({
+    expect(
+      req.session.serviceConfigurationChanges[req.params.sid].authFlowType,
+    ).toEqual("hybridFlow");
+    expect(
+      req.session.serviceConfigurationChanges[req.params.sid].grantTypes,
+    ).toEqual({
       newValue: ["authorization_code", "implicit"],
       oldValue: ["authorization_code"],
     });
@@ -745,10 +757,12 @@ describe("when editing the HYBRID flow service configuration", () => {
 
     // ASSERT
     expect(res.redirect.mock.calls).toHaveLength(1);
-    expect(req.session.serviceConfigurationChanges.authFlowType).toEqual(
-      "hybridFlow",
-    );
-    expect(req.session.serviceConfigurationChanges.grantTypes).toEqual({
+    expect(
+      req.session.serviceConfigurationChanges[req.params.sid].authFlowType,
+    ).toEqual("hybridFlow");
+    expect(
+      req.session.serviceConfigurationChanges[req.params.sid].grantTypes,
+    ).toEqual({
       newValue: ["authorization_code", "implicit"],
       oldValue: ["authorization_code"],
     });
@@ -763,10 +777,12 @@ describe("when editing the HYBRID flow service configuration", () => {
 
     // ASSERT
     expect(res.redirect.mock.calls).toHaveLength(1);
-    expect(req.session.serviceConfigurationChanges.authFlowType).toEqual(
-      "hybridFlow",
-    );
-    expect(req.session.serviceConfigurationChanges.grantTypes).toEqual({
+    expect(
+      req.session.serviceConfigurationChanges[req.params.sid].authFlowType,
+    ).toEqual("hybridFlow");
+    expect(
+      req.session.serviceConfigurationChanges[req.params.sid].grantTypes,
+    ).toEqual({
       newValue: ["authorization_code", "implicit"],
       oldValue: ["authorization_code"],
     });
@@ -782,16 +798,18 @@ describe("when editing the HYBRID flow service configuration", () => {
 
     // ASSERT
     expect(res.redirect.mock.calls).toHaveLength(1);
-    expect(req.session.serviceConfigurationChanges.authFlowType).toEqual(
-      "hybridFlow",
-    );
-    expect(req.session.serviceConfigurationChanges.grantTypes).toEqual({
+    expect(
+      req.session.serviceConfigurationChanges[req.params.sid].authFlowType,
+    ).toEqual("hybridFlow");
+    expect(
+      req.session.serviceConfigurationChanges[req.params.sid].grantTypes,
+    ).toEqual({
       newValue: ["authorization_code", "implicit"],
       oldValue: ["authorization_code"],
     });
-    expect(req.session.serviceConfigurationChanges.refreshToken).toBe(
-      undefined,
-    );
+    expect(
+      req.session.serviceConfigurationChanges[req.params.sid].refreshToken,
+    ).toBe(undefined);
   });
 
   it('then it should include "refresh_token" in grantTypes when the "refresh_token" is selected and the chosen response type corresponds to the "Hybrid" flow.', async () => {
@@ -804,10 +822,12 @@ describe("when editing the HYBRID flow service configuration", () => {
 
     // ASSERT
     expect(res.redirect.mock.calls).toHaveLength(1);
-    expect(req.session.serviceConfigurationChanges.authFlowType).toEqual(
-      "hybridFlow",
-    );
-    expect(req.session.serviceConfigurationChanges.grantTypes).toEqual({
+    expect(
+      req.session.serviceConfigurationChanges[req.params.sid].authFlowType,
+    ).toEqual("hybridFlow");
+    expect(
+      req.session.serviceConfigurationChanges[req.params.sid].grantTypes,
+    ).toEqual({
       newValue: ["authorization_code", "implicit", "refresh_token"],
       oldValue: ["authorization_code"],
     });
@@ -883,10 +903,12 @@ describe("when editing the IMPLICIT flow service configuration", () => {
 
     // ASSERT
     expect(res.redirect.mock.calls).toHaveLength(1);
-    expect(req.session.serviceConfigurationChanges.authFlowType).toEqual(
-      "implicitFlow",
-    );
-    expect(req.session.serviceConfigurationChanges.grantTypes).toEqual({
+    expect(
+      req.session.serviceConfigurationChanges[req.params.sid].authFlowType,
+    ).toEqual("implicitFlow");
+    expect(
+      req.session.serviceConfigurationChanges[req.params.sid].grantTypes,
+    ).toEqual({
       newValue: ["implicit"],
       oldValue: ["authorization_code"],
     });
@@ -901,10 +923,12 @@ describe("when editing the IMPLICIT flow service configuration", () => {
 
     // ASSERT
     expect(res.redirect.mock.calls).toHaveLength(1);
-    expect(req.session.serviceConfigurationChanges.authFlowType).toEqual(
-      "implicitFlow",
-    );
-    expect(req.session.serviceConfigurationChanges.grantTypes).toEqual({
+    expect(
+      req.session.serviceConfigurationChanges[req.params.sid].authFlowType,
+    ).toEqual("implicitFlow");
+    expect(
+      req.session.serviceConfigurationChanges[req.params.sid].grantTypes,
+    ).toEqual({
       newValue: ["implicit"],
       oldValue: ["authorization_code"],
     });
@@ -920,10 +944,12 @@ describe("when editing the IMPLICIT flow service configuration", () => {
 
     // ASSERT
     expect(res.redirect.mock.calls).toHaveLength(1);
-    expect(req.session.serviceConfigurationChanges.authFlowType).toEqual(
-      "implicitFlow",
-    );
-    expect(req.session.serviceConfigurationChanges.grantTypes).toEqual({
+    expect(
+      req.session.serviceConfigurationChanges[req.params.sid].authFlowType,
+    ).toEqual("implicitFlow");
+    expect(
+      req.session.serviceConfigurationChanges[req.params.sid].grantTypes,
+    ).toEqual({
       newValue: ["implicit"],
       oldValue: ["authorization_code"],
     });
@@ -938,11 +964,12 @@ describe("when editing the IMPLICIT flow service configuration", () => {
 
     // ASSERT
     expect(res.redirect.mock.calls).toHaveLength(1);
-    expect(req.session.serviceConfigurationChanges.authFlowType).toEqual(
-      "implicitFlow",
-    );
     expect(
-      req.session.serviceConfigurationChanges.tokenEndpointAuthMethod,
+      req.session.serviceConfigurationChanges[req.params.sid].authFlowType,
+    ).toEqual("implicitFlow");
+    expect(
+      req.session.serviceConfigurationChanges[req.params.sid]
+        .tokenEndpointAuthMethod,
     ).toBe(undefined);
   });
 });
