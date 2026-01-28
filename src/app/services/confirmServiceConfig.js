@@ -34,7 +34,7 @@ const getAddedAndRemovedValues = (oldValue, newValue) => {
 
   if (Array.isArray(oldValue) && Array.isArray(newValue)) {
     addedValues = newValue.filter((v) => !oldValue.includes(v));
-    removedValues = oldValue.filter((v) => !newValue.includes(v));
+    removedValues = oldValue.filter((v) => v && !newValue.includes(v));
   } else if (typeof oldValue === "string" && typeof newValue === "string") {
     if (oldValue !== newValue) {
       addedValues = newValue === "" ? [] : [newValue];
