@@ -95,6 +95,8 @@ const getConfirmRemovePolicyCondition = require("./getConfirmRemovePolicyConditi
 const postConfirmRemovePolicyCondition = require("./postConfirmRemovePolicyCondition");
 const getConfirmRemovePolicyRole = require("./getConfirmRemovePolicyRole");
 const postConfirmRemovePolicyRole = require("./postConfirmRemovePolicyRole");
+const getConfirmRemovePolicy = require("./getConfirmRemovePolicy");
+const postConfirmRemovePolicy = require("./postConfirmRemovePolicy");
 
 const getAudit = require("./getAudit");
 const postUpdateAuditLog = require("./postUpdateAuditLog");
@@ -541,6 +543,23 @@ const services = (csrf) => {
     isManageUserForService,
     hasGenericRole("internalServiceConfigurationManager"),
     asyncWrapper(postConfirmRemovePolicyRole),
+  );
+
+  // Remove policy
+  router.get(
+    "/:sid/policies/:pid/confirm-remove-policy",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("internalServiceConfigurationManager"),
+    asyncWrapper(getConfirmRemovePolicy),
+  );
+
+  router.post(
+    "/:sid/policies/:pid/confirm-remove-policy",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("internalServiceConfigurationManager"),
+    asyncWrapper(postConfirmRemovePolicy),
   );
 
   // Create new policy

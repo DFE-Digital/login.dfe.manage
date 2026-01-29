@@ -3,7 +3,7 @@
         <div class="govuk-grid-column-three-quarters">
             <span class="govuk-caption-l"><%= policy.name %></span>
             <h1 class="govuk-heading-l text-break">
-                Are you sure you want to remove this policy?
+                Are you sure you want to remove this policy condition?
             </h1>
             <p class="govuk-body">Review these details before confirming.</p>
             <p class="govuk-body">Removing this policy condition will stop additional users covered by it from accessing the associated role(s),
@@ -43,7 +43,7 @@
                 <input type="hidden" name="value" value="<%= locals.value %>"/>
 
                 <div class="govuk-button-group">
-                    <button type="submit" class="govuk-button govuk-button--warning" data-module="govuk-button">Yes, remove this policy</button>
+                    <button type="submit" class="govuk-button govuk-button--warning" data-module="govuk-button">Yes, remove this policy condition</button>
                     <a href="<%= locals.cancelLink %>" class="govuk-button govuk-button--secondary">Cancel</a>
                 </div>
             </form>
