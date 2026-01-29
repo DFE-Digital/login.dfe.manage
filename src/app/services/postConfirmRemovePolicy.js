@@ -5,7 +5,7 @@ const postConfirmRemovePolicy = async (req, res) => {
   const policyName = req.body.name;
 
   try {
-    deleteServicePolicy({
+    await deleteServicePolicy({
       serviceId: req.params.sid,
       policyId: req.params.pid,
     });

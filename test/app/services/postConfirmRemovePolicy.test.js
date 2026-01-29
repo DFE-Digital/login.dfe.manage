@@ -58,4 +58,22 @@ describe("when using the postConfirmRemovePolicy function", () => {
 
     expect(res.redirect).toHaveBeenCalledWith("/services/service-id/policies");
   });
+
+  it("should flash and log an error if something goes wrong when deleting the policy", async () => {
+    const mockError = new Error("Deletion error");
+    deleteServicePolicy.mockRejectedValue(mockError);
+    await postConfirmRemovePolicy(req, res);
+
+    expect(logger.error).toHaveBeenCalledWith(
+      "Something went wrong when deleting service policy",
+      mockError,
+    );
+
+    expect(res.flash).toHaveBeenCalledWith(
+      "error",
+      "Something went wrong when deleting the service policy",
+    );
+
+    expect(res.redirect).toHaveBeenCalledWith("/services/service-id/policies");
+  });
 });
