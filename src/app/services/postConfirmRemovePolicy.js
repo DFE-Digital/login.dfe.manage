@@ -1,13 +1,19 @@
+const { deleteServicePolicy } = require("login.dfe.api-client/services");
 const logger = require("../../infrastructure/logger");
 
 const postConfirmRemovePolicy = async (req, res) => {
   const policyName = req.body.name;
 
-  // try {
-  // Hit deletePolicy endpoint
-  // } catch (e) {
-  // handle error
-  //}
+  try {
+    deleteServicePolicy({
+      serviceId: req.params.sid,
+      policyId: req.params.pid,
+    });
+  } catch (e) {
+    logger.error("Something went wrong when deleting service policy", e);
+    res.flash("error", "Something went wrong when deleting the service policy");
+    return res.redirect(`/services/${req.params.sid}/policies`);
+  }
 
   logger.audit(
     `${req.user.email} (id: ${req.user.sub}) removed a policy for service ${req.params.sid}`,

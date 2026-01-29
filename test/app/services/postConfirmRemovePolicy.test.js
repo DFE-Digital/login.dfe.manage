@@ -5,6 +5,9 @@ jest.mock("./../../../src/infrastructure/logger", () =>
   require("../../utils").loggerMockFactory(),
 );
 
+jest.mock("login.dfe.api-client/services");
+
+const { deleteServicePolicy } = require("login.dfe.api-client/services");
 const { getRequestMock, getResponseMock } = require("../../utils");
 const postConfirmRemovePolicy = require("../../../src/app/services/postConfirmRemovePolicy");
 const logger = require("../../../src/infrastructure/logger");
@@ -25,6 +28,9 @@ describe("when using the postConfirmRemovePolicy function", () => {
     });
 
     res.mockResetAll();
+
+    deleteServicePolicy.mockReset();
+    deleteServicePolicy.mockReturnValue(undefined);
 
     logger.error.mockReset();
     logger.info.mockReset();
