@@ -1,0 +1,35 @@
+<div class="govuk-width-container govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <span class="govuk-caption-l"><%= locals.policy.name %></span>
+            <h1 class="govuk-heading-l text-break">
+                Are you sure you want to remove this policy?
+            </h1>
+            <p class="govuk-body">Review these details before confirming.</p>
+            <p class="govuk-body">Removing this policy will stop additional users covered by it from accessing the associated role(s),
+                but will not remove user current user access to them, this must be done through the support or manage console.</p>
+
+            <dl class="govuk-summary-list">
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Policy Name  
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        <p class="govuk-body"><%=locals.policy.name%></p>
+                    </dd>
+                </div>
+            </dl>
+
+            <form method="post">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
+                <input type="hidden" name="name" value="<%= locals.policy.name %>"/>
+
+                <div class="govuk-button-group">
+                    <button type="submit" class="govuk-button govuk-button--warning" data-module="govuk-button">Yes, remove this policy</button>
+                    <a href="<%= locals.cancelLink %>" class="govuk-button govuk-button--secondary">Cancel</a>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
