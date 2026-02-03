@@ -131,8 +131,9 @@ describe("when using the postConfirmRemovePolicyCondition function", () => {
     expect(res.redirect.mock.calls[0][0]).toBe("conditionsAndRoles");
   });
 
-  it("should create a new policy condition when the condition does not already exist", async () => {
-    const testReq = getRequestMock(requestBody);
+  it("should remove just the specified value if the condition is an array of values", async () => {
+    const clonedRequestBody = structuredClone(requestBody);
+    const testReq = getRequestMock(clonedRequestBody);
     testReq.body.condition = "organisation.status.id";
     testReq.body.value = "1";
     await postConfirmRemovePolicyCondition(testReq, res);
@@ -179,7 +180,8 @@ describe("when using the postConfirmRemovePolicyCondition function", () => {
   });
 
   it("should log a message and do nothing if the value does not exist", async () => {
-    const testReq = getRequestMock(requestBody);
+    const clonedRequestBody = structuredClone(requestBody);
+    const testReq = getRequestMock(clonedRequestBody);
     testReq.body.value = "10000";
     await postConfirmRemovePolicyCondition(testReq, res);
 
@@ -187,7 +189,42 @@ describe("when using the postConfirmRemovePolicyCondition function", () => {
     expect(res.flash.mock.calls).toHaveLength(1);
     expect(res.flash).toHaveBeenCalledWith(
       "info",
-      "Policy condition organisation.status.id is 10000 not found in policy. Policy has not been modified",
+      "Policy condition organisation.type.id is 10000 not found in policy. Policy has not been modified",
+    );
+    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toBe("conditionsAndRoles");
+  });
+
+  it("should log a message if the last policy condition is attempted to be removed", async () => {
+    const clonedPolicy = structuredClone(policy);
+    clonedPolicy.conditions = [
+      { field: "organisation.category.id", operator: "is", value: ["001"] },
+    ];
+    getServicePolicyRaw.mockReturnValue(clonedPolicy);
+
+    await postConfirmRemovePolicyCondition(req, res);
+
+    expect(updateServicePolicyRaw.mock.calls.length).toBe(0);
+    expect(res.flash.mock.calls).toHaveLength(1);
+    expect(res.flash).toHaveBeenCalledWith(
+      "error",
+      "The last policy condition for a policy cannot be deleted",
+    );
+    expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toBe("conditionsAndRoles");
+  });
+
+  it("should log a message there is an error when the policy is removed", async () => {
+    const mockError = new Error("Policy update error");
+    updateServicePolicyRaw.mockRejectedValue(mockError);
+
+    await postConfirmRemovePolicyCondition(req, res);
+
+    expect(updateServicePolicyRaw.mock.calls.length).toBe(1);
+    expect(res.flash.mock.calls).toHaveLength(1);
+    expect(res.flash).toHaveBeenCalledWith(
+      "error",
+      "Something went wrong when removing the policy. Check the logs for more details",
     );
     expect(res.redirect.mock.calls.length).toBe(1);
     expect(res.redirect.mock.calls[0][0]).toBe("conditionsAndRoles");
