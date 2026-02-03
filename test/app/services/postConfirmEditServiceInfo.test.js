@@ -4,8 +4,8 @@ jest.mock("./../../../src/infrastructure/config", () =>
 jest.mock("./../../../src/infrastructure/logger", () =>
   require("../../utils").loggerMockFactory(),
 );
-jest.mock("./../../../src/infrastructure/access");
 jest.mock("login.dfe.api-client/services", () => ({
+  updateRole: jest.fn(),
   getServiceRaw: jest.fn(),
   updateService: jest.fn(),
   getPaginatedServicesRaw: jest.fn(),
@@ -15,9 +15,9 @@ jest.mock("../../../src/app/services/utils");
 
 const { getRequestMock, getResponseMock } = require("../../utils");
 const postConfirmEditServiceInfo = require("../../../src/app/services/postConfirmEditServiceInfo");
-const { updateRole } = require("../../../src/infrastructure/access");
 const { getUserServiceRoles } = require("../../../src/app/services/utils");
 const {
+  updateRole,
   getServiceRaw,
   updateService,
   getPaginatedServicesRaw,

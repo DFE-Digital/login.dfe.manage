@@ -19,7 +19,7 @@ const handleApiError = (error, req, res, errorMessage, flashMessage) => {
 
 const postConfirmRemovePolicyRole = async (req, res) => {
   const model = {
-    appId: req.params.sid || "",
+    appId: req.params.sid,
     roleName: req.body.name || "",
     roleCode: req.body.code || "",
     validationMessages: {},
@@ -57,8 +57,8 @@ const postConfirmRemovePolicyRole = async (req, res) => {
     return res.redirect("conditionsAndRoles");
   }
 
-  /* Check if the role exists in other policies for this service. 
-  If it does, remove the role and update the policy. 
+  /* Check if the role exists in other policies for this service.
+  If it does, remove the role and update the policy.
   If not, remove the role and delete the role completely. */
   let allServicePolicies;
   let roleInMultiplePolicies;

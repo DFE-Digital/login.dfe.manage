@@ -4,10 +4,11 @@ jest.mock("./../../../src/infrastructure/config", () =>
 jest.mock("./../../../src/infrastructure/logger", () =>
   require("../../utils").loggerMockFactory(),
 );
+
 jest.mock("login.dfe.api-client/services");
 
 const { getRequestMock, getResponseMock } = require("../../utils");
-const getCreatePolicyRole = require("../../../src/app/services/getCreatePolicyRole");
+const getConfirmRemovePolicy = require("../../../src/app/services/getConfirmRemovePolicy");
 const { getServicePolicyRaw } = require("login.dfe.api-client/services");
 const logger = require("../../../src/infrastructure/logger");
 const res = getResponseMock();
@@ -20,11 +21,6 @@ const policy = {
   conditions: [
     { field: "organisation.status.id", operator: "is", value: ["1", "3", "4"] },
     { field: "organisation.type.id", operator: "is", value: ["57"] },
-    {
-      field: "organisation.category.id",
-      operator: "is",
-      value: ["001"],
-    },
   ],
   roles: [
     {
@@ -37,86 +33,80 @@ const policy = {
   ],
 };
 
-describe("when calling the getCreatePolicyRole function", () => {
+describe("when calling the getConfirmRemovePolicy function", () => {
   let req;
 
   beforeEach(() => {
-    req = getRequestMock({
+    const requestBody = {
       params: {
-        sid: "service-1",
+        sid: "service-id",
         pid: "policy-id",
       },
-      userServices: {
-        roles: [
-          {
-            id: "E6B7C861-7D76-4D75-BA23-26E4A89B9E4E",
-            name: "Test service - Service Configuration",
-            code: "service-1_serviceconfig",
-            numericId: "23413",
-            status: { id: 1 },
-          },
-        ],
-      },
-    });
+    };
+
+    req = getRequestMock(requestBody);
 
     getServicePolicyRaw.mockReset();
     getServicePolicyRaw.mockResolvedValue(policy);
 
     res.mockResetAll();
+
+    logger.error.mockReset();
+    logger.info.mockReset();
   });
 
-  it("should return the createPolicyRole view", async () => {
-    await getCreatePolicyRole(req, res);
+  it("should return the confirmRemovePolicy view", async () => {
+    await getConfirmRemovePolicy(req, res);
 
     expect(res.render.mock.calls.length).toBe(1);
-    expect(res.render.mock.calls[0][0]).toBe("services/views/createPolicyRole");
+    expect(res.render.mock.calls[0][0]).toBe(
+      "services/views/confirmRemovePolicy",
+    );
   });
 
   it("should include the following in the model on success", async () => {
-    await getCreatePolicyRole(req, res);
+    await getConfirmRemovePolicy(req, res);
 
-    expect(res.render.mock.calls[0][1]).toStrictEqual({
-      backLink: "/services/service-1/policies/policy-id/conditionsAndRoles",
-      cancelLink: "/services/service-1/policies/policy-id/conditionsAndRoles",
-      serviceId: "service-1",
+    expect(res.render.mock.calls[0][1]).toMatchObject({
       csrfToken: "token",
-      currentNavigation: "policies",
       policy: policy,
-      validationMessages: {},
-      userRoles: ["serviceconfig"],
+      cancelLink: "/services/service-id/policies/policy-id/conditionsAndRoles",
+      backLink: "/services/service-id/policies/policy-id/conditionsAndRoles",
+      serviceId: "service-id",
+      currentNavigation: "policies",
     });
   });
 
   it("should call getServicePolicyRaw with the correct parameters", async () => {
-    await getCreatePolicyRole(req, res);
+    await getConfirmRemovePolicy(req, res);
 
     expect(getServicePolicyRaw).toHaveBeenCalledWith({
-      serviceId: "service-1",
+      serviceId: "service-id",
       policyId: "policy-id",
     });
   });
 
   it("should handle errors when getServicePolicyRaw fails", async () => {
-    const mockError = new Error("API Error");
+    const mockError = new Error("Policy Fetch Error");
     getServicePolicyRaw.mockRejectedValue(mockError);
 
-    await getCreatePolicyRole(req, res);
+    await getConfirmRemovePolicy(req, res);
 
-    (expect(logger.error).toHaveBeenCalledWith(
-      "Error retrieving service policy",
+    expect(logger.error).toHaveBeenCalledWith(
+      "Error retrieving service policy policy-id",
       {
         correlationId: "correlationId",
-        serviceId: "service-1",
-        policyId: "policy-id",
         error: mockError,
       },
-    ),
-      expect(res.flash).toHaveBeenCalledWith(
-        "error",
-        "An error occurred while retrieving the policy. Please try again.",
-      ));
+    );
+
+    expect(res.flash).toHaveBeenCalledWith(
+      "error",
+      "Failed to retrieve policy. Please try again.",
+    );
+
     expect(res.redirect).toHaveBeenCalledWith(
-      "/services/service-1/policies/policy-id/conditionsAndRoles",
+      "/services/service-id/policies/policy-id/conditionsAndRoles",
     );
   });
 });

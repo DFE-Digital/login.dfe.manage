@@ -1,0 +1,157 @@
+const { getServiceRaw } = require("login.dfe.api-client/services");
+const { getOrganisationRaw } = require("login.dfe.api-client/organisations");
+const { getUserServiceRoles } = require("../utils");
+const { validate: validateUUID } = require("uuid");
+const logger = require("../../../infrastructure/logger");
+
+const validate = async (req) => {
+  const model = {
+    condition: (req.body.condition || "").trim(),
+    operator: (req.body.operator || "").trim(),
+    value: (req.body.value || "").trim(),
+    validationMessages: {},
+  };
+
+  if (!model.condition) {
+    model.validationMessages.condition = "Please enter a condition";
+  }
+
+  if (!model.operator) {
+    model.validationMessages.operator = "Please enter an operator";
+  }
+
+  if (!model.value) {
+    model.validationMessages.value = "Please enter a value";
+  }
+
+  if (model.condition && model.operator && model.value) {
+    if (model.condition === "organisation.urn") {
+      const urnRegex = /^\d{6}$/i;
+      if (!urnRegex.test(model.value)) {
+        model.validationMessages.value =
+          "organisation.urn can only be a 6 digit number";
+      }
+    }
+    if (model.condition === "organisation.ukprn") {
+      const ukprnRegex = /^\d{8}$/i;
+      if (!ukprnRegex.test(model.value)) {
+        model.validationMessages.value =
+          "organisation.ukprn can only be an 8 digit number";
+      }
+    }
+    if (model.condition === "organisation.id") {
+      if (!validateUUID(model.value)) {
+        model.validationMessages.value =
+          "organisation.id needs to be a valid uuid";
+      } else {
+        const organisation = await getOrganisationRaw({
+          by: { organisationId: model.value },
+        });
+        if (!organisation) {
+          model.validationMessages.value = "Organisation id does not exist";
+        }
+      }
+    }
+    if (model.condition === "organisation.type.id") {
+      const typeRegex = /^\d{2}$/i;
+      if (!typeRegex.test(model.value)) {
+        model.validationMessages.value =
+          "organisation.type.id can only be a 2 digit number";
+      }
+    }
+    if (model.condition === "organisation.status.id") {
+      const statusRegex = /^\d{1,2}$/i;
+      if (!statusRegex.test(model.value)) {
+        model.validationMessages.value =
+          "organisation.status.id can only be a 1 or 2 digit number";
+      }
+    }
+    if (model.condition === "organisation.category.id") {
+      const categoryRegex = /^\d{3}$/i;
+      if (!categoryRegex.test(model.value)) {
+        model.validationMessages.value =
+          "organisation.category.id can only be a 3 digit number";
+      }
+    }
+    if (model.condition === "organisation.IsOnAPAR") {
+      if (model.value !== "YES" && model.value !== "NO") {
+        model.validationMessages.value =
+          "organisation.IsOnAPAR can only be YES or NO";
+      }
+    }
+    if (model.condition === "organisation.phaseOfEducation.id") {
+      const categoryRegex = /^[0-7]$/i;
+      if (!categoryRegex.test(model.value)) {
+        model.validationMessages.value =
+          "organisation.phaseOfEducation.id can only be a number between 0 and 7 inclusive";
+      }
+    }
+    if (model.condition === "organisation.localAuthority.id") {
+      if (!validateUUID(model.value)) {
+        model.validationMessages.value =
+          "organisation.localAuthority.id needs to be a valid uuid";
+      }
+    }
+  }
+
+  // Ensure all 3 fields are populated and have sensible values before doing more
+  // thorough validation
+  if (Object.keys(model.validationMessages).length > 0) {
+    return model;
+  }
+
+  return model;
+};
+
+const postCreateNewPolicyCondition = async (req, res) => {
+  const service = await getServiceRaw({
+    by: { serviceId: req.params.sid },
+  });
+  const model = await validate(req, service);
+  const manageRolesForService = await getUserServiceRoles(req);
+
+  if (Object.keys(model.validationMessages).length > 0) {
+    return res.render("services/views/createNewPolicyCondition", {
+      policyName: req.session.createNewPolicy.name,
+      condition: model.condition,
+      operator: model.operator,
+      value: model.value,
+      validationMessages: model.validationMessages,
+      csrfToken: req.csrfToken(),
+      service,
+      backLink: `/services/${req.params.sid}/policies/create-new-policy-role`,
+      cancelLink: `/services/${req.params.sid}/policies`,
+      currentNavigation: "policies",
+      serviceId: req.params.sid,
+      userRoles: manageRolesForService,
+    });
+  }
+
+  req.session.createNewPolicy.condition = model;
+  req.session.save((error) => {
+    if (error) {
+      // Any error saving to session should hopefully be temporary. Assuming this, we log the error
+      // and just display an error message saying to try again.
+      logger.error("An error occurred when saving to the session", error);
+      model.validationMessages.condition =
+        "Something went wrong submitting data, please try again";
+      return res.render("services/views/createNewPolicyCondition", {
+        policyName: req.session.createNewPolicy.name,
+        condition: model.condition,
+        operator: model.operator,
+        value: model.value,
+        validationMessages: model.validationMessages,
+        csrfToken: req.csrfToken(),
+        service,
+        backLink: `/services/${req.params.sid}/policies/create-new-policy-role`,
+        cancelLink: `/services/${req.params.sid}/policies`,
+        currentNavigation: "policies",
+        serviceId: req.params.sid,
+        userRoles: manageRolesForService,
+      });
+    }
+    return res.redirect("confirm-create-new-policy");
+  });
+};
+
+module.exports = postCreateNewPolicyCondition;

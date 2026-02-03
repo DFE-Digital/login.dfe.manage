@@ -14,6 +14,14 @@ const getEditServiceInfo = require("./getEditServiceInfo");
 const postEditServiceInfo = require("./postEditServiceInfo");
 const getConfirmEditServiceInfo = require("./getConfirmEditServiceInfo");
 const postConfirmEditServiceInfo = require("./postConfirmEditServiceInfo");
+const getCreateNewPolicyName = require("./createNewPolicy/getCreateNewPolicyName");
+const postCreateNewPolicyName = require("./createNewPolicy/postCreateNewPolicyName");
+const getCreateNewPolicyRole = require("./createNewPolicy/getCreateNewPolicyRole");
+const postCreateNewPolicyRole = require("./createNewPolicy/postCreateNewPolicyRole");
+const getCreateNewPolicyCondition = require("./createNewPolicy/getCreateNewPolicyCondition");
+const postCreateNewPolicyCondition = require("./createNewPolicy/postCreateNewPolicyCondition");
+const getConfirmCreateNewPolicy = require("./createNewPolicy/getConfirmCreateNewPolicy");
+const postConfirmCreateNewPolicy = require("./createNewPolicy/postConfirmCreateNewPolicy");
 const { getServiceConfig, postServiceConfig } = require("./serviceConfig");
 const {
   getConfirmServiceConfig,
@@ -87,6 +95,8 @@ const getConfirmRemovePolicyCondition = require("./getConfirmRemovePolicyConditi
 const postConfirmRemovePolicyCondition = require("./postConfirmRemovePolicyCondition");
 const getConfirmRemovePolicyRole = require("./getConfirmRemovePolicyRole");
 const postConfirmRemovePolicyRole = require("./postConfirmRemovePolicyRole");
+const getConfirmRemovePolicy = require("./getConfirmRemovePolicy");
+const postConfirmRemovePolicy = require("./postConfirmRemovePolicy");
 
 const getAudit = require("./getAudit");
 const postUpdateAuditLog = require("./postUpdateAuditLog");
@@ -533,6 +543,88 @@ const services = (csrf) => {
     isManageUserForService,
     hasGenericRole("internalServiceConfigurationManager"),
     asyncWrapper(postConfirmRemovePolicyRole),
+  );
+
+  // Remove policy
+  router.get(
+    "/:sid/policies/:pid/confirm-remove-policy",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("internalServiceConfigurationManager"),
+    asyncWrapper(getConfirmRemovePolicy),
+  );
+
+  router.post(
+    "/:sid/policies/:pid/confirm-remove-policy",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("internalServiceConfigurationManager"),
+    asyncWrapper(postConfirmRemovePolicy),
+  );
+
+  // Create new policy
+  router.get(
+    "/:sid/policies/create-new-policy-name",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("internalServiceConfigurationManager"),
+    asyncWrapper(getCreateNewPolicyName),
+  );
+
+  router.post(
+    "/:sid/policies/create-new-policy-name",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("internalServiceConfigurationManager"),
+    asyncWrapper(postCreateNewPolicyName),
+  );
+
+  router.get(
+    "/:sid/policies/create-new-policy-role",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("internalServiceConfigurationManager"),
+    asyncWrapper(getCreateNewPolicyRole),
+  );
+
+  router.post(
+    "/:sid/policies/create-new-policy-role",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("internalServiceConfigurationManager"),
+    asyncWrapper(postCreateNewPolicyRole),
+  );
+
+  router.get(
+    "/:sid/policies/create-new-policy-condition",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("internalServiceConfigurationManager"),
+    asyncWrapper(getCreateNewPolicyCondition),
+  );
+
+  router.post(
+    "/:sid/policies/create-new-policy-condition",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("internalServiceConfigurationManager"),
+    asyncWrapper(postCreateNewPolicyCondition),
+  );
+
+  router.get(
+    "/:sid/policies/confirm-create-new-policy",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("internalServiceConfigurationManager"),
+    asyncWrapper(getConfirmCreateNewPolicy),
+  );
+
+  router.post(
+    "/:sid/policies/confirm-create-new-policy",
+    csrf,
+    isManageUserForService,
+    hasGenericRole("internalServiceConfigurationManager"),
+    asyncWrapper(postConfirmCreateNewPolicy),
   );
 
   return router;

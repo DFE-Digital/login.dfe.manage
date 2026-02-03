@@ -1,4 +1,5 @@
 const { getServicePolicyRaw } = require("login.dfe.api-client/services");
+const { getUserServiceRoles } = require("./utils");
 
 const getConfirmCreatePolicyRole = async (req, res) => {
   if (!req.session.createPolicyRoleData) {
@@ -10,6 +11,7 @@ const getConfirmCreatePolicyRole = async (req, res) => {
     serviceId: req.params.sid,
     policyId: req.params.pid,
   });
+  const manageRolesForService = await getUserServiceRoles(req);
 
   return res.render("services/views/confirmCreatePolicyRole", {
     csrfToken: req.csrfToken(),
@@ -20,6 +22,7 @@ const getConfirmCreatePolicyRole = async (req, res) => {
     backLink: `/services/${req.params.sid}/policies/${req.params.pid}/create-policy-role`,
     serviceId: req.params.sid,
     currentNavigation: "policies",
+    userRoles: manageRolesForService,
   });
 };
 

@@ -17,7 +17,7 @@
                             <span class="govuk-visually-hidden">Error:</span> <%=locals.validationMessages.bannerName %>
                         </p>
                     <% } %>
-                        <input type="text" id="bannerName" name="bannerName" value="<%=locals.name%>" class="govuk-input govuk-!-width-three-quarters" maxlength="20"<% if (locals.validationMessages.bannerName) { %> aria-invalid="true" aria-describedby="validation-bannerName" <% } %>>
+                        <input type="text" id="bannerName" name="bannerName" value="<%=locals.name%>" class="govuk-input govuk-!-width-three-quarters" <% if (locals.validationMessages.bannerName) { %> aria-invalid="true" aria-describedby="validation-bannerName" <% } %>>
                     </div>
 
                     <div class="govuk-form-group <%= (locals.validationMessages.bannerTitle !== undefined) ? 'govuk-form-group--error' : '' %>">
@@ -27,7 +27,7 @@
                             <span class="govuk-visually-hidden">Error:</span> <%=locals.validationMessages.bannerTitle %>
                         </p>
                     <% } %>
-                        <input type="text" id="bannerTitle" name="bannerTitle" value="<%=locals.bannerTitle%>" class="govuk-input govuk-!-width-three-quarters" maxlength="80"<% if (locals.validationMessages.bannerTitle) { %> aria-invalid="true" aria-describedby="validation-bannerTitle" <% } %>>
+                        <input type="text" id="bannerTitle" name="bannerTitle" value="<%=locals.bannerTitle%>" class="govuk-input govuk-!-width-three-quarters" <% if (locals.validationMessages.bannerTitle) { %> aria-invalid="true" aria-describedby="validation-bannerTitle" <% } %>>
                     </div>
 
                     <div class="govuk-form-group <%= (locals.validationMessages.bannerMessage !== undefined) ? 'govuk-form-group--error' : '' %>">
