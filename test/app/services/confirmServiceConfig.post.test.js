@@ -115,52 +115,54 @@ describe("when confirming service config changes in the review page", () => {
       .mockReturnValueOnce(null);
 
     res.mockResetAll();
-
+    const { sid } = req.params;
     req.session.serviceConfigurationChanges = {
-      authFlowType: "authorisationCodeFlow",
-      serviceHome: {
-        newValue: "https://newservicehome.com",
-        oldValue: "http://old-service-home.com",
-      },
-      postResetUrl: {
-        oldValue: "https://www.postreset.com",
-        newValue: "https://newpostreseturl",
-      },
-
-      responseTypes: {
-        oldValue: ["code", "id_token"],
-        newValue: ["token", "id_token"],
-      },
-      grantTypes: {
-        newValue: ["authorisation_code", "refresh_token"],
-        oldValue: ["implicit", "authorization_code"],
+      [sid]: {
+        authFlowType: "authorisationCodeFlow",
         serviceHome: {
+          newValue: "https://newservicehome.com",
           oldValue: "http://old-service-home.com",
-          newValue: "http://new-service-home.com",
         },
-      },
-      apiSecret: {
-        oldValue: "EXPUNGED",
-        newValue: "EXPUNGED",
-        secretNewValue: "outshine-wringing-imparting-submitted",
-      },
-      clientSecret: {
-        oldValue: "EXPUNGED",
-        newValue: "EXPUNGED",
-        secretNewValue: "outshine-wringing-imparting-submitted",
-      },
-      tokenEndpointAuthMethod: {
-        oldValue: null,
-        newValue: "client_secret_post",
-      },
-      clientId: {
-        newValue: "new-client-id",
-        oldValue: "clientid",
+        postResetUrl: {
+          oldValue: "https://www.postreset.com",
+          newValue: "https://newpostreseturl",
+        },
+
+        responseTypes: {
+          oldValue: ["code", "id_token"],
+          newValue: ["token", "id_token"],
+        },
+        grantTypes: {
+          newValue: ["authorisation_code", "refresh_token"],
+          oldValue: ["implicit", "authorization_code"],
+          serviceHome: {
+            oldValue: "http://old-service-home.com",
+            newValue: "http://new-service-home.com",
+          },
+        },
+        apiSecret: {
+          oldValue: "EXPUNGED",
+          newValue: "EXPUNGED",
+          secretNewValue: "outshine-wringing-imparting-submitted",
+        },
+        clientSecret: {
+          oldValue: "EXPUNGED",
+          newValue: "EXPUNGED",
+          secretNewValue: "outshine-wringing-imparting-submitted",
+        },
+        tokenEndpointAuthMethod: {
+          oldValue: null,
+          newValue: "client_secret_post",
+        },
+        clientId: {
+          newValue: "new-client-id",
+          oldValue: "clientid",
+        },
       },
     };
   });
   it("then it should redirect to service configuration page if there are no changes stored in session", async () => {
-    req.session.serviceConfigurationChanges = undefined;
+    req.session.serviceConfigurationChanges["service1"] = undefined;
     await postConfirmServiceConfig(req, res);
 
     expect(res.redirect).toHaveBeenCalledTimes(1);
@@ -170,15 +172,19 @@ describe("when confirming service config changes in the review page", () => {
   });
 
   it("then it should render view with validation if service home not a valid url", async () => {
-    req.session.serviceConfigurationChanges.serviceHome.newValue =
-      "invalid-url";
-    req.session.serviceConfigurationChanges.redirectUris = {};
-    req.session.serviceConfigurationChanges.redirectUris.oldValue = [
-      "https://google.com",
-      "https://yahoo.com",
-    ];
-    req.session.serviceConfigurationChanges.postLogoutRedirectUris = {};
-    req.session.serviceConfigurationChanges.postLogoutRedirectUris.oldValue = [
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].serviceHome.newValue = "invalid-url";
+    req.session.serviceConfigurationChanges[req.params.sid].redirectUris = {};
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].redirectUris.oldValue = ["https://google.com", "https://yahoo.com"];
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].postLogoutRedirectUris = {};
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].postLogoutRedirectUris.oldValue = [
       "https://google.com",
       "https://yahoo.com",
     ];
@@ -201,15 +207,19 @@ describe("when confirming service config changes in the review page", () => {
   });
 
   it("then it should render view with validation if Post-reset Url is not valid", async () => {
-    req.session.serviceConfigurationChanges.postResetUrl.newValue =
-      "invalid-url";
-    req.session.serviceConfigurationChanges.redirectUris = {};
-    req.session.serviceConfigurationChanges.redirectUris.oldValue = [
-      "https://google.com",
-      "https://yahoo.com",
-    ];
-    req.session.serviceConfigurationChanges.postLogoutRedirectUris = {};
-    req.session.serviceConfigurationChanges.postLogoutRedirectUris.oldValue = [
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].postResetUrl.newValue = "invalid-url";
+    req.session.serviceConfigurationChanges[req.params.sid].redirectUris = {};
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].redirectUris.oldValue = ["https://google.com", "https://yahoo.com"];
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].postLogoutRedirectUris = {};
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].postLogoutRedirectUris.oldValue = [
       "https://google.com",
       "https://yahoo.com",
     ];
@@ -226,15 +236,18 @@ describe("when confirming service config changes in the review page", () => {
   });
 
   it("then it should render view with validation if client ID is too long", async () => {
-    req.session.serviceConfigurationChanges.clientId.newValue =
+    req.session.serviceConfigurationChanges[req.params.sid].clientId.newValue =
       "long-client-id-long-client-id-long-client-id-long-client-id-long-client-id-long-client-id-long-client-id";
-    req.session.serviceConfigurationChanges.redirectUris = {};
-    req.session.serviceConfigurationChanges.redirectUris.oldValue = [
-      "https://google.com",
-      "https://yahoo.com",
-    ];
-    req.session.serviceConfigurationChanges.postLogoutRedirectUris = {};
-    req.session.serviceConfigurationChanges.postLogoutRedirectUris.oldValue = [
+    req.session.serviceConfigurationChanges[req.params.sid].redirectUris = {};
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].redirectUris.oldValue = ["https://google.com", "https://yahoo.com"];
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].postLogoutRedirectUris = {};
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].postLogoutRedirectUris.oldValue = [
       "https://google.com",
       "https://yahoo.com",
     ];
@@ -257,14 +270,18 @@ describe("when confirming service config changes in the review page", () => {
   });
 
   it("then it should render view with validation if client ID is not containing only letters a to z, hyphens and numbers", async () => {
-    req.session.serviceConfigurationChanges.clientId.newValue = "client-id_1_$";
-    req.session.serviceConfigurationChanges.redirectUris = {};
-    req.session.serviceConfigurationChanges.redirectUris.oldValue = [
-      "https://google.com",
-      "https://yahoo.com",
-    ];
-    req.session.serviceConfigurationChanges.postLogoutRedirectUris = {};
-    req.session.serviceConfigurationChanges.postLogoutRedirectUris.oldValue = [
+    req.session.serviceConfigurationChanges[req.params.sid].clientId.newValue =
+      "client-id_1_$";
+    req.session.serviceConfigurationChanges[req.params.sid].redirectUris = {};
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].redirectUris.oldValue = ["https://google.com", "https://yahoo.com"];
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].postLogoutRedirectUris = {};
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].postLogoutRedirectUris.oldValue = [
       "https://google.com",
       "https://yahoo.com",
     ];
@@ -281,14 +298,18 @@ describe("when confirming service config changes in the review page", () => {
   });
 
   it("then it should render view with validation if client ID already exists", async () => {
-    req.session.serviceConfigurationChanges.clientId.newValue = "client-id-new";
-    req.session.serviceConfigurationChanges.redirectUris = {};
-    req.session.serviceConfigurationChanges.redirectUris.oldValue = [
-      "https://google.com",
-      "https://yahoo.com",
-    ];
-    req.session.serviceConfigurationChanges.postLogoutRedirectUris = {};
-    req.session.serviceConfigurationChanges.postLogoutRedirectUris.oldValue = [
+    req.session.serviceConfigurationChanges[req.params.sid].clientId.newValue =
+      "client-id-new";
+    req.session.serviceConfigurationChanges[req.params.sid].redirectUris = {};
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].redirectUris.oldValue = ["https://google.com", "https://yahoo.com"];
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].postLogoutRedirectUris = {};
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].postLogoutRedirectUris.oldValue = [
       "https://google.com",
       "https://yahoo.com",
     ];
@@ -306,15 +327,19 @@ describe("when confirming service config changes in the review page", () => {
   });
 
   it("then it should render view without validation if client ID is present, only contain letters a to z, hyphens and numbers,is 50 characters or less and is unique ", async () => {
-    req.session.serviceConfigurationChanges.clientId.newValue = "client-id-new";
+    req.session.serviceConfigurationChanges[req.params.sid].clientId.newValue =
+      "client-id-new";
     checkClientId.mockReset().mockReturnValueOnce(false);
-    req.session.serviceConfigurationChanges.redirectUris = {};
-    req.session.serviceConfigurationChanges.redirectUris.oldValue = [
-      "https://google.com",
-      "https://yahoo.com",
-    ];
-    req.session.serviceConfigurationChanges.postLogoutRedirectUris = {};
-    req.session.serviceConfigurationChanges.postLogoutRedirectUris.oldValue = [
+    req.session.serviceConfigurationChanges[req.params.sid].redirectUris = {};
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].redirectUris.oldValue = ["https://google.com", "https://yahoo.com"];
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].postLogoutRedirectUris = {};
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].postLogoutRedirectUris.oldValue = [
       "https://google.com",
       "https://yahoo.com",
     ];
@@ -324,12 +349,16 @@ describe("when confirming service config changes in the review page", () => {
   });
 
   it("then it should render view with validation if any of the redirect Urls are invalid", async () => {
-    req.session.serviceConfigurationChanges.redirectUris = {
+    req.session.serviceConfigurationChanges[req.params.sid].redirectUris = {
       oldValue: ["https://www.redirect.com"],
       newValue: ["https://valid-url.com", "invalid-url"],
     };
-    req.session.serviceConfigurationChanges.postLogoutRedirectUris = {};
-    req.session.serviceConfigurationChanges.postLogoutRedirectUris.oldValue = [
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].postLogoutRedirectUris = {};
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].postLogoutRedirectUris.oldValue = [
       "https://google.com",
       "https://yahoo.com",
     ];
@@ -347,12 +376,16 @@ describe("when confirming service config changes in the review page", () => {
   });
 
   it("then it should render view with validation if redirect Urls are not unique", async () => {
-    req.session.serviceConfigurationChanges.redirectUris = {
+    req.session.serviceConfigurationChanges[req.params.sid].redirectUris = {
       oldValue: ["https://www.redirect.com"],
       newValue: ["https://valid-url.com", "https://valid-url.com"],
     };
-    req.session.serviceConfigurationChanges.postLogoutRedirectUris = {};
-    req.session.serviceConfigurationChanges.postLogoutRedirectUris.oldValue = [
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].postLogoutRedirectUris = {};
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].postLogoutRedirectUris.oldValue = [
       "https://google.com",
       "https://yahoo.com",
     ];
@@ -369,15 +402,16 @@ describe("when confirming service config changes in the review page", () => {
   });
 
   it("then it should render view with validation if logout redirect Urls are not unique", async () => {
-    req.session.serviceConfigurationChanges.postLogoutRedirectUris = {
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].postLogoutRedirectUris = {
       oldValue: ["https://www.redirect.com"],
       newValue: ["https://duplicate-url.com", "https://duplicate-url.com"],
     };
-    req.session.serviceConfigurationChanges.redirectUris = {};
-    req.session.serviceConfigurationChanges.redirectUris.oldValue = [
-      "https://google.com",
-      "https://yahoo.com",
-    ];
+    req.session.serviceConfigurationChanges[req.params.sid].redirectUris = {};
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].redirectUris.oldValue = ["https://google.com", "https://yahoo.com"];
 
     await postConfirmServiceConfig(req, res);
 
@@ -395,15 +429,16 @@ describe("when confirming service config changes in the review page", () => {
   });
 
   it("then it should render view with validation if any of the logout redirect Urls are invalid", async () => {
-    req.session.serviceConfigurationChanges.postLogoutRedirectUris = {
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].postLogoutRedirectUris = {
       oldValue: ["https://www.redirect.com"],
       newValue: ["https://valid-url.com", "invalid"],
     };
-    req.session.serviceConfigurationChanges.redirectUris = {};
-    req.session.serviceConfigurationChanges.redirectUris.oldValue = [
-      "https://google.com",
-      "https://yahoo.com",
-    ];
+    req.session.serviceConfigurationChanges[req.params.sid].redirectUris = {};
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].redirectUris.oldValue = ["https://google.com", "https://yahoo.com"];
 
     await postConfirmServiceConfig(req, res);
 
@@ -418,15 +453,19 @@ describe("when confirming service config changes in the review page", () => {
   });
 
   it("then it should render view with validation if client secret is invalid", async () => {
-    req.session.serviceConfigurationChanges.clientSecret.secretNewValue =
-      "invalid-secret";
-    req.session.serviceConfigurationChanges.redirectUris = {};
-    req.session.serviceConfigurationChanges.redirectUris.oldValue = [
-      "https://google.com",
-      "https://yahoo.com",
-    ];
-    req.session.serviceConfigurationChanges.postLogoutRedirectUris = {};
-    req.session.serviceConfigurationChanges.postLogoutRedirectUris.oldValue = [
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].clientSecret.secretNewValue = "invalid-secret";
+    req.session.serviceConfigurationChanges[req.params.sid].redirectUris = {};
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].redirectUris.oldValue = ["https://google.com", "https://yahoo.com"];
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].postLogoutRedirectUris = {};
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].postLogoutRedirectUris.oldValue = [
       "https://google.com",
       "https://yahoo.com",
     ];
@@ -443,15 +482,19 @@ describe("when confirming service config changes in the review page", () => {
   });
 
   it("then it should render view with validation if API secret is invalid", async () => {
-    req.session.serviceConfigurationChanges.apiSecret.secretNewValue =
-      "invalid-secret";
-    req.session.serviceConfigurationChanges.redirectUris = {};
-    req.session.serviceConfigurationChanges.redirectUris.oldValue = [
-      "https://google.com",
-      "https://yahoo.com",
-    ];
-    req.session.serviceConfigurationChanges.postLogoutRedirectUris = {};
-    req.session.serviceConfigurationChanges.postLogoutRedirectUris.oldValue = [
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].apiSecret.secretNewValue = "invalid-secret";
+    req.session.serviceConfigurationChanges[req.params.sid].redirectUris = {};
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].redirectUris.oldValue = ["https://google.com", "https://yahoo.com"];
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].postLogoutRedirectUris = {};
+    req.session.serviceConfigurationChanges[
+      req.params.sid
+    ].postLogoutRedirectUris.oldValue = [
       "https://google.com",
       "https://yahoo.com",
     ];
@@ -469,7 +512,7 @@ describe("when confirming service config changes in the review page", () => {
   });
 
   it("then it should update the service if no errors are displayed", async () => {
-    req.session.serviceConfigurationChanges = {
+    req.session.serviceConfigurationChanges[req.params.sid] = {
       authFlowType: "authorisationCodeFlow",
       serviceHome: {
         newValue: "https://newservicehome.com",
@@ -543,7 +586,7 @@ describe("when confirming service config changes in the review page", () => {
   });
 
   it("then it should audit the service being edited and it should return a mix of explicit/expunged elements in the audit editedFields array, if a mix of secret/non-secret fields have been updated", async () => {
-    req.session.serviceConfigurationChanges = {
+    req.session.serviceConfigurationChanges[req.params.sid] = {
       authFlowType: "authorisationCodeFlow",
       serviceHome: {
         newValue: "https://newservicehome.com",
@@ -660,7 +703,7 @@ describe("when confirming service config changes in the review page", () => {
   });
 
   it("then it should return multiple elements in the audit editedFields array, if multiple non-secret fields have been updated", async () => {
-    req.session.serviceConfigurationChanges = {
+    req.session.serviceConfigurationChanges[req.params.sid] = {
       postResetUrl: {
         oldValue: "https://www.postreset.com",
         newValue: "https://newpostreseturl.com",
@@ -670,7 +713,7 @@ describe("when confirming service config changes in the review page", () => {
         newValue: "http://new-service-home.com",
       },
     };
-    req.session.serviceConfigurationChanges = {
+    req.session.serviceConfigurationChanges[req.params.sid] = {
       authFlowType: "authorisationCodeFlow",
       serviceHome: {
         newValue: "https://newservicehome.com",
@@ -723,21 +766,10 @@ describe("when confirming service config changes in the review page", () => {
     await postConfirmServiceConfig(req, res);
 
     expect(logger.audit.mock.calls).toHaveLength(1);
-    /* expect(logger.audit.mock.calls[0][1]).toHaveProperty('editedFields', [{
-      name: 'postResetUrl',
-      newValue: 'https://newpostreseturl.com',
-      oldValue: 'https://www.postreset.com',
-    },
-    {
-      name: 'postLogoutRedirectUris',
-      newValue: 'https://newpostlogoutreseturl.com',
-      oldValue: 'https://www.postlogoutreset.com',
-    },
-    ]); */
   });
 
   it("should redirect to Dashboard page and display success banner if service successfuly updated", async () => {
-    req.session.serviceConfigurationChanges = {
+    req.session.serviceConfigurationChanges[req.params.sid] = {
       authFlowType: "authorisationCodeFlow",
       serviceHome: {
         newValue: "https://newservicehome.com",
