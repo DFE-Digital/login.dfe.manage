@@ -72,55 +72,57 @@ describe("when getting the Review service config changes page", () => {
 
     res.mockResetAll();
     req.session.serviceConfigurationChanges = {
-      authFlowType: "authorisationCodeFlow",
-      serviceHome: {
-        newValue: "https://new-service-home.com",
-        oldValue: "http://old-service-home.com",
-      },
-      postResetUrl: {
-        oldValue: "https://www.postreset.com",
-        newValue: "https://new-post-reset-url",
-      },
-      refreshToken: {
-        oldValue: undefined,
-        newValue: "refresh_token",
-      },
-      responseTypes: {
-        oldValue: ["code", "id_token"],
-        newValue: ["token", "id_token"],
-      },
-      grantTypes: {
-        newValue: ["authorisation_code", "refresh_token"],
-        oldValue: ["implicit", "authorization_code"],
+      [req.params.sid]: {
+        authFlowType: "authorisationCodeFlow",
         serviceHome: {
+          newValue: "https://new-service-home.com",
           oldValue: "http://old-service-home.com",
-          newValue: "http://new-service-home.com",
         },
-      },
-      apiSecret: {
-        oldValue: "EXPUNGED",
-        newValue: "EXPUNGED",
-        secretNewValue: "outshine-wringing-imparting-submitted",
-      },
-      clientSecret: {
-        oldValue: "EXPUNGED",
-        newValue: "EXPUNGED",
-        secretNewValue: "outshine-wringing-imparting-submitted",
-      },
-      tokenEndpointAuthMethod: {
-        oldValue: null,
-        newValue: "client_secret_post",
-      },
-      redirectUris: {
-        oldValue: ["https://www.redirect.com"],
-        newValue: ["https://www.new-redirect.com"],
-      },
-      postLogoutRedirectUris: {
-        oldValue: ["http://old-logout-url-1.com"],
-        newValue: [
-          "http://new-logout-url-1.com",
-          "http://new-logout-url-2.com",
-        ],
+        postResetUrl: {
+          oldValue: "https://www.postreset.com",
+          newValue: "https://new-post-reset-url",
+        },
+        refreshToken: {
+          oldValue: undefined,
+          newValue: "refresh_token",
+        },
+        responseTypes: {
+          oldValue: ["code", "id_token"],
+          newValue: ["token", "id_token"],
+        },
+        grantTypes: {
+          newValue: ["authorisation_code", "refresh_token"],
+          oldValue: ["implicit", "authorization_code"],
+          serviceHome: {
+            oldValue: "http://old-service-home.com",
+            newValue: "http://new-service-home.com",
+          },
+        },
+        apiSecret: {
+          oldValue: "EXPUNGED",
+          newValue: "EXPUNGED",
+          secretNewValue: "outshine-wringing-imparting-submitted",
+        },
+        clientSecret: {
+          oldValue: "EXPUNGED",
+          newValue: "EXPUNGED",
+          secretNewValue: "outshine-wringing-imparting-submitted",
+        },
+        tokenEndpointAuthMethod: {
+          oldValue: null,
+          newValue: "client_secret_post",
+        },
+        redirectUris: {
+          oldValue: ["https://www.redirect.com"],
+          newValue: ["https://www.new-redirect.com"],
+        },
+        postLogoutRedirectUris: {
+          oldValue: ["http://old-logout-url-1.com"],
+          newValue: [
+            "http://new-logout-url-1.com",
+            "http://new-logout-url-2.com",
+          ],
+        },
       },
     };
   });
@@ -325,7 +327,7 @@ describe("when getting the Review service config changes page", () => {
   });
 
   it("then it should redirect to service configuration page if there are no changes stored in session", async () => {
-    req.session.serviceConfigurationChanges = undefined;
+    req.session.serviceConfigurationChanges[req.params.sid] = undefined;
     await getConfirmServiceConfig(req, res);
 
     expect(res.redirect).toHaveBeenCalledTimes(1);

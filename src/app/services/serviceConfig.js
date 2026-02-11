@@ -72,8 +72,8 @@ const buildServiceModelFromObject = (service, sessionService = {}) => {
       service.relyingParty.client_secret ||
       "",
     serviceHome:
-      sessionService?.serviceHome?.newValue ||
-      service.relyingParty.service_home ||
+      sessionService?.serviceHome?.newValue ??
+      service.relyingParty.service_home ??
       "",
     postResetUrl:
       sessionService?.postResetUrl?.newValue ||
@@ -100,10 +100,12 @@ const buildServiceModelFromObject = (service, sessionService = {}) => {
 
 const buildCurrentServiceModel = async (req) => {
   try {
-    const sessionService =
-      req.query?.action === ACTIONS.AMEND_CHANGES
-        ? req.session.serviceConfigurationChanges
-        : {};
+    let sessionService = {};
+
+    if (req.query?.action === ACTIONS.AMEND_CHANGES) {
+      sessionService =
+        req.session?.serviceConfigurationChanges?.[req.params.sid] ?? {};
+    }
     const service = await getServiceRaw({
       by: { serviceId: req.params.sid },
     });
@@ -129,17 +131,19 @@ const buildCurrentServiceModel = async (req) => {
 
 const getServiceConfig = async (req, res) => {
   try {
-    if (req.query.action !== ACTIONS.AMEND_CHANGES) {
-      req.session.serviceConfigurationChanges = {};
+    const { sid } = req.params;
+    if (req.query?.action !== ACTIONS.AMEND_CHANGES) {
+      req.session.serviceConfigurationChanges ??= {};
+      req.session.serviceConfigurationChanges[sid] = {};
     }
     const manageRolesForService = await getUserServiceRoles(req);
     const serviceModel = await buildCurrentServiceModel(req);
     return res.render("services/views/serviceConfig", {
       csrfToken: req.csrfToken(),
       service: serviceModel.currentServiceModel,
-      backLink: `/services/${req.params.sid}`,
+      backLink: `/services/${sid}`,
       validationMessages: {},
-      serviceId: req.params.sid,
+      serviceId: sid,
       userRoles: manageRolesForService,
       currentNavigation: "configuration",
     });
@@ -590,39 +594,52 @@ const postServiceConfig = async (req, res) => {
         return editedField;
       });
 
-    req.session.serviceConfigurationChanges = {};
+    const { sid } = req.params;
+    req.session.serviceConfigurationChanges =
+      req.session.serviceConfigurationChanges || {};
+    req.session.serviceConfigurationChanges[sid] = {};
+
     if (editedFields && editedFields.length > 0) {
       editedFields.map(
         ({ name, oldValue, newValue, isSecret, secretNewValue }) => {
-          if (!req.session.serviceConfigurationChanges[name]) {
-            req.session.serviceConfigurationChanges[name] = {};
+          if (!req.session.serviceConfigurationChanges[sid][name]) {
+            req.session.serviceConfigurationChanges[sid][name] = {};
           }
-          req.session.serviceConfigurationChanges[name].oldValue = oldValue;
-          req.session.serviceConfigurationChanges[name].newValue = newValue;
+          req.session.serviceConfigurationChanges[sid][name].oldValue =
+            oldValue;
+          req.session.serviceConfigurationChanges[sid][name].newValue =
+            newValue;
           if (isSecret) {
-            req.session.serviceConfigurationChanges[name].secretNewValue =
+            req.session.serviceConfigurationChanges[sid][name].secretNewValue =
               secretNewValue;
           }
         },
       );
 
-      req.session.serviceConfigurationChanges.authFlowType = model.authFlowType;
+      req.session.serviceConfigurationChanges[sid].authFlowType =
+        model.authFlowType;
 
       if (
-        req.session.serviceConfigurationChanges.postLogoutRedirectUris ===
+        req.session.serviceConfigurationChanges[sid].postLogoutRedirectUris ===
         undefined
       ) {
-        req.session.serviceConfigurationChanges.postLogoutRedirectUris = {};
-        req.session.serviceConfigurationChanges.postLogoutRedirectUris.oldValue =
+        req.session.serviceConfigurationChanges[sid].postLogoutRedirectUris =
+          {};
+        req.session.serviceConfigurationChanges[
+          sid
+        ].postLogoutRedirectUris.oldValue =
           model.service.postLogoutRedirectUris;
-        req.session.serviceConfigurationChanges.postLogoutRedirectUris.newValue =
-          undefined;
+        req.session.serviceConfigurationChanges[
+          sid
+        ].postLogoutRedirectUris.newValue = undefined;
       }
-      if (req.session.serviceConfigurationChanges.redirectUris === undefined) {
-        req.session.serviceConfigurationChanges.redirectUris = {};
-        req.session.serviceConfigurationChanges.redirectUris.oldValue =
+      if (
+        req.session.serviceConfigurationChanges[sid].redirectUris === undefined
+      ) {
+        req.session.serviceConfigurationChanges[sid].redirectUris = {};
+        req.session.serviceConfigurationChanges[sid].redirectUris.oldValue =
           model.service.redirectUris;
-        req.session.serviceConfigurationChanges.redirectUris.newValue =
+        req.session.serviceConfigurationChanges[sid].redirectUris.newValue =
           undefined;
       }
     }
