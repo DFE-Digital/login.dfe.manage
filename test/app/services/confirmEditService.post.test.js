@@ -63,6 +63,9 @@ describe("when editing a service for a user", () => {
       dateActivated: "10/10/2018",
       name: "service name",
       status: "active",
+      relyingParty: {
+        client_id: "serviceClient1",
+      },
     });
 
     getServiceRolesRaw.mockReset();
@@ -125,7 +128,7 @@ describe("when editing a service for a user", () => {
 
     expect(logger.audit.mock.calls).toHaveLength(1);
     expect(logger.audit.mock.calls[0][0]).toBe(
-      "user@unit.test updated service service name for user undefined",
+      "user@unit.test updated service for user undefined",
     );
     expect(logger.audit.mock.calls[0][1]).toMatchObject({
       type: "manage",
@@ -134,6 +137,7 @@ describe("when editing a service for a user", () => {
       userEmail: "user@unit.test",
       organisationId: "org1",
       editedUser: "user1",
+      client: "serviceClient1",
       editedFields: [
         {
           name: "update_service",
