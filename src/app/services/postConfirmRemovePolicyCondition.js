@@ -73,7 +73,7 @@ const postConfirmRemovePolicyCondition = async (req, res) => {
   }
 
   logger.audit(
-    `${req.user.email} (id: ${req.user.sub}) removed a policy condition for service ${req.params.sid} and policy ${req.params.pid}`,
+    `${req.user.email} removed a policy condition for service ${req.params.sid} and policy ${req.params.pid}`,
     {
       type: "manage",
       subType: "policy-condition-removed",
