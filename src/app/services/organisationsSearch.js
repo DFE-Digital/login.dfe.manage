@@ -124,7 +124,7 @@ const search = async (req) => {
       status: orgStatuses,
     });
     logger.audit(
-      `${req.user.email} (id: ${req.user.sub}) searched for organisations associated with service (sid: ${req.params.sid}) in manage using criteria "${criteria}"`,
+      `${req.user.email} searched for organisations associated with service (sid: ${req.params.sid}) in manage using criteria "${criteria}"`,
       {
         type: "manage",
         subType: "organisation-search",
@@ -147,7 +147,7 @@ const search = async (req) => {
       status: orgStatuses,
     });
     logger.audit(
-      `${req.user.email} (id: ${req.user.sub}) searched for organisations in manage using criteria "${criteria}"`,
+      `${req.user.email} searched for organisations in manage using criteria "${criteria}"`,
       {
         type: "manage",
         subType: "organisation-search",
