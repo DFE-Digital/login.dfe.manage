@@ -129,8 +129,8 @@ describe("when confirming service config changes in the review page", () => {
         },
 
         responseTypes: {
-          oldValue: ["code", "id_token"],
-          newValue: ["token", "id_token"],
+          oldValue: ["id_token"],
+          newValue: ["code", "id_token"],
         },
         grantTypes: {
           newValue: ["authorisation_code", "refresh_token"],
@@ -258,12 +258,6 @@ describe("when confirming service config changes in the review page", () => {
       expect.objectContaining({
         validationMessages: {
           clientId: `${ERROR_MESSAGES.INVALID_CLIENT_ID_LENGTH}`,
-          // redirect_uris: `${ERROR_MESSAGES.REDIRECT_URLS_NOT_UNIQUE}`,
-          // postResetUrl: `${ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL}`,
-          // post_logout_redirect_uris: `${ERROR_MESSAGES.POST_LOGOUT_URL_NOT_UNIQUE}`,
-          //
-          // post_logout_redirect_uris: `${ERROR_MESSAGES.MISSING_POST_LOGOUT_URL}`,
-          // redirect_uris: `${ERROR_MESSAGES.MISSING_REDIRECT_URL}`,
         },
       }),
     );
@@ -531,8 +525,8 @@ describe("when confirming service config changes in the review page", () => {
         newValue: "https://newpostreseturl.com",
       },
       responseTypes: {
-        oldValue: ["code", "id_token"],
-        newValue: ["token", "id_token"],
+        oldValue: ["id_token"],
+        newValue: ["code", "id_token"],
       },
       grantTypes: {
         newValue: ["authorisation_code", "refresh_token"],
@@ -578,7 +572,7 @@ describe("when confirming service config changes in the review page", () => {
           "http://newlogouturl2.com",
         ],
         redirectUris: ["https://www.redirected.com"],
-        responseTypes: ["id_token", "token"],
+        responseTypes: ["code", "id_token"],
         serviceHome: "https://newservicehome.com",
         tokenEndpointAuthMethod: "client_secret_post",
       },
@@ -605,8 +599,8 @@ describe("when confirming service config changes in the review page", () => {
         newValue: "https://newpostreseturl.com",
       },
       responseTypes: {
-        oldValue: ["code", "id_token"],
-        newValue: ["token", "id_token"],
+        oldValue: ["id_token"],
+        newValue: ["code", "id_token"],
       },
       grantTypes: {
         newValue: ["authorisation_code", "refresh_token"],
@@ -655,8 +649,8 @@ describe("when confirming service config changes in the review page", () => {
         },
         {
           name: "responseTypes",
-          newValue: ["id_token", "token"],
-          oldValue: ["code", "id_token"],
+          newValue: ["code", "id_token"],
+          oldValue: ["id_token"],
         },
         {
           name: "grantTypes",
@@ -732,8 +726,8 @@ describe("when confirming service config changes in the review page", () => {
         newValue: "https://newpostlogoutreseturl.com",
       },
       responseTypes: {
-        oldValue: ["code", "id_token"],
-        newValue: ["token", "id_token"],
+        oldValue: ["id_token"],
+        newValue: ["code", "id_token"],
       },
       grantTypes: {
         newValue: ["authorisation_code", "refresh_token"],
@@ -788,8 +782,8 @@ describe("when confirming service config changes in the review page", () => {
         newValue: "https://newpostlogoutreseturl.com",
       },
       responseTypes: {
-        oldValue: ["code", "id_token"],
-        newValue: ["token", "id_token"],
+        oldValue: ["id_token"],
+        newValue: ["code", "id_token"],
       },
       grantTypes: {
         newValue: ["authorisation_code", "refresh_token"],

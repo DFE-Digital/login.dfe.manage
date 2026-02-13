@@ -87,8 +87,8 @@ describe("when getting the Review service config changes page", () => {
           newValue: "refresh_token",
         },
         responseTypes: {
-          oldValue: ["code", "id_token"],
-          newValue: ["token", "id_token"],
+          oldValue: ["id_token"],
+          newValue: ["code", "id_token"],
         },
         grantTypes: {
           newValue: ["authorisation_code", "refresh_token"],
@@ -222,14 +222,14 @@ describe("when getting the Review service config changes page", () => {
         title: "Post password-reset URL",
       },
       {
-        addedValues: ["token"],
+        addedValues: ["code"],
         changeLink:
           "/services/service1/service-configuration?action=amendChanges#response_types-form-group",
         description: "A value that determines the authentication flow.",
         displayOrder: 6,
-        newValue: ["token", "id_token"],
-        oldValue: ["code", "id_token"],
-        removedValues: ["code"],
+        newValue: ["code", "id_token"],
+        oldValue: ["id_token"],
+        removedValues: [],
         title: "Response types",
       },
       {
