@@ -242,7 +242,7 @@ const post = async (req, res) => {
 
   if (req.params.bid) {
     logger.audit(
-      `${req.user.email} (id: ${req.user.sub}) updated banner ${model.name} (${model.bannerId}) for service ${req.params.sid}`,
+      `${req.user.email} updated banner ${model.name} (${model.bannerId}) for service ${req.params.sid}`,
       {
         type: "manage",
         subType: "service-banner-updated",
@@ -253,7 +253,7 @@ const post = async (req, res) => {
     );
   } else {
     logger.audit(
-      `${req.user.email} (id: ${req.user.sub}) created banner ${model.name} for service ${req.params.sid}`,
+      `${req.user.email} created banner ${model.name} for service ${req.params.sid}`,
       {
         type: "manage",
         subType: "service-banner-created",

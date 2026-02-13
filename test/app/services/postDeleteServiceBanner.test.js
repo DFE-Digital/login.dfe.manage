@@ -60,7 +60,7 @@ describe("when deleting a service banner", () => {
 
     expect(logger.audit.mock.calls).toHaveLength(1);
     expect(logger.audit.mock.calls[0][0]).toBe(
-      "user@unit.test (id: user1) removed banner bannerId for service service1",
+      "user@unit.test removed banner bannerId for service service1",
     );
     expect(logger.audit.mock.calls[0][1]).toMatchObject({
       type: "manage",

@@ -16,7 +16,7 @@ const postConfirmRemovePolicy = async (req, res) => {
   }
 
   logger.audit(
-    `${req.user.email} (id: ${req.user.sub}) removed a policy for service ${req.params.sid}`,
+    `${req.user.email} removed a policy for service ${req.params.sid}`,
     {
       type: "manage",
       subType: "policy-removed",

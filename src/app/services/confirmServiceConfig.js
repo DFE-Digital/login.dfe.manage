@@ -560,17 +560,15 @@ const postConfirmServiceConfig = async (req, res) => {
 
     await updateService(req.params.sid, updatedService);
 
-    logger.audit(
-      `${req.user.email} (id: ${req.user.sub}) updated service configuration for service ${model.service.name} (id: ${req.params.sid})`,
-      {
-        type: "manage",
-        subType: "service-config-updated",
-        userId: req.user.sub,
-        userEmail: req.user.email,
-        editedService: req.params.sid,
-        editedFields,
-      },
-    );
+    logger.audit(`${req.user.email} updated service configuration`, {
+      type: "manage",
+      subType: "service-config-updated",
+      userId: req.user.sub,
+      userEmail: req.user.email,
+      client: updatedService.clientId,
+      editedService: req.params.sid,
+      editedFields,
+    });
 
     res.flash("title", "Success");
     res.flash("heading", "Service configuration changed");

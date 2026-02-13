@@ -352,4 +352,49 @@ describe("when getting users audit details", () => {
       backLink: `/services/${req.params.sid}/users/${req.params.uid}/organisations?returnOrg=${orgId}`,
     });
   });
+
+  // This test should be rewritten to be a paramaterised test
+  it("should leave a number of subtypes of message unchanged", async () => {
+    getPageOfUserAudits.mockReturnValue({
+      audits: [
+        createSimpleAuditRecord(
+          "organisation",
+          "access-request",
+          "some.user@test.tester requested organisation access",
+        ),
+        createSimpleAuditRecord(
+          "services",
+          "access-request",
+          "some.user@test.tester requested service access",
+        ),
+        createSimpleAuditRecord(
+          "support",
+          "service-create",
+          "some.user@test.tester created Check A Thing service",
+        ),
+        createSimpleAuditRecord(
+          "manage",
+          "service-config-updated",
+          "some.user@test.tester updated service configuration",
+        ),
+      ],
+      numberOfPages: 3,
+      numberOfRecords: 56,
+    });
+    await getAudit(req, res);
+
+    const auditRows = res.render.mock.calls[0][1].audits;
+    expect(auditRows[0].event.description).toBe(
+      "some.user@test.tester requested organisation access",
+    );
+    expect(auditRows[1].event.description).toBe(
+      "some.user@test.tester requested service access",
+    );
+    expect(auditRows[2].event.description).toBe(
+      "some.user@test.tester created Check A Thing service",
+    );
+    expect(auditRows[3].event.description).toBe(
+      "some.user@test.tester updated service configuration",
+    );
+  });
 });

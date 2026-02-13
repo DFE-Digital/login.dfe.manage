@@ -379,7 +379,7 @@ describe("when creating a new service banner", () => {
 
     expect(logger.audit.mock.calls).toHaveLength(1);
     expect(logger.audit.mock.calls[0][0]).toBe(
-      "user@unit.test (id: user1) updated banner banner name (bannerId) for service service1",
+      "user@unit.test updated banner banner name (bannerId) for service service1",
     );
     expect(logger.audit.mock.calls[0][1]).toMatchObject({
       type: "manage",
@@ -396,7 +396,7 @@ describe("when creating a new service banner", () => {
 
     expect(logger.audit.mock.calls).toHaveLength(1);
     expect(logger.audit.mock.calls[0][0]).toBe(
-      "user@unit.test (id: user1) created banner banner name for service service1",
+      "user@unit.test created banner banner name for service service1",
     );
     expect(logger.audit.mock.calls[0][1]).toMatchObject({
       type: "manage",
