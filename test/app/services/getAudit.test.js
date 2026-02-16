@@ -352,4 +352,65 @@ describe("when getting users audit details", () => {
       backLink: `/services/${req.params.sid}/users/${req.params.uid}/organisations?returnOrg=${orgId}`,
     });
   });
+
+  // This test should be rewritten to be a paramaterised test
+  it("should leave a number of subtypes of message unchanged", async () => {
+    getPageOfUserAudits.mockReturnValue({
+      audits: [
+        createSimpleAuditRecord(
+          "manage",
+          "policy-created",
+          "user@unit.test added a policy with name 'Test policy'",
+        ),
+        createSimpleAuditRecord(
+          "manage",
+          "policy-condition-added",
+          "some.user@test.tester added 'organisation.ukprn' policy condition",
+        ),
+        createSimpleAuditRecord(
+          "manage",
+          "policy-role-added",
+          "some.user@test.tester added a policy role with name 'MyRole'",
+        ),
+        createSimpleAuditRecord(
+          "manage",
+          "policy-removed",
+          "user@unit.test removed a policy with name 'Test policy'",
+        ),
+        createSimpleAuditRecord(
+          "manage",
+          "policy-condition-removed",
+          "some.user@test.tester removed 'organisation.ukprn' policy condition",
+        ),
+        createSimpleAuditRecord(
+          "manage",
+          "policy-role-removed",
+          "some.user@test.tester removed a policy role with name 'MyRole'",
+        ),
+      ],
+      numberOfPages: 3,
+      numberOfRecords: 56,
+    });
+    await getAudit(req, res);
+
+    const auditRows = res.render.mock.calls[0][1].audits;
+    expect(auditRows[0].event.description).toBe(
+      "user@unit.test added a policy with name 'Test policy'",
+    );
+    expect(auditRows[1].event.description).toBe(
+      "some.user@test.tester added 'organisation.ukprn' policy condition",
+    );
+    expect(auditRows[2].event.description).toBe(
+      "some.user@test.tester added a policy role with name 'MyRole'",
+    );
+    expect(auditRows[3].event.description).toBe(
+      "user@unit.test removed a policy with name 'Test policy'",
+    );
+    expect(auditRows[4].event.description).toBe(
+      "some.user@test.tester removed 'organisation.ukprn' policy condition",
+    );
+    expect(auditRows[5].event.description).toBe(
+      "some.user@test.tester removed a policy role with name 'MyRole'",
+    );
+  });
 });
