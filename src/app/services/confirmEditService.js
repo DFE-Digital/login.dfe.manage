@@ -94,7 +94,7 @@ const post = async (req, res) => {
       userId: req.user.sub,
       userEmail: req.user.email,
       organisationId: model.organisation.id,
-      client: model.service.relyingParty.client_id,
+      client: model.service.relyingParty?.client_id,
       editedUser: model.user.id,
       editedFields: [
         {

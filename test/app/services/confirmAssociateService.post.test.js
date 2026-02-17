@@ -261,6 +261,22 @@ describe("when confirm associating a service to user", () => {
     });
   });
 
+  it("should should handle relyingParty not being present when auditing", async () => {
+    getServiceRaw.mockReturnValue({
+      id: "service1",
+      dateActivated: "10/10/2018",
+      name: "service name",
+      status: "active",
+    });
+    await postConfirmAssociateService(req, res);
+
+    expect(logger.audit.mock.calls).toHaveLength(1);
+    expect(logger.audit.mock.calls[0][0]).toBe(
+      "user@unit.test added service for user test@test.com",
+    );
+    expect(logger.audit.mock.calls[0][1].client).toBe(undefined);
+  });
+
   it("then a flash message is shown to the user", async () => {
     await postConfirmAssociateService(req, res);
 

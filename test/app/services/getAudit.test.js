@@ -353,48 +353,46 @@ describe("when getting users audit details", () => {
     });
   });
 
-  // This test should be rewritten to be a paramaterised test
-  it("should leave a number of subtypes of message unchanged", async () => {
-    getPageOfUserAudits.mockReturnValue({
-      audits: [
-        createSimpleAuditRecord(
-          "organisation",
-          "access-request",
-          "some.user@test.tester requested organisation access",
-        ),
-        createSimpleAuditRecord(
-          "services",
-          "access-request",
-          "some.user@test.tester requested service access",
-        ),
-        createSimpleAuditRecord(
-          "support",
-          "service-create",
-          "some.user@test.tester created Check A Thing service",
-        ),
-        createSimpleAuditRecord(
-          "manage",
-          "service-config-updated",
-          "some.user@test.tester updated service configuration",
-        ),
-      ],
+  it.each([
+    [
+      "manage",
+      "user-service-added",
+      "some.user@test.tester added service Test Service for user another.user@example.com",
+    ],
+    [
+      "manage",
+      "user-service-deleted",
+      "some.user@test.tester removed service Test Service for user another.user@example.com",
+    ],
+    [
+      "organisation",
+      "access-request",
+      "some.user@test.tester requested organisation access",
+    ],
+    [
+      "services",
+      "access-request",
+      "some.user@test.tester requested service access",
+    ],
+    [
+      "support",
+      "service-create",
+      "some.user@test.tester created Check A Thing service",
+    ],
+    [
+      "manage",
+      "service-config-updated",
+      "some.user@test.tester updated service configuration",
+    ],
+  ])("should convert %s / %s", async (type, subType, message) => {
+    getPageOfUserAudits.mockResolvedValue({
+      audits: [createSimpleAuditRecord(type, subType, message)],
       numberOfPages: 3,
       numberOfRecords: 56,
     });
     await getAudit(req, res);
 
     const auditRows = res.render.mock.calls[0][1].audits;
-    expect(auditRows[0].event.description).toBe(
-      "some.user@test.tester requested organisation access",
-    );
-    expect(auditRows[1].event.description).toBe(
-      "some.user@test.tester requested service access",
-    );
-    expect(auditRows[2].event.description).toBe(
-      "some.user@test.tester created Check A Thing service",
-    );
-    expect(auditRows[3].event.description).toBe(
-      "some.user@test.tester updated service configuration",
-    );
+    expect(auditRows[0].event.description).toBe(message);
   });
 });

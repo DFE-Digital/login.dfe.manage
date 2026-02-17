@@ -121,7 +121,7 @@ const post = async (req, res) => {
     userId: req.user.sub,
     userEmail: req.user.email,
     organisationId: organisation.id,
-    client: service.relyingParty.client_id,
+    client: service.relyingParty?.client_id,
     editedFields: [
       {
         name: "add_services",

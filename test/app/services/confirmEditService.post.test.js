@@ -83,6 +83,7 @@ describe("when editing a service for a user", () => {
     getUserDetails.mockReset();
     getUserDetails.mockReturnValue({
       id: "user1",
+      email: "user1@test.com",
     });
 
     getOrganisationRaw.mockReset();
@@ -128,7 +129,7 @@ describe("when editing a service for a user", () => {
 
     expect(logger.audit.mock.calls).toHaveLength(1);
     expect(logger.audit.mock.calls[0][0]).toBe(
-      "user@unit.test updated service for user undefined",
+      "user@unit.test updated service for user user1@test.com",
     );
     expect(logger.audit.mock.calls[0][1]).toMatchObject({
       type: "manage",
@@ -145,6 +146,22 @@ describe("when editing a service for a user", () => {
         },
       ],
     });
+  });
+
+  it("should should handle relyingParty not being present when auditing", async () => {
+    getServiceRaw.mockReturnValue({
+      id: "service1",
+      dateActivated: "10/10/2018",
+      name: "service name",
+      status: "active",
+    });
+    await postConfirmEditService(req, res);
+
+    expect(logger.audit.mock.calls).toHaveLength(1);
+    expect(logger.audit.mock.calls[0][0]).toBe(
+      "user@unit.test updated service for user user1@test.com",
+    );
+    expect(logger.audit.mock.calls[0][1].client).toBe(undefined);
   });
 
   it("then a flash message is shown to the user", async () => {
