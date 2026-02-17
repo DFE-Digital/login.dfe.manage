@@ -353,64 +353,56 @@ describe("when getting users audit details", () => {
     });
   });
 
-  // This test should be rewritten to be a paramaterised test
-  it("should leave a number of subtypes of message unchanged", async () => {
-    getPageOfUserAudits.mockReturnValue({
-      audits: [
-        createSimpleAuditRecord(
-          "manage",
-          "policy-created",
-          "user@unit.test added a policy with name 'Test policy'",
-        ),
-        createSimpleAuditRecord(
-          "manage",
-          "policy-condition-added",
-          "some.user@test.tester added 'organisation.ukprn' policy condition",
-        ),
-        createSimpleAuditRecord(
-          "manage",
-          "policy-role-added",
-          "some.user@test.tester added a policy role with name 'MyRole'",
-        ),
-        createSimpleAuditRecord(
-          "manage",
-          "policy-removed",
-          "user@unit.test removed a policy with name 'Test policy'",
-        ),
-        createSimpleAuditRecord(
-          "manage",
-          "policy-condition-removed",
-          "some.user@test.tester removed 'organisation.ukprn' policy condition",
-        ),
-        createSimpleAuditRecord(
-          "manage",
-          "policy-role-removed",
-          "some.user@test.tester removed a policy role with name 'MyRole'",
-        ),
-      ],
+  it.each([
+    [
+      "manage",
+      "user-service-added",
+      "some.user@test.tester added service Test Service for user another.user@example.com",
+    ],
+    [
+      "manage",
+      "user-service-deleted",
+      "some.user@test.tester removed service Test Service for user another.user@example.com",
+    ],
+    [
+      "manage",
+      "policy-created",
+      "user@unit.test added a policy with name 'Test policy'",
+    ],
+    [
+      "manage",
+      "policy-condition-added",
+      "some.user@test.tester added 'organisation.ukprn' policy condition",
+    ],
+    [
+      "manage",
+      "policy-role-added",
+      "some.user@test.tester added a policy role with name 'MyRole'",
+    ],
+    [
+      "manage",
+      "policy-removed",
+      "user@unit.test removed a policy with name 'Test policy'",
+    ],
+    [
+      "manage",
+      "policy-condition-removed",
+      "some.user@test.tester removed 'organisation.ukprn' policy condition",
+    ],
+    [
+      "manage",
+      "policy-role-removed",
+      "some.user@test.tester removed a policy role with name 'MyRole'",
+    ],
+  ])("should convert %s / %s", async (type, subType, message) => {
+    getPageOfUserAudits.mockResolvedValue({
+      audits: [createSimpleAuditRecord(type, subType, message)],
       numberOfPages: 3,
       numberOfRecords: 56,
     });
     await getAudit(req, res);
 
     const auditRows = res.render.mock.calls[0][1].audits;
-    expect(auditRows[0].event.description).toBe(
-      "user@unit.test added a policy with name 'Test policy'",
-    );
-    expect(auditRows[1].event.description).toBe(
-      "some.user@test.tester added 'organisation.ukprn' policy condition",
-    );
-    expect(auditRows[2].event.description).toBe(
-      "some.user@test.tester added a policy role with name 'MyRole'",
-    );
-    expect(auditRows[3].event.description).toBe(
-      "user@unit.test removed a policy with name 'Test policy'",
-    );
-    expect(auditRows[4].event.description).toBe(
-      "some.user@test.tester removed 'organisation.ukprn' policy condition",
-    );
-    expect(auditRows[5].event.description).toBe(
-      "some.user@test.tester removed a policy role with name 'MyRole'",
-    );
+    expect(auditRows[0].event.description).toBe(message);
   });
 });
