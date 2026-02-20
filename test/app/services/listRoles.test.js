@@ -162,14 +162,6 @@ describe("when getting a list of service roles", () => {
     expect(roleTwo.policies).toEqual(["Policy One"]);
   });
 
-  it("it should then clear the createNewPolicy session data", async () => {
-    req.session.createNewPolicy = "someData";
-
-    await getListRoles(req, res);
-
-    expect(req.session.createNewPolicy).toBeUndefined();
-  });
-
   it("should include a backLink in the model", async () => {
     await getListRoles(req, res);
 

@@ -35,14 +35,7 @@ const viewModel = async (req) => {
   };
 };
 
-const clearSessionData = (req) => {
-  if (req.session.createNewPolicy) {
-    req.session.createNewPolicy = undefined;
-  }
-};
-
 const getListRoles = async (req, res) => {
-  clearSessionData(req);
   const model = await viewModel(req);
   return res.render("services/views/listRoles", model);
 };
