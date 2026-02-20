@@ -12,6 +12,7 @@ const viewModel = async (req) => {
     serviceId: req.params.sid,
   });
 
+  // Deduplicate service roles if they occur for more than one policy
   const roleObj = {};
 
   for (const policy of servicePolicies) {
