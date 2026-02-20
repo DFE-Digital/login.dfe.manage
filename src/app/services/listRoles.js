@@ -8,13 +8,9 @@ const viewModel = async (req) => {
     by: { serviceId: req.params.sid },
   });
 
-  // const serviceRoles = await getServiceRolesRaw({serviceId:req.params.sid});
-  // console.log("serviceRoles: ", serviceRoles);
-
   const servicePolicies = await getServicePoliciesRaw({
     serviceId: req.params.sid,
   });
-  // console.log("servicePolicies: ", servicePolicies);
 
   const roleObj = {};
 
