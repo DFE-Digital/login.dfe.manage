@@ -1,0 +1,90 @@
+<div class="govuk-width-container govuk-main-wrapper">
+    <% if (locals.flash.info) { %>
+        <div id="notification-wrapper" class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+            <div class="govuk-notification-banner__header">
+                <span class="close-button">x</span>
+                <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                    Success
+                </h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+                <p class="govuk-body">
+                    <%=locals.flash.info%>
+                </p>
+            </div>
+        </div>
+    <% } %>
+    <% if (locals.flash.error) { %>
+        <div id="notification-wrapper" class="govuk-notification-banner govuk-notification-banner" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+            <div class="govuk-notification-banner__header">
+                <span class="close-button">x</span>
+                <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                    Error
+                </h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+                <p class="govuk-body">
+                    <%=locals.flash.error%>
+                </p>
+            </div>
+        </div>
+    <% } %>
+    
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <h1 class="govuk-heading-xl govuk-!-margin-top-0 text-break">
+                <span class="govuk-caption-xl"><%=locals.serviceDetails.name%></span>
+                Service Roles
+            </h1>
+        </div>
+    </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <p class="govuk-body">
+                The following table lists all roles available for <span class="govuk-!-font-weight-bold"><%=locals.serviceDetails.name%></span>. 
+                Each role may belong to one or more policies which determine the level of access granted to users of this service.
+            </p>
+        </div>
+    </div>
+
+    <div class="govuk-grid-row govuk-!-margin-top-6">
+        <div class="govuk-grid-column-full">
+            <table class="govuk-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row sortable">
+                        <th scope="col" class="govuk-table__header width-55">Name</th>
+                        <th scope="col" class="govuk-table__header width-20">Policies</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                <% if (locals.roles.length === 0) { %>
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell" colspan="4">
+                            <div class="empty-state">
+                                <p class="govuk-body">No roles found for service</p>
+                            </div>
+                        </td>
+                    </tr>
+                <% } %>
+                <% for (let i = 0; i < locals.roles.length; i++) {
+                    const role = locals.roles[i];
+                %>
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell">
+                            <%= role.name %>
+                        </td>
+                        <td class="govuk-table__cell">
+                            <ul class="govuk-list">
+                                <% for (let i = 0; i < role.policies.length; i++) { %>
+                                    <li class="govuk-!-margin-bottom-2 govuk-!-margin-top-2"><%= role.policies[i] %></li>
+                                <% } %>
+                            </ul>
+                        </td>
+                    </tr>
+                <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

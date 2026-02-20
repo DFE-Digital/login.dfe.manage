@@ -82,6 +82,7 @@ const {
   get: getListPolicies,
   post: postListPolicies,
 } = require("./listPolicies");
+const getListRoles = require("./listRoles");
 const getPolicyConditions = require("./getPolicyConditionsAndRoles");
 const getCreatePolicyCondition = require("./getCreatePolicyCondition");
 const postCreatePolicyCondition = require("./postCreatePolicyCondition");
@@ -434,6 +435,15 @@ const services = (csrf) => {
     hasRole("accessManage"),
     asyncWrapper(getListPolicies),
   );
+
+  router.get(
+    "/:sid/roles",
+    csrf,
+    isManageUserForService,
+    hasRole("accessManage"),
+    asyncWrapper(getListRoles),
+  );
+
   router.post(
     "/:sid/policies",
     csrf,
