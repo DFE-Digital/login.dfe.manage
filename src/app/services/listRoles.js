@@ -13,19 +13,24 @@ const viewModel = async (req) => {
   });
 
   // Deduplicate service roles if they occur for more than one policy
-  const roleObj = {};
+  const uniqueRoles = {};
 
+  // Check each policy
   for (const policy of servicePolicies) {
+    // Check each role in that policy
     for (const role of policy.roles) {
-      if (roleObj[role.id]) {
-        roleObj[role.id].policies.push(policy.name);
+      // Has the role been added already?
+      if (uniqueRoles[role.id]) {
+        // If it has, push the current policy
+        uniqueRoles[role.id].policies.push(policy.name);
       } else {
-        roleObj[role.id] = { ...role, policies: [policy.name] };
+        // If hasn't, create new role and add current policy
+        uniqueRoles[role.id] = { ...role, policies: [policy.name] };
       }
     }
   }
 
-  const roles = Object.values(roleObj);
+  const roles = Object.values(uniqueRoles);
 
   return {
     csrfToken: req.csrfToken(),
