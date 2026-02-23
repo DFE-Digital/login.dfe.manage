@@ -566,6 +566,7 @@ const postConfirmServiceConfig = async (req, res) => {
       userId: req.user.sub,
       userEmail: req.user.email,
       client: updatedService.clientId,
+      serviceId: req.params.sid,
       editedService: req.params.sid,
       editedFields,
     });

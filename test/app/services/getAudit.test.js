@@ -413,6 +413,8 @@ describe("when getting users audit details", () => {
       "manage",
       "service-config-updated",
       "some.user@test.tester updated service configuration",
+    ],
+    [
       "manage",
       "policy-created",
       "user@unit.test added a policy with name 'Test policy'",
