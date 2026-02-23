@@ -49,12 +49,14 @@ const postConfirmCreatePolicyCondition = async (req, res) => {
   });
 
   logger.audit(
-    `${req.user.email} added a policy condition for service ${req.params.sid} and policy ${req.params.pid}`,
+    `${req.user.email} added '${model.condition}' policy condition`,
     {
       type: "manage",
       subType: "policy-condition-added",
       userId: req.user.sub,
       userEmail: req.user.email,
+      serviceId: req.params.sid,
+      policyId: req.params.pid,
       field: model.condition,
       operator: model.operator,
       value: model.value,

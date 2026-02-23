@@ -15,17 +15,15 @@ const postConfirmRemovePolicy = async (req, res) => {
     return res.redirect(`/services/${req.params.sid}/policies`);
   }
 
-  logger.audit(
-    `${req.user.email} removed a policy for service ${req.params.sid}`,
-    {
-      type: "manage",
-      subType: "policy-removed",
-      userId: req.user.sub,
-      userEmail: req.user.email,
-      serviceId: req.params.sid,
-      policyName,
-    },
-  );
+  logger.audit(`${req.user.email} removed a policy with name '${policyName}'`, {
+    type: "manage",
+    subType: "policy-removed",
+    userId: req.user.sub,
+    userEmail: req.user.email,
+    serviceId: req.params.sid,
+    policyId: req.params.pid,
+    policyName,
+  });
 
   res.flash("info", `Policy '${policyName}' successfully removed`);
 

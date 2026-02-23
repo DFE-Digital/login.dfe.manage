@@ -143,12 +143,14 @@ const postConfirmCreatePolicyRole = async (req, res) => {
   }
 
   logger.audit(
-    `${req.user.email} added a policy role for service ${req.params.sid} and policy ${req.params.pid}`,
+    `${req.user.email} added a policy role with name '${model.roleName}'`,
     {
       type: "manage",
       subType: "policy-role-added",
       userId: req.user.sub,
       userEmail: req.user.email,
+      serviceId: req.params.sid,
+      policyId: req.params.pid,
       name: model.roleName,
       code: model.roleCode,
     },

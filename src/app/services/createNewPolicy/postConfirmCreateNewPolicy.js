@@ -79,6 +79,19 @@ const postConfirmCreateNewPolicy = async (req, res) => {
   try {
     const response = await createServicePolicy(payload);
     logger.info(`New policy created with id [${response.id}]`);
+
+    logger.audit(
+      `${req.user.email} added a policy for service with name '${model.name}`,
+      {
+        type: "manage",
+        subType: "policy-created",
+        userId: req.user.sub,
+        userEmail: req.user.email,
+        serviceId: req.params.sid,
+        policyId: response.id,
+        policyName: model.name,
+      },
+    );
   } catch (e) {
     logger.error("Something went wrong creating the policy", e);
     res.flash("error", "Something went wrong creating the policy");

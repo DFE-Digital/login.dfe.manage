@@ -72,6 +72,12 @@ const describeAuditEvent = async (audit, req) => {
     "access-request",
     "service-create",
     "service-config-updated",
+    "policy-created",
+    "policy-condition-added",
+    "policy-role-added",
+    "policy-removed",
+    "policy-condition-removed",
+    "policy-role-removed",
   ]);
 
   // The default SHOULD be audit.message, until the work is done to make this happen
@@ -105,7 +111,7 @@ const describeAuditEvent = async (audit, req) => {
     return "Edited user";
   }
 
-  if (audit.type === "support" && audit.subType === "user-search") {
+  if (audit.subType === "user-search") {
     return `Searched for users using criteria "${audit.criteria}"`;
   }
 
@@ -226,6 +232,12 @@ const getAudit = async (req, res) => {
           `User audit tab - No service mapping for client ${clientId} using client id`,
         );
         service = { name: clientId };
+      }
+    } else {
+      // If clientId isn't found, we'll try and see if the serviceId is part of the metadata
+      const serviceId = audit.serviceId;
+      if (serviceId) {
+        service = await getCachedServiceById(serviceId, req.id);
       }
     }
     if (audit.organisationId) {
