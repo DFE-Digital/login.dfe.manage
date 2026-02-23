@@ -221,12 +221,14 @@ describe("when using the postConfirmRemovePolicyRole function", () => {
     await postConfirmRemovePolicyRole(req, res);
 
     expect(logger.audit).toHaveBeenCalledWith(
-      "user@unit.test (id: user1) removed a policy role for service service-id and policy policy-id",
+      "user@unit.test removed a policy role with name 'School'",
       {
         type: "manage",
         subType: "policy-role-removed",
         userId: "user1",
         userEmail: "user@unit.test",
+        policyId: "policy-id",
+        serviceId: "service-id",
         name: "School",
         code: "CheckRecord_School",
       },

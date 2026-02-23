@@ -41,10 +41,11 @@ describe("when using the postConfirmRemovePolicy function", () => {
     await postConfirmRemovePolicy(req, res);
 
     expect(logger.audit).toHaveBeenCalledWith(
-      "user@unit.test (id: user1) removed a policy for service service-id",
+      "user@unit.test removed a policy with name 'Test policy'",
       {
         policyName: "Test policy",
         serviceId: "service-id",
+        policyId: "policy-id",
         subType: "policy-removed",
         type: "manage",
         userEmail: "user@unit.test",
