@@ -93,6 +93,9 @@ describe("when confirm associating a service to user", () => {
       dateActivated: "10/10/2018",
       name: "service name",
       status: "active",
+      relyingParty: {
+        client_id: "serviceClient1",
+      },
     });
 
     getServiceRolesRaw.mockReset();
@@ -240,13 +243,14 @@ describe("when confirm associating a service to user", () => {
 
     expect(logger.audit.mock.calls).toHaveLength(1);
     expect(logger.audit.mock.calls[0][0]).toBe(
-      "user@unit.test added service service name for user test@test.com",
+      "user@unit.test added service for user test@test.com",
     );
     expect(logger.audit.mock.calls[0][1]).toMatchObject({
       type: "manage",
       subType: "user-service-added",
       userId: "user1",
       userEmail: "user@unit.test",
+      client: "serviceClient1",
       editedUser: "user1",
       editedFields: [
         {
@@ -255,6 +259,22 @@ describe("when confirm associating a service to user", () => {
         },
       ],
     });
+  });
+
+  it("should should handle relyingParty not being present when auditing", async () => {
+    getServiceRaw.mockReturnValue({
+      id: "service1",
+      dateActivated: "10/10/2018",
+      name: "service name",
+      status: "active",
+    });
+    await postConfirmAssociateService(req, res);
+
+    expect(logger.audit.mock.calls).toHaveLength(1);
+    expect(logger.audit.mock.calls[0][0]).toBe(
+      "user@unit.test added service for user test@test.com",
+    );
+    expect(logger.audit.mock.calls[0][1].client).toBe(undefined);
   });
 
   it("then a flash message is shown to the user", async () => {

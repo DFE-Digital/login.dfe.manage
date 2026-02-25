@@ -639,7 +639,7 @@ describe("when confirming service config changes in the review page", () => {
 
     expect(logger.audit.mock.calls).toHaveLength(1);
     expect(logger.audit.mock.calls[0][0]).toBe(
-      "user@unit.test (id: user1) updated service configuration for service service one (id: service1)",
+      "user@unit.test updated service configuration",
     );
     expect(logger.audit.mock.calls[0][1]).toMatchObject({
       editedFields: expect.arrayContaining([
@@ -699,6 +699,7 @@ describe("when confirming service config changes in the review page", () => {
       type: "manage",
       userEmail: "user@unit.test",
       userId: "user1",
+      client: "new-client-id",
     });
   });
 

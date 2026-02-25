@@ -115,26 +115,24 @@ const post = async (req, res) => {
     userOrgPermission,
   );
 
-  logger.audit(
-    `${req.user.email} added service ${service.name} for user ${user.email}`,
-    {
-      type: "manage",
-      subType: "user-service-added",
-      userId: req.user.sub,
-      userEmail: req.user.email,
-      organisationId: organisation.id,
-      editedFields: [
-        {
-          name: "add_services",
-          newValue: {
-            id: service.id,
-            roles: selectedRoles,
-          },
+  logger.audit(`${req.user.email} added service for user ${user.email}`, {
+    type: "manage",
+    subType: "user-service-added",
+    userId: req.user.sub,
+    userEmail: req.user.email,
+    organisationId: organisation.id,
+    client: service.relyingParty?.client_id,
+    editedFields: [
+      {
+        name: "add_services",
+        newValue: {
+          id: service.id,
+          roles: selectedRoles,
         },
-      ],
-      editedUser: user.id,
-    },
-  );
+      },
+    ],
+    editedUser: user.id,
+  });
 
   res.flash("title", "Success");
   res.flash("heading", `Service added: ${service.name}`);

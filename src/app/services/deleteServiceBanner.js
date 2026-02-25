@@ -37,7 +37,7 @@ const post = async (req, res) => {
   });
 
   logger.audit(
-    `${req.user.email} (id: ${req.user.sub}) removed banner ${req.params.bid} for service ${req.params.sid}`,
+    `${req.user.email} removed banner ${req.params.bid} for service ${req.params.sid}`,
     {
       type: "manage",
       subType: "service-banner-deleted",

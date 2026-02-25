@@ -395,6 +395,26 @@ describe("when getting users audit details", () => {
       "some.user@test.tester removed service Test Service for user another.user@example.com",
     ],
     [
+      "organisation",
+      "access-request",
+      "some.user@test.tester requested organisation access",
+    ],
+    [
+      "services",
+      "access-request",
+      "some.user@test.tester requested service access",
+    ],
+    [
+      "support",
+      "service-create",
+      "some.user@test.tester created Check A Thing service",
+    ],
+    [
+      "manage",
+      "service-config-updated",
+      "some.user@test.tester updated service configuration",
+    ],
+    [
       "manage",
       "policy-created",
       "user@unit.test added a policy with name 'Test policy'",
