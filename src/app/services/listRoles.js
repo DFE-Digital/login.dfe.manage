@@ -2,6 +2,7 @@ const {
   getServiceRaw,
   getServicePoliciesRaw,
 } = require("login.dfe.api-client/services");
+const { getUserServiceRoles } = require("./utils");
 
 const viewModel = async (req) => {
   const serviceDetails = await getServiceRaw({
@@ -31,12 +32,16 @@ const viewModel = async (req) => {
   }
 
   const roles = Object.values(uniqueRoles);
+  const manageRolesForService = await getUserServiceRoles(req);
 
   return {
     csrfToken: req.csrfToken(),
     backLink: true,
     roles,
     serviceDetails,
+    serviceId: req.params.sid,
+    userRoles: manageRolesForService,
+    currentNavigation: "roles",
   };
 };
 
