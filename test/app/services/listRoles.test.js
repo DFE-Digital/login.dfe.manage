@@ -24,7 +24,7 @@ describe("when getting a list of service roles", () => {
   beforeEach(() => {
     req = getRequestMock({
       params: {
-        sid: "service1",
+        serviceId: "service1", // ← CHANGED FROM 'sid' TO 'serviceId'
       },
       session: {},
     });

@@ -5,12 +5,15 @@ const {
 const { getUserServiceRoles } = require("./utils");
 
 const viewModel = async (req) => {
+  // Support both parameter names for compatibility
+  const serviceId = req.params.serviceId || req.params.sid;
+  
   const serviceDetails = await getServiceRaw({
-    by: { serviceId: req.params.sid },
+    by: { serviceId },
   });
 
   const servicePolicies = await getServicePoliciesRaw({
-    serviceId: req.params.sid,
+    serviceId,
   });
 
   // Deduplicate service roles if they occur for more than one policy
@@ -39,7 +42,7 @@ const viewModel = async (req) => {
     backLink: true,
     roles,
     serviceDetails,
-    serviceId: req.params.sid,
+    serviceId, // Now correctly uses the extracted serviceId
     userRoles: manageRolesForService,
     currentNavigation: "roles",
   };
