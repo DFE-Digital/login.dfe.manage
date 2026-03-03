@@ -2,18 +2,14 @@ const {
   getServiceRaw,
   getServicePoliciesRaw,
 } = require("login.dfe.api-client/services");
-const { getUserServiceRoles } = require("./utils");
 
 const viewModel = async (req) => {
-  // Support both parameter names for compatibility
-  const serviceId = req.params.serviceId || req.params.sid;
-  
   const serviceDetails = await getServiceRaw({
-    by: { serviceId },
+    by: { serviceId: req.params.sid },
   });
 
   const servicePolicies = await getServicePoliciesRaw({
-    serviceId,
+    serviceId: req.params.sid,
   });
 
   // Deduplicate service roles if they occur for more than one policy
@@ -35,16 +31,12 @@ const viewModel = async (req) => {
   }
 
   const roles = Object.values(uniqueRoles);
-  const manageRolesForService = await getUserServiceRoles(req);
 
   return {
     csrfToken: req.csrfToken(),
     backLink: true,
     roles,
     serviceDetails,
-    serviceId, // Now correctly uses the extracted serviceId
-    userRoles: manageRolesForService,
-    currentNavigation: "roles",
   };
 };
 
