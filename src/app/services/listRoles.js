@@ -3,65 +3,127 @@ const {
   getServicePoliciesRaw,
 } = require("login.dfe.api-client/services");
 const { getUserServiceRoles } = require("./utils");
+const logger = require("../../infrastructure/logger");
+
+const getServiceIdFromRequest = (req) =>
+  req?.params?.sid || req?.params?.serviceId;
 
 const viewModel = async (req) => {
+  const serviceId = getServiceIdFromRequest(req);
+
+  if (!serviceId) {
+    throw {
+      statusCode: 400,
+      message: "Service ID is required",
+    };
+  }
+
+  logger.info(`[listRoles] Fetching roles for service: ${serviceId}`);
+
+  // Fetch service details
+  let serviceDetails;
   try {
-    // Support both parameter names for compatibility
-    const serviceId = req.params.serviceId || req.params.sid;
-    
-    const serviceDetails = await getServiceRaw({
+    serviceDetails = await getServiceRaw({
       by: { serviceId },
     });
+  } catch (apiError) {
+    logger.error(`[listRoles] Failed to fetch service details:`, apiError);
+    throw {
+      statusCode: 503,
+      message: "Unable to connect to service API",
+    };
+  }
 
-    const servicePolicies = await getServicePoliciesRaw({
+  if (!serviceDetails || !serviceDetails.id) {
+    logger.warn(`[listRoles] Service not found: ${serviceId}`);
+    throw {
+      statusCode: 404,
+      message: `Service not found`,
+    };
+  }
+
+  // Fetch service policies
+  let servicePolicies = [];
+  try {
+    const policiesResult = await getServicePoliciesRaw({
       serviceId,
     });
-
-    // Deduplicate service roles if they occur for more than one policy
-    const uniqueRoles = {};
-
-    // Check each policy
-    for (const policy of servicePolicies) {
-      // Check each role in that policy
-      for (const role of policy.roles) {
-        // Has the role been added already?
-        if (uniqueRoles[role.id]) {
-          // If it has, push the current policy
-          uniqueRoles[role.id].policies.push(policy.name);
-        } else {
-          // If hasn't, create new role and add current policy
-          uniqueRoles[role.id] = { ...role, policies: [policy.name] };
-        }
-      }
-    }
-
-    const roles = Object.values(uniqueRoles);
-    const manageRolesForService = await getUserServiceRoles(req);
-
-    return {
-      csrfToken: req.csrfToken(),
-      backLink: true,
-      roles,
-      serviceDetails,
-      serviceId, // ← IMPORTANT: Return serviceId for layout template
-      userRoles: manageRolesForService,
-      currentNavigation: "roles",
-    };
-  } catch (error) {
-    console.error("ERROR in listRoles viewModel:", error.message);
-    throw error;
+    servicePolicies = Array.isArray(policiesResult)
+      ? policiesResult
+      : policiesResult?.policies || [];
+    logger.info(`[listRoles] Found ${servicePolicies.length} policies`);
+  } catch (apiError) {
+    logger.warn(`[listRoles] Could not fetch policies:`, apiError);
+    // Continue with empty policies rather than failing
+    servicePolicies = [];
   }
+
+  // Build unique roles map
+  const uniqueRoles = {};
+
+  servicePolicies.forEach((policy) => {
+    if (!policy || !Array.isArray(policy.roles)) return;
+    const policyName = policy.name || "";
+
+    policy.roles.forEach((role) => {
+      if (!role || !role.id) return;
+
+      if (uniqueRoles[role.id]) {
+        const policies = uniqueRoles[role.id].policies || [];
+        if (policyName && !policies.includes(policyName)) {
+          policies.push(policyName);
+        }
+      } else {
+        uniqueRoles[role.id] = {
+          ...role,
+          policies: policyName ? [policyName] : [],
+        };
+      }
+    });
+  });
+
+  const roles = Object.values(uniqueRoles);
+
+  // Get user service roles
+  let manageRolesForService = [];
+  try {
+    const rolesReq = req.params?.sid
+      ? req
+      : {
+          ...req,
+          params: {
+            ...req.params,
+            sid: serviceId,
+          },
+        };
+    manageRolesForService = (await getUserServiceRoles(rolesReq)) || [];
+  } catch (error) {
+    logger.warn(`[listRoles] Could not fetch user roles:`, error);
+  }
+
+  return {
+    csrfToken: req.csrfToken(),
+    backLink: true,
+    roles,
+    serviceDetails,
+    serviceId,
+    userRoles: manageRolesForService,
+    currentNavigation: "policies",
+  };
 };
 
 const getListRoles = async (req, res) => {
   try {
     const model = await viewModel(req);
-    return res.render("services/views/listRoles", model);
+    res.render("services/views/listRoles", model);
   } catch (error) {
-    console.error("ERROR in getListRoles:", error);
-    return res.status(500).render("error", { 
-      message: error.message,
-      error: error 
+    const statusCode = error.statusCode || 500;
+    const message = error.message || "Unable to load service roles";
+
+    logger.error(`[listRoles] Error (${statusCode}): ${message}`);
+
+    res.status(statusCode).render("errors/views/notFound", {
+      message,
     });
   }
 };

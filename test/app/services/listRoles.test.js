@@ -169,4 +169,47 @@ describe("when getting a list of service roles", () => {
       backLink: true,
     });
   });
+
+  it("should support route param sid", async () => {
+    req.params = { sid: "service1" };
+
+    await getListRoles(req, res);
+
+    expect(getServiceRaw).toHaveBeenCalledWith({
+      by: { serviceId: "service1" },
+    });
+    expect(res.render.mock.calls[0][0]).toBe("services/views/listRoles");
+  });
+
+  it("should render an empty list when no policies are returned", async () => {
+    getServicePoliciesRaw.mockResolvedValue([]);
+
+    await getListRoles(req, res);
+
+    expect(res.render.mock.calls[0][1].roles).toEqual([]);
+  });
+
+  it("should support policies wrapped in a paged response", async () => {
+    getServicePoliciesRaw.mockResolvedValue({
+      policies: [
+        {
+          id: "policy1",
+          name: "Policy One",
+          roles: [
+            {
+              id: "role1",
+              name: "Role One",
+            },
+          ],
+        },
+      ],
+    });
+
+    await getListRoles(req, res);
+
+    expect(res.render.mock.calls[0][1].roles).toHaveLength(1);
+    expect(res.render.mock.calls[0][1].roles[0].policies).toEqual([
+      "Policy One",
+    ]);
+  });
 });
