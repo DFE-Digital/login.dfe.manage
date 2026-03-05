@@ -10,7 +10,8 @@ const Redis = require("ioredis");
 // service when an admin deactivates a user.  This is intentionally separate
 // from the session-store connection (DB 3) so a DB-index mismatch cannot
 // silently skip the kill-switch check.
-const oidcRedisConnString = process.env.LOCAL_REDIS_CONN || process.env.REDIS_CONN;
+const oidcRedisConnString =
+  process.env.LOCAL_REDIS_CONN || process.env.REDIS_CONN;
 const oidcKillSwitchClient = new Redis(oidcRedisConnString, {
   tls: oidcRedisConnString?.includes("6380"),
   lazyConnect: true,
@@ -59,6 +60,9 @@ const getPassportStrategy = async () => {
 
 const hasJwtExpired = (exp) => {
   if (!exp) {
+    logger.info(
+      `No exp claim in JWT, treating as expired for safety.`,
+    );
     return true;
   }
 
