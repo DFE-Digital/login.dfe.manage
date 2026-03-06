@@ -82,7 +82,12 @@ const viewModel = async (req) => {
     });
   });
 
-  const roles = Object.values(uniqueRoles);
+  const roles = Object.values(uniqueRoles)
+    .map((role) => ({
+      ...role,
+      policies: [...(role.policies || [])].sort((a, b) => a.localeCompare(b)),
+    }))
+    .sort((a, b) => (a.name || "").localeCompare(b.name || ""));
 
   // Get user service roles
   let manageRolesForService = [];

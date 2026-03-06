@@ -170,6 +170,15 @@ describe("when getting a list of service roles", () => {
     });
   });
 
+  it("should include the service navigation context in the model", async () => {
+    await getListRoles(req, res);
+
+    expect(res.render.mock.calls[0][1]).toMatchObject({
+      serviceId: "service1",
+      currentNavigation: "policies",
+    });
+  });
+
   it("should support route param sid", async () => {
     req.params = { sid: "service1" };
 
@@ -210,6 +219,16 @@ describe("when getting a list of service roles", () => {
     expect(res.render.mock.calls[0][1].roles).toHaveLength(1);
     expect(res.render.mock.calls[0][1].roles[0].policies).toEqual([
       "Policy One",
+    ]);
+  });
+
+  it("should return roles in a stable alphabetical order", async () => {
+    await getListRoles(req, res);
+
+    expect(res.render.mock.calls[0][1].roles.map((x) => x.name)).toEqual([
+      "Role One",
+      "Role Three",
+      "Role Two",
     ]);
   });
 });

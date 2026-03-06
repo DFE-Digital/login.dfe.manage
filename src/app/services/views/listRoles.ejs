@@ -1,4 +1,3 @@
-<% layout('layouts/layout') %>
 <div class="govuk-width-container govuk-main-wrapper">
     <% if (locals.flash.info) { %>
         <div id="notification-wrapper" class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
@@ -61,7 +60,7 @@
                 <tbody class="govuk-table__body">
                 <% if (locals.roles.length === 0) { %>
                     <tr class="govuk-table__row">
-                        <td class="govuk-table__cell" colspan="4">
+                        <td class="govuk-table__cell" colspan="2">
                             <div class="empty-state">
                                 <p class="govuk-body">No roles found for service</p>
                             </div>
