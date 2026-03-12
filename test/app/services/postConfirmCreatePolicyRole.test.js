@@ -154,7 +154,7 @@ describe("when using the postConfirmCreatePolicyRole function", () => {
     });
 
     expect(res.redirect.mock.calls.length).toBe(1);
-    expect(res.redirect.mock.calls[0][0]).toBe("conditionsAndRoles");
+    expect(res.redirect.mock.calls[0][0]).toBe("/services/service-1/roles");
     expect(res.flash).toHaveBeenCalledWith(
       "info",
       "Policy role New Test Role new_test_role successfully added",
@@ -215,7 +215,7 @@ describe("when using the postConfirmCreatePolicyRole function", () => {
       serviceId: "service-1",
     });
 
-    expect(res.redirect.mock.calls[0][0]).toBe("conditionsAndRoles");
+    expect(res.redirect.mock.calls[0][0]).toBe("/services/service-1/roles");
     expect(res.flash).toHaveBeenCalledWith(
       "info",
       "Policy role Existing Role existing_role successfully added",

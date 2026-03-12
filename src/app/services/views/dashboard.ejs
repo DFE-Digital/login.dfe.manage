@@ -130,19 +130,18 @@
                 </div>
                 <% } %>
 
-                <!-- TODO: - add after the Manage Roles functionality in place -->
-                <!-- <% if (locals.userRoles.includes('accessManage')) { %>
+                <% if (locals.userRoles.includes('accessManage') && locals.serviceDetails.isIdOnlyService === false) { %>
 
                 <div class="manage-card">
                     <h3 class="govuk-heading-s">
-                        <a id="manage-roles" class="govuk-link-bold" href="<%= locals.serviceId %>/roles">Manage roles</a>
+                        <a id="manage-roles" class="govuk-link-bold" href="<%= locals.serviceId %>/roles">Service roles</a>
                     </h3>
                     <p class="govuk-body">
-                        Change your service roles to provide different levels of access to your service.
+                        View service roles and linked policies.
                     </p>
                 </div>
                 <% } %> 
-                 -->
+                
 
                 <% if (locals.userRoles.includes('serviceBanner')) { %>
                 <div class="manage-card">
