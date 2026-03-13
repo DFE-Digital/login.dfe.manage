@@ -72,7 +72,7 @@ const currentAuthServiceInfo = {
     redirect_uris: ["https://www.redirect.com"],
     post_logout_redirect_uris: ["https://www.logout.com"],
     grant_types: ["authorization_code", "implicit"],
-    response_types: ["code", "token"],
+    response_types: ["code"],
     api_secret: "dewier-thrombi-confounder-mikado",
     token_endpoint_auth_method: undefined,
   },
@@ -155,14 +155,11 @@ const requestImplicitServiceInfo = {
   tokenEndpointAuthMethod: "client_secret_post",
 };
 
-// | Selection # | Code | ID_Token | Token | Flow Type |
-// |-------------|------|----------|-------|-----------|
-// | 1           | X    |          |       | Auth      |
-// | 2           | X    |          | X     | Hybrid    |
-// | 3           | X    | X        |       | Hybrid    |
-// | 4           | X    | X        | X     | Hybrid    |
-// | 5           |      | X        |       | Implicit  |
-// | 6           |      | X        | X     | Implicit  |
+// | Selection # | Code | ID_Token | Flow Type |
+// |-------------|------|----------|-----------|
+// | 1           | X    |          | Auth      |
+// | 2           | X    | X        | Hybrid    |
+// | 3           |      | X        | Implicit  |
 
 // AUTH FLOW / General Bound Checks
 describe("when editing the AUTH flow service configuration", () => {
@@ -610,7 +607,7 @@ describe("when editing the AUTH flow service configuration", () => {
 
   it('then it should not update "tokenEndpointAuthMethod" when the tokenEndpointAuthMethod is not selected and the chosen response type corresponds to the "Hybrid" flow.', async () => {
     // ARRANGE
-    req.body.response_types.push("id_token");
+    req.body.response_types = ["code", "id_token"];
     req.body.tokenEndpointAuthMethod = undefined;
 
     // ACT
@@ -629,7 +626,7 @@ describe("when editing the AUTH flow service configuration", () => {
 
   it('then it should update "tokenEndpointAuthMethod" when the tokenEndpointAuthMethod is selected and the chosen response type corresponds to the "Hybrid" flow.', async () => {
     // ARRANGE
-    req.body.response_types.push("token");
+    req.body.response_types = ["code", "id_token"];
 
     // ACT
     await postServiceConfig(req, res);
@@ -695,7 +692,7 @@ describe("when editing the HYBRID flow service configuration", () => {
   it("then it should render view with validation if service home not a valid url", async () => {
     // ARRANGE
     req.body.serviceHome = "not-a-url";
-    req.body.response_types = ["code", "token"];
+    req.body.response_types = ["code", "id_token"];
 
     // ACT
     await postServiceConfig(req, res);
@@ -714,7 +711,7 @@ describe("when editing the HYBRID flow service configuration", () => {
       "https://www.redirect-url.com",
       "https://www.redirect-url.com",
     ];
-    req.body.response_types = ["code", "token"];
+    req.body.response_types = ["code", "id_token"];
 
     // ACT
     await postServiceConfig(req, res);
@@ -731,46 +728,6 @@ describe("when editing the HYBRID flow service configuration", () => {
     // ARRANGE
     // req.body.response_types.push("id_token");
     req.body.response_types = ["code", "id_token"];
-
-    // ACT
-    await postServiceConfig(req, res);
-
-    // ASSERT
-    expect(res.redirect.mock.calls).toHaveLength(1);
-    expect(
-      req.session.serviceConfigurationChanges[req.params.sid].authFlowType,
-    ).toEqual("hybridFlow");
-    expect(
-      req.session.serviceConfigurationChanges[req.params.sid].grantTypes,
-    ).toEqual({
-      newValue: ["authorization_code", "implicit"],
-      oldValue: ["authorization_code"],
-    });
-  });
-
-  it('then it should set the grantTypes to "authorization_code", "implicit" when the selected response type is "code & id_token & token" - corresponding to the "Hybrid" flow', async () => {
-    // ARRANGE
-    req.body.response_types = ["code", "token", "id_token"];
-
-    // ACT
-    await postServiceConfig(req, res);
-
-    // ASSERT
-    expect(res.redirect.mock.calls).toHaveLength(1);
-    expect(
-      req.session.serviceConfigurationChanges[req.params.sid].authFlowType,
-    ).toEqual("hybridFlow");
-    expect(
-      req.session.serviceConfigurationChanges[req.params.sid].grantTypes,
-    ).toEqual({
-      newValue: ["authorization_code", "implicit"],
-      oldValue: ["authorization_code"],
-    });
-  });
-
-  it('then it should set the grantTypes to "authorization_code", "implicit" when the selected response type is "code and token" - corresponding to the "Hybrid" flow', async () => {
-    // ARRANGE
-    req.body.response_types = ["code", "token"];
 
     // ACT
     await postServiceConfig(req, res);
@@ -834,14 +791,11 @@ describe("when editing the HYBRID flow service configuration", () => {
   });
 });
 
-// | Selection # | Code | ID_Token | Token | Flow Type |
-// |-------------|------|----------|-------|-----------|
-// | 1           | X    |          |       | Auth      |
-// | 2           | X    |          | X     | Hybrid    |
-// | 3           | X    | X        |       | Hybrid    |
-// | 4           | X    | X        | X     | Hybrid    |
-// | 5           |      | X        |       | Implicit  |
-// | 6           |      | X        | X     | Implicit  |
+// | Selection # | Code | ID_Token | Flow Type |
+// |-------------|------|----------|-----------|
+// | 1           | X    |          | Auth      |
+// | 2           | X    | X        | Hybrid    |
+// | 3           |      | X        | Implicit  |
 
 // IMPLICIT FLOW
 describe("when editing the IMPLICIT flow service configuration", () => {
@@ -876,24 +830,6 @@ describe("when editing the IMPLICIT flow service configuration", () => {
     res.mockResetAll();
   });
 
-  it('then it should render view with validation when "token" is the sole response_type selected', async () => {
-    // ARRANGE
-    req.body.response_types = ["token"];
-
-    // ACT
-    await postServiceConfig(req, res);
-
-    // ASSERT
-    expect(res.render.mock.calls).toHaveLength(1);
-    expect(res.render.mock.calls[0][1]).toEqual(
-      expect.objectContaining({
-        validationMessages: {
-          responseTypes: `${ERROR_MESSAGES.RESPONSE_TYPE_TOKEN_ERROR}`,
-        },
-      }),
-    );
-  });
-
   it('then it should set the grantTypes to "implicit" when the selected response type is "id_token" - corresponding to the "Implicit" flow', async () => {
     // ARRANGE
     req.body.response_types = ["id_token"];
@@ -914,29 +850,9 @@ describe("when editing the IMPLICIT flow service configuration", () => {
     });
   });
 
-  it('then it should set the grantTypes to "implicit" when the selected response type is "id_token and token" - corresponding to the "Implicit" flow', async () => {
-    // ARRANGE
-    req.body.response_types = ["id_token", "token"];
-
-    // ACT
-    await postServiceConfig(req, res);
-
-    // ASSERT
-    expect(res.redirect.mock.calls).toHaveLength(1);
-    expect(
-      req.session.serviceConfigurationChanges[req.params.sid].authFlowType,
-    ).toEqual("implicitFlow");
-    expect(
-      req.session.serviceConfigurationChanges[req.params.sid].grantTypes,
-    ).toEqual({
-      newValue: ["implicit"],
-      oldValue: ["authorization_code"],
-    });
-  });
-
   it('then it should not include "refresh_token" in grantTypes when the "refresh_token" is selected and the chosen response type corresponds to the "Implicit" flow.', async () => {
     // ARRANGE
-    req.body.response_types = ["token", "id_token"];
+    req.body.response_types = ["id_token"];
     req.body.refresh_token = "refresh_token";
 
     // ACT
@@ -957,7 +873,7 @@ describe("when editing the IMPLICIT flow service configuration", () => {
 
   it('then it should not update "tokenEndpointAuthMethod" when the tokenEndpointAuthMethod is selected and the chosen response type corresponds to the "Implicit" flow.', async () => {
     // ARRANGE
-    req.body.response_types = ["token", "id_token"];
+    req.body.response_types = ["id_token"];
 
     // ACT
     await postServiceConfig(req, res);

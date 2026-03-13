@@ -321,12 +321,6 @@ const validate = async (req, currentService, oldService) => {
   ) {
     model.validationMessages.responseTypes =
       ERROR_MESSAGES.MISSING_RESPONSE_TYPE;
-  } else if (
-    model.service.responseTypes.length === 1 &&
-    model.service.responseTypes.includes("token")
-  ) {
-    model.validationMessages.responseTypes =
-      ERROR_MESSAGES.RESPONSE_TYPE_TOKEN_ERROR;
   }
   // takeout encoding from server
   unecodedurl = _unescape(postResetUrl);

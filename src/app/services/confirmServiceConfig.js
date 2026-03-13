@@ -268,15 +268,6 @@ const validate = async (req, currentService) => {
       model.validationMessages.clientId = ERROR_MESSAGES.CLIENT_ID_UNAVAILABLE;
     }
 
-    if (
-      model.service.responseTypes &&
-      model.service.responseTypes.length === 1 &&
-      model.service.responseTypes.includes("token")
-    ) {
-      model.validationMessages.responseTypes =
-        ERROR_MESSAGES.RESPONSE_TYPE_TOKEN_ERROR;
-    }
-
     if (!model.service.redirectUris || !model.service.redirectUris.length > 0) {
       model.validationMessages.redirect_uris =
         ERROR_MESSAGES.MISSING_REDIRECT_URL;

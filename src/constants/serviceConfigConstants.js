@@ -10,7 +10,6 @@ const AUTHENTICATION_FLOWS = {
 const RESPONSE_TYPES = {
   CODE: "code",
   ID_TOKEN: "id_token",
-  TOKEN: "token",
 };
 
 // Grant Types
@@ -32,19 +31,7 @@ const AUTHENTICATION_FLOWS_PATTERNS = [
     flow: AUTHENTICATION_FLOWS.IMPLICIT_FLOW,
   },
   {
-    types: [RESPONSE_TYPES.ID_TOKEN, RESPONSE_TYPES.TOKEN],
-    flow: AUTHENTICATION_FLOWS.IMPLICIT_FLOW,
-  },
-  {
     types: [RESPONSE_TYPES.CODE, RESPONSE_TYPES.ID_TOKEN],
-    flow: AUTHENTICATION_FLOWS.HYBRID_FLOW,
-  },
-  {
-    types: [RESPONSE_TYPES.CODE, RESPONSE_TYPES.TOKEN],
-    flow: AUTHENTICATION_FLOWS.HYBRID_FLOW,
-  },
-  {
-    types: [RESPONSE_TYPES.CODE, RESPONSE_TYPES.ID_TOKEN, RESPONSE_TYPES.TOKEN],
     flow: AUTHENTICATION_FLOWS.HYBRID_FLOW,
   },
 ];
@@ -75,8 +62,6 @@ const ERROR_MESSAGES = {
     "Client secret cannot be validated. Click ‘regenerate’",
   INVALID_API_SECRET: "API secret cannot be validated. Click ‘regenerate’",
   MISSING_RESPONSE_TYPE: "Select at least 1 response type",
-  RESPONSE_TYPE_TOKEN_ERROR:
-    "Select more than 1 response type when ‘token’ is selected as a response type",
   NO_CHANGES_MADE: "No changes have been made",
   INVALID_HOME_PROTOCOL:
     "Enter a home URL in the correct format. The URL must follow http or https protocols only ",
