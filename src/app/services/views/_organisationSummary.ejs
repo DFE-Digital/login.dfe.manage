@@ -1,4 +1,4 @@
-<% if (locals.flash.info) { %>
+<% if (locals.flash.success) { %>
 <div id="notification-wrapper" class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
     <div class="govuk-notification-banner__header">
         <span class="close-button">x</span>
@@ -8,8 +8,37 @@
     </div>
     <div class="govuk-notification-banner__content">
         <p class="govuk-body">
+            <%=locals.flash.success%>
+        </p>
+    </div>
+</div>
+<% } %>
+<% if (locals.flash.info) { %>
+<div id="notification-wrapper" class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+    <div class="govuk-notification-banner__header">
+        <span class="close-button">x</span>
+        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+            Important
+        </h2>
+    </div>
+    <div class="govuk-notification-banner__content">
+        <p class="govuk-body">
             <%=locals.flash.info%>
         </p>
+    </div>
+</div>
+<% } %>
+<% if (locals.flash.error) { %>
+<div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1" aria-labelledby="error-summary-title">
+    <div role="alert">
+        <h2 class="govuk-error-summary__title" id="error-summary-title">
+            There is a problem
+        </h2>
+        <div class="govuk-error-summary__body">
+            <p class="govuk-body">
+                <%=locals.flash.error%>
+            </p>
+        </div>
     </div>
 </div>
 <% } %>
