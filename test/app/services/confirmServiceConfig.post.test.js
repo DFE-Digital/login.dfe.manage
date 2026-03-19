@@ -130,7 +130,7 @@ describe("when confirming service config changes in the review page", () => {
 
         responseTypes: {
           oldValue: ["code", "id_token"],
-          newValue: ["token", "id_token"],
+          newValue: ["code", "id_token"],
         },
         grantTypes: {
           newValue: ["authorisation_code", "refresh_token"],
@@ -532,7 +532,7 @@ describe("when confirming service config changes in the review page", () => {
       },
       responseTypes: {
         oldValue: ["code", "id_token"],
-        newValue: ["token", "id_token"],
+        newValue: ["code", "id_token"],
       },
       grantTypes: {
         newValue: ["authorisation_code", "refresh_token"],
@@ -578,7 +578,7 @@ describe("when confirming service config changes in the review page", () => {
           "http://newlogouturl2.com",
         ],
         redirectUris: ["https://www.redirected.com"],
-        responseTypes: ["id_token", "token"],
+        responseTypes: ["code", "id_token"],
         serviceHome: "https://newservicehome.com",
         tokenEndpointAuthMethod: "client_secret_post",
       },
@@ -606,7 +606,7 @@ describe("when confirming service config changes in the review page", () => {
       },
       responseTypes: {
         oldValue: ["code", "id_token"],
-        newValue: ["token", "id_token"],
+        newValue: ["code", "id_token"],
       },
       grantTypes: {
         newValue: ["authorisation_code", "refresh_token"],
@@ -655,7 +655,7 @@ describe("when confirming service config changes in the review page", () => {
         },
         {
           name: "responseTypes",
-          newValue: ["id_token", "token"],
+          newValue: ["code", "id_token"],
           oldValue: ["code", "id_token"],
         },
         {
@@ -734,7 +734,7 @@ describe("when confirming service config changes in the review page", () => {
       },
       responseTypes: {
         oldValue: ["code", "id_token"],
-        newValue: ["token", "id_token"],
+        newValue: ["code", "id_token"],
       },
       grantTypes: {
         newValue: ["authorisation_code", "refresh_token"],
@@ -790,7 +790,7 @@ describe("when confirming service config changes in the review page", () => {
       },
       responseTypes: {
         oldValue: ["code", "id_token"],
-        newValue: ["token", "id_token"],
+        newValue: ["code", "id_token"],
       },
       grantTypes: {
         newValue: ["authorisation_code", "refresh_token"],
