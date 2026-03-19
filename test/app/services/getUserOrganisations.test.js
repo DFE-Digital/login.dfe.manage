@@ -107,6 +107,7 @@ describe("when getting users organisation details", () => {
         organisation: {
           id: "88a1ed39-5a98-43da-b66e-78e564ea72b0",
           name: "Great Big School",
+          status: { id: 1, name: "Open" },
         },
         approvers: ["user1"],
         services: [
@@ -362,6 +363,84 @@ describe("when getting users organisation details", () => {
           ],
         },
       ],
+    });
+  });
+
+  describe("organisation status tag colour mapping", () => {
+    const statusCases = [
+      { name: "Open", expectedTagColor: "green" },
+      { name: "Active", expectedTagColor: "green" },
+      { name: "Invited", expectedTagColor: "blue" },
+      { name: "Pending", expectedTagColor: "blue" },
+      { name: "Proposed", expectedTagColor: "blue" },
+      { name: "Pending Activation", expectedTagColor: "blue" },
+      { name: "Suspended", expectedTagColor: "yellow" },
+      { name: "Proposed to Close", expectedTagColor: "yellow" },
+      { name: "Closed", expectedTagColor: "red" },
+      { name: "Unknown Status", expectedTagColor: "" },
+    ];
+
+    statusCases.forEach(({ name: statusName, expectedTagColor }) => {
+      it(`should set tagColor "${expectedTagColor}" for status "${statusName}"`, async () => {
+        getUserOrganisationsWithServicesRaw.mockReturnValue([
+          {
+            organisation: {
+              id: "88a1ed39-5a98-43da-b66e-78e564ea72b0",
+              name: "Test School",
+              status: { id: 1, name: statusName },
+            },
+            approvers: [],
+            services: [],
+          },
+        ]);
+
+        await getUserOrganisations(req, res);
+
+        expect(
+          res.render.mock.calls[0][1].organisations[0].status,
+        ).toMatchObject({
+          name: statusName,
+          tagColor: expectedTagColor,
+        });
+      });
+    });
+
+    it("should preserve tagColor already provided by the API", async () => {
+      getUserOrganisationsWithServicesRaw.mockReturnValue([
+        {
+          organisation: {
+            id: "88a1ed39-5a98-43da-b66e-78e564ea72b0",
+            name: "Test School",
+            status: { id: 1, name: "Open", tagColor: "purple" },
+          },
+          approvers: [],
+          services: [],
+        },
+      ]);
+
+      await getUserOrganisations(req, res);
+
+      expect(res.render.mock.calls[0][1].organisations[0].status.tagColor).toBe(
+        "purple",
+      );
+    });
+
+    it("should handle a null status without throwing", async () => {
+      getUserOrganisationsWithServicesRaw.mockReturnValue([
+        {
+          organisation: {
+            id: "88a1ed39-5a98-43da-b66e-78e564ea72b0",
+            name: "Test School",
+            status: null,
+          },
+          approvers: [],
+          services: [],
+        },
+      ]);
+
+      await getUserOrganisations(req, res);
+
+      expect(res.render.mock.calls[0][1].organisations[0].status).toBeNull();
     });
   });
 });

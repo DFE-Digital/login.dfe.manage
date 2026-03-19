@@ -13,6 +13,25 @@ const {
   getUserServiceRoles,
   getReturnOrgId,
 } = require("./utils");
+
+// Maps organisation status names to GOV.UK tag colour modifiers.
+// Extend this object if new org statuses are introduced upstream.
+const orgStatusTagColourMap = {
+  open: "green",
+  active: "green",
+  invited: "blue",
+  pending: "blue",
+  proposed: "blue",
+  "pending activation": "blue",
+  suspended: "yellow",
+  "proposed to close": "yellow",
+  closed: "red",
+};
+
+const getOrgStatusTagColour = (statusName) => {
+  if (!statusName) return "";
+  return orgStatusTagColourMap[statusName.toLowerCase()] ?? "";
+};
 const logger = require("../../infrastructure/logger");
 const { getServiceRaw } = require("login.dfe.api-client/services");
 const {
@@ -83,11 +102,20 @@ const getOrganisations = async (userId) => {
         return service;
       });
 
+      const rawStatus = invitation.organisation.status;
+      const mappedStatus = rawStatus
+        ? {
+            ...rawStatus,
+            tagColor:
+              rawStatus.tagColor || getOrgStatusTagColour(rawStatus.name),
+          }
+        : rawStatus;
+
       return {
         id: invitation.organisation.id,
         name: invitation.organisation.name,
         LegalName: invitation.organisation.LegalName,
-        status: invitation.organisation.status,
+        status: mappedStatus,
         role: invitation.role,
         urn: invitation.organisation.urn,
         uid: invitation.organisation.uid,
