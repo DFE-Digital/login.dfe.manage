@@ -27,6 +27,13 @@
 								<dt class="govuk-label"><%=org.name%></dt>
 								<%}%>
 							<%}%>
+						<% if (org.status && org.status.name) { %>
+						<dd class="govuk-label">
+							<strong class="govuk-tag govuk-tag--<%= org.status.tagColor %>">
+								<%=org.status.name%>
+							</strong>
+						</dd>
+						<% } %>
 						<% if (!locals.isInvitation) { %>
 						<dt class="govuk-label govuk-!-font-weight-regular">Legacy ID:</dt>
 						<dd class="govuk-label"><%= org.numericIdentifier %></dd>
@@ -52,16 +59,7 @@
 								</div>
 								<div class="meta js-hidden">
 									<div class="approvers">
-                                        <% if (org.status && org.status.name) { %>
-                                            <dl class="inline condensed small-dt govuk-summary-list govuk-summary-list--no-border">
-                                        <dt class="govuk-label">Organisation Status:</dt>
-                                        <dd>
-                                            <strong class="govuk-tag govuk-tag--<%= org.status.tagColor %>">
-                                                <%=org.status.name%>
-                                            </strong>
-                                        </dd>
-                                        </dl>
-                                        <% } %>
+
 										<dl class="inline condensed small-dt govuk-summary-list govuk-summary-list--no-border">
 											<% if (org.LegalName) { %>
 											<dt class="govuk-label"><abbr title="Registered legal name">Legal name: </abbr></dt>
