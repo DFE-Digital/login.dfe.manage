@@ -16,7 +16,7 @@ const {
 
 // Maps organisation status names to GOV.UK tag colour modifiers.
 // Extend this object if new org statuses are introduced upstream.
-const orgStatusTagColourMap = {
+const orgStatusTagColorMap = {
   open: "green",
   active: "green",
   invited: "blue",
@@ -28,9 +28,9 @@ const orgStatusTagColourMap = {
   closed: "red",
 };
 
-const getOrgStatusTagColour = (statusName) => {
+const getOrgStatusTagColor = (statusName) => {
   if (!statusName) return "";
-  return orgStatusTagColourMap[statusName.toLowerCase()] ?? "";
+  return orgStatusTagColorMap[statusName.toLowerCase()] ?? "";
 };
 const logger = require("../../infrastructure/logger");
 const { getServiceRaw } = require("login.dfe.api-client/services");
@@ -107,7 +107,7 @@ const getOrganisations = async (userId) => {
         ? {
             ...rawStatus,
             tagColor:
-              rawStatus.tagColor ?? getOrgStatusTagColour(rawStatus.name),
+              rawStatus.tagColor ?? getOrgStatusTagColor(rawStatus.name),
           }
         : rawStatus;
 
