@@ -29,7 +29,7 @@
 							<%}%>
 						<% if (org.status && org.status.name) { %>
 						<dd class="govuk-label">
-							<strong class="govuk-tag govuk-tag--<%= org.status.tagColor %>">
+							<strong class="govuk-tag<% if (org.status.tagColor) { %> govuk-tag--<%= org.status.tagColor %><% } %>">
 								<%=org.status.name%>
 							</strong>
 						</dd>
