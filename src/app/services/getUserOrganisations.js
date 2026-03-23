@@ -107,7 +107,7 @@ const getOrganisations = async (userId) => {
         ? {
             ...rawStatus,
             tagColor:
-              rawStatus.tagColor || getOrgStatusTagColour(rawStatus.name),
+              rawStatus.tagColor ?? getOrgStatusTagColour(rawStatus.name),
           }
         : rawStatus;
 
