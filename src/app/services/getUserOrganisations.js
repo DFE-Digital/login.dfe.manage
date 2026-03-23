@@ -14,7 +14,7 @@ const {
   getReturnOrgId,
 } = require("./utils");
 
-// Maps organisation status names to GOV.UK tag colour modifiers.
+// Maps organisation status names to GOV.UK tag color modifiers.
 // Extend this object if new org statuses are introduced upstream.
 const orgStatusTagColorMap = {
   open: "green",
