@@ -14,7 +14,17 @@ const postConfirmRemovePolicyCondition = async (req, res) => {
     policyId: req.params.pid,
   });
 
-  if (policy.conditions.length === 1) {
+  const conditionOperatorAndValueInPolicy = policy.conditions.find(
+    (policyCondition) =>
+      policyCondition.field === condition &&
+      policyCondition.operator === operator &&
+      policyCondition.value.includes(value),
+  );
+
+  if (
+    policy.conditions.length === 1 &&
+    conditionOperatorAndValueInPolicy?.value.length === 1
+  ) {
     logger.error(
       `The last policy condition for policy [${req.params.pid}] cannot be deleted`,
     );
@@ -24,13 +34,6 @@ const postConfirmRemovePolicyCondition = async (req, res) => {
     );
     return res.redirect("conditionsAndRoles");
   }
-
-  const conditionOperatorAndValueInPolicy = policy.conditions.find(
-    (policyCondition) =>
-      policyCondition.field === condition &&
-      policyCondition.operator === operator &&
-      policyCondition.value.includes(value),
-  );
 
   if (conditionOperatorAndValueInPolicy) {
     if (conditionOperatorAndValueInPolicy.value.length === 1) {

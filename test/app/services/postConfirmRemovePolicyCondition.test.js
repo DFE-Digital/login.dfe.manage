@@ -198,7 +198,7 @@ describe("when using the postConfirmRemovePolicyCondition function", () => {
   it("should log a message if the last policy condition is attempted to be removed", async () => {
     const clonedPolicy = structuredClone(policy);
     clonedPolicy.conditions = [
-      { field: "organisation.category.id", operator: "is", value: ["001"] },
+      { field: "organisation.type.id", operator: "is", value: ["57"] },
     ];
     getServicePolicyRaw.mockReturnValue(clonedPolicy);
 
@@ -211,6 +211,52 @@ describe("when using the postConfirmRemovePolicyCondition function", () => {
       "The last policy condition for a policy cannot be deleted",
     );
     expect(res.redirect.mock.calls.length).toBe(1);
+    expect(res.redirect.mock.calls[0][0]).toBe("conditionsAndRoles");
+  });
+
+  it("should allow removing a value from the only condition when it has multiple values", async () => {
+    const clonedPolicy = structuredClone(policy);
+    clonedPolicy.conditions = [
+      { field: "organisation.status.id", operator: "is", value: ["1", "3"] },
+    ];
+    getServicePolicyRaw.mockReturnValue(clonedPolicy);
+
+    const clonedRequestBody = structuredClone(requestBody);
+    const testReq = getRequestMock(clonedRequestBody);
+    testReq.body.condition = "organisation.status.id";
+    testReq.body.operator = "is";
+    testReq.body.value = "1";
+
+    await postConfirmRemovePolicyCondition(testReq, res);
+
+    expect(updateServicePolicyRaw).toHaveBeenCalledWith({
+      policy: {
+        applicationId: "32A923EE-B729-44B1-BB52-1789FD08862A",
+        conditions: [
+          {
+            field: "organisation.status.id",
+            operator: "is",
+            value: ["3"],
+          },
+        ],
+        id: "6C8172B6-011B-4526-B04D-E2809A3D71A2",
+        name: "Test Service - Test Policy",
+        roles: [
+          {
+            code: "CheckRecord_School",
+            id: "717E2ECB-8B76-402C-A142-15DD486CBE95",
+            name: "School",
+            numericId: "22997",
+            status: ["1"],
+          },
+        ],
+        status: {
+          id: 1,
+        },
+      },
+      policyId: "policy-1",
+      serviceId: "service-1",
+    });
     expect(res.redirect.mock.calls[0][0]).toBe("conditionsAndRoles");
   });
 
