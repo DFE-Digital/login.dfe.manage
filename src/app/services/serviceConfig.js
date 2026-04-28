@@ -120,9 +120,27 @@ const buildCurrentServiceModel = async (req) => {
     );
     const oldServiceConfigModel = buildServiceModelFromObject(service);
 
+    const params = service.relyingParty?.params || {};
+    const isIdOnlyService = service.isIdOnlyService === true;
+    let isServiceHiddenFromDb;
+    if (isIdOnlyService) {
+      isServiceHiddenFromDb =
+        service.isHiddenService === true &&
+        params.hideApprover === "true" &&
+        params.hideSupport === "true" &&
+        params.helpHidden === "true";
+    } else {
+      isServiceHiddenFromDb =
+        params.hideApprover === "true" &&
+        params.hideSupport === "true" &&
+        params.helpHidden === "true";
+    }
+
     return {
       currentServiceModel,
       oldServiceConfigModel,
+      isServiceHiddenFromDb,
+      isIdOnlyService,
     };
   } catch (error) {
     throw new Error(`Could not build service model - ${error}`);
@@ -138,6 +156,16 @@ const getServiceConfig = async (req, res) => {
     }
     const manageRolesForService = await getUserServiceRoles(req);
     const serviceModel = await buildCurrentServiceModel(req);
+
+    // Determine whether the Hide Service checkbox should be pre-checked.
+    // When amending changes, use the session-stored value; otherwise use the DB value.
+    const sessionHideService =
+      req.session.serviceConfigurationChanges?.[sid]?.hideService?.newValue;
+    const isServiceHidden =
+      sessionHideService !== undefined
+        ? sessionHideService
+        : serviceModel.isServiceHiddenFromDb;
+
     return res.render("services/views/serviceConfig", {
       csrfToken: req.csrfToken(),
       service: serviceModel.currentServiceModel,
@@ -146,6 +174,7 @@ const getServiceConfig = async (req, res) => {
       serviceId: sid,
       userRoles: manageRolesForService,
       currentNavigation: "configuration",
+      isServiceHidden,
     });
   } catch (error) {
     throw new Error(error);
@@ -558,6 +587,13 @@ const postServiceConfig = async (req, res) => {
 
     if (Object.keys(model.validationMessages).length > 0) {
       model.csrfToken = req.csrfToken();
+      const sessionHideService =
+        req.session.serviceConfigurationChanges?.[req.params.sid]?.hideService
+          ?.newValue;
+      model.isServiceHidden =
+        sessionHideService !== undefined
+          ? sessionHideService
+          : serviceModels.isServiceHiddenFromDb;
       return res.render("services/views/serviceConfig", model);
     }
 
@@ -637,6 +673,18 @@ const postServiceConfig = async (req, res) => {
           undefined;
       }
     }
+
+    // Handle the Hide Service checkbox separately from OIDC config fields.
+    const newHideService = req.body.hideService === "yes";
+    const oldHideService = serviceModels.isServiceHiddenFromDb;
+    if (newHideService !== oldHideService) {
+      req.session.serviceConfigurationChanges[sid].hideService = {
+        oldValue: oldHideService,
+        newValue: newHideService,
+        isIdOnlyService: serviceModels.isIdOnlyService,
+      };
+    }
+
     return res.redirect("review-service-configuration#");
   } catch (error) {
     throw new Error(error);

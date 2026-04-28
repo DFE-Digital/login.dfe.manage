@@ -170,48 +170,54 @@ const validate = async (req, currentService) => {
       model.service.redirectUris =
         serviceConfigurationChanges.redirectUris.oldValue;
     }
-    const urlValidator = new UrlValidator(serviceHome);
-    const lengthResult = await isCorrectLength(urlValidator);
-    if (serviceHome !== null && !lengthResult) {
-      if (
-        model.validationMessages.serviceHome !== "" &&
-        model.validationMessages.serviceHome !== undefined
-      ) {
-        model.validationMessages.serviceHome +=
-          ERROR_MESSAGES.INVALID_HOME_LENTGH;
-      } else {
-        model.validationMessages.serviceHome =
-          ERROR_MESSAGES.INVALID_HOME_LENTGH;
-      }
-    }
-    const validUrl = await isValidUrl(urlValidator);
-    if (serviceHome !== null && !validUrl) {
-      if (serviceHome !== "") {
+    // Only validate serviceHome if it was part of the submitted changes.
+    // When only hideService changed, serviceHome is not in the session and
+    // should not be re-validated.
+    if (serviceHome !== undefined) {
+      const urlValidator = new UrlValidator(serviceHome);
+      const lengthResult = await isCorrectLength(urlValidator);
+      if (serviceHome !== null && !lengthResult) {
         if (
           model.validationMessages.serviceHome !== "" &&
           model.validationMessages.serviceHome !== undefined
         ) {
           model.validationMessages.serviceHome +=
-            ERROR_MESSAGES.INVALID_HOME_CHARACTERS;
+            ERROR_MESSAGES.INVALID_HOME_LENTGH;
         } else {
           model.validationMessages.serviceHome =
-            ERROR_MESSAGES.INVALID_HOME_CHARACTERS;
+            ERROR_MESSAGES.INVALID_HOME_LENTGH;
         }
-      } else {
-        model.validationMessages.serviceHome = ERROR_MESSAGES.INVALID_HOME_URL;
       }
-    }
-    const validProtocol = await isCorrectProtocol(urlValidator);
-    if (!validProtocol) {
-      if (
-        model.validationMessages.serviceHome !== "" &&
-        model.validationMessages.serviceHome !== undefined
-      ) {
-        model.validationMessages.serviceHome +=
-          ERROR_MESSAGES.INVALID_HOME_PROTOCOL;
-      } else {
-        model.validationMessages.serviceHome =
-          ERROR_MESSAGES.INVALID_HOME_PROTOCOL;
+      const validUrl = await isValidUrl(urlValidator);
+      if (serviceHome !== null && !validUrl) {
+        if (serviceHome !== "") {
+          if (
+            model.validationMessages.serviceHome !== "" &&
+            model.validationMessages.serviceHome !== undefined
+          ) {
+            model.validationMessages.serviceHome +=
+              ERROR_MESSAGES.INVALID_HOME_CHARACTERS;
+          } else {
+            model.validationMessages.serviceHome =
+              ERROR_MESSAGES.INVALID_HOME_CHARACTERS;
+          }
+        } else {
+          model.validationMessages.serviceHome =
+            ERROR_MESSAGES.INVALID_HOME_URL;
+        }
+      }
+      const validProtocol = await isCorrectProtocol(urlValidator);
+      if (!validProtocol) {
+        if (
+          model.validationMessages.serviceHome !== "" &&
+          model.validationMessages.serviceHome !== undefined
+        ) {
+          model.validationMessages.serviceHome +=
+            ERROR_MESSAGES.INVALID_HOME_PROTOCOL;
+        } else {
+          model.validationMessages.serviceHome =
+            ERROR_MESSAGES.INVALID_HOME_PROTOCOL;
+        }
       }
     }
 
@@ -447,8 +453,19 @@ const getConfirmServiceConfig = async (req, res) => {
       req.session.serviceConfigurationChanges[sid]?.authFlowType;
     const serviceConfigChanges = req.session.serviceConfigurationChanges[sid];
 
+    // Extract hideService before building the standard OIDC changes summary.
+    const hideServiceChange = serviceConfigChanges?.hideService;
+    const hideServiceChanged = !!(
+      hideServiceChange &&
+      hideServiceChange.newValue !== hideServiceChange.oldValue
+    );
+    const hideService = hideServiceChange?.newValue;
+
     const changedServiceParams = { ...serviceConfigChanges };
     delete changedServiceParams.authFlowType;
+    // Exclude hideService from the standard changes summary — it is displayed
+    // as a dedicated warning message in the template instead.
+    delete changedServiceParams.hideService;
 
     const serviceChanges = createFlattenedMappedServiceConfigChanges(
       changedServiceParams,
@@ -478,6 +495,8 @@ const getConfirmServiceConfig = async (req, res) => {
       userRoles: manageRolesForService,
       currentNavigation: "configuration",
       serviceChanges: fixedServiceChanges,
+      hideService,
+      hideServiceChanged,
     });
   } catch (error) {
     throw new Error(error);
@@ -550,6 +569,28 @@ const postConfirmServiceConfig = async (req, res) => {
     };
 
     await updateService(req.params.sid, updatedService);
+
+    // Apply Hide Service changes if the checkbox state was changed.
+    const hideServiceChange =
+      req.session.serviceConfigurationChanges[req.params.sid]?.hideService;
+    if (
+      hideServiceChange &&
+      hideServiceChange.newValue !== hideServiceChange.oldValue
+    ) {
+      const hiddenValue = hideServiceChange.newValue ? "true" : "false";
+      const serviceId = req.params.sid;
+
+      // TODO: implement updateServiceParam in login.dfe.api-client
+      // await updateServiceParam(serviceId, 'hideApprover', hiddenValue);
+      // await updateServiceParam(serviceId, 'hideSupport', hiddenValue);
+      // await updateServiceParam(serviceId, 'helpHidden', hiddenValue);
+
+      if (hideServiceChange.isIdOnlyService) {
+        const isHiddenServiceValue = hideServiceChange.newValue ? 1 : 0;
+        // TODO: implement isHiddenService update in login.dfe.api-client
+        // await updateService(serviceId, { isHiddenService: isHiddenServiceValue });
+      }
+    }
 
     logger.audit(`${req.user.email} updated service configuration`, {
       type: "manage",
