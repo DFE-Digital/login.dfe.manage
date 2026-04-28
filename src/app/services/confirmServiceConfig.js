@@ -577,18 +577,17 @@ const postConfirmServiceConfig = async (req, res) => {
       hideServiceChange &&
       hideServiceChange.newValue !== hideServiceChange.oldValue
     ) {
-      const hiddenValue = hideServiceChange.newValue ? "true" : "false";
-      const serviceId = req.params.sid;
-
       // TODO: implement updateServiceParam in login.dfe.api-client
+      // const hiddenValue = hideServiceChange.newValue ? "true" : "false";
+      // const serviceId = req.params.sid;
       // await updateServiceParam(serviceId, 'hideApprover', hiddenValue);
       // await updateServiceParam(serviceId, 'hideSupport', hiddenValue);
       // await updateServiceParam(serviceId, 'helpHidden', hiddenValue);
 
       if (hideServiceChange.isIdOnlyService) {
-        const isHiddenServiceValue = hideServiceChange.newValue ? 1 : 0;
         // TODO: implement isHiddenService update in login.dfe.api-client
-        // await updateService(serviceId, { isHiddenService: isHiddenServiceValue });
+        // const isHiddenServiceValue = hideServiceChange.newValue ? 1 : 0;
+        // await updateService(req.params.sid, { isHiddenService: isHiddenServiceValue });
       }
     }
 
