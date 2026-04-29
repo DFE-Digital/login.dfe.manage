@@ -18,9 +18,9 @@ const validate = async (req) => {
     model.validationMessages.roleCode = "Please enter a role code";
   }
 
-  if (model.roleName.length > 125) {
+  if (model.roleName.length > 250) {
     model.validationMessages.roleName =
-      "Role name must be 125 characters or less";
+      "Role name must be 250 characters or less";
   }
 
   if (model.roleCode.length > 50) {

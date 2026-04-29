@@ -119,11 +119,11 @@ describe("when using postCreatePolicyRole", () => {
   });
 
   it("should trim whitespace before checking role name length", async () => {
-    req.body.roleName = "  " + "a".repeat(125) + "  ";
+    req.body.roleName = "  " + "a".repeat(250) + "  ";
 
     await postCreatePolicyRole(req, res);
 
-    expect(req.session.createPolicyRoleData.roleName).toBe("a".repeat(125));
+    expect(req.session.createPolicyRoleData.roleName).toBe("a".repeat(250));
     expect(res.redirect.mock.calls[0][0]).toBe("confirm-create-policy-role");
   });
 
@@ -162,13 +162,13 @@ describe("when using postCreatePolicyRole", () => {
     });
   });
 
-  it("should return a validation error when the role name exceeds 125 characters", async () => {
-    req.body.roleName = "a".repeat(126);
+  it("should return a validation error when the role name exceeds 250 characters", async () => {
+    req.body.roleName = "a".repeat(251);
 
     await postCreatePolicyRole(req, res);
 
     expect(res.render.mock.calls[0][1].validationMessages).toMatchObject({
-      roleName: "Role name must be 125 characters or less",
+      roleName: "Role name must be 250 characters or less",
     });
   });
 
