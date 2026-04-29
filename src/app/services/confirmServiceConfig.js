@@ -1,7 +1,10 @@
 const niceware = require("niceware");
 const UrlValidator = require("login.dfe.validation/src/urlValidator");
 const { updateService } = require("../../infrastructure/utils/services");
-const { getServiceRaw } = require("login.dfe.api-client/services");
+const {
+  getServiceRaw,
+  updateServiceParam,
+} = require("login.dfe.api-client/services");
 const logger = require("../../infrastructure/logger");
 const {
   getUserServiceRoles,
@@ -577,17 +580,19 @@ const postConfirmServiceConfig = async (req, res) => {
       hideServiceChange &&
       hideServiceChange.newValue !== hideServiceChange.oldValue
     ) {
-      // TODO: implement updateServiceParam in login.dfe.api-client
-      // const hiddenValue = hideServiceChange.newValue ? "true" : "false";
-      // const serviceId = req.params.sid;
-      // await updateServiceParam(serviceId, 'hideApprover', hiddenValue);
-      // await updateServiceParam(serviceId, 'hideSupport', hiddenValue);
-      // await updateServiceParam(serviceId, 'helpHidden', hiddenValue);
+      const hiddenValue = hideServiceChange.newValue ? "true" : "false";
+      const serviceId = req.params.sid;
+      await Promise.all([
+        updateServiceParam(serviceId, "hideApprover", hiddenValue),
+        updateServiceParam(serviceId, "hideSupport", hiddenValue),
+        updateServiceParam(serviceId, "helpHidden", hiddenValue),
+      ]);
 
       if (hideServiceChange.isIdOnlyService) {
-        // TODO: implement isHiddenService update in login.dfe.api-client
-        // const isHiddenServiceValue = hideServiceChange.newValue ? 1 : 0;
-        // await updateService(req.params.sid, { isHiddenService: isHiddenServiceValue });
+        const isHiddenServiceValue = hideServiceChange.newValue ? 1 : 0;
+        await updateService(req.params.sid, {
+          isHiddenService: isHiddenServiceValue,
+        });
       }
     }
 
