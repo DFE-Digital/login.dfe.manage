@@ -221,7 +221,12 @@ const init = async () => {
     sanitization({
       sanitizer: (key, value) => {
         // add exception for fields that we don't want to encode
-        const fieldToNotSanitize = ["criteria", "bannerMessage"];
+        const fieldToNotSanitize = [
+          "criteria",
+          "bannerMessage",
+          "roleName",
+          "roleCode",
+        ];
         if (
           fieldToNotSanitize.find((x) => x.toLowerCase() === key.toLowerCase())
         ) {
