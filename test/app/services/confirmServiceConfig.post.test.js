@@ -915,7 +915,7 @@ describe("when confirming service config changes in the review page", () => {
       expect(updateServiceParam).not.toHaveBeenCalled();
     });
 
-    it("also calls updateService with isHiddenService for id-only services", async () => {
+    it("calls updateService with isHiddenService: 1 and updateServiceParam three times with 'true' when hiding for id-only services", async () => {
       req.session.serviceConfigurationChanges["service1"] = hideServiceSession({
         oldValue: false,
         newValue: true,
@@ -925,10 +925,58 @@ describe("when confirming service config changes in the review page", () => {
       await postConfirmServiceConfig(req, res);
 
       expect(updateServiceParam).toHaveBeenCalledTimes(3);
+      expect(updateServiceParam).toHaveBeenCalledWith(
+        "service1",
+        "hideApprover",
+        "true",
+      );
+      expect(updateServiceParam).toHaveBeenCalledWith(
+        "service1",
+        "hideSupport",
+        "true",
+      );
+      expect(updateServiceParam).toHaveBeenCalledWith(
+        "service1",
+        "helpHidden",
+        "true",
+      );
       expect(updateService).toHaveBeenCalledWith(
         expect.objectContaining({
           serviceId: "service1",
           update: expect.objectContaining({ isHiddenService: 1 }),
+        }),
+      );
+    });
+
+    it("calls updateService with isHiddenService: 0 and updateServiceParam three times with 'false' when revealing for id-only services", async () => {
+      req.session.serviceConfigurationChanges["service1"] = hideServiceSession({
+        oldValue: true,
+        newValue: false,
+        isIdOnlyService: true,
+      });
+
+      await postConfirmServiceConfig(req, res);
+
+      expect(updateServiceParam).toHaveBeenCalledTimes(3);
+      expect(updateServiceParam).toHaveBeenCalledWith(
+        "service1",
+        "hideApprover",
+        "false",
+      );
+      expect(updateServiceParam).toHaveBeenCalledWith(
+        "service1",
+        "hideSupport",
+        "false",
+      );
+      expect(updateServiceParam).toHaveBeenCalledWith(
+        "service1",
+        "helpHidden",
+        "false",
+      );
+      expect(updateService).toHaveBeenCalledWith(
+        expect.objectContaining({
+          serviceId: "service1",
+          update: expect.objectContaining({ isHiddenService: 0 }),
         }),
       );
     });
