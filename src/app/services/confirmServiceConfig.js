@@ -167,11 +167,11 @@ const validate = async (req, currentService) => {
     const { serviceHome, postResetUrl, clientId } = model.service;
     if (model.service.postLogoutRedirectUris === undefined) {
       model.service.postLogoutRedirectUris =
-        serviceConfigurationChanges.postLogoutRedirectUris.oldValue;
+        serviceConfigurationChanges.postLogoutRedirectUris?.oldValue;
     }
     if (model.service.redirectUris === undefined) {
       model.service.redirectUris =
-        serviceConfigurationChanges.redirectUris.oldValue;
+        serviceConfigurationChanges.redirectUris?.oldValue;
     }
     // Only validate serviceHome if it was part of the submitted changes.
     // When only hideService changed, serviceHome is not in the session and
@@ -224,46 +224,51 @@ const validate = async (req, currentService) => {
       }
     }
 
-    const postUrlValidator = new UrlValidator(postResetUrl);
-    const isPostResetUrlValid = await isValidUrl(postUrlValidator);
-    if (postResetUrl && !isPostResetUrlValid) {
-      if (
-        model.validationMessages.postResetUrl !== "" &&
-        model.validationMessages.postResetUrl !== undefined
-      ) {
-        model.validationMessages.postResetUrl +=
-          ERROR_MESSAGES.INVALID_RESETPASS_CHARACTERS;
-      } else {
-        model.validationMessages.postResetUrl =
-          ERROR_MESSAGES.INVALID_RESETPASS_CHARACTERS;
+    // Only validate postResetUrl if it was part of the submitted changes.
+    // When only hideService changed, postResetUrl is not in the session and
+    // should not be re-validated.
+    if (postResetUrl !== undefined) {
+      const postUrlValidator = new UrlValidator(postResetUrl);
+      const isPostResetUrlValid = await isValidUrl(postUrlValidator);
+      if (postResetUrl && !isPostResetUrlValid) {
+        if (
+          model.validationMessages.postResetUrl !== "" &&
+          model.validationMessages.postResetUrl !== undefined
+        ) {
+          model.validationMessages.postResetUrl +=
+            ERROR_MESSAGES.INVALID_RESETPASS_CHARACTERS;
+        } else {
+          model.validationMessages.postResetUrl =
+            ERROR_MESSAGES.INVALID_RESETPASS_CHARACTERS;
+        }
       }
-    }
 
-    const isPOstResetUrlToLength = await isCorrectLength(postUrlValidator);
-    if (!isPOstResetUrlToLength) {
-      if (
-        model.validationMessages.postResetUrl !== "" &&
-        model.validationMessages.postResetUrl !== undefined
-      ) {
-        model.validationMessages.postResetUrl +=
-          ERROR_MESSAGES.INVALID_RESETPASS_LENTGH;
-      } else {
-        model.validationMessages.postResetUrl =
-          ERROR_MESSAGES.INVALID_RESETPASS_LENTGH;
+      const isPOstResetUrlToLength = await isCorrectLength(postUrlValidator);
+      if (!isPOstResetUrlToLength) {
+        if (
+          model.validationMessages.postResetUrl !== "" &&
+          model.validationMessages.postResetUrl !== undefined
+        ) {
+          model.validationMessages.postResetUrl +=
+            ERROR_MESSAGES.INVALID_RESETPASS_LENTGH;
+        } else {
+          model.validationMessages.postResetUrl =
+            ERROR_MESSAGES.INVALID_RESETPASS_LENTGH;
+        }
       }
-    }
 
-    const isPostResetUrlProtocol = await isCorrectProtocol(postUrlValidator);
-    if (!isPostResetUrlProtocol) {
-      if (
-        model.validationMessages.postResetUrl !== "" &&
-        model.validationMessages.postResetUrl !== undefined
-      ) {
-        model.validationMessages.postResetUrl +=
-          ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL;
-      } else {
-        model.validationMessages.postResetUrl =
-          ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL;
+      const isPostResetUrlProtocol = await isCorrectProtocol(postUrlValidator);
+      if (!isPostResetUrlProtocol) {
+        if (
+          model.validationMessages.postResetUrl !== "" &&
+          model.validationMessages.postResetUrl !== undefined
+        ) {
+          model.validationMessages.postResetUrl +=
+            ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL;
+        } else {
+          model.validationMessages.postResetUrl =
+            ERROR_MESSAGES.INVALID_RESETPASS_PROTOCOL;
+        }
       }
     }
 
@@ -277,129 +282,144 @@ const validate = async (req, currentService) => {
       model.validationMessages.clientId = ERROR_MESSAGES.CLIENT_ID_UNAVAILABLE;
     }
 
-    if (!model.service.redirectUris || !model.service.redirectUris.length > 0) {
-      model.validationMessages.redirect_uris =
-        ERROR_MESSAGES.MISSING_REDIRECT_URL;
-    } else if (model.service.redirectUris.length > 0) {
-      await Promise.all(
-        model.service.redirectUris.map(async (x) => {
-          const redirecturlValidator = new UrlValidator(x);
-          const isRCorrectLength = await isCorrectLength(redirecturlValidator);
-          const isCorrectUtl = await isValidUrl(redirecturlValidator);
-          if (!isRCorrectLength) {
-            if (
-              model.validationMessages.redirect_uris !== "" &&
-              model.validationMessages.redirect_uris !== undefined
-            ) {
-              model.validationMessages.redirect_uris +=
-                ERROR_MESSAGES.INVALID_REDIRECT_LENTGH;
-            } else {
-              model.validationMessages.redirect_uris =
-                ERROR_MESSAGES.INVALID_REDIRECT_LENTGH;
-            }
-          }
-          if (!isCorrectUtl) {
-            if (
-              model.validationMessages.redirect_uris !== "" &&
-              model.validationMessages.redirect_uris !== undefined
-            ) {
-              model.validationMessages.redirect_uris +=
-                ERROR_MESSAGES.INVALID_REDIRECT_CHARACTERS;
-            } else {
-              model.validationMessages.redirect_uris =
-                ERROR_MESSAGES.INVALID_REDIRECT_CHARACTERS;
-            }
-          }
-
-          const isValidProtocol = await isCorrectProtocol(redirecturlValidator);
-          if (!isValidProtocol) {
-            if (
-              model.validationMessages.redirect_uris !== "" &&
-              model.validationMessages.redirect_uris !== undefined
-            ) {
-              model.validationMessages.redirect_uris +=
-                ERROR_MESSAGES.INVALID_REDIRECT_PROTOCOL;
-            } else {
-              model.validationMessages.redirect_uris =
-                ERROR_MESSAGES.INVALID_REDIRECT_PROTOCOL;
-            }
-          }
-        }),
-      );
+    // Only validate redirectUris if they were part of the submitted changes.
+    // When only hideService changed, redirectUris is not in the session and
+    // should not be re-validated.
+    if (serviceConfigurationChanges.redirectUris !== undefined) {
       if (
-        model.service.redirectUris.some(
-          (value, i) => model.service.redirectUris.indexOf(value) !== i,
-        )
+        !model.service.redirectUris ||
+        !model.service.redirectUris.length > 0
       ) {
         model.validationMessages.redirect_uris =
-          ERROR_MESSAGES.REDIRECT_URLS_NOT_UNIQUE;
+          ERROR_MESSAGES.MISSING_REDIRECT_URL;
+      } else if (model.service.redirectUris.length > 0) {
+        await Promise.all(
+          model.service.redirectUris.map(async (x) => {
+            const redirecturlValidator = new UrlValidator(x);
+            const isRCorrectLength =
+              await isCorrectLength(redirecturlValidator);
+            const isCorrectUtl = await isValidUrl(redirecturlValidator);
+            if (!isRCorrectLength) {
+              if (
+                model.validationMessages.redirect_uris !== "" &&
+                model.validationMessages.redirect_uris !== undefined
+              ) {
+                model.validationMessages.redirect_uris +=
+                  ERROR_MESSAGES.INVALID_REDIRECT_LENTGH;
+              } else {
+                model.validationMessages.redirect_uris =
+                  ERROR_MESSAGES.INVALID_REDIRECT_LENTGH;
+              }
+            }
+            if (!isCorrectUtl) {
+              if (
+                model.validationMessages.redirect_uris !== "" &&
+                model.validationMessages.redirect_uris !== undefined
+              ) {
+                model.validationMessages.redirect_uris +=
+                  ERROR_MESSAGES.INVALID_REDIRECT_CHARACTERS;
+              } else {
+                model.validationMessages.redirect_uris =
+                  ERROR_MESSAGES.INVALID_REDIRECT_CHARACTERS;
+              }
+            }
+
+            const isValidProtocol =
+              await isCorrectProtocol(redirecturlValidator);
+            if (!isValidProtocol) {
+              if (
+                model.validationMessages.redirect_uris !== "" &&
+                model.validationMessages.redirect_uris !== undefined
+              ) {
+                model.validationMessages.redirect_uris +=
+                  ERROR_MESSAGES.INVALID_REDIRECT_PROTOCOL;
+              } else {
+                model.validationMessages.redirect_uris =
+                  ERROR_MESSAGES.INVALID_REDIRECT_PROTOCOL;
+              }
+            }
+          }),
+        );
+        if (
+          model.service.redirectUris.some(
+            (value, i) => model.service.redirectUris.indexOf(value) !== i,
+          )
+        ) {
+          model.validationMessages.redirect_uris =
+            ERROR_MESSAGES.REDIRECT_URLS_NOT_UNIQUE;
+        }
       }
     }
 
-    if (
-      !model.service.postLogoutRedirectUris ||
-      !model.service.postLogoutRedirectUris.length > 0
-    ) {
-      model.validationMessages.post_logout_redirect_uris =
-        ERROR_MESSAGES.MISSING_POST_LOGOUT_URL;
-    } else if (model.service.postLogoutRedirectUris.length > 0) {
-      await Promise.all(
-        model.service.postLogoutRedirectUris.map(async (x) => {
-          const postRedirecturlValidator = new UrlValidator(x);
-          const isRDCorrectLength = await isCorrectLength(
-            postRedirecturlValidator,
-          );
-          const estCorrect = await isValidUrl(postRedirecturlValidator);
-          if (!isRDCorrectLength) {
-            if (
-              model.validationMessages.post_logout_redirect_uris !== "" &&
-              model.validationMessages.post_logout_redirect_uris !== undefined
-            ) {
-              model.validationMessages.post_logout_redirect_uris +=
-                ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_LENTGH;
-            } else {
-              model.validationMessages.post_logout_redirect_uris =
-                ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_LENTGH;
-            }
-          }
-          if (estCorrect !== true) {
-            if (
-              model.validationMessages.post_logout_redirect_uris !== "" &&
-              model.validationMessages.post_logout_redirect_uris !== undefined
-            ) {
-              model.validationMessages.post_logout_redirect_uris +=
-                ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_CHARACTERS;
-            } else {
-              model.validationMessages.post_logout_redirect_uris =
-                ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_CHARACTERS;
-            }
-          }
-
-          const testRDProtocol = await isCorrectProtocol(
-            postRedirecturlValidator,
-          );
-          if (!testRDProtocol) {
-            if (
-              model.validationMessages.post_logout_redirect_uris !== "" &&
-              model.validationMessages.post_logout_redirect_uris !== undefined
-            ) {
-              model.validationMessages.post_logout_redirect_uris +=
-                ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_PROTOCOL;
-            } else {
-              model.validationMessages.post_logout_redirect_uris =
-                ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_PROTOCOL;
-            }
-          }
-        }),
-      );
+    // Only validate postLogoutRedirectUris if they were part of the submitted changes.
+    // When only hideService changed, postLogoutRedirectUris is not in the session and
+    // should not be re-validated.
+    if (serviceConfigurationChanges.postLogoutRedirectUris !== undefined) {
       if (
-        model.service.postLogoutRedirectUris.some(
-          (value, i) =>
-            model.service.postLogoutRedirectUris.indexOf(value) !== i,
-        )
+        !model.service.postLogoutRedirectUris ||
+        !model.service.postLogoutRedirectUris.length > 0
       ) {
         model.validationMessages.post_logout_redirect_uris =
-          ERROR_MESSAGES.POST_LOGOUT_URL_NOT_UNIQUE;
+          ERROR_MESSAGES.MISSING_POST_LOGOUT_URL;
+      } else if (model.service.postLogoutRedirectUris.length > 0) {
+        await Promise.all(
+          model.service.postLogoutRedirectUris.map(async (x) => {
+            const postRedirecturlValidator = new UrlValidator(x);
+            const isRDCorrectLength = await isCorrectLength(
+              postRedirecturlValidator,
+            );
+            const estCorrect = await isValidUrl(postRedirecturlValidator);
+            if (!isRDCorrectLength) {
+              if (
+                model.validationMessages.post_logout_redirect_uris !== "" &&
+                model.validationMessages.post_logout_redirect_uris !== undefined
+              ) {
+                model.validationMessages.post_logout_redirect_uris +=
+                  ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_LENTGH;
+              } else {
+                model.validationMessages.post_logout_redirect_uris =
+                  ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_LENTGH;
+              }
+            }
+            if (estCorrect !== true) {
+              if (
+                model.validationMessages.post_logout_redirect_uris !== "" &&
+                model.validationMessages.post_logout_redirect_uris !== undefined
+              ) {
+                model.validationMessages.post_logout_redirect_uris +=
+                  ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_CHARACTERS;
+              } else {
+                model.validationMessages.post_logout_redirect_uris =
+                  ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_CHARACTERS;
+              }
+            }
+
+            const testRDProtocol = await isCorrectProtocol(
+              postRedirecturlValidator,
+            );
+            if (!testRDProtocol) {
+              if (
+                model.validationMessages.post_logout_redirect_uris !== "" &&
+                model.validationMessages.post_logout_redirect_uris !== undefined
+              ) {
+                model.validationMessages.post_logout_redirect_uris +=
+                  ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_PROTOCOL;
+              } else {
+                model.validationMessages.post_logout_redirect_uris =
+                  ERROR_MESSAGES.INVALID_LOGOUT_REDIRECT_PROTOCOL;
+              }
+            }
+          }),
+        );
+        if (
+          model.service.postLogoutRedirectUris.some(
+            (value, i) =>
+              model.service.postLogoutRedirectUris.indexOf(value) !== i,
+          )
+        ) {
+          model.validationMessages.post_logout_redirect_uris =
+            ERROR_MESSAGES.POST_LOGOUT_URL_NOT_UNIQUE;
+        }
       }
     }
 
@@ -564,11 +584,15 @@ const postConfirmServiceConfig = async (req, res) => {
       apiSecret: model.service.apiSecret
         ? encrypt(model.service.apiSecret)
         : model.service.apiSecret,
-      // If tokenEndpointAuthMethod isn't 'client_secret_post', store NULL in the DB.
+      // If tokenEndpointAuthMethod was changed and isn't 'client_secret_post', store NULL in the DB.
+      // When tokenEndpointAuthMethod is undefined (not changed), pass undefined so the infrastructure
+      // wrapper's '!== undefined' guard correctly skips it and avoids overwriting the stored value.
       tokenEndpointAuthMethod:
-        model.service.tokenEndpointAuthMethod === CLIENT_SECRET_POST
-          ? CLIENT_SECRET_POST
-          : null,
+        model.service.tokenEndpointAuthMethod !== undefined
+          ? model.service.tokenEndpointAuthMethod === CLIENT_SECRET_POST
+            ? CLIENT_SECRET_POST
+            : null
+          : undefined,
     };
 
     await updateService(req.params.sid, updatedService);

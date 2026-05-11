@@ -854,6 +854,39 @@ describe("when confirming service config changes in the review page", () => {
       },
     });
 
+    it("should not crash with 500 when only hideService is in session (no OIDC fields)", async () => {
+      // This is the real-world failing scenario: user only toggles Hide Service
+      // without changing any OIDC fields, so redirectUris / postLogoutRedirectUris
+      // are absent from the session.
+      req.session.serviceConfigurationChanges["service1"] = {
+        hideService: {
+          oldValue: false,
+          newValue: true,
+          isIdOnlyService: false,
+        },
+      };
+
+      await postConfirmServiceConfig(req, res);
+
+      expect(updateServiceParam).toHaveBeenCalledTimes(3);
+      expect(updateServiceParam).toHaveBeenCalledWith(
+        "service1",
+        "hideApprover",
+        "true",
+      );
+      expect(updateServiceParam).toHaveBeenCalledWith(
+        "service1",
+        "hideSupport",
+        "true",
+      );
+      expect(updateServiceParam).toHaveBeenCalledWith(
+        "service1",
+        "helpHidden",
+        "true",
+      );
+      expect(res.redirect).toHaveBeenCalledWith("/services/service1");
+    });
+
     it("calls updateServiceParam for all three params with 'true' when checkbox is checked", async () => {
       req.session.serviceConfigurationChanges["service1"] =
         hideServiceSession();
