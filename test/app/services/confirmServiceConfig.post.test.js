@@ -868,6 +868,9 @@ describe("when confirming service config changes in the review page", () => {
 
       await postConfirmServiceConfig(req, res);
 
+      // The OIDC updateService API must NOT be called — calling it with an
+      // empty update object causes the real API to return a 500.
+      expect(updateService).not.toHaveBeenCalled();
       expect(updateServiceParam).toHaveBeenCalledTimes(3);
       expect(updateServiceParam).toHaveBeenCalledWith(
         "service1",

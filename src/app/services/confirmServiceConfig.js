@@ -595,7 +595,15 @@ const postConfirmServiceConfig = async (req, res) => {
           : undefined,
     };
 
-    await updateService(req.params.sid, updatedService);
+    // Only call updateService if at least one OIDC field has a value to persist.
+    // When only hideService was changed all values in updatedService will be
+    // undefined, and calling the API with an empty update object causes a 500.
+    const hasOidcChanges = Object.values(updatedService).some(
+      (v) => v !== undefined,
+    );
+    if (hasOidcChanges) {
+      await updateService(req.params.sid, updatedService);
+    }
 
     // Apply Hide Service changes if the checkbox state was changed.
     const hideServiceChange =
