@@ -631,13 +631,6 @@ const postConfirmServiceConfig = async (req, res) => {
           paramValue: hiddenValue,
         }),
       ]);
-
-      if (hideServiceChange.isIdOnlyService) {
-        const isHiddenServiceValue = hideServiceChange.newValue ? 1 : 0;
-        await updateService(req.params.sid, {
-          isHiddenService: isHiddenServiceValue,
-        });
-      }
     }
 
     logger.audit(`${req.user.email} updated service configuration`, {

@@ -951,7 +951,7 @@ describe("when confirming service config changes in the review page", () => {
       expect(updateServiceParam).not.toHaveBeenCalled();
     });
 
-    it("calls updateService with isHiddenService: 1 and updateServiceParam three times with 'true' when hiding for id-only services", async () => {
+    it("calls updateServiceParam three times with 'true' when hiding for id-only services", async () => {
       req.session.serviceConfigurationChanges["service1"] = hideServiceSession({
         oldValue: false,
         newValue: true,
@@ -976,15 +976,9 @@ describe("when confirming service config changes in the review page", () => {
         paramName: "helpHidden",
         paramValue: "true",
       });
-      expect(updateService).toHaveBeenCalledWith(
-        expect.objectContaining({
-          serviceId: "service1",
-          update: expect.objectContaining({ isHiddenService: 1 }),
-        }),
-      );
     });
 
-    it("calls updateService with isHiddenService: 0 and updateServiceParam three times with 'false' when revealing for id-only services", async () => {
+    it("calls updateServiceParam three times with 'false' when revealing for id-only services", async () => {
       req.session.serviceConfigurationChanges["service1"] = hideServiceSession({
         oldValue: true,
         newValue: false,
@@ -1009,12 +1003,6 @@ describe("when confirming service config changes in the review page", () => {
         paramName: "helpHidden",
         paramValue: "false",
       });
-      expect(updateService).toHaveBeenCalledWith(
-        expect.objectContaining({
-          serviceId: "service1",
-          update: expect.objectContaining({ isHiddenService: 0 }),
-        }),
-      );
     });
 
     it("does not call updateService with isHiddenService for role-based services", async () => {
