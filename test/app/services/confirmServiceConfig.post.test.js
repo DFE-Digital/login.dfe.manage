@@ -875,17 +875,17 @@ describe("when confirming service config changes in the review page", () => {
       expect(updateServiceParam).toHaveBeenCalledWith({
         serviceId: "service1",
         paramName: "hideApprover",
-        value: "true",
+        paramValue: "true",
       });
       expect(updateServiceParam).toHaveBeenCalledWith({
         serviceId: "service1",
         paramName: "hideSupport",
-        value: "true",
+        paramValue: "true",
       });
       expect(updateServiceParam).toHaveBeenCalledWith({
         serviceId: "service1",
         paramName: "helpHidden",
-        value: "true",
+        paramValue: "true",
       });
       expect(res.redirect).toHaveBeenCalledWith("/services/service1");
     });
@@ -900,17 +900,17 @@ describe("when confirming service config changes in the review page", () => {
       expect(updateServiceParam).toHaveBeenCalledWith({
         serviceId: "service1",
         paramName: "hideApprover",
-        value: "true",
+        paramValue: "true",
       });
       expect(updateServiceParam).toHaveBeenCalledWith({
         serviceId: "service1",
         paramName: "hideSupport",
-        value: "true",
+        paramValue: "true",
       });
       expect(updateServiceParam).toHaveBeenCalledWith({
         serviceId: "service1",
         paramName: "helpHidden",
-        value: "true",
+        paramValue: "true",
       });
     });
 
@@ -926,17 +926,17 @@ describe("when confirming service config changes in the review page", () => {
       expect(updateServiceParam).toHaveBeenCalledWith({
         serviceId: "service1",
         paramName: "hideApprover",
-        value: "false",
+        paramValue: "false",
       });
       expect(updateServiceParam).toHaveBeenCalledWith({
         serviceId: "service1",
         paramName: "hideSupport",
-        value: "false",
+        paramValue: "false",
       });
       expect(updateServiceParam).toHaveBeenCalledWith({
         serviceId: "service1",
         paramName: "helpHidden",
-        value: "false",
+        paramValue: "false",
       });
     });
 
@@ -964,17 +964,17 @@ describe("when confirming service config changes in the review page", () => {
       expect(updateServiceParam).toHaveBeenCalledWith({
         serviceId: "service1",
         paramName: "hideApprover",
-        value: "true",
+        paramValue: "true",
       });
       expect(updateServiceParam).toHaveBeenCalledWith({
         serviceId: "service1",
         paramName: "hideSupport",
-        value: "true",
+        paramValue: "true",
       });
       expect(updateServiceParam).toHaveBeenCalledWith({
         serviceId: "service1",
         paramName: "helpHidden",
-        value: "true",
+        paramValue: "true",
       });
       expect(updateService).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -997,17 +997,17 @@ describe("when confirming service config changes in the review page", () => {
       expect(updateServiceParam).toHaveBeenCalledWith({
         serviceId: "service1",
         paramName: "hideApprover",
-        value: "false",
+        paramValue: "false",
       });
       expect(updateServiceParam).toHaveBeenCalledWith({
         serviceId: "service1",
         paramName: "hideSupport",
-        value: "false",
+        paramValue: "false",
       });
       expect(updateServiceParam).toHaveBeenCalledWith({
         serviceId: "service1",
         paramName: "helpHidden",
-        value: "false",
+        paramValue: "false",
       });
       expect(updateService).toHaveBeenCalledWith(
         expect.objectContaining({

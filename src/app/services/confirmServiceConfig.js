@@ -618,17 +618,17 @@ const postConfirmServiceConfig = async (req, res) => {
         updateServiceParam({
           serviceId,
           paramName: "hideApprover",
-          value: hiddenValue,
+          paramValue: hiddenValue,
         }),
         updateServiceParam({
           serviceId,
           paramName: "hideSupport",
-          value: hiddenValue,
+          paramValue: hiddenValue,
         }),
         updateServiceParam({
           serviceId,
           paramName: "helpHidden",
-          value: hiddenValue,
+          paramValue: hiddenValue,
         }),
       ]);
 
