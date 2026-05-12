@@ -615,9 +615,21 @@ const postConfirmServiceConfig = async (req, res) => {
       const hiddenValue = hideServiceChange.newValue ? "true" : "false";
       const serviceId = req.params.sid;
       await Promise.all([
-        updateServiceParam(serviceId, "hideApprover", hiddenValue),
-        updateServiceParam(serviceId, "hideSupport", hiddenValue),
-        updateServiceParam(serviceId, "helpHidden", hiddenValue),
+        updateServiceParam({
+          serviceId,
+          paramName: "hideApprover",
+          value: hiddenValue,
+        }),
+        updateServiceParam({
+          serviceId,
+          paramName: "hideSupport",
+          value: hiddenValue,
+        }),
+        updateServiceParam({
+          serviceId,
+          paramName: "helpHidden",
+          value: hiddenValue,
+        }),
       ]);
 
       if (hideServiceChange.isIdOnlyService) {

@@ -161,7 +161,7 @@
                         <%-locals.validationMessages.serviceHome %>
                         </p>
                         <% } %>
-                        <input type="url" class="form-control  govuk-input" id="serviceHome" name="serviceHome" pattern="https://.\<>*" value='<%- locals.service.serviceHome %>' />
+                        <input type="url" class="form-control  govuk-input" id="serviceHome" name="serviceHome" pattern="https://[^<>]*" value='<%- locals.service.serviceHome %>' />
                     
                     </div>
 

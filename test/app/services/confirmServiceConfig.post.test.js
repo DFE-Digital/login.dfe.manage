@@ -872,21 +872,21 @@ describe("when confirming service config changes in the review page", () => {
       // empty update object causes the real API to return a 500.
       expect(updateService).not.toHaveBeenCalled();
       expect(updateServiceParam).toHaveBeenCalledTimes(3);
-      expect(updateServiceParam).toHaveBeenCalledWith(
-        "service1",
-        "hideApprover",
-        "true",
-      );
-      expect(updateServiceParam).toHaveBeenCalledWith(
-        "service1",
-        "hideSupport",
-        "true",
-      );
-      expect(updateServiceParam).toHaveBeenCalledWith(
-        "service1",
-        "helpHidden",
-        "true",
-      );
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "hideApprover",
+        value: "true",
+      });
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "hideSupport",
+        value: "true",
+      });
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "helpHidden",
+        value: "true",
+      });
       expect(res.redirect).toHaveBeenCalledWith("/services/service1");
     });
 
@@ -897,21 +897,21 @@ describe("when confirming service config changes in the review page", () => {
       await postConfirmServiceConfig(req, res);
 
       expect(updateServiceParam).toHaveBeenCalledTimes(3);
-      expect(updateServiceParam).toHaveBeenCalledWith(
-        "service1",
-        "hideApprover",
-        "true",
-      );
-      expect(updateServiceParam).toHaveBeenCalledWith(
-        "service1",
-        "hideSupport",
-        "true",
-      );
-      expect(updateServiceParam).toHaveBeenCalledWith(
-        "service1",
-        "helpHidden",
-        "true",
-      );
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "hideApprover",
+        value: "true",
+      });
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "hideSupport",
+        value: "true",
+      });
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "helpHidden",
+        value: "true",
+      });
     });
 
     it("calls updateServiceParam with 'false' for all three params when checkbox is unchecked", async () => {
@@ -923,21 +923,21 @@ describe("when confirming service config changes in the review page", () => {
       await postConfirmServiceConfig(req, res);
 
       expect(updateServiceParam).toHaveBeenCalledTimes(3);
-      expect(updateServiceParam).toHaveBeenCalledWith(
-        "service1",
-        "hideApprover",
-        "false",
-      );
-      expect(updateServiceParam).toHaveBeenCalledWith(
-        "service1",
-        "hideSupport",
-        "false",
-      );
-      expect(updateServiceParam).toHaveBeenCalledWith(
-        "service1",
-        "helpHidden",
-        "false",
-      );
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "hideApprover",
+        value: "false",
+      });
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "hideSupport",
+        value: "false",
+      });
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "helpHidden",
+        value: "false",
+      });
     });
 
     it("does not call updateServiceParam when the checkbox value has not changed", async () => {
@@ -961,21 +961,21 @@ describe("when confirming service config changes in the review page", () => {
       await postConfirmServiceConfig(req, res);
 
       expect(updateServiceParam).toHaveBeenCalledTimes(3);
-      expect(updateServiceParam).toHaveBeenCalledWith(
-        "service1",
-        "hideApprover",
-        "true",
-      );
-      expect(updateServiceParam).toHaveBeenCalledWith(
-        "service1",
-        "hideSupport",
-        "true",
-      );
-      expect(updateServiceParam).toHaveBeenCalledWith(
-        "service1",
-        "helpHidden",
-        "true",
-      );
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "hideApprover",
+        value: "true",
+      });
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "hideSupport",
+        value: "true",
+      });
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "helpHidden",
+        value: "true",
+      });
       expect(updateService).toHaveBeenCalledWith(
         expect.objectContaining({
           serviceId: "service1",
@@ -994,21 +994,21 @@ describe("when confirming service config changes in the review page", () => {
       await postConfirmServiceConfig(req, res);
 
       expect(updateServiceParam).toHaveBeenCalledTimes(3);
-      expect(updateServiceParam).toHaveBeenCalledWith(
-        "service1",
-        "hideApprover",
-        "false",
-      );
-      expect(updateServiceParam).toHaveBeenCalledWith(
-        "service1",
-        "hideSupport",
-        "false",
-      );
-      expect(updateServiceParam).toHaveBeenCalledWith(
-        "service1",
-        "helpHidden",
-        "false",
-      );
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "hideApprover",
+        value: "false",
+      });
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "hideSupport",
+        value: "false",
+      });
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "helpHidden",
+        value: "false",
+      });
       expect(updateService).toHaveBeenCalledWith(
         expect.objectContaining({
           serviceId: "service1",
