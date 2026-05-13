@@ -22,6 +22,7 @@ const {
 } = require("./utils");
 const { decrypt } = require("login.dfe.api-client/encryption");
 const { updateService } = require("../../infrastructure/utils/services");
+const logger = require("../../infrastructure/logger");
 
 // Normalise param values to a consistent boolean.
 // The support console stores integer 1/0, the PUT API stores boolean true/false,
@@ -175,9 +176,17 @@ const getServiceConfig = async (req, res) => {
       isTruthyParam(serviceModel.rawIsHiddenService) !==
         serviceModel.isServiceHiddenFromDb
     ) {
-      await updateService(sid, {
-        isHiddenService: serviceModel.isServiceHiddenFromDb,
-      });
+      try {
+        await updateService(sid, {
+          // API requires integer 1/0, not boolean.
+          isHiddenService: serviceModel.isServiceHiddenFromDb ? 1 : 0,
+        });
+      } catch (syncError) {
+        // Best-effort correction — log but do not block page render.
+        logger.warn(
+          `Failed to auto-sync isHiddenService for service ${sid}: ${syncError}`,
+        );
+      }
     }
 
     // Determine whether the Hide Service checkbox should be pre-checked.

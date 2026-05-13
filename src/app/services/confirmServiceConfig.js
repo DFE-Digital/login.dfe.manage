@@ -637,7 +637,8 @@ const postConfirmServiceConfig = async (req, res) => {
       if (hideServiceChange.isIdOnlyService) {
         paramUpdates.push(
           updateService(serviceId, {
-            isHiddenService: hideServiceChange.newValue,
+            // API requires integer 1/0, not boolean.
+            isHiddenService: hideServiceChange.newValue ? 1 : 0,
           }),
         );
       }

@@ -979,7 +979,7 @@ describe("when confirming service config changes in the review page", () => {
       // isHiddenService on the service record must also be set for id-only services
       expect(updateService).toHaveBeenCalledWith({
         serviceId: "service1",
-        update: { isHiddenService: true },
+        update: { isHiddenService: 1 },
       });
     });
 
@@ -1011,7 +1011,7 @@ describe("when confirming service config changes in the review page", () => {
       // isHiddenService on the service record must also be cleared for id-only services
       expect(updateService).toHaveBeenCalledWith({
         serviceId: "service1",
-        update: { isHiddenService: false },
+        update: { isHiddenService: 0 },
       });
     });
 

@@ -618,7 +618,7 @@ describe("when getting the service config page", () => {
         await getServiceConfig(req, res);
 
         expect(updateService).toHaveBeenCalledWith("service1", {
-          isHiddenService: false,
+          isHiddenService: 0,
         });
       });
 
@@ -640,7 +640,7 @@ describe("when getting the service config page", () => {
         await getServiceConfig(req, res);
 
         expect(updateService).toHaveBeenCalledWith("service1", {
-          isHiddenService: false,
+          isHiddenService: 0,
         });
       });
 
@@ -662,7 +662,7 @@ describe("when getting the service config page", () => {
         await getServiceConfig(req, res);
 
         expect(updateService).toHaveBeenCalledWith("service1", {
-          isHiddenService: false,
+          isHiddenService: 0,
         });
       });
 
@@ -684,7 +684,7 @@ describe("when getting the service config page", () => {
         await getServiceConfig(req, res);
 
         expect(updateService).toHaveBeenCalledWith("service1", {
-          isHiddenService: false,
+          isHiddenService: 0,
         });
       });
 
@@ -707,7 +707,7 @@ describe("when getting the service config page", () => {
         await getServiceConfig(req, res);
 
         expect(updateService).toHaveBeenCalledWith("service1", {
-          isHiddenService: true,
+          isHiddenService: 1,
         });
       });
 
@@ -797,6 +797,31 @@ describe("when getting the service config page", () => {
         await getServiceConfig(req, res);
 
         expect(updateService).not.toHaveBeenCalled();
+      });
+
+      it("should still render the page even if the auto-sync updateService call fails", async () => {
+        // The sync is best-effort: a failing API write must never cause a 500.
+        updateService.mockRejectedValue(new Error("API unavailable"));
+        getServiceRaw.mockReturnValue(
+          makeService({
+            isIdOnlyService: 1,
+            isHiddenService: 1,
+            relyingParty: {
+              params: {
+                hideApprover: "false",
+                hideSupport: "false",
+                helpHidden: "false",
+              },
+            },
+          }),
+        );
+
+        await getServiceConfig(req, res);
+
+        expect(res.render).toHaveBeenCalledTimes(1);
+        expect(res.render.mock.calls[0][0]).toBe(
+          "services/views/serviceConfig",
+        );
       });
     });
   });
