@@ -619,13 +619,10 @@ const postServiceConfig = async (req, res) => {
 
     if (Object.keys(model.validationMessages).length > 0) {
       model.csrfToken = req.csrfToken();
-      const sessionHideService =
-        req.session.serviceConfigurationChanges?.[req.params.sid]?.hideService
-          ?.newValue;
-      model.isServiceHidden =
-        sessionHideService !== undefined
-          ? sessionHideService
-          : serviceModels.isServiceHiddenFromDb;
+      // Use the submitted checkbox value so it is preserved on re-render.
+      // The session has not been updated yet at this point, so reading from
+      // it would give a stale value (or undefined on a first submission).
+      model.isServiceHidden = req.body.hideService === "yes";
       return res.render("services/views/serviceConfig", model);
     }
 
