@@ -30,9 +30,14 @@ jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
 }));
 
+jest.mock("../../../src/infrastructure/utils/services", () => ({
+  updateService: jest.fn(),
+}));
+
 const { getRequestMock, getResponseMock } = require("../../utils");
 const { getServiceConfig } = require("../../../src/app/services/serviceConfig");
 const { getServiceRaw } = require("login.dfe.api-client/services");
+const { updateService } = require("../../../src/infrastructure/utils/services");
 const { getUserServiceRoles } = require("../../../src/app/services/utils");
 const { ACTIONS } = require("../../../src/constants/serviceConfigConstants");
 
@@ -84,6 +89,8 @@ describe("when getting the service config page", () => {
     });
     getUserServiceRoles.mockReset();
     getUserServiceRoles.mockImplementation(() => Promise.resolve([]));
+    updateService.mockReset();
+    updateService.mockResolvedValue();
     res.mockResetAll();
   });
 
@@ -303,5 +310,494 @@ describe("when getting the service config page", () => {
 
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][0]).toBe("services/views/serviceConfig");
+  });
+
+  describe("isServiceHidden flag — Hide Service checkbox state", () => {
+    const makeService = (overrides = {}) => ({
+      id: "service1",
+      name: "service one",
+      description: "service description",
+      isIdOnlyService: false,
+      isHiddenService: false,
+      relyingParty: {
+        token_endpoint_auth_method: "test",
+        client_id: "clientid",
+        client_secret: "dewier-thrombi-confounder-mikado",
+        api_secret: "dewier-thrombi-confounder-mikado",
+        service_home: "https://www.servicehome.com",
+        postResetUrl: "https://www.postreset.com",
+        redirect_uris: ["https://www.redirect.com"],
+        post_logout_redirect_uris: ["https://www.logout.com"],
+        grant_types: ["implicit", "authorization_code"],
+        response_types: ["code"],
+        ...overrides.relyingParty,
+      },
+      ...overrides,
+    });
+
+    it("should set isServiceHidden=true for role-based service when params are boolean true", async () => {
+      getServiceRaw.mockReturnValue(
+        makeService({
+          relyingParty: {
+            params: {
+              hideApprover: "true",
+              hideSupport: "true",
+              helpHidden: "true",
+            },
+          },
+        }),
+      );
+
+      await getServiceConfig(req, res);
+
+      expect(res.render.mock.calls[0][1].isServiceHidden).toBe(true);
+    });
+
+    it("should set isServiceHidden=true for role-based service when params are integer 1 (support console format)", async () => {
+      getServiceRaw.mockReturnValue(
+        makeService({
+          relyingParty: {
+            params: {
+              hideApprover: 1,
+              hideSupport: 1,
+              helpHidden: 1,
+            },
+          },
+        }),
+      );
+
+      await getServiceConfig(req, res);
+
+      expect(res.render.mock.calls[0][1].isServiceHidden).toBe(true);
+    });
+
+    it("should set isServiceHidden=false for role-based service when any param is false — scenario 7 (all false)", async () => {
+      // Scenario 7: all params false → unchecked
+      getServiceRaw.mockReturnValue(
+        makeService({
+          relyingParty: {
+            params: {
+              hideApprover: "false",
+              hideSupport: "false",
+              helpHidden: "false",
+            },
+          },
+        }),
+      );
+
+      await getServiceConfig(req, res);
+
+      expect(res.render.mock.calls[0][1].isServiceHidden).toBe(false);
+    });
+
+    it("should set isServiceHidden=false for role-based service — scenario 8 (hideApprover=true, rest false)", async () => {
+      // Scenario 8: only hideApprover is true; not all three → unchecked
+      getServiceRaw.mockReturnValue(
+        makeService({
+          relyingParty: {
+            params: {
+              hideApprover: "true",
+              hideSupport: "false",
+              helpHidden: "false",
+            },
+          },
+        }),
+      );
+
+      await getServiceConfig(req, res);
+
+      expect(res.render.mock.calls[0][1].isServiceHidden).toBe(false);
+    });
+
+    it("should set isServiceHidden=false for role-based service — scenario 9 (hideSupport=true, rest false)", async () => {
+      // Scenario 9: only hideSupport is true → unchecked
+      getServiceRaw.mockReturnValue(
+        makeService({
+          relyingParty: {
+            params: {
+              hideApprover: "false",
+              hideSupport: "true",
+              helpHidden: "false",
+            },
+          },
+        }),
+      );
+
+      await getServiceConfig(req, res);
+
+      expect(res.render.mock.calls[0][1].isServiceHidden).toBe(false);
+    });
+
+    it("should set isServiceHidden=false for role-based service — scenario 10 (helpHidden=true, rest false)", async () => {
+      // Scenario 10: only helpHidden is true → unchecked
+      getServiceRaw.mockReturnValue(
+        makeService({
+          relyingParty: {
+            params: {
+              hideApprover: "false",
+              hideSupport: "false",
+              helpHidden: "true",
+            },
+          },
+        }),
+      );
+
+      await getServiceConfig(req, res);
+
+      expect(res.render.mock.calls[0][1].isServiceHidden).toBe(false);
+    });
+
+    it("should set isServiceHidden=true for id-only service when params are integer 1 (support console format) — scenario 0", async () => {
+      // Scenario 0: integer 1/0 from support console must be normalised to true/false.
+      getServiceRaw.mockReturnValue(
+        makeService({
+          isIdOnlyService: 1,
+          isHiddenService: 1,
+          relyingParty: {
+            params: {
+              hideApprover: 1,
+              hideSupport: 1,
+              helpHidden: 1,
+            },
+          },
+        }),
+      );
+
+      await getServiceConfig(req, res);
+
+      expect(res.render.mock.calls[0][1].isServiceHidden).toBe(true);
+    });
+
+    it("should set isServiceHidden=false for id-only service when all params are false regardless of isHiddenService value — scenarios 2-5", async () => {
+      // Checkbox is derived from params only. isHiddenService is kept in sync
+      // separately on save and must NOT override the checkbox display.
+      getServiceRaw.mockReturnValue(
+        makeService({
+          isIdOnlyService: 1,
+          isHiddenService: 1,
+          relyingParty: {
+            params: {
+              hideApprover: "false",
+              hideSupport: "false",
+              helpHidden: "false",
+            },
+          },
+        }),
+      );
+
+      await getServiceConfig(req, res);
+
+      expect(res.render.mock.calls[0][1].isServiceHidden).toBe(false);
+    });
+
+    it("should set isServiceHidden=false for id-only service when only some params are true — scenario 3 (hideApprover=true, rest false)", async () => {
+      // All three params must be truthy; partial true is not enough.
+      getServiceRaw.mockReturnValue(
+        makeService({
+          isIdOnlyService: 1,
+          isHiddenService: 1,
+          relyingParty: {
+            params: {
+              hideApprover: "true",
+              hideSupport: "false",
+              helpHidden: "false",
+            },
+          },
+        }),
+      );
+
+      await getServiceConfig(req, res);
+
+      expect(res.render.mock.calls[0][1].isServiceHidden).toBe(false);
+    });
+
+    it("should set isServiceHidden=false for id-only service — scenario 4 (hideSupport=true, rest false)", async () => {
+      // Scenario 4: isHiddenService=1, hideApprover=false, hideSupport=true, helpHidden=false
+      // Not all three params are truthy so checkbox must be unchecked.
+      getServiceRaw.mockReturnValue(
+        makeService({
+          isIdOnlyService: 1,
+          isHiddenService: 1,
+          relyingParty: {
+            params: {
+              hideApprover: "false",
+              hideSupport: "true",
+              helpHidden: "false",
+            },
+          },
+        }),
+      );
+
+      await getServiceConfig(req, res);
+
+      expect(res.render.mock.calls[0][1].isServiceHidden).toBe(false);
+    });
+
+    it("should set isServiceHidden=false for id-only service — scenario 5 (helpHidden=true, rest false)", async () => {
+      // Scenario 5: isHiddenService=1, hideApprover=false, hideSupport=false, helpHidden=true
+      getServiceRaw.mockReturnValue(
+        makeService({
+          isIdOnlyService: 1,
+          isHiddenService: 1,
+          relyingParty: {
+            params: {
+              hideApprover: "false",
+              hideSupport: "false",
+              helpHidden: "true",
+            },
+          },
+        }),
+      );
+
+      await getServiceConfig(req, res);
+
+      expect(res.render.mock.calls[0][1].isServiceHidden).toBe(false);
+    });
+
+    it("should set isServiceHidden=true for id-only service when all params are truthy regardless of isHiddenService value", async () => {
+      // Checkbox is derived from params; isHiddenService=false does not override
+      // truthy params.
+      getServiceRaw.mockReturnValue(
+        makeService({
+          isIdOnlyService: 1,
+          isHiddenService: false,
+          relyingParty: {
+            params: {
+              hideApprover: 1,
+              hideSupport: 1,
+              helpHidden: 1,
+            },
+          },
+        }),
+      );
+
+      await getServiceConfig(req, res);
+
+      expect(res.render.mock.calls[0][1].isServiceHidden).toBe(true);
+    });
+
+    it("should set isServiceHidden=false for id-only service when all params are false and isHiddenService=0", async () => {
+      getServiceRaw.mockReturnValue(
+        makeService({
+          isIdOnlyService: 1,
+          isHiddenService: 0,
+          relyingParty: {
+            params: {
+              hideApprover: "false",
+              hideSupport: "false",
+              helpHidden: "false",
+            },
+          },
+        }),
+      );
+
+      await getServiceConfig(req, res);
+
+      expect(res.render.mock.calls[0][1].isServiceHidden).toBe(false);
+    });
+
+    describe("auto-sync isHiddenService for id-only services — scenarios 2-5", () => {
+      it("should call updateService to clear isHiddenService when it is 1 but all params are false (scenario 2)", async () => {
+        // isHiddenService=1 with params=false is an inconsistent state that makes
+        // downstream apps (support console, help page) hide the service even
+        // though it should be visible. Auto-correct on page load.
+        getServiceRaw.mockReturnValue(
+          makeService({
+            isIdOnlyService: 1,
+            isHiddenService: 1,
+            relyingParty: {
+              params: {
+                hideApprover: "false",
+                hideSupport: "false",
+                helpHidden: "false",
+              },
+            },
+          }),
+        );
+
+        await getServiceConfig(req, res);
+
+        expect(updateService).toHaveBeenCalledWith("service1", {
+          isHiddenService: false,
+        });
+      });
+
+      it("should call updateService to clear isHiddenService when it is 1 and only some params are true (scenario 3)", async () => {
+        getServiceRaw.mockReturnValue(
+          makeService({
+            isIdOnlyService: 1,
+            isHiddenService: 1,
+            relyingParty: {
+              params: {
+                hideApprover: "true",
+                hideSupport: "false",
+                helpHidden: "false",
+              },
+            },
+          }),
+        );
+
+        await getServiceConfig(req, res);
+
+        expect(updateService).toHaveBeenCalledWith("service1", {
+          isHiddenService: false,
+        });
+      });
+
+      it("should call updateService to clear isHiddenService — scenario 4 (hideSupport=true, rest false)", async () => {
+        getServiceRaw.mockReturnValue(
+          makeService({
+            isIdOnlyService: 1,
+            isHiddenService: 1,
+            relyingParty: {
+              params: {
+                hideApprover: "false",
+                hideSupport: "true",
+                helpHidden: "false",
+              },
+            },
+          }),
+        );
+
+        await getServiceConfig(req, res);
+
+        expect(updateService).toHaveBeenCalledWith("service1", {
+          isHiddenService: false,
+        });
+      });
+
+      it("should call updateService to clear isHiddenService — scenario 5 (helpHidden=true, rest false)", async () => {
+        getServiceRaw.mockReturnValue(
+          makeService({
+            isIdOnlyService: 1,
+            isHiddenService: 1,
+            relyingParty: {
+              params: {
+                hideApprover: "false",
+                hideSupport: "false",
+                helpHidden: "true",
+              },
+            },
+          }),
+        );
+
+        await getServiceConfig(req, res);
+
+        expect(updateService).toHaveBeenCalledWith("service1", {
+          isHiddenService: false,
+        });
+      });
+
+      it("should call updateService to set isHiddenService when it is false but all params are truthy", async () => {
+        // Inverse inconsistency: params say hidden but isHiddenService=false.
+        getServiceRaw.mockReturnValue(
+          makeService({
+            isIdOnlyService: 1,
+            isHiddenService: false,
+            relyingParty: {
+              params: {
+                hideApprover: 1,
+                hideSupport: 1,
+                helpHidden: 1,
+              },
+            },
+          }),
+        );
+
+        await getServiceConfig(req, res);
+
+        expect(updateService).toHaveBeenCalledWith("service1", {
+          isHiddenService: true,
+        });
+      });
+
+      it("should NOT call updateService when isHiddenService is consistent with params (scenario 0 — all true)", async () => {
+        // isHiddenService=1 AND all params=1: no inconsistency, no sync needed.
+        getServiceRaw.mockReturnValue(
+          makeService({
+            isIdOnlyService: 1,
+            isHiddenService: 1,
+            relyingParty: {
+              params: {
+                hideApprover: 1,
+                hideSupport: 1,
+                helpHidden: 1,
+              },
+            },
+          }),
+        );
+
+        await getServiceConfig(req, res);
+
+        expect(updateService).not.toHaveBeenCalled();
+      });
+
+      it("should NOT call updateService when isHiddenService is consistent with params (all false)", async () => {
+        getServiceRaw.mockReturnValue(
+          makeService({
+            isIdOnlyService: 1,
+            isHiddenService: 0,
+            relyingParty: {
+              params: {
+                hideApprover: "false",
+                hideSupport: "false",
+                helpHidden: "false",
+              },
+            },
+          }),
+        );
+
+        await getServiceConfig(req, res);
+
+        expect(updateService).not.toHaveBeenCalled();
+      });
+
+      it("should NOT call updateService for role-based services regardless of param state", async () => {
+        // Role-based services do not have isHiddenService; no sync should occur.
+        getServiceRaw.mockReturnValue(
+          makeService({
+            isIdOnlyService: false,
+            isHiddenService: 1,
+            relyingParty: {
+              params: {
+                hideApprover: "false",
+                hideSupport: "false",
+                helpHidden: "false",
+              },
+            },
+          }),
+        );
+
+        await getServiceConfig(req, res);
+
+        expect(updateService).not.toHaveBeenCalled();
+      });
+
+      it("should NOT call updateService during an amend-changes round-trip even if isHiddenService is inconsistent", async () => {
+        // During amend-changes (back from review page), auto-sync must not fire.
+        // The state may still be in-flight from a pending save operation.
+        req.query = { action: ACTIONS.AMEND_CHANGES };
+        req.session.serviceConfigurationChanges = {
+          [req.params.sid]: {},
+        };
+        getServiceRaw.mockReturnValue(
+          makeService({
+            isIdOnlyService: 1,
+            isHiddenService: 1,
+            relyingParty: {
+              params: {
+                hideApprover: "false",
+                hideSupport: "false",
+                helpHidden: "false",
+              },
+            },
+          }),
+        );
+
+        await getServiceConfig(req, res);
+
+        expect(updateService).not.toHaveBeenCalled();
+      });
+    });
   });
 });

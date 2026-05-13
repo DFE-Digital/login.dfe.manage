@@ -976,6 +976,11 @@ describe("when confirming service config changes in the review page", () => {
         paramName: "helpHidden",
         paramValue: "true",
       });
+      // isHiddenService on the service record must also be set for id-only services
+      expect(updateService).toHaveBeenCalledWith({
+        serviceId: "service1",
+        update: { isHiddenService: true },
+      });
     });
 
     it("calls updateServiceParam three times with 'false' when revealing for id-only services", async () => {
@@ -1002,6 +1007,11 @@ describe("when confirming service config changes in the review page", () => {
         serviceId: "service1",
         paramName: "helpHidden",
         paramValue: "false",
+      });
+      // isHiddenService on the service record must also be cleared for id-only services
+      expect(updateService).toHaveBeenCalledWith({
+        serviceId: "service1",
+        update: { isHiddenService: false },
       });
     });
 

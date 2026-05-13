@@ -614,7 +614,7 @@ const postConfirmServiceConfig = async (req, res) => {
     ) {
       const hiddenValue = hideServiceChange.newValue ? "true" : "false";
       const serviceId = req.params.sid;
-      await Promise.all([
+      const paramUpdates = [
         updateServiceParam({
           serviceId,
           paramName: "hideApprover",
@@ -630,7 +630,18 @@ const postConfirmServiceConfig = async (req, res) => {
           paramName: "helpHidden",
           paramValue: hiddenValue,
         }),
-      ]);
+      ];
+      // For id-only services, isHiddenService on the service record must also
+      // be kept in sync with the params so that downstream policy checks that
+      // read isHiddenService directly reflect the correct hidden state.
+      if (hideServiceChange.isIdOnlyService) {
+        paramUpdates.push(
+          updateService(serviceId, {
+            isHiddenService: hideServiceChange.newValue,
+          }),
+        );
+      }
+      await Promise.all(paramUpdates);
     }
 
     logger.audit(`${req.user.email} updated service configuration`, {

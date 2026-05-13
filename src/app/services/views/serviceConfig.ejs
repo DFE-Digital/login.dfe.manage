@@ -25,6 +25,7 @@
             id="<%=sectionId%>"
             name="<%=sectionId%>"
             type="password"
+            autocomplete="off"
             readonly="readonly"
             value="<%-dataValues%>" />
         </div>
@@ -300,14 +301,14 @@
                                     <input id="response_types-code" class ="govuk-checkboxes__input" type="checkbox"
                                     name="response_types" value="code" <%=
                                     (locals.service.responseTypes.indexOf('code') !== -1) ? 'checked' : ''%>>
-                                    <label class="govuk-label govuk-checkboxes__label" for="code" id="code-label">code</label>
+                                    <label class="govuk-label govuk-checkboxes__label" for="response_types-code" id="code-label">code</label>
                                 </div>
 
                                 <div class="multiple-choice govuk-checkboxes__item">
                                     <input id="response_types-id_token" class = "govuk-checkboxes__input" type="checkbox"
                                     name="response_types" value="id_token" <%=
                                     (locals.service.responseTypes.indexOf('id_token') !== -1) ? 'checked' : ''%>>
-                                    <label class="govuk-label govuk-checkboxes__label" for="id_token" id="id_token-label">
+                                    <label class="govuk-label govuk-checkboxes__label" for="response_types-id_token" id="id_token-label">
                                         id_token
                                     </label>
                                 </div>
