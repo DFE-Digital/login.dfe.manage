@@ -976,11 +976,6 @@ describe("when confirming service config changes in the review page", () => {
         paramName: "helpHidden",
         paramValue: "true",
       });
-      // isHiddenService on the service record must also be set for id-only services
-      expect(updateService).toHaveBeenCalledWith({
-        serviceId: "service1",
-        update: { isHiddenService: 1 },
-      });
     });
 
     it("calls updateServiceParam three times with 'false' when revealing for id-only services", async () => {
@@ -1008,27 +1003,29 @@ describe("when confirming service config changes in the review page", () => {
         paramName: "helpHidden",
         paramValue: "false",
       });
-      // isHiddenService on the service record must also be cleared for id-only services
-      expect(updateService).toHaveBeenCalledWith({
-        serviceId: "service1",
-        update: { isHiddenService: 0 },
-      });
     });
 
-    it("does not call updateService with isHiddenService for role-based services", async () => {
-      req.session.serviceConfigurationChanges["service1"] = hideServiceSession({
-        oldValue: false,
-        newValue: true,
-        isIdOnlyService: false,
-      });
+    it.each([
+      { label: "role-based", isIdOnlyService: false },
+      { label: "id-only", isIdOnlyService: true },
+    ])(
+      "does not call updateService with isHiddenService for $label services",
+      async ({ isIdOnlyService }) => {
+        req.session.serviceConfigurationChanges["service1"] =
+          hideServiceSession({
+            oldValue: false,
+            newValue: true,
+            isIdOnlyService,
+          });
 
-      await postConfirmServiceConfig(req, res);
+        await postConfirmServiceConfig(req, res);
 
-      expect(updateServiceParam).toHaveBeenCalledTimes(3);
-      const allUpdateServiceCalls = updateService.mock.calls;
-      allUpdateServiceCalls.forEach(([params]) => {
-        expect(params.update).not.toHaveProperty("isHiddenService");
-      });
-    });
+        expect(updateServiceParam).toHaveBeenCalledTimes(3);
+        const allUpdateServiceCalls = updateService.mock.calls;
+        allUpdateServiceCalls.forEach(([params]) => {
+          expect(params.update).not.toHaveProperty("isHiddenService");
+        });
+      },
+    );
   });
 });

@@ -631,17 +631,6 @@ const postConfirmServiceConfig = async (req, res) => {
           paramValue: hiddenValue,
         }),
       ];
-      // For id-only services, isHiddenService on the service record must also
-      // be kept in sync with the params so that downstream policy checks that
-      // read isHiddenService directly reflect the correct hidden state.
-      if (hideServiceChange.isIdOnlyService) {
-        paramUpdates.push(
-          updateService(serviceId, {
-            // API requires integer 1/0, not boolean.
-            isHiddenService: hideServiceChange.newValue ? 1 : 0,
-          }),
-        );
-      }
       await Promise.all(paramUpdates);
     }
 
