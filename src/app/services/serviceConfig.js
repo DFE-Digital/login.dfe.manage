@@ -21,7 +21,6 @@ const {
   _unescape,
 } = require("./utils");
 const { decrypt } = require("login.dfe.api-client/encryption");
-const { updateService } = require("../../infrastructure/utils/services");
 const logger = require("../../infrastructure/logger");
 
 // Normalise param values to a consistent boolean.
@@ -144,9 +143,6 @@ const buildCurrentServiceModel = async (req) => {
       oldServiceConfigModel,
       isServiceHiddenFromDb,
       isIdOnlyService,
-      // The raw DB value is returned so getServiceConfig can detect inconsistencies
-      // and auto-correct isHiddenService without an extra API round-trip.
-      rawIsHiddenService: service.isHiddenService,
     };
   } catch (error) {
     throw new Error(`Could not build service model - ${error}`);
@@ -162,32 +158,6 @@ const getServiceConfig = async (req, res) => {
     }
     const manageRolesForService = await getUserServiceRoles(req);
     const serviceModel = await buildCurrentServiceModel(req);
-
-    // Scenarios 2–5: for id-only services, isHiddenService in the DB can be
-    // inconsistent with the three params (e.g. when created by the support
-    // console with integer 1/0 and then params were changed via PUT API).
-    // Downstream apps (support console, help/contact-us) read isHiddenService
-    // directly, so fix the inconsistency proactively when an admin views the
-    // service configuration page for the first time (not during an amend-changes
-    // round-trip, where the state may still be in-flight from a pending save).
-    if (
-      req.query?.action !== ACTIONS.AMEND_CHANGES &&
-      serviceModel.isIdOnlyService &&
-      isTruthyParam(serviceModel.rawIsHiddenService) !==
-        serviceModel.isServiceHiddenFromDb
-    ) {
-      try {
-        await updateService(sid, {
-          // API requires integer 1/0, not boolean.
-          isHiddenService: serviceModel.isServiceHiddenFromDb ? 1 : 0,
-        });
-      } catch (syncError) {
-        // Best-effort correction — log but do not block page render.
-        logger.warn(
-          `Failed to auto-sync isHiddenService for service ${sid}: ${syncError}`,
-        );
-      }
-    }
 
     // Determine whether the Hide Service checkbox should be pre-checked.
     // When amending changes, use the session-stored value; otherwise use the DB value.
