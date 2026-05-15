@@ -712,6 +712,10 @@ const postServiceConfig = async (req, res) => {
         newValue: newHideService,
         isIdOnlyService: serviceModels.isIdOnlyService,
       };
+    } else {
+      // User reverted to the original DB state — clear any stale session entry
+      // so the confirm step does not apply a change the user cancelled.
+      delete req.session.serviceConfigurationChanges[sid].hideService;
     }
 
     return res.redirect("review-service-configuration#");

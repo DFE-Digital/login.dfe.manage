@@ -998,6 +998,27 @@ describe("Hide Service checkbox — postServiceConfig session handling", () => {
     ).toBeUndefined();
   });
 
+  it("clears a stale hideService session entry when user reverts checkbox to DB state during amend", async () => {
+    // Simulate a prior submit that stored hideService=true in session (amend scenario)
+    req.session.serviceConfigurationChanges = {
+      service1: {
+        hideService: {
+          oldValue: false,
+          newValue: true,
+          isIdOnlyService: false,
+        },
+      },
+    };
+    // User goes back (amend) and unchecks — DB value is false, so this is a revert
+    req.body.hideService = undefined;
+
+    await postServiceConfig(req, res);
+
+    expect(
+      req.session.serviceConfigurationChanges["service1"].hideService,
+    ).toBeUndefined();
+  });
+
   it("stores isIdOnlyService=true when hiding an id-only service", async () => {
     getServiceRaw.mockReturnValue(makeServiceRaw({ isIdOnlyService: 1 }));
     req.body.hideService = "yes";
