@@ -1,10 +1,10 @@
 const niceware = require("niceware");
 const UrlValidator = require("login.dfe.validation/src/urlValidator");
-const { updateService } = require("../../infrastructure/utils/services");
 const {
-  getServiceRaw,
-  updateServiceParam,
-} = require("login.dfe.api-client/services");
+  updateService,
+  upsertServiceParam,
+} = require("../../infrastructure/utils/services");
+const { getServiceRaw } = require("login.dfe.api-client/services");
 const logger = require("../../infrastructure/logger");
 const {
   getUserServiceRoles,
@@ -615,17 +615,17 @@ const postConfirmServiceConfig = async (req, res) => {
       const hiddenValue = hideServiceChange.newValue ? "true" : "false";
       const serviceId = req.params.sid;
       const paramUpdates = [
-        updateServiceParam({
+        upsertServiceParam({
           serviceId,
           paramName: "hideApprover",
           paramValue: hiddenValue,
         }),
-        updateServiceParam({
+        upsertServiceParam({
           serviceId,
           paramName: "hideSupport",
           paramValue: hiddenValue,
         }),
-        updateServiceParam({
+        upsertServiceParam({
           serviceId,
           paramName: "helpHidden",
           paramValue: hiddenValue,
