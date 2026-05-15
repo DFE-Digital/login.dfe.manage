@@ -21,6 +21,14 @@ const {
   _unescape,
 } = require("./utils");
 const { decrypt } = require("login.dfe.api-client/encryption");
+const { updateService } = require("../../infrastructure/utils/services");
+const logger = require("../../infrastructure/logger");
+
+// Normalise param values to a consistent boolean.
+// The support console stores integer 1/0, the PUT API stores boolean true/false,
+// and the manage UI stores string "true"/"false". All must be treated as equivalent.
+const isTruthyParam = (val) =>
+  val === true || val === 1 || val === "true" || val === "1";
 
 const buildServiceModelFromObject = (service, sessionService = {}) => {
   let tokenEndpointAuthMethod = null;
@@ -120,9 +128,25 @@ const buildCurrentServiceModel = async (req) => {
     );
     const oldServiceConfigModel = buildServiceModelFromObject(service);
 
+    const params = service.relyingParty?.params || {};
+    const isIdOnlyService = isTruthyParam(service.isIdOnlyService);
+    // The "Hide Service" checkbox state is derived from ALL THREE params for
+    // both id-only and role-based services. isHiddenService is intentionally
+    // NOT used here: it is kept in sync separately on save (confirmServiceConfig)
+    // and must not override the individual param values.
+    const isServiceHiddenFromDb =
+      isTruthyParam(params.hideApprover) &&
+      isTruthyParam(params.hideSupport) &&
+      isTruthyParam(params.helpHidden);
+
     return {
       currentServiceModel,
       oldServiceConfigModel,
+      isServiceHiddenFromDb,
+      isIdOnlyService,
+      // The raw DB value is returned so getServiceConfig can detect inconsistencies
+      // and auto-correct isHiddenService without an extra API round-trip.
+      rawIsHiddenService: service.isHiddenService,
     };
   } catch (error) {
     throw new Error(`Could not build service model - ${error}`);
@@ -138,6 +162,42 @@ const getServiceConfig = async (req, res) => {
     }
     const manageRolesForService = await getUserServiceRoles(req);
     const serviceModel = await buildCurrentServiceModel(req);
+
+    // Scenarios 2–5: for id-only services, isHiddenService in the DB can be
+    // inconsistent with the three params (e.g. when created by the support
+    // console with integer 1/0 and then params were changed via PUT API).
+    // Downstream apps (support console, help/contact-us) read isHiddenService
+    // directly, so fix the inconsistency proactively when an admin views the
+    // service configuration page for the first time (not during an amend-changes
+    // round-trip, where the state may still be in-flight from a pending save).
+    if (
+      req.query?.action !== ACTIONS.AMEND_CHANGES &&
+      serviceModel.isIdOnlyService &&
+      isTruthyParam(serviceModel.rawIsHiddenService) !==
+        serviceModel.isServiceHiddenFromDb
+    ) {
+      try {
+        await updateService(sid, {
+          // API requires integer 1/0, not boolean.
+          isHiddenService: serviceModel.isServiceHiddenFromDb ? 1 : 0,
+        });
+      } catch (syncError) {
+        // Best-effort correction — log but do not block page render.
+        logger.warn(
+          `Failed to auto-sync isHiddenService for service ${sid}: ${syncError}`,
+        );
+      }
+    }
+
+    // Determine whether the Hide Service checkbox should be pre-checked.
+    // When amending changes, use the session-stored value; otherwise use the DB value.
+    const sessionHideService =
+      req.session.serviceConfigurationChanges?.[sid]?.hideService?.newValue;
+    const isServiceHidden =
+      sessionHideService !== undefined
+        ? sessionHideService
+        : serviceModel.isServiceHiddenFromDb;
+
     return res.render("services/views/serviceConfig", {
       csrfToken: req.csrfToken(),
       service: serviceModel.currentServiceModel,
@@ -146,6 +206,7 @@ const getServiceConfig = async (req, res) => {
       serviceId: sid,
       userRoles: manageRolesForService,
       currentNavigation: "configuration",
+      isServiceHidden,
     });
   } catch (error) {
     throw new Error(error);
@@ -558,6 +619,10 @@ const postServiceConfig = async (req, res) => {
 
     if (Object.keys(model.validationMessages).length > 0) {
       model.csrfToken = req.csrfToken();
+      // Use the submitted checkbox value so it is preserved on re-render.
+      // The session has not been updated yet at this point, so reading from
+      // it would give a stale value (or undefined on a first submission).
+      model.isServiceHidden = req.body.hideService === "yes";
       return res.render("services/views/serviceConfig", model);
     }
 
@@ -637,6 +702,18 @@ const postServiceConfig = async (req, res) => {
           undefined;
       }
     }
+
+    // Handle the Hide Service checkbox separately from OIDC config fields.
+    const newHideService = req.body.hideService === "yes";
+    const oldHideService = serviceModels.isServiceHiddenFromDb;
+    if (newHideService !== oldHideService) {
+      req.session.serviceConfigurationChanges[sid].hideService = {
+        oldValue: oldHideService,
+        newValue: newHideService,
+        isIdOnlyService: serviceModels.isIdOnlyService,
+      };
+    }
+
     return res.redirect("review-service-configuration#");
   } catch (error) {
     throw new Error(error);

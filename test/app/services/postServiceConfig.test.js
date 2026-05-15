@@ -889,3 +889,158 @@ describe("when editing the IMPLICIT flow service configuration", () => {
     ).toBe(undefined);
   });
 });
+
+describe("Hide Service checkbox — postServiceConfig session handling", () => {
+  let req;
+
+  const makeServiceRaw = (overrides = {}) => ({
+    id: "service1",
+    name: "service one",
+    description: "service description",
+    isIdOnlyService: false,
+    isHiddenService: 0,
+    relyingParty: {
+      client_id: "clientid",
+      client_secret: "dewier-thrombi-confounder-mikado",
+      service_home: "https://www.servicehome.com",
+      postResetUrl: "https://www.postreset.com",
+      redirect_uris: ["https://www.redirect.com"],
+      post_logout_redirect_uris: ["https://www.logout.com"],
+      grant_types: ["authorization_code"],
+      response_types: ["code"],
+      api_secret: "dewier-thrombi-confounder-mikado",
+      token_endpoint_auth_method: undefined,
+      params: {
+        hideApprover: "false",
+        hideSupport: "false",
+        helpHidden: "false",
+      },
+      ...overrides.relyingParty,
+    },
+    ...overrides,
+  });
+
+  const validBody = {
+    clientId: "clientid",
+    serviceHome: "https://www.servicehome.com",
+    postResetUrl: "https://www.postreset.com",
+    redirect_uris: ["https://www.redirect.com"],
+    post_logout_redirect_uris: ["https://www.logout.com"],
+    response_types: ["code"],
+    tokenEndpointAuthMethod: "client_secret_basic",
+  };
+
+  beforeEach(() => {
+    req = getRequestMock({
+      body: { ...validBody },
+      params: { sid: "service1" },
+      query: {},
+      session: { passport: { user: { sub: "user_id_uuid" } } },
+    });
+
+    getUserServiceRoles.mockReset();
+    getUserServiceRoles.mockImplementation(() => Promise.resolve([]));
+    checkClientId.mockReset();
+    updateService.mockReset();
+    updateService.mockImplementation(() => Promise.resolve([]));
+    getServiceRaw.mockReset();
+    getServiceRaw.mockReturnValue(makeServiceRaw());
+    res.mockResetAll();
+  });
+
+  it("stores hideService in session when checkbox is ticked and DB value is false", async () => {
+    req.body.hideService = "yes";
+
+    await postServiceConfig(req, res);
+
+    expect(
+      req.session.serviceConfigurationChanges["service1"].hideService,
+    ).toEqual({
+      oldValue: false,
+      newValue: true,
+      isIdOnlyService: false,
+    });
+    expect(res.redirect).toHaveBeenCalledWith("review-service-configuration#");
+  });
+
+  it("stores hideService in session when checkbox is unticked and DB value is true", async () => {
+    getServiceRaw.mockReturnValue(
+      makeServiceRaw({
+        relyingParty: {
+          params: {
+            hideApprover: "true",
+            hideSupport: "true",
+            helpHidden: "true",
+          },
+        },
+      }),
+    );
+    req.body.hideService = undefined;
+
+    await postServiceConfig(req, res);
+
+    expect(
+      req.session.serviceConfigurationChanges["service1"].hideService,
+    ).toEqual({
+      oldValue: true,
+      newValue: false,
+      isIdOnlyService: false,
+    });
+  });
+
+  it("does not store hideService in session when checkbox state matches the DB", async () => {
+    req.body.hideService = undefined;
+
+    await postServiceConfig(req, res);
+
+    expect(
+      req.session.serviceConfigurationChanges["service1"].hideService,
+    ).toBeUndefined();
+  });
+
+  it("stores isIdOnlyService=true when hiding an id-only service", async () => {
+    getServiceRaw.mockReturnValue(makeServiceRaw({ isIdOnlyService: 1 }));
+    req.body.hideService = "yes";
+
+    await postServiceConfig(req, res);
+
+    expect(
+      req.session.serviceConfigurationChanges["service1"].hideService,
+    ).toEqual({
+      oldValue: false,
+      newValue: true,
+      isIdOnlyService: true,
+    });
+  });
+
+  it("preserves the submitted checkbox state (checked) when validation fails", async () => {
+    req.body.serviceHome = "not-a-valid-url";
+    req.body.hideService = "yes";
+
+    await postServiceConfig(req, res);
+
+    expect(res.render).toHaveBeenCalledTimes(1);
+    expect(res.render.mock.calls[0][1].isServiceHidden).toBe(true);
+  });
+
+  it("preserves the submitted checkbox state (unchecked) when validation fails", async () => {
+    getServiceRaw.mockReturnValue(
+      makeServiceRaw({
+        relyingParty: {
+          params: {
+            hideApprover: "true",
+            hideSupport: "true",
+            helpHidden: "true",
+          },
+        },
+      }),
+    );
+    req.body.serviceHome = "not-a-valid-url";
+    req.body.hideService = undefined;
+
+    await postServiceConfig(req, res);
+
+    expect(res.render).toHaveBeenCalledTimes(1);
+    expect(res.render.mock.calls[0][1].isServiceHidden).toBe(false);
+  });
+});

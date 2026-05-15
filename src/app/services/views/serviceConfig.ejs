@@ -25,6 +25,7 @@
             id="<%=sectionId%>"
             name="<%=sectionId%>"
             type="password"
+            autocomplete="off"
             readonly="readonly"
             value="<%-dataValues%>" />
         </div>
@@ -161,7 +162,7 @@
                         <%-locals.validationMessages.serviceHome %>
                         </p>
                         <% } %>
-                        <input type="url" class="form-control  govuk-input" id="serviceHome" name="serviceHome" pattern="https://.\<>*" value='<%- locals.service.serviceHome %>' />
+                        <input type="url" class="form-control  govuk-input" id="serviceHome" name="serviceHome" pattern="https://[^<>]*" value='<%- locals.service.serviceHome %>' />
                     
                     </div>
 
@@ -184,6 +185,18 @@
 
                         <input class="form-control govuk-input" id="postResetUrl" name="postResetUrl" type="text"
                             value="<%-locals.service.postResetUrl%>" />
+                    </div>
+
+                    <div class="govuk-form-group" id="hideService-form-group">
+                        <h2 class="govuk-heading-m">Hide Service</h2>
+                        <div class="govuk-checkboxes" id="hideService-checkboxes">
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" id="hideService" name="hideService" type="checkbox" value="yes" <%= locals.isServiceHidden ? 'checked' : '' %>>
+                                <label class="govuk-label govuk-checkboxes__label" for="hideService">
+                                    Hide this service from users, approvers, support, and the help page
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </fieldset>
 
@@ -288,14 +301,14 @@
                                     <input id="response_types-code" class ="govuk-checkboxes__input" type="checkbox"
                                     name="response_types" value="code" <%=
                                     (locals.service.responseTypes.indexOf('code') !== -1) ? 'checked' : ''%>>
-                                    <label class="govuk-label govuk-checkboxes__label" for="code" id="code-label">code</label>
+                                    <label class="govuk-label govuk-checkboxes__label" for="response_types-code" id="code-label">code</label>
                                 </div>
 
                                 <div class="multiple-choice govuk-checkboxes__item">
                                     <input id="response_types-id_token" class = "govuk-checkboxes__input" type="checkbox"
                                     name="response_types" value="id_token" <%=
                                     (locals.service.responseTypes.indexOf('id_token') !== -1) ? 'checked' : ''%>>
-                                    <label class="govuk-label govuk-checkboxes__label" for="id_token" id="id_token-label">
+                                    <label class="govuk-label govuk-checkboxes__label" for="response_types-id_token" id="id_token-label">
                                         id_token
                                     </label>
                                 </div>

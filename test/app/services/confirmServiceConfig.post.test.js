@@ -14,6 +14,7 @@ jest.mock("./../../../src/infrastructure/logger", () =>
 jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
   updateService: jest.fn(),
+  updateServiceParam: jest.fn(),
 }));
 
 jest.mock("../../../src/app/services/utils", () => {
@@ -53,6 +54,7 @@ const {
 const {
   getServiceRaw,
   updateService,
+  updateServiceParam,
 } = require("login.dfe.api-client/services");
 
 const res = getResponseMock();
@@ -109,6 +111,7 @@ describe("when confirming service config changes in the review page", () => {
     checkClientId.mockReset();
 
     updateService.mockReset();
+    updateServiceParam.mockReset();
     getServiceRaw.mockReset();
     getServiceRaw
       .mockReturnValueOnce({ ...currentServiceInfo })
@@ -831,5 +834,221 @@ describe("when confirming service config changes in the review page", () => {
       "Your changes to service configuration for service one have been saved.",
     );
     expect(res.redirect).toHaveBeenCalledWith("/services/service1");
+  });
+
+  describe("Hide Service checkbox", () => {
+    const hideServiceSession = (hideServiceOverrides = {}) => ({
+      redirectUris: {
+        oldValue: ["https://example.com"],
+        newValue: ["https://example.com"],
+      },
+      postLogoutRedirectUris: {
+        oldValue: ["https://example.com"],
+        newValue: ["https://example.com"],
+      },
+      hideService: {
+        oldValue: false,
+        newValue: true,
+        isIdOnlyService: false,
+        ...hideServiceOverrides,
+      },
+    });
+
+    it("should not crash with 500 when only hideService is in session (no OIDC fields)", async () => {
+      // This is the real-world failing scenario: user only toggles Hide Service
+      // without changing any OIDC fields, so redirectUris / postLogoutRedirectUris
+      // are absent from the session.
+      req.session.serviceConfigurationChanges["service1"] = {
+        hideService: {
+          oldValue: false,
+          newValue: true,
+          isIdOnlyService: false,
+        },
+      };
+
+      await postConfirmServiceConfig(req, res);
+
+      // The OIDC updateService API must NOT be called — calling it with an
+      // empty update object causes the real API to return a 500.
+      expect(updateService).not.toHaveBeenCalled();
+      expect(updateServiceParam).toHaveBeenCalledTimes(3);
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "hideApprover",
+        paramValue: "true",
+      });
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "hideSupport",
+        paramValue: "true",
+      });
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "helpHidden",
+        paramValue: "true",
+      });
+      expect(res.redirect).toHaveBeenCalledWith("/services/service1");
+    });
+
+    it("calls updateServiceParam for all three params with 'true' when checkbox is checked", async () => {
+      req.session.serviceConfigurationChanges["service1"] =
+        hideServiceSession();
+
+      await postConfirmServiceConfig(req, res);
+
+      expect(updateServiceParam).toHaveBeenCalledTimes(3);
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "hideApprover",
+        paramValue: "true",
+      });
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "hideSupport",
+        paramValue: "true",
+      });
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "helpHidden",
+        paramValue: "true",
+      });
+    });
+
+    it("calls updateServiceParam with 'false' for all three params when checkbox is unchecked", async () => {
+      req.session.serviceConfigurationChanges["service1"] = hideServiceSession({
+        oldValue: true,
+        newValue: false,
+      });
+
+      await postConfirmServiceConfig(req, res);
+
+      expect(updateServiceParam).toHaveBeenCalledTimes(3);
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "hideApprover",
+        paramValue: "false",
+      });
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "hideSupport",
+        paramValue: "false",
+      });
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "helpHidden",
+        paramValue: "false",
+      });
+    });
+
+    it("does not call updateServiceParam when the checkbox value has not changed", async () => {
+      req.session.serviceConfigurationChanges["service1"] = hideServiceSession({
+        oldValue: true,
+        newValue: true,
+      });
+
+      await postConfirmServiceConfig(req, res);
+
+      expect(updateServiceParam).not.toHaveBeenCalled();
+    });
+
+    it("calls updateServiceParam three times with 'true' when hiding for id-only services", async () => {
+      req.session.serviceConfigurationChanges["service1"] = hideServiceSession({
+        oldValue: false,
+        newValue: true,
+        isIdOnlyService: true,
+      });
+
+      await postConfirmServiceConfig(req, res);
+
+      expect(updateServiceParam).toHaveBeenCalledTimes(3);
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "hideApprover",
+        paramValue: "true",
+      });
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "hideSupport",
+        paramValue: "true",
+      });
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "helpHidden",
+        paramValue: "true",
+      });
+    });
+
+    it("calls updateServiceParam three times with 'false' when revealing for id-only services", async () => {
+      req.session.serviceConfigurationChanges["service1"] = hideServiceSession({
+        oldValue: true,
+        newValue: false,
+        isIdOnlyService: true,
+      });
+
+      await postConfirmServiceConfig(req, res);
+
+      expect(updateServiceParam).toHaveBeenCalledTimes(3);
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "hideApprover",
+        paramValue: "false",
+      });
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "hideSupport",
+        paramValue: "false",
+      });
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName: "helpHidden",
+        paramValue: "false",
+      });
+    });
+
+    it("calls updateService with isHiddenService: 1 when hiding an id-only service", async () => {
+      req.session.serviceConfigurationChanges["service1"] = hideServiceSession({
+        oldValue: false,
+        newValue: true,
+        isIdOnlyService: true,
+      });
+
+      await postConfirmServiceConfig(req, res);
+
+      const isHiddenCalls = updateService.mock.calls.filter(
+        ([params]) => params.update?.isHiddenService !== undefined,
+      );
+      expect(isHiddenCalls).toHaveLength(1);
+      expect(isHiddenCalls[0][0].update).toMatchObject({ isHiddenService: 1 });
+    });
+
+    it("calls updateService with isHiddenService: 0 when revealing an id-only service", async () => {
+      req.session.serviceConfigurationChanges["service1"] = hideServiceSession({
+        oldValue: true,
+        newValue: false,
+        isIdOnlyService: true,
+      });
+
+      await postConfirmServiceConfig(req, res);
+
+      const isHiddenCalls = updateService.mock.calls.filter(
+        ([params]) => params.update?.isHiddenService !== undefined,
+      );
+      expect(isHiddenCalls).toHaveLength(1);
+      expect(isHiddenCalls[0][0].update).toMatchObject({ isHiddenService: 0 });
+    });
+
+    it("does not call updateService with isHiddenService for role-based services", async () => {
+      req.session.serviceConfigurationChanges["service1"] = hideServiceSession({
+        oldValue: false,
+        newValue: true,
+        isIdOnlyService: false,
+      });
+
+      await postConfirmServiceConfig(req, res);
+
+      updateService.mock.calls.forEach(([params]) => {
+        expect(params.update).not.toHaveProperty("isHiddenService");
+      });
+    });
   });
 });

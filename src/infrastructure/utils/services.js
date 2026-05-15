@@ -1,5 +1,6 @@
 const {
   updateService: updateServiceApiClient,
+  updateServiceParam,
 } = require("login.dfe.api-client/services");
 
 const updateService = async (serviceId, serviceDetails) => {
@@ -44,6 +45,9 @@ const updateService = async (serviceId, serviceDetails) => {
     updatedServiceDetails.tokenEndpointAuthMethod =
       serviceDetails.tokenEndpointAuthMethod;
   }
+  if (serviceDetails.isHiddenService !== undefined) {
+    updatedServiceDetails.isHiddenService = serviceDetails.isHiddenService;
+  }
 
   await updateServiceApiClient({
     serviceId: serviceId,
@@ -51,6 +55,41 @@ const updateService = async (serviceId, serviceDetails) => {
   });
 };
 
+// updateServiceParam uses PUT which only updates existing params. This helper
+// falls back to POST when the param doesn't exist (404), because the api-client
+// does not export the `./api` subpath needed to call POST directly at the top level.
+const upsertServiceParam = async ({ serviceId, paramName, paramValue }) => {
+  try {
+    await updateServiceParam({ serviceId, paramName, paramValue });
+  } catch (err) {
+    if (err?.statusCode === 404) {
+      // Lazy-load api-client internals via direct file path to bypass the package's
+      // `exports` restriction — `./api` is intentionally not a public export.
+      const {
+        getApiClient,
+        ApiName,
+      } = require("../../../node_modules/login.dfe.api-client/dist/api/index.js");
+      const {
+        RequestMethod,
+      } = require("../../../node_modules/login.dfe.api-client/dist/api/common/ApiClient.js");
+      const client = getApiClient(ApiName.Applications);
+      const response = await client.requestRaw(
+        RequestMethod.POST,
+        `/services/${serviceId}/params`,
+        { jsonBody: { paramName, paramValue } },
+      );
+      if (response.status < 200 || response.status >= 300) {
+        throw new Error(
+          `Failed to create service param ${paramName}: HTTP ${response.status}`,
+        );
+      }
+    } else {
+      throw err;
+    }
+  }
+};
+
 module.exports = {
   updateService,
+  upsertServiceParam,
 };
