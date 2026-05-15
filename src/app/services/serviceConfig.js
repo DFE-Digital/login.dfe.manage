@@ -21,7 +21,6 @@ const {
   _unescape,
 } = require("./utils");
 const { decrypt } = require("login.dfe.api-client/encryption");
-const logger = require("../../infrastructure/logger");
 
 // Normalise param values to a consistent boolean.
 // The support console stores integer 1/0, the PUT API stores boolean true/false,
