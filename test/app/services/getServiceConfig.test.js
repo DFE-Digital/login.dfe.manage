@@ -547,9 +547,9 @@ describe("when getting the service config page", () => {
       expect(res.render.mock.calls[0][1].isServiceHidden).toBe(false);
     });
 
-    it("should set isServiceHidden=true for id-only service when all params are truthy regardless of isHiddenService value", async () => {
-      // Checkbox is derived from params; isHiddenService=false does not override
-      // truthy params.
+    it("should set isServiceHidden=false for id-only service when all params are truthy but isHiddenService is false", async () => {
+      // For id-only services all four conditions must be met; truthy params alone
+      // are not sufficient if isHiddenService is 0/false.
       getServiceRaw.mockReturnValue(
         makeService({
           isIdOnlyService: 1,
@@ -566,7 +566,7 @@ describe("when getting the service config page", () => {
 
       await getServiceConfig(req, res);
 
-      expect(res.render.mock.calls[0][1].isServiceHidden).toBe(true);
+      expect(res.render.mock.calls[0][1].isServiceHidden).toBe(false);
     });
 
     it("should set isServiceHidden=false for id-only service when all params are false and isHiddenService=0", async () => {

@@ -1004,5 +1004,51 @@ describe("when confirming service config changes in the review page", () => {
         paramValue: "false",
       });
     });
+
+    it("calls updateService with isHiddenService: 1 when hiding an id-only service", async () => {
+      req.session.serviceConfigurationChanges["service1"] = hideServiceSession({
+        oldValue: false,
+        newValue: true,
+        isIdOnlyService: true,
+      });
+
+      await postConfirmServiceConfig(req, res);
+
+      const isHiddenCalls = updateService.mock.calls.filter(
+        ([{ update }]) => update?.isHiddenService !== undefined,
+      );
+      expect(isHiddenCalls).toHaveLength(1);
+      expect(isHiddenCalls[0][0].update).toMatchObject({ isHiddenService: 1 });
+    });
+
+    it("calls updateService with isHiddenService: 0 when revealing an id-only service", async () => {
+      req.session.serviceConfigurationChanges["service1"] = hideServiceSession({
+        oldValue: true,
+        newValue: false,
+        isIdOnlyService: true,
+      });
+
+      await postConfirmServiceConfig(req, res);
+
+      const isHiddenCalls = updateService.mock.calls.filter(
+        ([{ update }]) => update?.isHiddenService !== undefined,
+      );
+      expect(isHiddenCalls).toHaveLength(1);
+      expect(isHiddenCalls[0][0].update).toMatchObject({ isHiddenService: 0 });
+    });
+
+    it("does not call updateService with isHiddenService for role-based services", async () => {
+      req.session.serviceConfigurationChanges["service1"] = hideServiceSession({
+        oldValue: false,
+        newValue: true,
+        isIdOnlyService: false,
+      });
+
+      await postConfirmServiceConfig(req, res);
+
+      updateService.mock.calls.forEach(([{ update }]) => {
+        expect(update).not.toHaveProperty("isHiddenService");
+      });
+    });
   });
 });

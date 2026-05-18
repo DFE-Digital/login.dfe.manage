@@ -632,6 +632,12 @@ const postConfirmServiceConfig = async (req, res) => {
         }),
       ];
       await Promise.all(paramUpdates);
+
+      if (hideServiceChange.isIdOnlyService) {
+        await updateService(req.params.sid, {
+          isHiddenService: hideServiceChange.newValue ? 1 : 0,
+        });
+      }
     }
 
     logger.audit(`${req.user.email} updated service configuration`, {

@@ -128,14 +128,13 @@ const buildCurrentServiceModel = async (req) => {
 
     const params = service.relyingParty?.params || {};
     const isIdOnlyService = isTruthyParam(service.isIdOnlyService);
-    // The "Hide Service" checkbox state is derived from ALL THREE params for
-    // both id-only and role-based services. isHiddenService is intentionally
-    // NOT used here: it is kept in sync separately on save (confirmServiceConfig)
-    // and must not override the individual param values.
-    const isServiceHiddenFromDb =
+    const paramsHidden =
       isTruthyParam(params.hideApprover) &&
       isTruthyParam(params.hideSupport) &&
       isTruthyParam(params.helpHidden);
+    const isServiceHiddenFromDb = isIdOnlyService
+      ? paramsHidden && isTruthyParam(service.isHiddenService)
+      : paramsHidden;
 
     return {
       currentServiceModel,
