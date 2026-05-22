@@ -95,9 +95,12 @@ const postConfirmCreatePolicyRole = async (req, res) => {
   }
 
   try {
-    allServiceRoles = await getServiceRolesRaw({
+    const serviceRolesResponse = await getServiceRolesRaw({
       serviceId: req.params.sid,
     });
+    allServiceRoles = Array.isArray(serviceRolesResponse)
+      ? serviceRolesResponse
+      : (serviceRolesResponse?.roles ?? []);
   } catch (error) {
     logger.error(
       `Error retrieving service roles for service ${req.params.sid}`,

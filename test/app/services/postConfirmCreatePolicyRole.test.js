@@ -222,6 +222,32 @@ describe("when using the postConfirmCreatePolicyRole function", () => {
     );
   });
 
+  it("should handle a paged response from getServiceRolesRaw", async () => {
+    req.session.createPolicyRoleData.roleName = "Existing Role";
+    req.session.createPolicyRoleData.roleCode = "existing_role";
+
+    getServiceRolesRaw.mockResolvedValue({
+      roles: [
+        {
+          id: "A1B2C3D4-5E6F-7G8H-9I0J-K1L2M3N4O5P6",
+          name: "Existing Role",
+          code: "existing_role",
+          numericId: "12345",
+          status: ["1"],
+        },
+      ],
+    });
+
+    await postConfirmCreatePolicyRole(req, res);
+
+    expect(createServiceRole).not.toHaveBeenCalled();
+    expect(updateServicePolicyRaw).toHaveBeenCalled();
+    expect(res.flash).toHaveBeenCalledWith(
+      "info",
+      "Policy role Existing Role existing_role successfully added",
+    );
+  });
+
   it("should show a different flash message when the added role name differs from the model name", async () => {
     req.session.createPolicyRoleData.roleName = "Different Name";
     req.session.createPolicyRoleData.roleCode = "existing_role";
