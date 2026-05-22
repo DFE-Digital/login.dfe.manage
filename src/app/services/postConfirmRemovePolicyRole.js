@@ -73,8 +73,12 @@ const postConfirmRemovePolicyRole = async (req, res) => {
       serviceId: req.params.sid,
     });
 
-    allRoleOccurrences = allServicePolicies
-      .flatMap((serviceRole) => serviceRole.roles)
+    const servicePolicies = Array.isArray(allServicePolicies)
+      ? allServicePolicies
+      : (allServicePolicies?.policies ?? []);
+
+    allRoleOccurrences = servicePolicies
+      .flatMap((servicePolicy) => servicePolicy.roles ?? [])
       .filter((role) => role.id === roleInPolicy.id);
   } catch (error) {
     return handleApiError(

@@ -194,6 +194,46 @@ describe("when using the postConfirmRemovePolicyRole function", () => {
     expect(res.redirect).toHaveBeenCalledWith("conditionsAndRoles");
   });
 
+  it("should handle a paged response from getServicePoliciesRaw", async () => {
+    getServicePoliciesRaw.mockResolvedValue({
+      policies: [
+        {
+          id: "6C8172B6-011B-4526-B04D-E2809A3D71A2",
+          name: "Policy 1",
+          roles: [
+            {
+              id: "717E2ECB-8B76-402C-A142-15DD486CBE95",
+              name: "School",
+              code: "CheckRecord_School",
+            },
+          ],
+        },
+        {
+          id: "ANOTHER-POLICY-ID",
+          name: "Policy 2",
+          roles: [
+            {
+              id: "717E2ECB-8B76-402C-A142-15DD486CBE95",
+              name: "School",
+              code: "CheckRecord_School",
+            },
+          ],
+        },
+      ],
+    });
+
+    await postConfirmRemovePolicyRole(req, res);
+
+    expect(deleteServiceRoleRaw).not.toHaveBeenCalled();
+
+    expect(res.flash).toHaveBeenCalledWith(
+      "info",
+      "Policy role School CheckRecord_School successfully removed",
+    );
+
+    expect(res.redirect).toHaveBeenCalledWith("conditionsAndRoles");
+  });
+
   it("should flash an error when the role ID does not match any role in the policy", async () => {
     req.body.roleId = "NON-EXISTENT-ROLE-ID";
 
