@@ -48,8 +48,7 @@ describe("when calling the getConfirmRemovePolicyRole function", () => {
         pid: "policy-id",
       },
       query: {
-        name: "School",
-        code: "CheckRecord_School",
+        roleId: "717E2ECB-8B76-402C-A142-15DD486CBE95",
       },
     };
 
@@ -80,6 +79,7 @@ describe("when calling the getConfirmRemovePolicyRole function", () => {
       csrfToken: "token",
       name: "School",
       code: "CheckRecord_School",
+      roleId: "717E2ECB-8B76-402C-A142-15DD486CBE95",
       policy: policy,
       cancelLink: "/services/service-id/policies/policy-id/conditionsAndRoles",
       backLink: "/services/service-id/policies/policy-id/conditionsAndRoles",
@@ -95,6 +95,45 @@ describe("when calling the getConfirmRemovePolicyRole function", () => {
       serviceId: "service-id",
       policyId: "policy-id",
     });
+  });
+
+  it("should redirect with error when role ID is not found in policy", async () => {
+    req.query.roleId = "NON-EXISTENT-ROLE-ID";
+
+    await getConfirmRemovePolicyRole(req, res);
+
+    expect(logger.info).toHaveBeenCalledWith(
+      "[NON-EXISTENT-ROLE-ID] not found in existing policy",
+      { correlationId: "correlationId" },
+    );
+    expect(res.flash).toHaveBeenCalledWith(
+      "error",
+      "Role not found in policy. It may have already been removed.",
+    );
+    expect(res.redirect).toHaveBeenCalledWith(
+      "/services/service-id/policies/policy-id/conditionsAndRoles",
+    );
+    expect(res.render).not.toHaveBeenCalled();
+  });
+
+  it("should redirect with error when roleId query param is missing", async () => {
+    delete req.query.roleId;
+
+    await getConfirmRemovePolicyRole(req, res);
+
+    expect(logger.info).toHaveBeenCalledWith(
+      "No roleId provided in query params",
+      { correlationId: "correlationId" },
+    );
+    expect(res.flash).toHaveBeenCalledWith(
+      "error",
+      "Role not found in policy.",
+    );
+    expect(res.redirect).toHaveBeenCalledWith(
+      "/services/service-id/policies/policy-id/conditionsAndRoles",
+    );
+    expect(res.render).not.toHaveBeenCalled();
+    expect(getServicePolicyRaw).not.toHaveBeenCalled();
   });
 
   it("should handle errors when getServicePolicyRaw fails", async () => {
@@ -119,17 +158,5 @@ describe("when calling the getConfirmRemovePolicyRole function", () => {
     expect(res.redirect).toHaveBeenCalledWith(
       "/services/service-id/policies/policy-id/conditionsAndRoles",
     );
-  });
-
-  it("should pass role name and code from query parameters", async () => {
-    req.query.name = "Test Role";
-    req.query.code = "test_role_code";
-
-    await getConfirmRemovePolicyRole(req, res);
-
-    expect(res.render.mock.calls[0][1]).toMatchObject({
-      name: "Test Role",
-      code: "test_role_code",
-    });
   });
 });
