@@ -18,12 +18,18 @@ const handleApiError = (error, req, res, errorMessage, flashMessage) => {
 };
 
 const postConfirmRemovePolicyRole = async (req, res) => {
-  const model = {
-    appId: req.params.sid,
-    roleName: req.body.name || "",
-    roleCode: req.body.code || "",
-    validationMessages: {},
-  };
+  const roleId = req.body.roleId;
+
+  if (!roleId) {
+    logger.info("No roleId provided in request body", {
+      correlationId: req.id,
+    });
+    res.flash("error", "Role not found in policy.");
+    return res.redirect(
+      `/services/${req.params.sid}/policies/${req.params.pid}/conditionsAndRoles`,
+    );
+  }
+
   let policy;
 
   try {
@@ -41,35 +47,38 @@ const postConfirmRemovePolicyRole = async (req, res) => {
     );
   }
 
-  const roleInPolicy = policy.roles.find(
-    (role) => role.name === model.roleName && role.code === model.roleCode,
-  );
+  const roleInPolicy = (policy.roles ?? []).find((role) => role.id === roleId);
 
   if (!roleInPolicy) {
-    logger.info(
-      `[${model.roleName}] [${model.roleCode}] not found in existing policy`,
-      { correlationId: req.id },
-    );
+    logger.info(`[${roleId}] not found in existing policy`, {
+      correlationId: req.id,
+    });
     res.flash(
-      "info",
-      `Policy role [${model.roleName}] [${model.roleCode}] not found in policy. Policy has not been modified`,
+      "error",
+      "Role not found in policy. It may have already been removed.",
     );
-    return res.redirect("conditionsAndRoles");
+    return res.redirect(
+      `/services/${req.params.sid}/policies/${req.params.pid}/conditionsAndRoles`,
+    );
   }
 
   /* Check if the role exists in other policies for this service.
   If it does, remove the role and update the policy.
   If not, remove the role and delete the role completely. */
   let allServicePolicies;
-  let roleInMultiplePolicies;
+  let allRoleOccurrences;
 
   try {
     allServicePolicies = await getServicePoliciesRaw({
       serviceId: req.params.sid,
     });
 
-    roleInMultiplePolicies = allServicePolicies
-      .flatMap((serviceRole) => serviceRole.roles)
+    const servicePolicies = Array.isArray(allServicePolicies)
+      ? allServicePolicies
+      : (allServicePolicies?.policies ?? []);
+
+    allRoleOccurrences = servicePolicies
+      .flatMap((servicePolicy) => servicePolicy.roles ?? [])
       .filter((role) => role.id === roleInPolicy.id);
   } catch (error) {
     return handleApiError(
@@ -81,8 +90,7 @@ const postConfirmRemovePolicyRole = async (req, res) => {
     );
   }
 
-  const roleIndex = policy.roles.indexOf(roleInPolicy);
-  policy.roles.splice(roleIndex, 1);
+  policy.roles = policy.roles.filter((role) => role !== roleInPolicy);
 
   try {
     await updateServicePolicyRaw({
@@ -100,7 +108,7 @@ const postConfirmRemovePolicyRole = async (req, res) => {
     );
   }
 
-  const roleUsedInOtherPolicies = roleInMultiplePolicies.length > 1;
+  const roleUsedInOtherPolicies = allRoleOccurrences.length > 1;
 
   if (!roleUsedInOtherPolicies) {
     logger.info(
@@ -127,7 +135,7 @@ const postConfirmRemovePolicyRole = async (req, res) => {
   }
 
   logger.audit(
-    `${req.user.email} removed a policy role with name '${model.roleName}'`,
+    `${req.user.email} removed a policy role with name '${roleInPolicy.name}'`,
     {
       type: "manage",
       subType: "policy-role-removed",
@@ -135,14 +143,14 @@ const postConfirmRemovePolicyRole = async (req, res) => {
       userEmail: req.user.email,
       serviceId: req.params.sid,
       policyId: req.params.pid,
-      name: model.roleName,
-      code: model.roleCode,
+      name: roleInPolicy.name,
+      code: roleInPolicy.code,
     },
   );
 
   res.flash(
     "info",
-    `Policy role ${model.roleName} ${model.roleCode} successfully removed`,
+    `Policy role ${roleInPolicy.name} ${roleInPolicy.code} successfully removed`,
   );
 
   return res.redirect("conditionsAndRoles");

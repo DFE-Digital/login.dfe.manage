@@ -2,8 +2,18 @@ const { getServicePolicyRaw } = require("login.dfe.api-client/services");
 const logger = require("../../infrastructure/logger");
 
 const getConfirmRemovePolicyRole = async (req, res) => {
-  const name = req.query.name;
-  const code = req.query.code;
+  const roleId = req.query.roleId;
+
+  if (!roleId) {
+    logger.info("No roleId provided in query params", {
+      correlationId: req.id,
+    });
+    res.flash("error", "Role not found in policy.");
+    return res.redirect(
+      `/services/${req.params.sid}/policies/${req.params.pid}/conditionsAndRoles`,
+    );
+  }
+
   let policy;
 
   try {
@@ -22,10 +32,26 @@ const getConfirmRemovePolicyRole = async (req, res) => {
     );
   }
 
+  const role = (policy.roles ?? []).find((r) => r.id === roleId);
+
+  if (!role) {
+    logger.info(`[${roleId}] not found in existing policy`, {
+      correlationId: req.id,
+    });
+    res.flash(
+      "error",
+      "Role not found in policy. It may have already been removed.",
+    );
+    return res.redirect(
+      `/services/${req.params.sid}/policies/${req.params.pid}/conditionsAndRoles`,
+    );
+  }
+
   return res.render("services/views/confirmRemovePolicyRole", {
     csrfToken: req.csrfToken(),
-    name,
-    code,
+    name: role.name,
+    code: role.code,
+    roleId,
     policy,
     cancelLink: `/services/${req.params.sid}/policies/${req.params.pid}/conditionsAndRoles`,
     backLink: `/services/${req.params.sid}/policies/${req.params.pid}/conditionsAndRoles`,

@@ -49,7 +49,7 @@ describe("when using the postConfirmRemovePolicyRole function", () => {
           status: ["1"],
         },
         {
-          id: "A1B2C3D4-5E6F-7G8H-9I0J-K1L2M3N4O5P6",
+          id: "A1B2C3D4-E5F6-7890-ABCD-EF1234567890",
           name: "Teacher",
           code: "CheckRecord_Teacher",
           numericId: "22998",
@@ -89,8 +89,7 @@ describe("when using the postConfirmRemovePolicyRole function", () => {
         pid: "policy-id",
       },
       body: {
-        name: "School",
-        code: "CheckRecord_School",
+        roleId: "717E2ECB-8B76-402C-A142-15DD486CBE95",
       },
     });
 
@@ -122,7 +121,7 @@ describe("when using the postConfirmRemovePolicyRole function", () => {
       policy: expect.objectContaining({
         roles: [
           {
-            id: "A1B2C3D4-5E6F-7G8H-9I0J-K1L2M3N4O5P6",
+            id: "A1B2C3D4-E5F6-7890-ABCD-EF1234567890",
             name: "Teacher",
             code: "CheckRecord_Teacher",
             numericId: "22998",
@@ -167,7 +166,7 @@ describe("when using the postConfirmRemovePolicyRole function", () => {
       policy: expect.objectContaining({
         roles: [
           {
-            id: "A1B2C3D4-5E6F-7G8H-9I0J-K1L2M3N4O5P6",
+            id: "A1B2C3D4-E5F6-7890-ABCD-EF1234567890",
             name: "Teacher",
             code: "CheckRecord_Teacher",
             numericId: "22998",
@@ -195,26 +194,183 @@ describe("when using the postConfirmRemovePolicyRole function", () => {
     expect(res.redirect).toHaveBeenCalledWith("conditionsAndRoles");
   });
 
-  it("should flash an info message when the role does not exist in the policy", async () => {
-    req.body.name = "NonExistent";
-    req.body.code = "non_existent_code";
+  it("should handle a paged response from getServicePoliciesRaw", async () => {
+    getServicePoliciesRaw.mockResolvedValue({
+      policies: [
+        {
+          id: "6C8172B6-011B-4526-B04D-E2809A3D71A2",
+          name: "Policy 1",
+          roles: [
+            {
+              id: "717E2ECB-8B76-402C-A142-15DD486CBE95",
+              name: "School",
+              code: "CheckRecord_School",
+            },
+          ],
+        },
+        {
+          id: "ANOTHER-POLICY-ID",
+          name: "Policy 2",
+          roles: [
+            {
+              id: "717E2ECB-8B76-402C-A142-15DD486CBE95",
+              name: "School",
+              code: "CheckRecord_School",
+            },
+          ],
+        },
+      ],
+    });
+
+    await postConfirmRemovePolicyRole(req, res);
+
+    expect(deleteServiceRoleRaw).not.toHaveBeenCalled();
+
+    expect(res.flash).toHaveBeenCalledWith(
+      "info",
+      "Policy role School CheckRecord_School successfully removed",
+    );
+
+    expect(res.redirect).toHaveBeenCalledWith("conditionsAndRoles");
+  });
+
+  it("should flash an error when the role ID does not match any role in the policy", async () => {
+    req.body.roleId = "NON-EXISTENT-ROLE-ID";
 
     await postConfirmRemovePolicyRole(req, res);
 
     expect(logger.info).toHaveBeenCalledWith(
-      "[NonExistent] [non_existent_code] not found in existing policy",
+      "[NON-EXISTENT-ROLE-ID] not found in existing policy",
       { correlationId: "correlationId" },
     );
 
     expect(res.flash).toHaveBeenCalledWith(
-      "info",
-      "Policy role [NonExistent] [non_existent_code] not found in policy. Policy has not been modified",
+      "error",
+      "Role not found in policy. It may have already been removed.",
     );
 
-    expect(res.redirect).toHaveBeenCalledWith("conditionsAndRoles");
+    expect(res.redirect).toHaveBeenCalledWith(
+      "/services/service-id/policies/policy-id/conditionsAndRoles",
+    );
 
     expect(updateServicePolicyRaw).not.toHaveBeenCalled();
     expect(deleteServiceRoleRaw).not.toHaveBeenCalled();
+  });
+
+  it("should successfully remove a role with special characters in its name", async () => {
+    const specialCharsRoleId = "C3A2B1D0-E4F5-6789-ABCD-123456789ABC";
+    const specialCharsName =
+      "Q0_KLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_'{|}~abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const specialCharsCode = "role_code_250_special_chars";
+
+    getServicePolicyRaw.mockResolvedValue({
+      id: "6C8172B6-011B-4526-B04D-E2809A3D71A2",
+      name: "Test Service - Test Policy",
+      applicationId: "32A923EE-B729-44B1-BB52-1789FD08862A",
+      status: { id: 1 },
+      conditions: [],
+      roles: [
+        {
+          id: specialCharsRoleId,
+          name: specialCharsName,
+          code: specialCharsCode,
+          numericId: "23058",
+          status: ["1"],
+        },
+      ],
+    });
+
+    getServicePoliciesRaw.mockResolvedValue([
+      {
+        id: "6C8172B6-011B-4526-B04D-E2809A3D71A2",
+        name: "Policy 1",
+        roles: [
+          {
+            id: specialCharsRoleId,
+            name: specialCharsName,
+            code: specialCharsCode,
+          },
+        ],
+      },
+    ]);
+
+    req.body.roleId = specialCharsRoleId;
+
+    await postConfirmRemovePolicyRole(req, res);
+
+    expect(updateServicePolicyRaw).toHaveBeenCalledWith(
+      expect.objectContaining({
+        policy: expect.objectContaining({ roles: [] }),
+      }),
+    );
+
+    expect(deleteServiceRoleRaw).toHaveBeenCalledWith({
+      roleId: specialCharsRoleId,
+      serviceId: "32A923EE-B729-44B1-BB52-1789FD08862A",
+    });
+
+    expect(res.flash).toHaveBeenCalledWith(
+      "info",
+      `Policy role ${specialCharsName} ${specialCharsCode} successfully removed`,
+    );
+
+    expect(res.redirect).toHaveBeenCalledWith("conditionsAndRoles");
+  });
+
+  it("should successfully remove a role with a 250-character name", async () => {
+    const longNameRoleId = "F1E2D3C4-B5A6-7890-CDEF-1234567890AB";
+    const longName =
+      "Leadspaces Role Management Access Control Security Application Platform Integration Governance Operations Administration Compliance Configuration Monitoring Leadership Strategy Planning Execution Support Responsibility Enterprise Role ManagementAAAAA";
+    const longNameCode = "role_code_250_char_name";
+
+    expect(longName.length).toBe(250);
+
+    getServicePolicyRaw.mockResolvedValue({
+      id: "6C8172B6-011B-4526-B04D-E2809A3D71A2",
+      name: "Test Service - Test Policy",
+      applicationId: "32A923EE-B729-44B1-BB52-1789FD08862A",
+      status: { id: 1 },
+      conditions: [],
+      roles: [
+        {
+          id: longNameRoleId,
+          name: longName,
+          code: longNameCode,
+          numericId: "23059",
+          status: ["1"],
+        },
+      ],
+    });
+
+    getServicePoliciesRaw.mockResolvedValue([
+      {
+        id: "6C8172B6-011B-4526-B04D-E2809A3D71A2",
+        name: "Policy 1",
+        roles: [{ id: longNameRoleId, name: longName, code: longNameCode }],
+      },
+    ]);
+
+    req.body.roleId = longNameRoleId;
+
+    await postConfirmRemovePolicyRole(req, res);
+
+    expect(updateServicePolicyRaw).toHaveBeenCalledWith(
+      expect.objectContaining({
+        policy: expect.objectContaining({ roles: [] }),
+      }),
+    );
+
+    expect(deleteServiceRoleRaw).toHaveBeenCalledWith({
+      roleId: longNameRoleId,
+      serviceId: "32A923EE-B729-44B1-BB52-1789FD08862A",
+    });
+
+    expect(res.flash).toHaveBeenCalledWith(
+      "info",
+      `Policy role ${longName} ${longNameCode} successfully removed`,
+    );
+
+    expect(res.redirect).toHaveBeenCalledWith("conditionsAndRoles");
   });
 
   it("should log an audit entry after successfully removing a role", async () => {
@@ -347,16 +503,24 @@ describe("when using the postConfirmRemovePolicyRole function", () => {
     );
   });
 
-  it("should handle missing body parameters", async () => {
+  it("should flash an error when roleId is missing from request body", async () => {
     req.body = {};
 
     await postConfirmRemovePolicyRole(req, res);
 
-    expect(res.flash).toHaveBeenCalledWith(
-      "info",
-      "Policy role [] [] not found in policy. Policy has not been modified",
+    expect(logger.info).toHaveBeenCalledWith(
+      "No roleId provided in request body",
+      { correlationId: "correlationId" },
     );
 
-    expect(res.redirect).toHaveBeenCalledWith("conditionsAndRoles");
+    expect(res.flash).toHaveBeenCalledWith(
+      "error",
+      "Role not found in policy.",
+    );
+
+    expect(res.redirect).toHaveBeenCalledWith(
+      "/services/service-id/policies/policy-id/conditionsAndRoles",
+    );
+    expect(getServicePolicyRaw).not.toHaveBeenCalled();
   });
 });
