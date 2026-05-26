@@ -32,6 +32,11 @@ const addRoleToPolicy = async (
   );
 
   const newRole = await createServiceRole(model);
+  if (!newRole) {
+    throw new Error(
+      `createServiceRole returned no data for role [code: ${model.roleCode}]`,
+    );
+  }
   policy.roles.push(newRole);
   return newRole;
 };

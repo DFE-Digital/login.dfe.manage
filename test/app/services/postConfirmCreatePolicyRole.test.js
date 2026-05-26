@@ -290,6 +290,19 @@ describe("when using the postConfirmCreatePolicyRole function", () => {
     expect(req.session.createPolicyRoleData.roleName).toBe("New Test Role");
   });
 
+  it("should handle createServiceRole returning undefined (e.g. empty API response body)", async () => {
+    createServiceRole.mockResolvedValue(undefined);
+    req.session.save = jest.fn((callback) => callback());
+
+    await postConfirmCreatePolicyRole(req, res);
+
+    expect(res.flash).toHaveBeenCalledWith(
+      "error",
+      "Failed to update policy. Please try again.",
+    );
+    expect(res.redirect).toHaveBeenCalledWith("conditionsAndRoles");
+  });
+
   it("should handle errors when getServicePolicyRaw fails", async () => {
     const mockError = new Error("Policy Fetch Error");
     getServicePolicyRaw.mockRejectedValue(mockError);
