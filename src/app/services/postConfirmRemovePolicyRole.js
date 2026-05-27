@@ -1,6 +1,6 @@
 const {
   getServicePolicyRaw,
-  getServicePoliciesRaw,
+  getPaginatedServicePoliciesRaw,
   updateServicePolicyRaw,
   deleteServiceRoleRaw,
 } = require("login.dfe.api-client/services");
@@ -65,19 +65,16 @@ const postConfirmRemovePolicyRole = async (req, res) => {
   /* Check if the role exists in other policies for this service.
   If it does, remove the role and update the policy.
   If not, remove the role and delete the role completely. */
-  let allServicePolicies;
   let allRoleOccurrences;
 
   try {
-    allServicePolicies = await getServicePoliciesRaw({
+    const policiesResponse = await getPaginatedServicePoliciesRaw({
       serviceId: req.params.sid,
+      page: 1,
+      pageSize: 500,
     });
 
-    const servicePolicies = Array.isArray(allServicePolicies)
-      ? allServicePolicies
-      : (allServicePolicies?.policies ?? []);
-
-    allRoleOccurrences = servicePolicies
+    allRoleOccurrences = (policiesResponse?.policies ?? [])
       .flatMap((servicePolicy) => servicePolicy.roles ?? [])
       .filter((role) => role.id === roleInPolicy.id);
   } catch (error) {

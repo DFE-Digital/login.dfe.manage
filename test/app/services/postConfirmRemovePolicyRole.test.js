@@ -11,7 +11,7 @@ const { getRequestMock, getResponseMock } = require("../../utils");
 const postConfirmRemovePolicyRole = require("../../../src/app/services/postConfirmRemovePolicyRole");
 const {
   getServicePolicyRaw,
-  getServicePoliciesRaw,
+  getPaginatedServicePoliciesRaw,
   updateServicePolicyRaw,
   deleteServiceRoleRaw,
 } = require("login.dfe.api-client/services");
@@ -58,30 +58,32 @@ describe("when using the postConfirmRemovePolicyRole function", () => {
       ],
     };
 
-    const allServicePolicies = [
-      {
-        id: "6C8172B6-011B-4526-B04D-E2809A3D71A2",
-        name: "Policy 1",
-        roles: [
-          {
-            id: "717E2ECB-8B76-402C-A142-15DD486CBE95",
-            name: "School",
-            code: "CheckRecord_School",
-          },
-        ],
-      },
-      {
-        id: "ANOTHER-POLICY-ID",
-        name: "Policy 2",
-        roles: [
-          {
-            id: "717E2ECB-8B76-402C-A142-15DD486CBE95",
-            name: "School",
-            code: "CheckRecord_School",
-          },
-        ],
-      },
-    ];
+    const allServicePolicies = {
+      policies: [
+        {
+          id: "6C8172B6-011B-4526-B04D-E2809A3D71A2",
+          name: "Policy 1",
+          roles: [
+            {
+              id: "717E2ECB-8B76-402C-A142-15DD486CBE95",
+              name: "School",
+              code: "CheckRecord_School",
+            },
+          ],
+        },
+        {
+          id: "ANOTHER-POLICY-ID",
+          name: "Policy 2",
+          roles: [
+            {
+              id: "717E2ECB-8B76-402C-A142-15DD486CBE95",
+              name: "School",
+              code: "CheckRecord_School",
+            },
+          ],
+        },
+      ],
+    };
 
     req = getRequestMock({
       params: {
@@ -96,8 +98,8 @@ describe("when using the postConfirmRemovePolicyRole function", () => {
     getServicePolicyRaw.mockReset();
     getServicePolicyRaw.mockResolvedValue(policy);
 
-    getServicePoliciesRaw.mockReset();
-    getServicePoliciesRaw.mockResolvedValue(allServicePolicies);
+    getPaginatedServicePoliciesRaw.mockReset();
+    getPaginatedServicePoliciesRaw.mockResolvedValue(allServicePolicies);
 
     updateServicePolicyRaw.mockReset();
     updateServicePolicyRaw.mockResolvedValue(undefined);
@@ -142,21 +144,21 @@ describe("when using the postConfirmRemovePolicyRole function", () => {
   });
 
   it("should remove a role from the policy and delete it when it does not exist in other policies", async () => {
-    const policiesWithSingleRole = [
-      {
-        id: "6C8172B6-011B-4526-B04D-E2809A3D71A2",
-        name: "Policy 1",
-        roles: [
-          {
-            id: "717E2ECB-8B76-402C-A142-15DD486CBE95",
-            name: "School",
-            code: "CheckRecord_School",
-          },
-        ],
-      },
-    ];
-
-    getServicePoliciesRaw.mockResolvedValue(policiesWithSingleRole);
+    getPaginatedServicePoliciesRaw.mockResolvedValue({
+      policies: [
+        {
+          id: "6C8172B6-011B-4526-B04D-E2809A3D71A2",
+          name: "Policy 1",
+          roles: [
+            {
+              id: "717E2ECB-8B76-402C-A142-15DD486CBE95",
+              name: "School",
+              code: "CheckRecord_School",
+            },
+          ],
+        },
+      ],
+    });
 
     await postConfirmRemovePolicyRole(req, res);
 
@@ -185,46 +187,6 @@ describe("when using the postConfirmRemovePolicyRole function", () => {
       "[32A923EE-B729-44B1-BB52-1789FD08862A] [717E2ECB-8B76-402C-A142-15DD486CBE95] does not exist in any other policies for this service. Calling deleteServiceRoleRaw.",
       { correlationId: "correlationId" },
     );
-
-    expect(res.flash).toHaveBeenCalledWith(
-      "info",
-      "Policy role School CheckRecord_School successfully removed",
-    );
-
-    expect(res.redirect).toHaveBeenCalledWith("conditionsAndRoles");
-  });
-
-  it("should handle a paged response from getServicePoliciesRaw", async () => {
-    getServicePoliciesRaw.mockResolvedValue({
-      policies: [
-        {
-          id: "6C8172B6-011B-4526-B04D-E2809A3D71A2",
-          name: "Policy 1",
-          roles: [
-            {
-              id: "717E2ECB-8B76-402C-A142-15DD486CBE95",
-              name: "School",
-              code: "CheckRecord_School",
-            },
-          ],
-        },
-        {
-          id: "ANOTHER-POLICY-ID",
-          name: "Policy 2",
-          roles: [
-            {
-              id: "717E2ECB-8B76-402C-A142-15DD486CBE95",
-              name: "School",
-              code: "CheckRecord_School",
-            },
-          ],
-        },
-      ],
-    });
-
-    await postConfirmRemovePolicyRole(req, res);
-
-    expect(deleteServiceRoleRaw).not.toHaveBeenCalled();
 
     expect(res.flash).toHaveBeenCalledWith(
       "info",
@@ -280,19 +242,21 @@ describe("when using the postConfirmRemovePolicyRole function", () => {
       ],
     });
 
-    getServicePoliciesRaw.mockResolvedValue([
-      {
-        id: "6C8172B6-011B-4526-B04D-E2809A3D71A2",
-        name: "Policy 1",
-        roles: [
-          {
-            id: specialCharsRoleId,
-            name: specialCharsName,
-            code: specialCharsCode,
-          },
-        ],
-      },
-    ]);
+    getPaginatedServicePoliciesRaw.mockResolvedValue({
+      policies: [
+        {
+          id: "6C8172B6-011B-4526-B04D-E2809A3D71A2",
+          name: "Policy 1",
+          roles: [
+            {
+              id: specialCharsRoleId,
+              name: specialCharsName,
+              code: specialCharsCode,
+            },
+          ],
+        },
+      ],
+    });
 
     req.body.roleId = specialCharsRoleId;
 
@@ -342,13 +306,15 @@ describe("when using the postConfirmRemovePolicyRole function", () => {
       ],
     });
 
-    getServicePoliciesRaw.mockResolvedValue([
-      {
-        id: "6C8172B6-011B-4526-B04D-E2809A3D71A2",
-        name: "Policy 1",
-        roles: [{ id: longNameRoleId, name: longName, code: longNameCode }],
-      },
-    ]);
+    getPaginatedServicePoliciesRaw.mockResolvedValue({
+      policies: [
+        {
+          id: "6C8172B6-011B-4526-B04D-E2809A3D71A2",
+          name: "Policy 1",
+          roles: [{ id: longNameRoleId, name: longName, code: longNameCode }],
+        },
+      ],
+    });
 
     req.body.roleId = longNameRoleId;
 
@@ -415,9 +381,9 @@ describe("when using the postConfirmRemovePolicyRole function", () => {
     );
   });
 
-  it("should handle errors when getServicePoliciesRaw fails", async () => {
+  it("should handle errors when getPaginatedServicePoliciesRaw fails", async () => {
     const mockError = new Error("Policies Fetch Error");
-    getServicePoliciesRaw.mockRejectedValue(mockError);
+    getPaginatedServicePoliciesRaw.mockRejectedValue(mockError);
 
     await postConfirmRemovePolicyRole(req, res);
 
@@ -464,21 +430,21 @@ describe("when using the postConfirmRemovePolicyRole function", () => {
   });
 
   it("should handle errors when deleteServiceRoleRaw fails", async () => {
-    const policiesWithSingleRole = [
-      {
-        id: "6C8172B6-011B-4526-B04D-E2809A3D71A2",
-        name: "Policy 1",
-        roles: [
-          {
-            id: "717E2ECB-8B76-402C-A142-15DD486CBE95",
-            name: "School",
-            code: "CheckRecord_School",
-          },
-        ],
-      },
-    ];
-
-    getServicePoliciesRaw.mockResolvedValue(policiesWithSingleRole);
+    getPaginatedServicePoliciesRaw.mockResolvedValue({
+      policies: [
+        {
+          id: "6C8172B6-011B-4526-B04D-E2809A3D71A2",
+          name: "Policy 1",
+          roles: [
+            {
+              id: "717E2ECB-8B76-402C-A142-15DD486CBE95",
+              name: "School",
+              code: "CheckRecord_School",
+            },
+          ],
+        },
+      ],
+    });
 
     const mockError = new Error("Delete Error");
     deleteServiceRoleRaw.mockRejectedValue(mockError);
