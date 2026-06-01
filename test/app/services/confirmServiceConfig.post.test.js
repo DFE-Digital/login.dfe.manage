@@ -54,7 +54,6 @@ const {
 const {
   getServiceRaw,
   updateService,
-  updateServiceParam,
 } = require("login.dfe.api-client/services");
 
 const res = getResponseMock();
