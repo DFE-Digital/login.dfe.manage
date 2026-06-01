@@ -344,4 +344,24 @@ describe("when getting the Review service config changes page", () => {
       "services/views/confirmServiceConfig",
     );
   });
+
+  it("then it should include isServiceHidden in serviceChanges with title 'Hide service'", async () => {
+    req.session.serviceConfigurationChanges[req.params.sid] = {
+      authFlowType: "authorisationCodeFlow",
+      isServiceHidden: {
+        oldValue: "Visible",
+        newValue: "Hidden",
+      },
+    };
+
+    await getConfirmServiceConfig(req, res);
+
+    const { serviceChanges } = res.render.mock.calls[0][1];
+
+    expect(serviceChanges).toBeDefined();
+    const hiddenChange = serviceChanges.find((c) => c.title === "Hide service");
+    expect(hiddenChange).toBeDefined();
+    expect(hiddenChange.addedValues).toContain("Hidden");
+    expect(hiddenChange.removedValues).toContain("Visible");
+  });
 });
