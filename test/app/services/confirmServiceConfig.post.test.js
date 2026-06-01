@@ -54,6 +54,7 @@ const {
 const {
   getServiceRaw,
   updateService,
+  updateServiceParam,
 } = require("login.dfe.api-client/services");
 
 const res = getResponseMock();
@@ -832,5 +833,174 @@ describe("when confirming service config changes in the review page", () => {
       "Your changes to service configuration for service one have been saved.",
     );
     expect(res.redirect).toHaveBeenCalledWith("/services/service1");
+  });
+});
+
+describe("hide service save path", () => {
+  const baseSession = {
+    isServiceHidden: { oldValue: "Visible", newValue: "Hidden" },
+    redirectUris: {
+      oldValue: ["https://www.redirect.com"],
+      newValue: undefined,
+    },
+    postLogoutRedirectUris: {
+      oldValue: ["https://www.logout.com"],
+      newValue: undefined,
+    },
+  };
+
+  let req;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    getServiceRaw.mockReset();
+    updateService.mockReset();
+    getUserServiceRoles.mockReset();
+    getServiceRaw.mockReturnValue({
+      id: "service1",
+      name: "service one",
+      isIdOnlyService: false,
+      relyingParty: {
+        token_endpoint_auth_method: null,
+        client_id: "clientid",
+        client_secret: "dewier-thrombi-confounder-mikado",
+        api_secret: "dewier-thrombi-confounder-mikado",
+        service_home: "http://service-home.com",
+        postResetUrl: "https://www.postreset.com",
+        redirect_uris: ["https://www.redirect.com"],
+        post_logout_redirect_uris: ["https://www.logout.com"],
+        grant_types: ["implicit", "authorization_code"],
+        response_types: ["code"],
+      },
+    });
+    getUserServiceRoles.mockImplementation(() => Promise.resolve([]));
+    updateService.mockResolvedValue(undefined);
+    updateServiceParam.mockResolvedValue(undefined);
+    req = getRequestMock({
+      params: { sid: "service1" },
+      userServices: { roles: [{ code: "service1_serviceconfig" }] },
+      user: { sub: "user1", email: "test@test.com" },
+      session: {
+        serviceConfigurationChanges: {
+          service1: { ...baseSession },
+        },
+      },
+    });
+    res.mockResetAll();
+  });
+
+  it("calls updateServiceParam for hideApprover with 'true' when hiding", async () => {
+    await postConfirmServiceConfig(req, res);
+    expect(updateServiceParam).toHaveBeenCalledWith({
+      serviceId: "service1",
+      paramName: "hideApprover",
+      paramValue: "true",
+    });
+  });
+
+  it("calls updateServiceParam for hideSupport with 'true' when hiding", async () => {
+    await postConfirmServiceConfig(req, res);
+    expect(updateServiceParam).toHaveBeenCalledWith({
+      serviceId: "service1",
+      paramName: "hideSupport",
+      paramValue: "true",
+    });
+  });
+
+  it("calls updateServiceParam for helpHidden with 'true' when hiding", async () => {
+    await postConfirmServiceConfig(req, res);
+    expect(updateServiceParam).toHaveBeenCalledWith({
+      serviceId: "service1",
+      paramName: "helpHidden",
+      paramValue: "true",
+    });
+  });
+
+  it("calls updateServiceParam with 'false' for all three params when showing", async () => {
+    req.session.serviceConfigurationChanges.service1.isServiceHidden = {
+      oldValue: "Hidden",
+      newValue: "Visible",
+    };
+    await postConfirmServiceConfig(req, res);
+    ["hideApprover", "hideSupport", "helpHidden"].forEach((paramName) => {
+      expect(updateServiceParam).toHaveBeenCalledWith({
+        serviceId: "service1",
+        paramName,
+        paramValue: "false",
+      });
+    });
+  });
+
+  it("does NOT call updateServiceParam when isServiceHidden is not in session", async () => {
+    delete req.session.serviceConfigurationChanges.service1.isServiceHidden;
+    await postConfirmServiceConfig(req, res);
+    expect(updateServiceParam).not.toHaveBeenCalled();
+  });
+
+  it("calls updateService with isHiddenService: 1 for id-only service when hiding", async () => {
+    getServiceRaw.mockReturnValue({
+      id: "service1",
+      name: "service one",
+      isIdOnlyService: true,
+      relyingParty: {
+        token_endpoint_auth_method: null,
+        client_id: "clientid",
+        client_secret: "dewier-thrombi-confounder-mikado",
+        api_secret: "dewier-thrombi-confounder-mikado",
+        service_home: "http://service-home.com",
+        postResetUrl: "https://www.postreset.com",
+        redirect_uris: ["https://www.redirect.com"],
+        post_logout_redirect_uris: ["https://www.logout.com"],
+        grant_types: ["implicit", "authorization_code"],
+        response_types: ["code"],
+      },
+    });
+    await postConfirmServiceConfig(req, res);
+    expect(updateService).toHaveBeenCalledWith(
+      expect.objectContaining({
+        serviceId: "service1",
+        update: expect.objectContaining({ isHiddenService: 1 }),
+      }),
+    );
+  });
+
+  it("calls updateService with isHiddenService: 0 for id-only service when showing", async () => {
+    getServiceRaw.mockReturnValue({
+      id: "service1",
+      name: "service one",
+      isIdOnlyService: true,
+      relyingParty: {
+        token_endpoint_auth_method: null,
+        client_id: "clientid",
+        client_secret: "dewier-thrombi-confounder-mikado",
+        api_secret: "dewier-thrombi-confounder-mikado",
+        service_home: "http://service-home.com",
+        postResetUrl: "https://www.postreset.com",
+        redirect_uris: ["https://www.redirect.com"],
+        post_logout_redirect_uris: ["https://www.logout.com"],
+        grant_types: ["implicit", "authorization_code"],
+        response_types: ["code"],
+      },
+    });
+    req.session.serviceConfigurationChanges.service1.isServiceHidden = {
+      oldValue: "Hidden",
+      newValue: "Visible",
+    };
+    await postConfirmServiceConfig(req, res);
+    expect(updateService).toHaveBeenCalledWith(
+      expect.objectContaining({
+        serviceId: "service1",
+        update: expect.objectContaining({ isHiddenService: 0 }),
+      }),
+    );
+  });
+
+  it("does NOT call updateService with isHiddenService for role-based service", async () => {
+    // baseService has isIdOnlyService: false
+    await postConfirmServiceConfig(req, res);
+    const isHiddenServiceCalls = updateService.mock.calls.filter(
+      ([args]) => args && args.update && "isHiddenService" in args.update,
+    );
+    expect(isHiddenServiceCalls).toHaveLength(0);
   });
 });

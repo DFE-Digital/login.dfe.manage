@@ -1,7 +1,10 @@
 const niceware = require("niceware");
 const UrlValidator = require("login.dfe.validation/src/urlValidator");
 const { updateService } = require("../../infrastructure/utils/services");
-const { getServiceRaw } = require("login.dfe.api-client/services");
+const {
+  getServiceRaw,
+  updateServiceParam,
+} = require("login.dfe.api-client/services");
 const logger = require("../../infrastructure/logger");
 const {
   getUserServiceRoles,
@@ -93,6 +96,7 @@ const buildCurrentServiceModel = async (req) => {
   });
   return {
     name: service.name || "",
+    isIdOnlyService: !!service.isIdOnlyService,
   };
 };
 
@@ -502,6 +506,8 @@ const postConfirmServiceConfig = async (req, res) => {
     const serviceConfigChanges = {
       ...req.session.serviceConfigurationChanges[req.params.sid],
     };
+    const hideChange = serviceConfigChanges.isServiceHidden;
+    delete serviceConfigChanges.isServiceHidden;
     delete serviceConfigChanges.authFlowType;
 
     const editedFields = Object.entries(serviceConfigChanges)
@@ -550,6 +556,32 @@ const postConfirmServiceConfig = async (req, res) => {
     };
 
     await updateService(req.params.sid, updatedService);
+
+    if (hideChange?.newValue !== undefined) {
+      const shouldHide = hideChange.newValue === "Hidden";
+      await Promise.all([
+        updateServiceParam({
+          serviceId: req.params.sid,
+          paramName: "hideApprover",
+          paramValue: shouldHide ? "true" : "false",
+        }),
+        updateServiceParam({
+          serviceId: req.params.sid,
+          paramName: "hideSupport",
+          paramValue: shouldHide ? "true" : "false",
+        }),
+        updateServiceParam({
+          serviceId: req.params.sid,
+          paramName: "helpHidden",
+          paramValue: shouldHide ? "true" : "false",
+        }),
+      ]);
+      if (currentService.isIdOnlyService) {
+        await updateService(req.params.sid, {
+          isHiddenService: shouldHide ? 1 : 0,
+        });
+      }
+    }
 
     logger.audit(`${req.user.email} updated service configuration`, {
       type: "manage",
