@@ -429,4 +429,131 @@ describe("when getting the service config page", () => {
       expect(res.render.mock.calls[0][1].service.isServiceHidden).toBe(true);
     });
   });
+
+  describe("auto-sync isHiddenService for id-only services", () => {
+    const idOnlyServiceBase = {
+      id: "service1",
+      name: "service one",
+      description: "service description",
+      isIdOnlyService: true,
+      relyingParty: {
+        token_endpoint_auth_method: null,
+        client_id: "clientid",
+        client_secret: "dewier-thrombi-confounder-mikado",
+        api_secret: "dewier-thrombi-confounder-mikado",
+        service_home: "https://www.servicehome.com",
+        postResetUrl: "https://www.postreset.com",
+        redirect_uris: ["https://www.redirect.com"],
+        post_logout_redirect_uris: ["https://www.logout.com"],
+        grant_types: ["authorization_code"],
+        response_types: ["code"],
+      },
+    };
+
+    beforeEach(() => {
+      updateService.mockResolvedValue(undefined);
+    });
+
+    it("calls updateService with isHiddenService: 1 when params are truthy but isHiddenService is false", async () => {
+      getServiceRaw.mockReturnValue({
+        ...idOnlyServiceBase,
+        isHiddenService: false,
+        relyingParty: {
+          ...idOnlyServiceBase.relyingParty,
+          params: {
+            hideApprover: "true",
+            hideSupport: "true",
+            helpHidden: "true",
+          },
+        },
+      });
+
+      await getServiceConfig(req, res);
+
+      expect(updateService).toHaveBeenCalledWith("service1", {
+        isHiddenService: 1,
+      });
+    });
+
+    it("calls updateService with isHiddenService: 0 when params are falsy but isHiddenService is true", async () => {
+      getServiceRaw.mockReturnValue({
+        ...idOnlyServiceBase,
+        isHiddenService: true,
+        relyingParty: {
+          ...idOnlyServiceBase.relyingParty,
+          params: {
+            hideApprover: "false",
+            hideSupport: "true",
+            helpHidden: "true",
+          },
+        },
+      });
+
+      await getServiceConfig(req, res);
+
+      expect(updateService).toHaveBeenCalledWith("service1", {
+        isHiddenService: 0,
+      });
+    });
+
+    it("does NOT call updateService when params and isHiddenService are consistent", async () => {
+      getServiceRaw.mockReturnValue({
+        ...idOnlyServiceBase,
+        isHiddenService: true,
+        relyingParty: {
+          ...idOnlyServiceBase.relyingParty,
+          params: {
+            hideApprover: "true",
+            hideSupport: "true",
+            helpHidden: "true",
+          },
+        },
+      });
+
+      await getServiceConfig(req, res);
+
+      expect(updateService).not.toHaveBeenCalled();
+    });
+
+    it("does NOT call updateService during AMEND_CHANGES", async () => {
+      req.query.action = ACTIONS.AMEND_CHANGES;
+      req.session.serviceConfigurationChanges = { [req.params.sid]: {} };
+      getServiceRaw.mockReturnValue({
+        ...idOnlyServiceBase,
+        isHiddenService: false,
+        relyingParty: {
+          ...idOnlyServiceBase.relyingParty,
+          params: {
+            hideApprover: "true",
+            hideSupport: "true",
+            helpHidden: "true",
+          },
+        },
+      });
+
+      await getServiceConfig(req, res);
+
+      expect(updateService).not.toHaveBeenCalled();
+    });
+
+    it("does NOT call updateService for a role-based service", async () => {
+      getServiceRaw.mockReturnValue({
+        ...idOnlyServiceBase,
+        isIdOnlyService: false,
+        isHiddenService: false,
+        relyingParty: {
+          ...idOnlyServiceBase.relyingParty,
+          params: {
+            hideApprover: "true",
+            hideSupport: "true",
+            helpHidden: "true",
+          },
+        },
+      });
+
+      await getServiceConfig(req, res);
+
+      expect(updateService).not.toHaveBeenCalled();
+    });
+  });
 });

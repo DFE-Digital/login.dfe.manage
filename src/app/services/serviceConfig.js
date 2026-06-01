@@ -158,6 +158,24 @@ const getServiceConfig = async (req, res) => {
     }
     const manageRolesForService = await getUserServiceRoles(req);
     const serviceModel = await buildCurrentServiceModel(req);
+    if (
+      req.query?.action !== ACTIONS.AMEND_CHANGES &&
+      serviceModel.rawService.isIdOnlyService
+    ) {
+      const paramsTruthy =
+        isTruthyParam(
+          serviceModel.rawService.relyingParty?.params?.hideApprover,
+        ) &&
+        isTruthyParam(
+          serviceModel.rawService.relyingParty?.params?.hideSupport,
+        ) &&
+        isTruthyParam(serviceModel.rawService.relyingParty?.params?.helpHidden);
+      if (
+        paramsTruthy !== isTruthyParam(serviceModel.rawService.isHiddenService)
+      ) {
+        await updateService(sid, { isHiddenService: paramsTruthy ? 1 : 0 });
+      }
+    }
     return res.render("services/views/serviceConfig", {
       csrfToken: req.csrfToken(),
       service: {
