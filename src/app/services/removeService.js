@@ -16,6 +16,8 @@ const {
 } = require("./utils");
 const { mapSearchUserToSupportModel } = require("../../infrastructure/utils");
 
+const { ServiceNotificationsClient } = require("login.dfe.jobs-client");
+const config = require("../../infrastructure/config");
 const logger = require("../../infrastructure/logger");
 
 const getModel = async (req) => {
@@ -67,6 +69,26 @@ const post = async (req, res) => {
       serviceId: req.params.sid,
       organisationId: req.params.oid,
     });
+
+    try {
+      const serviceNotificationsClient = new ServiceNotificationsClient(
+        config.notifications,
+      );
+      await serviceNotificationsClient.notifyUserUpdated({
+        sub: req.params.uid,
+        removedServiceId: req.params.sid,
+        removedOrgId: req.params.oid,
+      });
+    } catch (e) {
+      logger.error(
+        `Failed to notify legacy WS Sync on service removal for user ${req.params.uid}`,
+        e,
+      );
+      res.flash(
+        "warning",
+        "Sync notification to legacy WS service failed. You can retry from the user's 'WS Sync' page.",
+      );
+    }
   }
 
   const getAllUserDetails = mapSearchUserToSupportModel(
