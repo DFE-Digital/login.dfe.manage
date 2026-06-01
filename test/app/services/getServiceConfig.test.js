@@ -29,10 +29,14 @@ jest.mock("../../../src/app/services/utils", () => {
 jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
 }));
+jest.mock("../../../src/infrastructure/utils/services", () => ({
+  updateService: jest.fn(),
+}));
 
 const { getRequestMock, getResponseMock } = require("../../utils");
 const { getServiceConfig } = require("../../../src/app/services/serviceConfig");
 const { getServiceRaw } = require("login.dfe.api-client/services");
+const { updateService } = require("../../../src/infrastructure/utils/services");
 const { getUserServiceRoles } = require("../../../src/app/services/utils");
 const { ACTIONS } = require("../../../src/constants/serviceConfigConstants");
 
@@ -84,6 +88,7 @@ describe("when getting the service config page", () => {
     });
     getUserServiceRoles.mockReset();
     getUserServiceRoles.mockImplementation(() => Promise.resolve([]));
+    updateService.mockResolvedValue(undefined);
     res.mockResetAll();
   });
 
@@ -218,6 +223,7 @@ describe("when getting the service config page", () => {
       clientSecret: "new-secret",
       description: "service description",
       grantTypes: ["refresh_token", "authorization_code"],
+      isServiceHidden: false,
       name: "service one",
       postLogoutRedirectUris: "https://new.logout.com",
       postResetUrl: "https://new.postreset.com",
@@ -303,5 +309,124 @@ describe("when getting the service config page", () => {
 
     expect(res.render.mock.calls).toHaveLength(1);
     expect(res.render.mock.calls[0][0]).toBe("services/views/serviceConfig");
+  });
+
+  describe("isServiceHidden checkbox state", () => {
+    const baseService = {
+      id: "service1",
+      name: "service one",
+      description: "service description",
+      isIdOnlyService: false,
+      isHiddenService: false,
+      relyingParty: {
+        token_endpoint_auth_method: null,
+        client_id: "clientid",
+        client_secret: "dewier-thrombi-confounder-mikado",
+        api_secret: "dewier-thrombi-confounder-mikado",
+        service_home: "https://www.servicehome.com",
+        postResetUrl: "https://www.postreset.com",
+        redirect_uris: ["https://www.redirect.com"],
+        post_logout_redirect_uris: ["https://www.logout.com"],
+        grant_types: ["implicit", "authorization_code"],
+        response_types: ["code"],
+      },
+    };
+
+    it("is false when no params are set", async () => {
+      getServiceRaw.mockReturnValue(baseService);
+      await getServiceConfig(req, res);
+      expect(res.render.mock.calls[0][1].service.isServiceHidden).toBe(false);
+    });
+
+    it("is true when all three params are truthy for a role-based service", async () => {
+      getServiceRaw.mockReturnValue({
+        ...baseService,
+        relyingParty: {
+          ...baseService.relyingParty,
+          params: {
+            hideApprover: "true",
+            hideSupport: "true",
+            helpHidden: "true",
+          },
+        },
+      });
+      await getServiceConfig(req, res);
+      expect(res.render.mock.calls[0][1].service.isServiceHidden).toBe(true);
+    });
+
+    it("is false when only two of three params are truthy for a role-based service", async () => {
+      getServiceRaw.mockReturnValue({
+        ...baseService,
+        relyingParty: {
+          ...baseService.relyingParty,
+          params: {
+            hideApprover: "true",
+            hideSupport: "true",
+            helpHidden: "false",
+          },
+        },
+      });
+      await getServiceConfig(req, res);
+      expect(res.render.mock.calls[0][1].service.isServiceHidden).toBe(false);
+    });
+
+    it("is true when all three params and isHiddenService are truthy for an id-only service", async () => {
+      getServiceRaw.mockReturnValue({
+        ...baseService,
+        isIdOnlyService: true,
+        isHiddenService: true,
+        relyingParty: {
+          ...baseService.relyingParty,
+          params: {
+            hideApprover: "true",
+            hideSupport: "true",
+            helpHidden: "true",
+          },
+        },
+      });
+      await getServiceConfig(req, res);
+      expect(res.render.mock.calls[0][1].service.isServiceHidden).toBe(true);
+    });
+
+    it("is false when all three params truthy but isHiddenService false for an id-only service", async () => {
+      getServiceRaw.mockReturnValue({
+        ...baseService,
+        isIdOnlyService: true,
+        isHiddenService: false,
+        relyingParty: {
+          ...baseService.relyingParty,
+          params: {
+            hideApprover: "true",
+            hideSupport: "true",
+            helpHidden: "true",
+          },
+        },
+      });
+      await getServiceConfig(req, res);
+      expect(res.render.mock.calls[0][1].service.isServiceHidden).toBe(false);
+    });
+
+    it("restores isServiceHidden from session during AMEND_CHANGES", async () => {
+      req.query.action = ACTIONS.AMEND_CHANGES;
+      req.session.serviceConfigurationChanges = {
+        [req.params.sid]: {
+          isServiceHidden: { oldValue: "Visible", newValue: "Hidden" },
+        },
+      };
+      getServiceRaw.mockReturnValue({
+        ...baseService,
+        relyingParty: {
+          ...baseService.relyingParty,
+          params: {
+            hideApprover: "false",
+            hideSupport: "false",
+            helpHidden: "false",
+          },
+        },
+      });
+      await getServiceConfig(req, res);
+      // Session says newValue: 'Hidden' → isServiceHidden should be true
+      expect(res.render.mock.calls[0][1].service.isServiceHidden).toBe(true);
+    });
   });
 });

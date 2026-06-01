@@ -21,6 +21,10 @@ const {
   _unescape,
 } = require("./utils");
 const { decrypt } = require("login.dfe.api-client/encryption");
+const { updateService } = require("../../infrastructure/utils/services");
+
+const isTruthyParam = (value) =>
+  value === true || value === 1 || value === "true" || value === "1";
 
 const buildServiceModelFromObject = (service, sessionService = {}) => {
   let tokenEndpointAuthMethod = null;
@@ -120,9 +124,25 @@ const buildCurrentServiceModel = async (req) => {
     );
     const oldServiceConfigModel = buildServiceModelFromObject(service);
 
+    const allParamsTruthy =
+      isTruthyParam(service.relyingParty?.params?.hideApprover) &&
+      isTruthyParam(service.relyingParty?.params?.hideSupport) &&
+      isTruthyParam(service.relyingParty?.params?.helpHidden);
+    const apiIsServiceHidden =
+      allParamsTruthy &&
+      (!service.isIdOnlyService || isTruthyParam(service.isHiddenService));
+
+    const sessionHideValue = sessionService?.isServiceHidden?.newValue;
+    const isServiceHidden =
+      sessionHideValue !== undefined
+        ? sessionHideValue === "Hidden"
+        : apiIsServiceHidden;
+
     return {
       currentServiceModel,
       oldServiceConfigModel,
+      rawService: service,
+      isServiceHidden,
     };
   } catch (error) {
     throw new Error(`Could not build service model - ${error}`);
@@ -140,7 +160,10 @@ const getServiceConfig = async (req, res) => {
     const serviceModel = await buildCurrentServiceModel(req);
     return res.render("services/views/serviceConfig", {
       csrfToken: req.csrfToken(),
-      service: serviceModel.currentServiceModel,
+      service: {
+        ...serviceModel.currentServiceModel,
+        isServiceHidden: serviceModel.isServiceHidden,
+      },
       backLink: `/services/${sid}`,
       validationMessages: {},
       serviceId: sid,
