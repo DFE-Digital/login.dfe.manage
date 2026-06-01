@@ -14,6 +14,7 @@ jest.mock("./../../../src/infrastructure/logger", () =>
 jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
   updateService: jest.fn(),
+  updateServiceParam: jest.fn(),
 }));
 
 jest.mock("../../../src/app/services/utils", () => {
@@ -53,6 +54,7 @@ const {
 const {
   getServiceRaw,
   updateService,
+  updateServiceParam,
 } = require("login.dfe.api-client/services");
 
 const res = getResponseMock();

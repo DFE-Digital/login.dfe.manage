@@ -44,6 +44,9 @@ const updateService = async (serviceId, serviceDetails) => {
     updatedServiceDetails.tokenEndpointAuthMethod =
       serviceDetails.tokenEndpointAuthMethod;
   }
+  if (serviceDetails.isHiddenService !== undefined) {
+    updatedServiceDetails.isHiddenService = serviceDetails.isHiddenService;
+  }
 
   await updateServiceApiClient({
     serviceId: serviceId,
