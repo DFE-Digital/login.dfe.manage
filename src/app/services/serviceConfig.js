@@ -174,6 +174,7 @@ const getServiceConfig = async (req, res) => {
         paramsTruthy !== isTruthyParam(serviceModel.rawService.isHiddenService)
       ) {
         await updateService(sid, { isHiddenService: paramsTruthy ? 1 : 0 });
+        serviceModel.isServiceHidden = paramsTruthy;
       }
     }
     return res.render("services/views/serviceConfig", {

@@ -388,7 +388,7 @@ describe("when getting the service config page", () => {
       expect(res.render.mock.calls[0][1].service.isServiceHidden).toBe(true);
     });
 
-    it("is false when all three params truthy but isHiddenService false for an id-only service", async () => {
+    it("is true when all three params truthy but isHiddenService false for an id-only service (auto-sync corrects display)", async () => {
       getServiceRaw.mockReturnValue({
         ...baseService,
         isIdOnlyService: true,
@@ -403,7 +403,8 @@ describe("when getting the service config page", () => {
         },
       });
       await getServiceConfig(req, res);
-      expect(res.render.mock.calls[0][1].service.isServiceHidden).toBe(false);
+      // Auto-sync fires (params truthy but isHiddenService false) and corrects the displayed state.
+      expect(res.render.mock.calls[0][1].service.isServiceHidden).toBe(true);
     });
 
     it("restores isServiceHidden from session during AMEND_CHANGES", async () => {
