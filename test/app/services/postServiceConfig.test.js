@@ -889,3 +889,99 @@ describe("when editing the IMPLICIT flow service configuration", () => {
     ).toBe(undefined);
   });
 });
+
+describe("when isServiceHidden checkbox state changes", () => {
+  const baseServiceWithNoParams = {
+    id: "service1",
+    name: "service one",
+    description: "service description",
+    isIdOnlyService: false,
+    isHiddenService: false,
+    relyingParty: {
+      client_id: "clientid",
+      client_secret: "dewier-thrombi-confounder-mikado",
+      service_home: "https://www.servicehome.com",
+      postResetUrl: "https://www.postreset.com",
+      redirect_uris: ["https://www.redirect.com"],
+      post_logout_redirect_uris: ["https://www.logout.com"],
+      grant_types: ["authorization_code", "implicit"],
+      response_types: ["code"],
+      api_secret: "dewier-thrombi-confounder-mikado",
+      token_endpoint_auth_method: undefined,
+      params: {
+        hideApprover: "false",
+        hideSupport: "false",
+        helpHidden: "false",
+      },
+    },
+  };
+
+  let req;
+
+  beforeEach(() => {
+    getServiceRaw.mockReset();
+    getServiceRaw.mockReturnValue(baseServiceWithNoParams);
+    getUserServiceRoles.mockReset();
+    getUserServiceRoles.mockImplementation(() => Promise.resolve([]));
+    checkClientId.mockReset();
+    checkClientId.mockResolvedValue(null);
+    res.mockResetAll();
+    req = getRequestMock({
+      params: { sid: "service1" },
+      userServices: { roles: [{ code: "service1_serviceconfig" }] },
+      session: {
+        serviceConfigurationChanges: { service1: {} },
+        passport: { user: { sub: "user1" } },
+      },
+      body: {
+        clientId: "clientid",
+        clientSecret: "dewier-thrombi-confounder-mikado",
+        serviceHome: "https://www.servicehome.com",
+        postResetUrl: "https://www.postreset.com",
+        redirect_uris: ["https://www.redirect.com"],
+        post_logout_redirect_uris: ["https://www.logout.com"],
+        response_types: ["code"],
+        isServiceHidden: "on",
+      },
+    });
+  });
+
+  it("writes isServiceHidden to session when checkbox goes from unchecked (Visible) to checked (Hidden)", async () => {
+    await postServiceConfig(req, res);
+
+    expect(
+      req.session.serviceConfigurationChanges["service1"].isServiceHidden,
+    ).toEqual({ oldValue: "Visible", newValue: "Hidden" });
+  });
+
+  it("writes isServiceHidden to session when checkbox goes from checked (Hidden) to unchecked (Visible)", async () => {
+    getServiceRaw.mockReturnValue({
+      ...baseServiceWithNoParams,
+      relyingParty: {
+        ...baseServiceWithNoParams.relyingParty,
+        params: {
+          hideApprover: "true",
+          hideSupport: "true",
+          helpHidden: "true",
+        },
+      },
+    });
+    req.body.isServiceHidden = undefined;
+
+    await postServiceConfig(req, res);
+
+    expect(
+      req.session.serviceConfigurationChanges["service1"].isServiceHidden,
+    ).toEqual({ oldValue: "Hidden", newValue: "Visible" });
+  });
+
+  it("does NOT write isServiceHidden to session when checkbox state is unchanged (both Visible)", async () => {
+    req.body.isServiceHidden = undefined;
+
+    await postServiceConfig(req, res);
+
+    expect(
+      req.session.serviceConfigurationChanges["service1"].isServiceHidden,
+    ).toBeUndefined();
+  });
+});

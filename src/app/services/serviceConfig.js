@@ -595,10 +595,12 @@ const postServiceConfig = async (req, res) => {
 
     const currentService = serviceModels.currentServiceModel;
     const oldService = serviceModels.oldServiceConfigModel;
+    const { isServiceHidden: oldIsServiceHidden } = serviceModels;
     const model = await validate(req, currentService, oldService);
 
     if (Object.keys(model.validationMessages).length > 0) {
       model.csrfToken = req.csrfToken();
+      model.service.isServiceHidden = oldIsServiceHidden;
       return res.render("services/views/serviceConfig", model);
     }
 
@@ -653,31 +655,38 @@ const postServiceConfig = async (req, res) => {
 
       req.session.serviceConfigurationChanges[sid].authFlowType =
         model.authFlowType;
-
-      if (
-        req.session.serviceConfigurationChanges[sid].postLogoutRedirectUris ===
-        undefined
-      ) {
-        req.session.serviceConfigurationChanges[sid].postLogoutRedirectUris =
-          {};
-        req.session.serviceConfigurationChanges[
-          sid
-        ].postLogoutRedirectUris.oldValue =
-          model.service.postLogoutRedirectUris;
-        req.session.serviceConfigurationChanges[
-          sid
-        ].postLogoutRedirectUris.newValue = undefined;
-      }
-      if (
-        req.session.serviceConfigurationChanges[sid].redirectUris === undefined
-      ) {
-        req.session.serviceConfigurationChanges[sid].redirectUris = {};
-        req.session.serviceConfigurationChanges[sid].redirectUris.oldValue =
-          model.service.redirectUris;
-        req.session.serviceConfigurationChanges[sid].redirectUris.newValue =
-          undefined;
-      }
     }
+
+    if (
+      req.session.serviceConfigurationChanges[sid].postLogoutRedirectUris ===
+      undefined
+    ) {
+      req.session.serviceConfigurationChanges[sid].postLogoutRedirectUris = {};
+      req.session.serviceConfigurationChanges[
+        sid
+      ].postLogoutRedirectUris.oldValue = model.service.postLogoutRedirectUris;
+      req.session.serviceConfigurationChanges[
+        sid
+      ].postLogoutRedirectUris.newValue = undefined;
+    }
+    if (
+      req.session.serviceConfigurationChanges[sid].redirectUris === undefined
+    ) {
+      req.session.serviceConfigurationChanges[sid].redirectUris = {};
+      req.session.serviceConfigurationChanges[sid].redirectUris.oldValue =
+        model.service.redirectUris;
+      req.session.serviceConfigurationChanges[sid].redirectUris.newValue =
+        undefined;
+    }
+
+    const newIsServiceHidden = req.body.isServiceHidden === "on";
+    if (newIsServiceHidden !== oldIsServiceHidden) {
+      req.session.serviceConfigurationChanges[sid].isServiceHidden = {
+        oldValue: oldIsServiceHidden ? "Hidden" : "Visible",
+        newValue: newIsServiceHidden ? "Hidden" : "Visible",
+      };
+    }
+
     return res.redirect("review-service-configuration#");
   } catch (error) {
     throw new Error(error);
