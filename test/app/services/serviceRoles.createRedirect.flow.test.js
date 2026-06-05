@@ -67,7 +67,7 @@ describe("service role create to service roles route flow", () => {
     ]);
   });
 
-  it("redirects to service roles route and provides nav context for the destination page", async () => {
+  it("redirects to the policy conditions and roles page after creating a policy role", async () => {
     const postReq = getRequestMock({
       params: {
         sid: "service-1",
@@ -85,7 +85,9 @@ describe("service role create to service roles route flow", () => {
 
     await postConfirmCreatePolicyRole(postReq, postRes);
 
-    expect(postRes.redirect).toHaveBeenCalledWith("/services/service-1/roles");
+    expect(postRes.redirect).toHaveBeenCalledWith(
+      "/services/service-1/policies/policy-1/conditionsAndRoles",
+    );
 
     const getReq = getRequestMock({
       params: {
