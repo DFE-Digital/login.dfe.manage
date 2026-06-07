@@ -176,7 +176,9 @@ const postConfirmCreatePolicyRole = async (req, res) => {
       `Policy role ${model.roleName} ${model.roleCode} successfully added`,
     );
   }
-  return res.redirect(`/services/${req.params.sid}/roles`);
+  return res.redirect(
+    `/services/${req.params.sid}/policies/${req.params.pid}/conditionsAndRoles`,
+  );
 };
 
 module.exports = postConfirmCreatePolicyRole;
