@@ -4,7 +4,10 @@ jest.mock("./../../../src/infrastructure/config", () =>
 jest.mock("./../../../src/infrastructure/logger", () =>
   require("./../../utils").loggerMockFactory(),
 );
-jest.mock("login.dfe.api-client/services");
+jest.mock("login.dfe.api-client/services", () => ({
+  getServiceRaw: jest.fn(),
+  updateServiceParam: jest.fn(),
+}));
 jest.mock("login.dfe.api-client/encryption", () => ({
   encrypt: jest.fn().mockReturnValue("encrypted-secret"),
 }));
