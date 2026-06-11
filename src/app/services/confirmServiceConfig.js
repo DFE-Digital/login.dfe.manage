@@ -1,7 +1,10 @@
 const niceware = require("niceware");
 const UrlValidator = require("login.dfe.validation/src/urlValidator");
 const { updateService } = require("../../infrastructure/utils/services");
-const { getServiceRaw } = require("login.dfe.api-client/services");
+const {
+  getServiceRaw,
+  updateServiceParam,
+} = require("login.dfe.api-client/services");
 const logger = require("../../infrastructure/logger");
 const {
   getUserServiceRoles,
@@ -93,6 +96,7 @@ const buildCurrentServiceModel = async (req) => {
   });
   return {
     name: service.name || "",
+    isIdOnlyService: !!service.isIdOnlyService,
   };
 };
 
@@ -110,10 +114,12 @@ const validate = async (req, currentService) => {
       serviceConfigurationChanges.responseTypes?.newValue,
     );
     const selectedRedirects = processRedirectUris(
-      serviceConfigurationChanges.redirectUris?.newValue,
+      serviceConfigurationChanges.redirectUris?.newValue ??
+        serviceConfigurationChanges.redirectUris?.oldValue,
     );
     const selectedLogout = processRedirectUris(
-      serviceConfigurationChanges.postLogoutRedirectUris?.newValue,
+      serviceConfigurationChanges.postLogoutRedirectUris?.newValue ??
+        serviceConfigurationChanges.postLogoutRedirectUris?.oldValue,
     );
 
     let tokenEndpointAuthMethod;
@@ -164,11 +170,11 @@ const validate = async (req, currentService) => {
     const { serviceHome, postResetUrl, clientId } = model.service;
     if (model.service.postLogoutRedirectUris === undefined) {
       model.service.postLogoutRedirectUris =
-        serviceConfigurationChanges.postLogoutRedirectUris.oldValue;
+        serviceConfigurationChanges.postLogoutRedirectUris?.oldValue ?? [];
     }
     if (model.service.redirectUris === undefined) {
       model.service.redirectUris =
-        serviceConfigurationChanges.redirectUris.oldValue;
+        serviceConfigurationChanges.redirectUris?.oldValue ?? [];
     }
     const urlValidator = new UrlValidator(serviceHome);
     const lengthResult = await isCorrectLength(urlValidator);
@@ -528,6 +534,8 @@ const postConfirmServiceConfig = async (req, res) => {
         };
       });
 
+    const hideChange = serviceConfigChanges?.isServiceHidden;
+
     const { CLIENT_SECRET_POST } = TOKEN_ENDPOINT_AUTH_METHOD;
 
     const updatedService = {
@@ -542,14 +550,38 @@ const postConfirmServiceConfig = async (req, res) => {
       apiSecret: model.service.apiSecret
         ? encrypt(model.service.apiSecret)
         : model.service.apiSecret,
-      // If tokenEndpointAuthMethod isn't 'client_secret_post', store NULL in the DB.
       tokenEndpointAuthMethod:
         model.service.tokenEndpointAuthMethod === CLIENT_SECRET_POST
           ? CLIENT_SECRET_POST
           : null,
+      ...(hideChange?.newValue !== undefined &&
+        currentService.isIdOnlyService && {
+          isHiddenService: hideChange.newValue === "Hidden" ? 1 : 0,
+        }),
     };
 
     await updateService(req.params.sid, updatedService);
+
+    if (hideChange?.newValue !== undefined) {
+      const shouldHide = hideChange.newValue === "Hidden";
+      await Promise.all([
+        updateServiceParam({
+          serviceId: req.params.sid,
+          paramName: "hideApprover",
+          paramValue: shouldHide ? "true" : "false",
+        }),
+        updateServiceParam({
+          serviceId: req.params.sid,
+          paramName: "hideSupport",
+          paramValue: shouldHide ? "true" : "false",
+        }),
+        updateServiceParam({
+          serviceId: req.params.sid,
+          paramName: "helpHidden",
+          paramValue: shouldHide ? "true" : "false",
+        }),
+      ]);
+    }
 
     logger.audit(`${req.user.email} updated service configuration`, {
       type: "manage",
