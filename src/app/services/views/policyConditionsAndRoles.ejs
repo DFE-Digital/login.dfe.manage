@@ -8,7 +8,7 @@
                 </h2>
             </div>
             <div class="govuk-notification-banner__content">
-                <p class="govuk-body">
+                <p class="govuk-body" style="word-break: break-all; overflow-wrap: anywhere;">
                     <%=locals.flash.info%>
                 </p>
             </div>
@@ -23,7 +23,7 @@
                 </h2>
             </div>
             <div class="govuk-notification-banner__content">
-                <p class="govuk-body">
+                <p class="govuk-body" style="word-break: break-all; overflow-wrap: anywhere;">
                     <%=locals.flash.error%>
                 </p>
             </div>
@@ -162,9 +162,9 @@
                         <% for (let i = 0; i < locals.policy.roles.length; i++) { %>
                             <% const role = locals.policy.roles[i];%>
                             <tr class="govuk-table__row">
-                                <td class="govuk-table__cell" style="overflow-wrap: break-word;"><%= role.name %></td>
-                                <td class="govuk-table__cell" style="overflow-wrap: break-word;"><%= role.code %></td>
-                                <td class="govuk-table__cell" style="overflow-wrap: break-word;"><%= role.numericId %></td>
+                                <td class="govuk-table__cell" style="word-break: break-all; overflow-wrap: anywhere;"><%= role.name %></td>
+                                <td class="govuk-table__cell" style="word-break: break-all; overflow-wrap: anywhere;"><%= role.code %></td>
+                                <td class="govuk-table__cell" style="word-break: break-all; overflow-wrap: anywhere;"><%= role.numericId %></td>
                                 <td class="govuk-table__cell govuk-table__cell--numeric"><%= role.status ? role.status.id : '' %></td>
                                 <%  if (locals.canUserModifyPolicyConditionsAndRoles) { %>
                                     <td class="govuk-table__cell">
