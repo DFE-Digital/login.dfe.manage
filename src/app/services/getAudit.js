@@ -56,6 +56,7 @@ const describeAuditEvent = async (audit, req) => {
   const AUDIT_MESSAGE_SUBTYPES = new Set([
     "service-request-approved",
     "sub-service-request-approved",
+    "sub-service-roles-request-approved",
     "organisation-request-approved",
     "service-request-rejected",
     "sub-service-request-rejected",
