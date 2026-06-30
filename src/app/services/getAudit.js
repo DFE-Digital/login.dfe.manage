@@ -167,6 +167,10 @@ const describeAuditEvent = async (audit, req) => {
     return `Edited permission level to ${editedFields.newValue} for user ${viewedUser.firstName} ${viewedUser.lastName} in organisation ${editedFields.organisation}`;
   }
 
+  if (audit.type === "sub-service" && audit.subType === "sub-service-request") {
+    return "Requested sub-service access";
+  }
+
   return `${audit.type} / ${audit.subType}`;
 };
 
