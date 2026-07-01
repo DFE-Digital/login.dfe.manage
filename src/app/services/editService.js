@@ -28,6 +28,7 @@ const getSingleServiceForUser = async (userId, organisationId, serviceId) => {
     id: userService.serviceId,
     roles: userService.roles,
     name: application.name,
+    clientId: application.relyingParty?.clientId,
   };
 };
 
@@ -55,6 +56,7 @@ const getViewModel = async (req) => {
     service: {
       name: userService.name,
       id: userService.id,
+      clientId: userService.clientId,
     },
     serviceRoles,
     selectedRoles: [],
@@ -75,6 +77,17 @@ const getViewModel = async (req) => {
 
 const get = async (req, res) => {
   const model = await getViewModel(req);
+  if (
+    model.organisation.category?.id === "054" &&
+    model.service.clientId !== "ukRlp"
+  ) {
+    return res.redirect(
+      getReturnUrl(
+        req.query,
+        `/services/${req.params.sid}/users/${req.params.uid}/organisations`,
+      ),
+    );
+  }
   if (req.session.service) {
     model.selectedRoles = req.session.service.roles;
   }

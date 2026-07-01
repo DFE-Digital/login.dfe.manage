@@ -59,14 +59,34 @@ const getModel = async (req) => {
   };
 };
 
+const isUkrlpOnlyOrg = (organisation, service) =>
+  organisation.category?.id === "054" &&
+  service.relyingParty?.clientId !== "ukRlp";
+
 const get = async (req, res) => {
   const model = await getModel(req);
+  if (isUkrlpOnlyOrg(model.organisation, model.service)) {
+    return res.redirect(
+      getReturnUrl(
+        req.query,
+        `/services/${req.params.sid}/users/${req.params.uid}/organisations`,
+      ),
+    );
+  }
   return res.render("services/views/confirmAssociateService", model);
 };
 
 const post = async (req, res) => {
   const model = await getModel(req);
   const { user, organisation, service, roles } = model;
+  if (isUkrlpOnlyOrg(organisation, service)) {
+    return res.redirect(
+      getReturnUrl(
+        req.query,
+        `/services/${req.params.sid}/users/${req.params.uid}/organisations`,
+      ),
+    );
+  }
 
   const selectedRoles = req.session.service.roles;
   const invitationId = user.id.startsWith("inv-")

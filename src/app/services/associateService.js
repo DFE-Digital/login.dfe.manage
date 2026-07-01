@@ -49,6 +49,17 @@ const getViewModel = async (req) => {
 
 const get = async (req, res) => {
   const model = await getViewModel(req);
+  if (
+    model.organisation.category?.id === "054" &&
+    model.service.relyingParty?.clientId !== "ukRlp"
+  ) {
+    return res.redirect(
+      getReturnUrl(
+        req.query,
+        `/services/${req.params.sid}/users/${req.params.uid}/organisations`,
+      ),
+    );
+  }
   return res.render("services/views/associateService", model);
 };
 
