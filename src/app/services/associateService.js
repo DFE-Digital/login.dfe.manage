@@ -51,7 +51,7 @@ const get = async (req, res) => {
   const model = await getViewModel(req);
   if (
     model.organisation.category?.id === "054" &&
-    model.service.relyingParty?.clientId !== "ukRlp"
+    model.service.relyingParty?.client_id !== "ukRlp"
   ) {
     return res.redirect(
       getReturnUrl(
@@ -67,6 +67,22 @@ const post = async (req, res) => {
   let selectedRoles = req.body.role ? req.body.role : [];
   if (!(selectedRoles instanceof Array)) {
     selectedRoles = [req.body.role];
+  }
+
+  const [organisation, service] = await Promise.all([
+    getOrganisationRaw({ by: { organisationId: req.params.oid } }),
+    getServiceRaw({ by: { serviceId: req.params.sid } }),
+  ]);
+  if (
+    organisation?.category?.id === "054" &&
+    service?.relyingParty?.client_id !== "ukRlp"
+  ) {
+    return res.redirect(
+      getReturnUrl(
+        req.query,
+        `/services/${req.params.sid}/users/${req.params.uid}/organisations`,
+      ),
+    );
   }
 
   const uid =

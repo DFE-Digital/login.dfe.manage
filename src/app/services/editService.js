@@ -28,7 +28,7 @@ const getSingleServiceForUser = async (userId, organisationId, serviceId) => {
     id: userService.serviceId,
     roles: userService.roles,
     name: application.name,
-    clientId: application.relyingParty?.clientId,
+    clientId: application.relyingParty?.client_id,
   };
 };
 
@@ -100,6 +100,22 @@ const post = async (req, res) => {
   let selectedRoles = req.body.role ? req.body.role : [];
   if (!(selectedRoles instanceof Array)) {
     selectedRoles = [req.body.role];
+  }
+
+  const [organisation, service] = await Promise.all([
+    getOrganisationRaw({ by: { organisationId: req.params.oid } }),
+    getServiceRaw({ by: { serviceId: req.params.sid } }),
+  ]);
+  if (
+    organisation?.category?.id === "054" &&
+    service?.relyingParty?.client_id !== "ukRlp"
+  ) {
+    return res.redirect(
+      getReturnUrl(
+        req.query,
+        `/services/${req.params.sid}/users/${req.params.uid}/organisations`,
+      ),
+    );
   }
 
   const uid =
