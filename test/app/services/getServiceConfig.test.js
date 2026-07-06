@@ -218,6 +218,7 @@ describe("when getting the service config page", () => {
       clientSecret: "new-secret",
       description: "service description",
       grantTypes: ["refresh_token", "authorization_code"],
+      isServiceHidden: false,
       name: "service one",
       postLogoutRedirectUris: "https://new.logout.com",
       postResetUrl: "https://new.postreset.com",

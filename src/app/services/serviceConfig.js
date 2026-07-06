@@ -22,6 +22,18 @@ const {
 } = require("./utils");
 const { decrypt } = require("login.dfe.api-client/encryption");
 
+const isTruthyParam = (v) => v === true || v === 1 || v === "true" || v === "1";
+
+const isServiceHiddenFromDb = (service) => {
+  const params = service.relyingParty?.params;
+  const paramsTruthy =
+    isTruthyParam(params?.hideApprover) &&
+    isTruthyParam(params?.hideSupport) &&
+    isTruthyParam(params?.helpHidden);
+  if (!service.isIdOnlyService) return paramsTruthy;
+  return paramsTruthy && isTruthyParam(service.isHiddenService);
+};
+
 const buildServiceModelFromObject = (service, sessionService = {}) => {
   let tokenEndpointAuthMethod = null;
   const { CLIENT_SECRET_POST, CLIENT_SECRET_BASIC } =
@@ -114,15 +126,26 @@ const buildCurrentServiceModel = async (req) => {
         service.relyingParty.api_secret,
       );
     }
+
+    const apiIsServiceHidden = isServiceHiddenFromDb(service);
+    const sessionHideValue = sessionService?.isServiceHidden?.newValue;
+    const isServiceHidden =
+      sessionHideValue !== undefined
+        ? sessionHideValue === "Hidden"
+        : apiIsServiceHidden;
+
     const currentServiceModel = buildServiceModelFromObject(
       service,
       sessionService,
     );
+    currentServiceModel.isServiceHidden = isServiceHidden;
+
     const oldServiceConfigModel = buildServiceModelFromObject(service);
 
     return {
       currentServiceModel,
       oldServiceConfigModel,
+      apiIsServiceHidden,
     };
   } catch (error) {
     throw new Error(`Could not build service model - ${error}`);
@@ -239,6 +262,7 @@ const validate = async (req, currentService, oldService) => {
       apiSecret: req.body.apiSecret,
       tokenEndpointAuthMethod,
       refreshToken,
+      isServiceHidden: req.body.isServiceHidden === "on",
     },
     authFlowType,
     backLink: `/services/${req.params.sid}`,
@@ -385,6 +409,10 @@ const validate = async (req, currentService, oldService) => {
     model.validationMessages.clientId = ERROR_MESSAGES.CLIENT_ID_UNAVAILABLE;
   }
 
+  // NOTE (NSA-9688): this validation runs even when the only change being saved is the
+  // "Hide this service" checkbox. A service with no redirect_uris configured cannot be
+  // hidden/unhidden via this form until at least one redirect URI is added. This is a
+  // known, accepted limitation — see NSA-9688 ticket comments for the product decision.
   if (!model.service.redirectUris || !model.service.redirectUris.length > 0) {
     model.validationMessages.redirect_uris =
       ERROR_MESSAGES.MISSING_REDIRECT_URL;
@@ -444,6 +472,10 @@ const validate = async (req, currentService, oldService) => {
       ERROR_MESSAGES.REDIRECT_URLS_NOT_UNIQUE;
   }
 
+  // NOTE (NSA-9688): this validation runs even when the only change being saved is the
+  // "Hide this service" checkbox. A service with no redirect_uris configured cannot be
+  // hidden/unhidden via this form until at least one redirect URI is added. This is a
+  // known, accepted limitation — see NSA-9688 ticket comments for the product decision.
   if (
     !model.service.postLogoutRedirectUris ||
     !model.service.postLogoutRedirectUris.length > 0
@@ -588,12 +620,19 @@ const postServiceConfig = async (req, res) => {
         return editedField;
       });
 
+    const oldIsServiceHidden = serviceModels.apiIsServiceHidden
+      ? "Hidden"
+      : "Visible";
+    const newIsServiceHidden =
+      req.body.isServiceHidden === "on" ? "Hidden" : "Visible";
+    const hideServiceChanged = oldIsServiceHidden !== newIsServiceHidden;
+
     const { sid } = req.params;
     req.session.serviceConfigurationChanges =
       req.session.serviceConfigurationChanges || {};
     req.session.serviceConfigurationChanges[sid] = {};
 
-    if (editedFields && editedFields.length > 0) {
+    if (editedFields.length > 0 || hideServiceChanged) {
       editedFields.map(
         ({ name, oldValue, newValue, isSecret, secretNewValue }) => {
           if (!req.session.serviceConfigurationChanges[sid][name]) {
@@ -636,7 +675,15 @@ const postServiceConfig = async (req, res) => {
         req.session.serviceConfigurationChanges[sid].redirectUris.newValue =
           undefined;
       }
+
+      if (hideServiceChanged) {
+        req.session.serviceConfigurationChanges[sid].isServiceHidden = {
+          oldValue: oldIsServiceHidden,
+          newValue: newIsServiceHidden,
+        };
+      }
     }
+
     return res.redirect("review-service-configuration#");
   } catch (error) {
     throw new Error(error);
@@ -647,4 +694,5 @@ module.exports = {
   getServiceConfig,
   postServiceConfig,
   getGrantTypes,
+  isServiceHiddenFromDb,
 };

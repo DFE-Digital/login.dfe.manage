@@ -48,17 +48,25 @@
                     </div>
                   </dt>
                   <dd class="govuk-summary-list__value">
-                    <% if (e.removedValues && e.removedValues.length > 0) { %>
-                      <p class="govuk-body govuk-!-font-weight-bold">Removed:</p>
-                      <% e.removedValues.forEach((value) => { %>
-                        <p class="govuk-body"><%- value %></p>
-                      <% }); %>
-                    <% } %>
-                    <% if (e.addedValues && e.addedValues.length > 0) { %>
-                      <p class="govuk-body govuk-!-font-weight-bold">Added:</p>
-                      <% e.addedValues.forEach((value) => { %>
-                        <p class="govuk-body"><%- value %></p>
-                      <% }); %>
+                    <% if (e.isToggle) { %>
+                      <% if (e.addedValues && e.addedValues.length > 0) { %>
+                        <% e.addedValues.forEach((value) => { %>
+                          <p class="govuk-body"><%- value %></p>
+                        <% }); %>
+                      <% } %>
+                    <% } else { %>
+                      <% if (e.removedValues && e.removedValues.length > 0) { %>
+                        <p class="govuk-body govuk-!-font-weight-bold">Removed:</p>
+                        <% e.removedValues.forEach((value) => { %>
+                          <p class="govuk-body"><%- value %></p>
+                        <% }); %>
+                      <% } %>
+                      <% if (e.addedValues && e.addedValues.length > 0) { %>
+                        <p class="govuk-body govuk-!-font-weight-bold">Added:</p>
+                        <% e.addedValues.forEach((value) => { %>
+                          <p class="govuk-body"><%- value %></p>
+                        <% }); %>
+                      <% } %>
                     <% } %>
                   </dd>
                   <dd class="govuk-summary-list__actions">
