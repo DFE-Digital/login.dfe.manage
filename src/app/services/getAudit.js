@@ -56,6 +56,7 @@ const describeAuditEvent = async (audit, req) => {
   const AUDIT_MESSAGE_SUBTYPES = new Set([
     "service-request-approved",
     "sub-service-request-approved",
+    "sub-service-roles-request-approved",
     "organisation-request-approved",
     "service-request-rejected",
     "sub-service-request-rejected",
@@ -164,6 +165,10 @@ const describeAuditEvent = async (audit, req) => {
       audit.editedFields.find((x) => x.name === "edited_permission");
     const viewedUser = await getCachedUserById(audit.editedUser, req.id);
     return `Edited permission level to ${editedFields.newValue} for user ${viewedUser.firstName} ${viewedUser.lastName} in organisation ${editedFields.organisation}`;
+  }
+
+  if (audit.type === "sub-service" && audit.subType === "sub-service-request") {
+    return "Requested sub-service access";
   }
 
   return `${audit.type} / ${audit.subType}`;
