@@ -97,6 +97,14 @@ const amendChangesBaseUrl = `service-configuration?action=${ACTIONS.AMEND_CHANGE
 
 // Service configuration fields and their description displayed in the `Review service configuration changes` page
 const SERVICE_CONFIG_CHANGES_SUMMARY_DETAILS = {
+  isServiceHidden: {
+    title: "Hide service",
+    description:
+      "Whether this service is hidden from users, approvers, the help site, and support.",
+    changeLink: `${amendChangesBaseUrl}#isServiceHidden-form-group`,
+    displayOrder: 0,
+    isToggle: true,
+  },
   serviceHome: {
     title: "Home URL",
     description:

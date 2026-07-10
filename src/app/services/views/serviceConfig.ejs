@@ -185,6 +185,25 @@
                         <input class="form-control govuk-input" id="postResetUrl" name="postResetUrl" type="text"
                             value="<%-locals.service.postResetUrl%>" />
                     </div>
+
+                <div class="govuk-form-group" id="isServiceHidden-form-group">
+                  <fieldset class="govuk-fieldset" aria-describedby="isServiceHidden-hint">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                      <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Hide service</h2>
+                    </legend>
+                    <div id="isServiceHidden-hint" class="govuk-hint">
+                      Tick to hide this service from users, approvers, the help site, and support. Untick to make it visible again.
+                    </div>
+                    <div class="govuk-checkboxes">
+                      <div class="multiple-choice govuk-checkboxes__item">
+                        <input class="govuk-checkboxes__input" id="isServiceHidden" name="isServiceHidden" type="checkbox" value="on" <%= locals.service.isServiceHidden ? 'checked' : '' %>>
+                        <label class="govuk-label govuk-checkboxes__label" for="isServiceHidden">
+                          Hide this service
+                        </label>
+                      </div>
+                    </div>
+                  </fieldset>
+                </div>
                 </fieldset>
 
                 <hr class="govuk-section-break govuk-section-break--visible">
