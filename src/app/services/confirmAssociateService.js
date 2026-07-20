@@ -61,7 +61,7 @@ const getModel = async (req) => {
 
 const isUkrlpOnlyOrg = (organisation, service) =>
   organisation.category?.id === "054" &&
-  service.relyingParty?.clientId !== "ukRlp";
+  service.relyingParty?.client_id !== "ukRlp";
 
 const get = async (req, res) => {
   const model = await getModel(req);
