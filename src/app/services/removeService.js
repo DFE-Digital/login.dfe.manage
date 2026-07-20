@@ -80,7 +80,7 @@ const post = async (req, res) => {
         removedOrgId: req.params.oid,
       });
     } catch (e) {
-      logger.error(
+      logger.warn(
         `Failed to notify legacy WS Sync on service removal for user ${req.params.uid}`,
         e,
       );
