@@ -22,9 +22,6 @@ jest.mock("login.dfe.api-client/services", () => ({
   getServiceRaw: jest.fn(),
 }));
 jest.mock("login.dfe.api-client/organisations");
-jest.mock("login.dfe.jobs-client", () => ({
-  ServiceNotificationsClient: jest.fn(),
-}));
 
 const { getRequestMock, getResponseMock } = require("../../utils");
 const { getUserDetails } = require("../../../src/app/services/utils");
@@ -38,14 +35,8 @@ const {
   deleteServiceAccessFromInvitation,
 } = require("login.dfe.api-client/invitations");
 const { deleteUserServiceAccess } = require("login.dfe.api-client/users");
-const { ServiceNotificationsClient } = require("login.dfe.jobs-client");
 const postRemoveService =
   require("../../../src/app/services/removeService").post;
-
-const mockNotifyUserUpdated = jest.fn();
-ServiceNotificationsClient.mockImplementation(() => ({
-  notifyUserUpdated: mockNotifyUserUpdated,
-}));
 
 const res = getResponseMock();
 
@@ -96,8 +87,6 @@ describe("when displaying the remove service access view", () => {
     deleteUserServiceAccess.mockReset();
     deleteServiceAccessFromInvitation.mockReset();
     updateUserDetailsInSearchIndex.mockReset();
-    mockNotifyUserUpdated.mockReset();
-    ServiceNotificationsClient.mockClear();
   });
 
   it("then it should delete service for invitation if request for invitation", async () => {
@@ -160,22 +149,5 @@ describe("when displaying the remove service access view", () => {
     expect(res.redirect.mock.calls[0][0]).toBe(
       `/services/${req.params.sid}/users/${req.params.uid}/organisations?returnOrg=${orgId}`,
     );
-  });
-
-  it("calls notifyUserUpdated with removedServiceId and removedOrgId for a regular user", async () => {
-    await postRemoveService(req, res);
-
-    expect(mockNotifyUserUpdated).toHaveBeenCalledWith({
-      sub: req.params.uid,
-      removedServiceId: req.params.sid,
-      removedOrgId: req.params.oid,
-    });
-  });
-
-  it("does not call notifyUserUpdated for an invitation user", async () => {
-    const invReq = { ...req, params: { ...req.params, uid: "inv-abc123" } };
-    await postRemoveService(invReq, res);
-
-    expect(mockNotifyUserUpdated).not.toHaveBeenCalled();
   });
 });
